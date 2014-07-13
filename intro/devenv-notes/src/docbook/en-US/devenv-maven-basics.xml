@@ -1,0 +1,697 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="devenv-mavenbasics">
+    <title>Maven Basics</title>
+    
+    <section id="devenv-mavenbasics-dirs">
+        <title>Directory Structure</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Follows a standard layout by convention</para></listitem>
+            <listitem><para>Can be customized</para></listitem>
+            <listitem><para>Root directory stays fairly clean</para></listitem>
+        </itemizedlist>                   
+        <programlisting language=""><![CDATA[|-- pom.xml
+|-- src
+|   |-- main
+|   `-- test
+`-- target
+    |-- classes
+    |-- ex1-1.0-SNAPSHOT.jar
+    |-- surefire-reports
+    `-- test-classes
+        ]]></programlisting>
+        <variablelist spacing="compact">
+            <varlistentry>
+                <term><filename>src</filename></term>
+                <listitem><para>Source tree for all developed code</para></listitem>
+            </varlistentry>
+            
+            <varlistentry>
+                <term><filename>target</filename></term>
+                <listitem><para>Build tree for artifacts created by the build</para>
+                </listitem>
+            </varlistentry>
+            
+            <varlistentry>
+                <term><filename>pom.xml</filename></term>
+                <listitem><para>Defines the build</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Managed by CM along with src tree</para></listitem>
+                        <listitem><para>Related artifacts normally placed in src/compile, etc.</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+        
+        <section id="devenv-mavenbasics-src">
+            <title>Source Tree</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Managed by CM</para></listitem>
+                <listitem><para>Should not contain any auto-generated artifacts</para></listitem>
+            </itemizedlist>                   
+            <programlisting language="">
+<![CDATA[src
+|-- main
+|   |-- java
+|   |   `-- myorg
+|   |       `-- mypackage
+|   |           `-- ex1
+|   |               `-- App.java
+|   `-- resources
+`-- test
+    |-- java
+    |   `-- myorg
+    |       `-- mypackage
+    |           `-- ex1
+    |               `-- AppTest.java
+    `-- resources
+        `-- log4j.xml]]></programlisting>
+                    
+            <variablelist spacing="compact">
+                <varlistentry>
+                    <term><filename>main</filename></term>
+                    <listitem><para>Contains production artifacts for module</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Built artifacts from this tree are generally placed in the produced archive</para>
+                            <programlisting language=""><![CDATA[jar tf target/ex1-1.0-SNAPSHOT.jar 
+META-INF/
+META-INF/MANIFEST.MF
+myorg/
+myorg/mypackage/
+myorg/mypackage/ex1/
+myorg/mypackage/ex1/App.class
+...]]></programlisting>
+                            </listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term><filename>test</filename></term>
+                    <listitem><para>Contains test artifacts for module</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Built artifacts from this tree are not generally placed in the produced archive</para></listitem>
+                            <listitem><para>A separate archive of built test artifacts can be optionally generated for reuse</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term><filename>[main or test]/java</filename></term>
+                    <listitem><para>Contains Java classes</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Placed in a directory that matches the Java package for the class</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term><filename>[main or test]/resources</filename></term>
+                    <listitem><para>Contains property or other data files</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Generally copied to target tree as-is or optionally filtered by the build</para></listitem>
+                        </itemizedlist>
+                        <note>
+                            <para>Resource filtering is when substitution ${placeholder}s in source files are replaced by their declared 
+                                property values in the target tree. This is quite useful in customizing URLs, credentials, and other properties that 
+                                might be unique to the current build environment. Properties can be defined in the pom.xml, settings.xml or
+                                injected into the build through various plugins (e.g., inject current date).
+                            </para>
+                        </note>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </section>             
+        
+        <section id="devenv-mavenbasics-target">
+            <title>Build Tree</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Not managed by CM</para></listitem>
+                <listitem><para>Contains auto-generated artifacts</para></listitem>
+                <listitem><para>Can be deleted at any time</para></listitem>
+            </itemizedlist>                   
+            <programlisting language=""><![CDATA[target
+|-- classes
+|   `-- myorg
+|       `-- mypackage
+|           `-- ex1
+|               `-- App.class
+|-- ex1-1.0-SNAPSHOT.jar
+|-- log4j-out.txt
+|-- surefire-reports
+|   |-- myorg.mypackage.ex1.AppTest.txt
+|   `-- TEST-myorg.mypackage.ex1.AppTest.xml
+`-- test-classes
+    |-- log4j.xml
+    `-- myorg
+        `-- mypackage
+            `-- ex1
+                `-- AppTest.class]]></programlisting>
+            <variablelist spacing="compact">
+                <varlistentry>
+                    <term><filename>classes</filename></term>
+                    <listitem><para>An exploded directory tree for built artifacts to be placed into the module archive</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Mixture of Java and resource artifacts</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term><filename>test-classes</filename></term>
+                    <listitem><para>An exploded directory tree for built artifacts used for test</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Mixture of Java and resource artifacts</para></listitem>
+                            <listitem><para>Part of the test classpath</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term><filename>*-reports</filename></term>
+                    <listitem><para>Results of unit and integration testing</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para><filename>surefire-reports</filename> unit test results</para></listitem>
+                            <listitem><para><filename>failsafe-reports</filename> integration test results</para></listitem>
+                            <listitem><para>Locate details of test pass/failures within this directory</para>
+                            <programlisting language=""><![CDATA[$ mvn clean test
+...
+Failed tests:   testFail(myorg.mypackage.ex1.AppTest): app didn't return 0
+
+Tests run: 2, Failures: 1, Errors: 0, Skipped: 0
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+...
+
+$ more target/surefire-reports/*.txt
+-------------------------------------------------------------------------------
+Test set: myorg.mypackage.ex1.AppTest
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.608 sec <<< FAILURE!
+testFail(myorg.mypackage.ex1.AppTest)  Time elapsed: 0.019 sec  <<< FAILURE!
+java.lang.AssertionError: app didn't return 0
+        at org.junit.Assert.fail(Assert.java:93)
+        at org.junit.Assert.assertTrue(Assert.java:43)
+        at myorg.mypackage.ex1.AppTest.testFail(AppTest.java:28)
+...]]></programlisting>
+                            </listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term><filename>{artifactId}-{version}.jar</filename></term>
+                    <listitem><para>Results of unit and integration testing</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Archive with contents of target/classes</para></listitem>
+                            <listitem><para>Can be installed into local Maven repo by build</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term><filename>log4j-out.txt</filename></term>
+                    <listitem><para>An example output file of the build/tests written to the target directory</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Produced by log4j based on configuration in src/test/resources/log4j.xml or log4j.properties</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </section>
+    </section>
+    
+    <section id="devenv-mavenbasics-pom">
+        <title>Maven POM</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Defines the artifact for dependents</para></listitem>
+            <listitem><para>Defines the build of the local module</para></listitem>
+        </itemizedlist>                   
+        <programlisting language="xml"><![CDATA[<?xml version="1.0"?>
+<project 
+    xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>myorg.myproject</groupId>
+    <artifactId>ex1</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>My First Simple Project</name>
+        ...
+    <properties>
+        ...
+    </properties>
+
+    <dependencies>
+        ...
+    <dependencies>
+
+    <build>
+        <plugins>
+            ...
+        </plugins>
+    </build>
+</project>]]></programlisting>
+
+        <section id="devenv-mavenbasics-packaging">
+            <title>Packaging</title>
+            <para>Defines the type of module and automatically enacts a profile of plugs (default=jar)</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>packaging=jar - primary artifact is a Java archive</para></listitem>
+                <listitem><para>packaging=ejb - primary artifact is a JavaEE EJB</para></listitem>
+                <listitem><para>packaging=war - primary artifact is a JavaEE WAR</para></listitem>
+                <listitem><para>packaging=ear - primary artifact is a JavaEE EAR</para></listitem>
+                <listitem><para>packaging=pom - parent pom, used primarily for grouping leaf modules</para></listitem>
+                <listitem><para>packaging=... - custom extensions</para></listitem>
+            </itemizedlist>
+            <para>Value assigned relates to dependency <code>type</code> element</para>
+            <programlisting language=""><![CDATA[<dependency>
+    <groupId>${project.groupId}</groupId>
+    <artifactId>ejbsessionBankEAR</artifactId>
+    <version>${project.version}</version>
+    <type>ear</type>
+    <scope>compile</scope>
+</dependency>]]></programlisting>                        
+
+        </section>
+        
+        <section id="devenv-mavenbasics-gav">
+            <title>Project Identity</title>
+            <subtitle>GroupId, ArtifactId, Version (GAV)</subtitle>
+            <para>Used to uniquely identify the module</para>
+            <programlisting language="xml"><![CDATA[<groupId>myorg.myproject</groupId>
+<artifactId>ex1</artifactId>
+<version>1.0-SNAPSHOT</version>]]></programlisting>
+            <variablelist spacing="compact">
+                <varlistentry>
+                    <term><filename>groupId</filename></term>
+                    <listitem><para>Hierarchical name used to group a set of one or more artifacts</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Represented as a directory structure in repositories</para>
+            <programlisting language=""><![CDATA[myorg/
+`-- myproject
+    `-- ex1
+        |-- 1.0-SNAPSHOT
+        |   |-- ex1-1.0-SNAPSHOT.jar
+        |   |-- ex1-1.0-SNAPSHOT.pom
+        ...]]></programlisting>
+                            </listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term><filename>artifactId</filename></term>
+                    <listitem><para>Base name for the artifacts produced by this module</para>
+            <programlisting language=""><![CDATA[1.0-SNAPSHOT/
+|-- ex1-1.0-SNAPSHOT.jar
+|-- ex1-1.0-SNAPSHOT.pom
+|-- ex1-1.0-SNAPSHOT-tests.jar]]></programlisting>
+                    </listitem>
+                </varlistentry>
+
+
+                <varlistentry>
+                    <term><filename>version</filename></term>
+                    <listitem><para>Version ID for the artifact</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Release: 1.0</para></listitem>
+                            <listitem><para>Snapshot: 1.0-SNAPSHOT</para></listitem>
+                        </itemizedlist>                   
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+
+            <section id="devenv-mavenbasics-gav-snapshots">
+                <title>Snapshot Versions</title>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Timestamped release that does not change name</para></listitem>
+                    <listitem><para>Useful for active development not yet ready for release</para></listitem>
+                    <listitem><para>Dependents poll for new snapshots and get the latest version</para></listitem>
+                    <listitem><para>Easy to use during development but nearly impossible to manage changes</para></listitem>
+                    <listitem><para>-SNAPSHOT suffix added to version</para>
+                        <programlisting language="xml"><![CDATA[<version>1.0-SNAPSHOT</version>]]></programlisting>
+            <programlisting language=""><![CDATA[1.0-SNAPSHOT/
+|-- ex1-1.0-SNAPSHOT.jar]]></programlisting>
+                    </listitem>
+                </itemizedlist>                   
+            </section>
+
+            <section id="devenv-mavenbasics-gav-releases">
+                <title>Releases</title>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Fixed-named version of the artifact</para></listitem>
+                    <listitem><para>Contents should not change -- allows caching, bypass updates</para></listitem>
+                    <listitem><para>No formal numbering scheme except for lack of SNAPSHOT in name</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Plugins and community work best with major.minor.x.y dotted numbering scheme</para></listitem>
+                        </itemizedlist>                   
+                    </listitem>
+                    <listitem><para>Releases should not depend on SNAPSHOTs</para></listitem>
+                </itemizedlist>                   
+            </section>
+        </section>
+        
+        <section id="devenv-mavenbasics-repositories">
+            <title>Maven Repositories</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Locations where Maven stores and locates artifacts</para></listitem>
+                <listitem><para>Each user has a local repository referenced by <code>${settings.localRepository}</code>.
+                    This defaults to $HOME/.m2/repository</para>
+                <programlisting language="xml"><![CDATA[<settings xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+    <localRepository>c:/jhu/repository</localRepository>
+    ...]]></programlisting>
+                </listitem>
+                <listitem><para>MAVEN_HOME/conf/settings.xml defines a core set of remote repositories</para></listitem>
+                <listitem><para>Maven poms can define extensions to the remote repository list</para>
+                <programlisting language="xml"><![CDATA[<repositories>
+    <repository>
+        <id>jboss-nexus</id>
+        <name>JBoss Nexus Repository</name>
+        <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+    </repository>
+</repositories>]]></programlisting>
+                </listitem>
+            </itemizedlist>                   
+            <figure>
+                <title>Maven Repositories
+                    <footnote id="rest-apis-must-be-hypertext-driven"><para>
+                        <ulink url="http://fusesource.com/docs/esb/4.4/esb_deploy_osgi/Locate-BuildTime.html">fusesource.com</ulink>
+                        </para>
+                    </footnote>
+                </title>
+                <graphic scalefit="1" fileref="images/maven-repositories.gif"/>
+            </figure>        
+            <orderedlist>
+                <listitem><para>Maven will first look for a dependency artifact in the local repository</para></listitem>
+                <listitem><para>Maven will then look for a dependency artifact in a remote repository like ibiblio</para></listitem>
+                <listitem><para>Maven will search all known repositories until the artifact is found or all repositories have been checked</para></listitem>
+                <listitem><para>Maven will install module artifacts into the local repository during the <code>install</code> 
+                    phase of the build</para>
+                <programlisting language=""><![CDATA[$ mvn install
+    ...
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ ex1 ---
+[INFO] Installing /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/ex1-1.0-SNAPSHOT.jar to 
+    /home/jcstaff/.m2/repository/myorg/myproject/ex1/1.0-SNAPSHOT/ex1-1.0-SNAPSHOT.jar
+[INFO] Installing /home/jcstaff/proj/ejava-javaee/solutions/ex1/pom.xml to 
+    /home/jcstaff/.m2/repository/myorg/myproject/ex1/1.0-SNAPSHOT/ex1-1.0-SNAPSHOT.pom
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+                ]]></programlisting>
+                    </listitem>
+            </orderedlist>
+            
+            <tip>
+                <title>Use <code>-U</code> to force an update check</title>
+                <para>Maven will limit its search of a remote repository to 
+                    expressed time limits. If it attempts and fails to locate
+                    an artifact from a remote repository it will not re-attempt
+                    to query that repository until the time limit expires. 
+                    Sometimes the failure has nothing to do with the repository
+                    not having the artifact (e.g., wireless network down) and
+                    when you clear the error you can force Maven to retry before
+                    the timeout period expires by adding a <code>-U</code>
+                    to the command line.</para>
+            </tip>
+            <tip>
+                <title>Use the <code>-o</code> offline flag to eliminate repository checks</title>
+                <para>Many times Maven will be too aggressive searching for
+                    artifacts you already know are not of value to the current
+                    build. You can tell Maven to work in an offline mode to
+                    bypass the work involved. This is helpful when you are 
+                    disconnected from the network but will fail if you are truly
+                    missing a required artifact. You can activate/deactivate
+                    the offline more consistently using an element in the 
+                    settings.xml
+                </para>
+                <programlisting language="xml"><![CDATA[<offline>false</offline>]]></programlisting>
+            </tip>
+        </section>
+
+        <section id="devenv-mavenbasics-props">
+            <title>Properties</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Provide a means to define behavior of the build</para></listitem>
+                <listitem><para>Provide a means to define values once and re-use across the build</para></listitem>
+                <listitem><para>Promotes consistency</para></listitem>
+            </itemizedlist>                   
+            <programlisting language="xml"><![CDATA[<properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
+    <java.source.version>1.6</java.source.version>
+    <java.target.version>1.7</java.target.version>
+</properties>]]></programlisting>
+            <itemizedlist spacing="compact">
+                <listitem><para>Properties can also be expressed using <code>-Dkey=value</code> system properties</para></listitem>
+            </itemizedlist>                   
+        </section>
+
+        <section id="devenv-mavenbasics-deps">
+            <title>Dependencies</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Modules depend on artifacts from other modules</para></listitem>
+            </itemizedlist>                   
+            <programlisting language="xml"><![CDATA[<dependencies>
+    <dependency>
+        <groupId>commons-logging</groupId>
+        <artifactId>commons-logging</artifactId>
+        <version>1.1.1</version>
+        <type>jar</type>
+        <scope>compile</scope>
+    </dependency>
+    <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.10</version>
+        <scope>test</scope>
+    </dependency>
+....
+</dependencies>]]></programlisting>
+            <variablelist spacing="compact">
+                <varlistentry>
+                    <term><filename>GAV</filename></term>
+                    <listitem><para>Must provide its groupId, artifactId, and version for each dependency</para></listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term><filename>scope</filename></term>
+                    <listitem><para>Defines when the dependency applies (default=compile)</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>scope=compile - classpath of src/main, src/test, and dependents</para></listitem>
+                            <listitem><para>scope=provided - classpath of src/main, src/test but not dependents</para></listitem>
+                            <listitem><para>scope=test - classpath of src/test but not src/main and dependents</para></listitem>
+                            <listitem><para>scope=runtime - classpath of src/test and dependents but not of src/main</para></listitem>
+                        </itemizedlist>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>scope=import - used to replace locally declared dependencyManagement dependencies with the contents from another pom. 
+                                Useful when declaring complex dependencies and want to make easy wholesale changes in dependency versions.</para></listitem>
+                            <listitem><para>scope=system - used to declare a direct reference to a local archive. Not portable.</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term><filename>type</filename></term>
+                    <listitem><para>Defines the artifact type of ther module (default=jar)</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>type=jar - java archive</para></listitem>
+                            <listitem><para>type=ejb - javaee EJB archive</para></listitem>
+                            <listitem><para>type=war - javaee WAR archive</para></listitem>
+                            <listitem><para>type=ear - javaee EAR archive</para></listitem>
+                            <listitem><para>type=... - custom type</para></listitem>
+                        </itemizedlist>
+                        <para>Value directly relates to the project packaging element of the dependency</para>
+                        <programlisting language=""><![CDATA[|-- ejbsessionBankImpl
+|       |-- ejbsessionBankImpl-3.0.2013.2-SNAPSHOT.jar
+|-- ejbsessionBankEJB
+|       |-- ejbsessionBankEJB-3.0.2013.2-SNAPSHOT.jar
+|-- ejbsessionBankWAR
+|       |-- ejbsessionBankWAR-3.0.2013.2-SNAPSHOT.war
+|-- ejbsessionBankEAR
+|       |-- ejbsessionBankEAR-3.0.2013.2-SNAPSHOT.ear]]></programlisting>                        
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term><filename>classifier</filename></term>
+                    <listitem><para>Defines a special type of artifact/custom from a module</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>classifier=tests - java archive containing test artifacts</para></listitem>
+                            <listitem><para>classifier=sources - java archive containing module source code</para></listitem>
+                            <listitem><para>type=... - custom classifiers</para></listitem>
+                        </itemizedlist>
+                        <programlisting language=""><![CDATA[`-- target
+...
+    |-- txHotelDAO-3.0.2013.2-SNAPSHOT.jar
+    |-- txHotelDAO-3.0.2013.2-SNAPSHOT-sources.jar
+    `-- txHotelDAO-3.0.2013.2-SNAPSHOT-tests.jar]]></programlisting>                        
+                    </listitem>                    
+                </varlistentry>                
+            </variablelist>
+           
+        </section>
+
+        <section id="devenv-mavenbasics-build">
+            <title>Build Definition</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Provides specific instructions for build</para></listitem>
+                <listitem><para>Usually does the right thing by default when possible</para></listitem>
+            </itemizedlist>                   
+    
+            <section id="devenv-mavenbasics-plugins">
+                <title>Build Plugins</title>
+                <itemizedlist spacing="compact">
+                    <listitem><para>All actions of the build are directed by plugins</para></listitem>
+                    <listitem><para>Even the simplest commands will result in plugin downloads when you first start</para></listitem>
+                    <listitem><para>Specific plugins are wired into the build by the module packaging type</para></listitem>
+                    <listitem><para>Plugins have goals (analogous to public methods)</para></listitem>
+                    <listitem><para>Plugins may have default phases for the goals to be executed</para></listitem>
+                    <listitem><para>Plugins can be configured</para></listitem>
+                </itemizedlist>                   
+                <programlisting language=""><![CDATA[<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>2.5.1</version>
+            <configuration>
+                <source>${java.source.version}</source>
+                <target>${java.target.version}</target>
+            </configuration>
+        </plugin>
+         <!-- surefire.argLine is set in debugger profile -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>2.12.2</version>
+            <configuration>
+                <argLine>${surefire.argLine}</argLine>
+            </configuration>
+        </plugin>
+        ...]]></programlisting>
+                <itemizedlist spacing="compact">
+                    <listitem><para>New plugins can be added, but will need to be wired into a specific 
+                        <ulink url="http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html#Lifecycle_Reference">lifecycle phase</ulink>
+                        of the build.
+                        </para>
+                <programlisting language="xml"><![CDATA[<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-failsafe-plugin</artifactId>
+    <version>${maven-failsafe-plugin.version}</version>
+    <configuration>
+        <argLine>${surefire.argLine}</argLine>
+    </configuration>
+    <executions>
+        <execution> <!-- run the tests here -->
+           <id>integration-tests</id>
+               <phase>integration-test</phase>
+           <goals>
+               <goal>integration-test</goal>
+           </goals>
+        </execution>
+        <execution> <!--  delay failures to after undeploy -->
+            <id>verify</id>
+            <phase>verify</phase>
+            <goals>
+                <goal>verify</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>]]></programlisting>
+                        <para>The above example shows the failsafe plugin being configured
+                            to share some properties with surefire and have specific goals 
+                            wired into the integration-test and verify lifecycle phases.</para>
+                    </listitem>
+                </itemizedlist>                           
+            </section>
+        </section>
+    </section>
+        
+    <section id="devenv-mavenbasics-cmds">
+        <title>Maven Commands</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Maven build broken into <ulink url="http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html#Lifecycle_Reference">phases</ulink></para></listitem>
+            <listitem><para>Plugins are added to the build and their goals execute during a specific phase</para></listitem>
+            <listitem><para>Build invoked using the <code>mvn</code> command</para></listitem>
+        </itemizedlist>                   
+        <programlisting language=""><![CDATA[
+$ mvn (phase) (plugin:goal) -D(system-property) -P(profile)
+        ]]></programlisting>
+        <itemizedlist spacing="compact">
+            <listitem><para>phase</para>
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>clean</filename></term>
+                        <listitem><para>Remove contents of target tree</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>test</filename></term>
+                        <listitem><para>Build the src/main and src/test tree and execute the unit tests as defined by the surefire plugin</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>pre-integration</filename></term>
+                        <listitem><para>Perform unit tests and perform any steps required to ready for integration test</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>integration-test</filename></term>
+                        <listitem><para>Perform integration tests as defined by the failsafe plugin</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>post-integration-test</filename></term>
+                        <listitem><para>Tear down anything required to perform integration tests</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>verify</filename></term>
+                        <listitem><para>Evaluate results of integration tests</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>install</filename></term>
+                        <listitem><para>Install module artifacts into local repository</para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </listitem>
+            <listitem><para>(plugin:goal)</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Manually trigger a plugin goal without a specific build lifecycle</para></listitem>
+                    <listitem><para>ex. jetty:run, dependency:tree, or dependency:help</para></listitem>
+                </itemizedlist>            
+            </listitem>
+            <listitem><para>-D(system-property)</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Manually define a system property key or key and value to be used as a property in the build</para></listitem>
+                    <listitem><para>Must configure surefire/failsafe to promote these as properties Junit -- 
+                        these are system properties of the maven build and not of the JVM tasks kicked off
+                        by the maven build.</para></listitem>
+                </itemizedlist>            
+            </listitem>
+            <listitem><para>-P(profile)</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Manually trigger build configurations latched by a profile</para></listitem>
+                    <listitem><para>e.g., which DB driver to use</para></listitem>
+                </itemizedlist>            
+            </listitem>
+            <listitem><para>-P!(profile)</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Manually turn off a profile</para></listitem>
+                    <listitem><para>e.g., turn off a profile activated by a rule or settings.xml</para></listitem>
+                </itemizedlist>
+                <note>
+                    <title>Use -P\!(profile) with bash shell</title>
+                    <para>The bash shell requires the bang ("!") character to be escaped. Use -P\!(profile)
+                        when using the bash shell.</para>
+                </note>            
+            </listitem>
+        </itemizedlist>                   
+    </section>
+</chapter>
+  
+  

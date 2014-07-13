@@ -1,0 +1,74 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="javaee-intro">
+    <bookinfo>
+        <title>Java Enterprise Edition (JavaEE) Intro</title>
+        <subtitle>version 6</subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>
+                This presentation introduces the JavaEE enterprise framework and
+                its associated API standards.
+            </para>
+        </abstract>
+    </bookinfo>
+
+    <preface id="javaeeintro-purpose">
+        <title>Purpose</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Become familiar with JavaEE architectures</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Understand the purpose of Java SE, Java ME, and Java EE</para></listitem>
+                    <listitem><para>Understand the purpose of key Java EE APIs</para></listitem>
+                    <listitem><para>Understand the purpose of the JavaEE container/application server</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Understand the difference between the API and the provider</para></listitem>
+            <listitem><para>Understand there are significant variations of JavaEE architectures</para></listitem>
+        </itemizedlist>
+    </preface>
+
+    <xi:include href="javaee-intro-why.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="javaee-intro-java-levels.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="javaee-intro-javaee-arch.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="javaee-intro-javaee-versions.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="javaee-intro-javaee-specs.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="javaee-intro-ejb.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+    <chapter id="javaeeintro-summary">
+        <title>Summary</title>
+        <itemizedlist>
+            <listitem><para>Made a technical case for JavaEE and EJB</para></listitem>
+            <listitem><para>Described an envolution of EJB</para></listitem>
+            <listitem><para>Showed where EJB fits within the JavaEE Specs</para></listitem>
+            <listitem><para>Introduced 4-5 types of EJBs</para></listitem>
+            <listitem><para>Introduced 3 EJB deployment types</para></listitem>
+        </itemizedlist>
+	</chapter>
+    
+    <appendix id="javaeeintro-sources">
+        <title>Sources</title>
+        <orderedlist>
+            <listitem><para>
+                <emphasis>"Java Platform, Enterprise Edition 6 Specification (JSR-316 Final Release)"</emphasis>,
+                Roberto Chinnici and Bill Shannon, 
+                <ulink url="http://jcp.org/aboutJava/communityprocess/final/jsr316">http://jcp.org/aboutJava/communityprocess/final/jsr316</ulink>,
+                2009 Sun Microsystems.
+                </para>
+            </listitem>
+            <listitem><para>
+                <emphasis>"JavaEE Version History"</emphasis>,
+                Wikipedia, 
+                <ulink url="http://en.wikipedia.org/wiki/Java_EE_version_history">http://en.wikipedia.org/wiki/Java_EE_version_history</ulink>,
+                September 3. 2012.
+                </para>
+            </listitem>
+        </orderedlist>
+    </appendix>
+</book>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>info.ejava.docs</groupId>
+        <artifactId>docs-root</artifactId>
+        <version>4.0.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>info.ejava.docs.intro</groupId>
+    <artifactId>intro-root</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Intro</name>
+    <description>
+        This module provides a root to all course intro topics.
+    </description>
+
+    <modules>
+    </modules>
+
+    <profiles>
+        <profile>
+            <id>docs</id>
+            <modules>
+                <module>javaee-intro-notes</module>
+                <module>605-784-devenv-setup-lab</module>
+                <module>devenv-notes</module>
+            </modules>
+        </profile>
+    </profiles>
+</project>

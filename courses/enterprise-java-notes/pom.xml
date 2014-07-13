@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>info.ejava.docs.build</groupId>
+        <artifactId>docbook-parent</artifactId>
+        <version>4.0.0-SNAPSHOT</version>
+        <relativePath>../../build/docbook-parent</relativePath>
+    </parent>
+
+    <groupId>info.ejava.docs.courses</groupId>
+    <artifactId>enterprise-java-notes</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Courses::Enterprise Java Course Notes</name>
+    <description>
+        This project generates a full set of the presentation topics.
+    </description>
+    
+    <properties>
+       <doc.base>enterprise-java-notes</doc.base>
+       <content.version>v2014-07-12</content.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>info.ejava.docs.intro</groupId>
+            <artifactId>javaee-intro-notes</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+        <dependency>
+            <groupId>info.ejava.docs.intro</groupId>
+            <artifactId>devenv-docbook</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jboss.maven.plugins</groupId>
+                <artifactId>maven-jdocbook-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

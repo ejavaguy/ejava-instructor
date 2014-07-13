@@ -1,0 +1,33 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>info.ejava.docs.build</groupId>
+        <artifactId>docbook-parent</artifactId>
+        <version>4.0.0-SNAPSHOT</version>
+        <relativePath>../../build/docbook-parent</relativePath>
+    </parent>
+
+    <groupId>info.ejava.docs.intro</groupId>
+    <artifactId>devenv-docbook</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Intro::Development Environment Overview</name>
+    <description>
+        This project contains overview information to get started using
+        development tools for enterprise java development.
+    </description>
+    
+    <properties>
+       <doc.base>devenv-book</doc.base>
+       <content.version>v2013-09-09</content.version>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jboss.maven.plugins</groupId>
+                <artifactId>maven-jdocbook-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

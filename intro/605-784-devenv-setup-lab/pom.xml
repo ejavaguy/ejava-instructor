@@ -1,0 +1,35 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>info.ejava.docs.build</groupId>
+        <artifactId>docbook-parent</artifactId>
+        <version>4.0.0-SNAPSHOT</version>
+        <relativePath>../../build/docbook-parent</relativePath>
+    </parent>
+
+    <groupId>info.ejava.docs.intro</groupId>
+    <artifactId>605-784-devenv-setup-lab</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Intro::Enterprise Java (605.784) DevEnv Setup</name>
+    <description>
+        This project contains instructions for setting up a development
+        environment to operate within class. This dev env will be suitable
+        for executing the sample projects and developing class projects
+        to turn in for course work.
+    </description>
+    
+    <properties>
+       <doc.base>605-784-devenv-setup-book</doc.base>
+       <content.version>v2013-09-02</content.version>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jboss.maven.plugins</groupId>
+                <artifactId>maven-jdocbook-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

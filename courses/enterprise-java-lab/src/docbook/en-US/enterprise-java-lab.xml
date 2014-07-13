@@ -1,0 +1,46 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="enterprise-java-lab">
+    <bookinfo>
+        <title>Enterprise Java (JavaEE) Course Exercises</title>
+        <subtitle></subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>
+                This book contains lab exercises covering Enterprise Development with Java. 
+            </para>
+        </abstract>
+    </bookinfo>
+    <preface id="enterprise-java-lab-topics">
+        <title>General Instructions</title>
+        <para></para>
+    </preface>
+    
+    <chapter id="enterprise-java-lab-labs">
+        <title>Lab Exercises</title>
+        <table>
+            <title>General Lab Exercises</title>
+            <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="topic"/>
+            <thead>
+                <row>
+                  <entry>Topic</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="topic"><para><link linkend="605-784-devenv-setup">Development Environment Setup</link></para></entry>
+                </row>
+            </tbody>
+            </tgroup>
+        </table>    
+    </chapter>
+    
+    <xi:include href="605-784-devenv-setup-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>

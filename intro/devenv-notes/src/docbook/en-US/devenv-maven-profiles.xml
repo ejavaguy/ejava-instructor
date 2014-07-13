@@ -1,0 +1,134 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="devenv-mavenprofiles">
+    <title>Maven Profiles</title>
+    <itemizedlist spacing="compact">
+        <listitem><para>Provide groups of conditional configuration</para></listitem>
+        <listitem><para>Adds flexibility to build</para></listitem>
+        <listitem><para>Flexibility can sometimes add confusion for both developers and build tools -- be careful</para></listitem>
+    </itemizedlist>                   
+    
+    <section id="devenv-mavenprofiles-spec">
+        <title>Profile Definition</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Can consist of</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>properties</para></listitem>
+                    <listitem><para>dependencies</para></listitem>
+                    <listitem><para>build elements</para></listitem>
+                    <listitem><para>...</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Cannot include GAV elements</para></listitem>
+        </itemizedlist>                   
+        <programlisting language="xml"><![CDATA[<profile> <!-- defines our default database -->
+        <id>h2db</id>
+        <properties>
+              <jdbc.driver>org.h2.Driver</jdbc.driver>
+              <jdbc.url>jdbc:h2:\${basedir}/target/h2db/ejava</jdbc.url>
+              <jdbc.user>sa</jdbc.user>
+              <jdbc.password/>
+              <hibernate.dialect>
+                  org.hibernate.dialect.H2Dialect
+              </hibernate.dialect>
+        </properties>
+        <dependencies>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </profile>]]></programlisting>
+        <para>The example above defines the properties and dependencies for the H2 database driver
+            when the <code>h2db</code> profile is active</para>
+    </section>
+    
+    
+    
+        
+    <section id="devenv-mavenprofiles-activation">
+        <title>Activation</title>
+
+        <section id="devenv-mavenprofiles-activation-explicit">
+            <title>Explicit Activation/Deactivation</title>
+            <itemizedlist spacing="compact">
+                <listitem>            
+                    <para>Use <code>-P(profile)</code> to manually trigger a profile to be included</para>
+                    <programlisting language=""><![CDATA[$ mvn test -Ph2db]]></programlisting>
+                </listitem>
+
+                <listitem>            
+                    <para>Use <code>-P!(profile)</code> to manually trigger a profile to be excluded. Use -P\!(profile) with bash shell</para>
+                    <programlisting language=""><![CDATA[$ mvn test -P\!h2db]]></programlisting>
+                </listitem>
+
+                <listitem>            
+                    <para>Specify an active profile in settings..xml</para>
+                    <programlisting language=""><![CDATA[<activeProfiles>
+    <activeProfile>jboss7</activeProfile>
+    <activeProfile>h2db</activeProfile>
+</activeProfiles>]]></programlisting>                
+                </listitem>
+            </itemizedlist>                   
+        </section>
+
+        <section id="devenv-mavenprofiles-activation-rule">
+            <title>Activation/Deactivation By Rule</title>
+            <itemizedlist spacing="compact">
+            
+                <listitem><para>Property having a value</para>
+            <programlisting language="xml"><![CDATA[<profile>
+    <id>h2db</id>
+    <activation>
+        <property>
+            <name>jdbcdb</name>
+            <value>h2</value>
+        </property>
+    </activation>]]></programlisting>
+                <para>The h2db profile will activate when -Djdbc=h2 is specified on the command line</para>
+                </listitem>
+
+                <listitem><para>Property existing</para>
+            <programlisting language="xml"><![CDATA[<profile>
+    <id>h2db</id>
+    <activation>
+        <property>
+            <name>h2db</name>
+        </property>
+    </activation>]]></programlisting>
+                <para>The h2db profile will activate when -Dh2db is specified on the command line -- no matter the value</para>
+                </listitem>
+
+                <listitem><para>Property not existing</para>
+            <programlisting language="xml"><![CDATA[<profile>
+    <id>h2db</id>
+    <activation>
+        <property>
+            <name>!h2db</name>
+        </property>
+    </activation>]]></programlisting>
+                <para>The h2db profile will activate when -Dh2db is not specified</para>
+                </listitem>
+
+                <listitem><para>Property not a spefici value</para>
+            <programlisting language="xml"><![CDATA[<profile>
+    <id>h2db</id>
+    <activation>
+        <property>
+            <name>jdbcdb</name>
+            <value>!hsql</value>
+        </property>
+    </activation>]]></programlisting>
+                <para>The h2db profile will activate in cases when -Dhsql is not equal to hsql</para>
+                </listitem>
+                
+            </itemizedlist>                   
+            
+            <para><ulink url="http://maven.apache.org/guides/introduction/introduction-to-profiles.html">more tests</ulink></para>
+        </section>
+
+    </section>
+</chapter>
+  
