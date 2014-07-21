@@ -1,23 +1,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>info.ejava.docs.intro</groupId>
-        <artifactId>intro-root</artifactId>
+        <groupId>info.ejava.docs.jpa</groupId>
+        <artifactId>business-logic</artifactId>
         <version>4.0.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>info.ejava.docs.intro</groupId>
-    <artifactId>devenv-docbook</artifactId>
+    <artifactId>business-logic-notes</artifactId>
     <packaging>pom</packaging>
 
-    <name>Intro::Development Environment Overview</name>
+    <name>JPA::Business Logic::Notes</name>
     <description>
-        This project contains overview information to get started using
-        development tools for enterprise java development.
+        This project contains the documentation for the 
+        business logic topics.
     </description>
     
     <properties>
-       <doc.base>devenv-book</doc.base>
+       <doc.base>business-logic-book</doc.base>
        <content.version>v2013-09-09</content.version>
     </properties>
 

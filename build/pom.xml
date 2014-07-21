@@ -19,17 +19,6 @@
     </description>
 
     <modules>
-        <module>docbook-parent</module>
         <module>ejava-style</module>
     </modules>
-
-    <profiles>
-        <profile>
-            <id>docs</id>
-            <activation>
-            </activation>
-            <modules>
-            </modules>
-        </profile>
-    </profiles>
 </project>

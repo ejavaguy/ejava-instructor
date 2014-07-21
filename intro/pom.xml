@@ -17,16 +17,8 @@
     </description>
 
     <modules>
+        <module>javaee-intro-notes</module>
+        <module>605-784-devenv-setup-lab</module>
+        <module>devenv-notes</module>
     </modules>
-
-    <profiles>
-        <profile>
-            <id>docs</id>
-            <modules>
-                <module>javaee-intro-notes</module>
-                <module>605-784-devenv-setup-lab</module>
-                <module>devenv-notes</module>
-            </modules>
-        </profile>
-    </profiles>
 </project>

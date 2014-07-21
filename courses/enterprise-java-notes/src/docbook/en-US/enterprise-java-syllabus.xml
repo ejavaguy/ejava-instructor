@@ -40,16 +40,16 @@
             <row rowsep="1">
               <entry namest="session">2</entry>
               <entry namest="date"></entry>
-              <entry namest="topic"><link linkend="devenv">Development Environment Overview</link></entry>
+              <entry namest="topic"><para><link linkend="devenv">Development Environment Overview</link></para></entry>
             </row>
             <row rowsep="1">
-              <entry namest="topic"><para>Business Logic</para></entry>
+              <entry namest="topic"><para><link linkend="business-logic">Business Logic</link></para></entry>
             </row>
 
             <row rowsep="1">
-              <entry namest="session">3</entry>
-              <entry namest="date"></entry>
-              <entry namest="topic"><para>Data Access Objects (DAOs)</para></entry>
+               <entry namest="session">3</entry>
+               <entry namest="date"></entry>
+               <entry namest="topic"><para><link linkend="jpa-dao">Data Access Objects (DAOs)</link></para></entry>
             </row>
             <row rowsep="1">
               <entry namest="topic"><para>JPA Entity Manager</para></entry>
