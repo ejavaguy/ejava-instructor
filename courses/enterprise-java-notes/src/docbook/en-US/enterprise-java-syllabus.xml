@@ -74,7 +74,7 @@
               <entry namest="comment"><para>Exercise: Entity Mapping Exercise</para></entry>
             </row>
             <row rowsep="1">
-              <entry namest="topic"><para>Validation API</para></entry>
+              <entry namest="topic"><para><link linkend="jpa-validation">Validation API</link></para></entry>
             </row>
 
             <row rowsep="1">

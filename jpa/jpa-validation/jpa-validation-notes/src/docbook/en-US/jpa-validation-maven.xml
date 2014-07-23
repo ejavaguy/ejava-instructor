@@ -1,0 +1,74 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-validation-maven">
+    <title>Validation API Build/Maven Aspects</title>
+        
+    <section id="jpa-validation-maven-dependencies">
+        <title>Adding POM Dependencies</title>
+        
+        <figure>
+            <title>API Dependency</title>
+<programlisting language="xml"><![CDATA[<dependency>
+    <groupId>javax.validation</groupId>
+    <artifactId>validation-api</artifactId>
+    <version>1.1.0.Final</version>
+    <scope>compile</scope>
+</dependency>]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>Implementation Dependency (includes API dependency)</title>
+<programlisting language="xml"><![CDATA[<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-validator</artifactId>
+    <version>5.0.1.Final</version>
+    <scope>test</scope>
+</dependency>]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>Hibernate Implementation Dependency for @Pattern constraints</title>
+<programlisting language="xml"><![CDATA[<dependency>
+    <groupId>javax.el</groupId>
+    <artifactId>javax.el-api</artifactId>
+    <version>2.2.4</version>
+    <scope>compile</scope>
+</dependency>
+<dependency>
+    <groupId>org.glassfish.web</groupId>
+    <artifactId>javax.el</artifactId>
+    <version>2.2.4</version>
+    <scope>test</scope>
+</dependency>]]></programlisting>                        
+        </figure>
+    </section>
+
+    <section id="jpa-validation-maven-plugins">
+        <title>Adding Plugin Dependencies</title>
+  
+          <figure>
+            <title>Add validator to schema generation pluginManagement</title>
+<programlisting language="xml"><![CDATA[<plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>hibernate3-maven-plugin</artifactId>
+    <version>${hibernate3-maven-plugin.version}</version>
+    <extensions>true</extensions>
+    <dependencies>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>${hibernate3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${hibernate-validator.version}</version>
+        </dependency>
+    </dependencies>
+</plugin>]]></programlisting>                        
+        </figure>
+
+    </section>
+</chapter>
+  

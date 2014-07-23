@@ -38,4 +38,5 @@
     <xi:include href="jpa-dao-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="jpa-entitymgr-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="jpa-entity-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-validation-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </book>

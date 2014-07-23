@@ -57,6 +57,12 @@
             <version>${project.version}</version>
             <classifier>docsrc</classifier>
         </dependency>
+        <dependency>
+            <groupId>info.ejava.docs.jpa</groupId>
+            <artifactId>jpa-validation-notes</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
     </dependencies>
 
     <build>
