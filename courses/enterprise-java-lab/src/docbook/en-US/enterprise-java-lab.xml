@@ -37,10 +37,14 @@
                 <row rowsep="1">
                   <entry namest="topic"><para><link linkend="605-784-devenv-setup">Development Environment Setup</link></para></entry>
                 </row>
+                <row rowsep="1">
+                  <entry namest="topic"><para><link linkend="jpa-entity-ex">Entity Mapping Exercise</link></para></entry>
+                </row>
             </tbody>
             </tgroup>
         </table>    
     </chapter>
     
     <xi:include href="605-784-devenv-setup-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entity-ex-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </book>

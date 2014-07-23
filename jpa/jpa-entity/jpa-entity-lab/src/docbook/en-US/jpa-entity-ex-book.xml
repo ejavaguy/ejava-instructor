@@ -1,0 +1,58 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="jpa-entity-ex">
+    <bookinfo>
+        <title>Java Persistence API: Entity Mapping Exercise</title>
+        <subtitle>Mapping POJOs to RDBMS Tables</subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>This document contains a series of exercises for mapping Java classes (without relationships)
+                to the database using JPA. It covers many of the core and corner mapping issues and demonstrates 
+                various issues that come up.
+            </para>
+        </abstract>
+    </bookinfo>
+    <preface id="jpa-entityex-purpose">
+        <title>Purpose</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>To provide hands on experience</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Defining JPA entity classes and mapping them to a relational database schema</para></listitem>
+                    <listitem><para>Using JPA annotations and XML descriptors</para></listitem>
+                    <listitem><para>Defining primary key mechanisms for entities</para></listitem>
+                    <listitem><para>Defining alternate entity/table mappings that do not require JPA relationships</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>At the completion of this exercise, the student will be able to</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Create a legal POJO to be used as a JPA entity</para></listitem>
+                    <listitem><para>Map POJO classes and properties to database tables and columns</para></listitem>
+                    <listitem><para>Define entity mappings with Java annotations and XML descriptors</para></listitem>
+                    <listitem><para>Define different primary key strategies</para></listitem>
+                    <listitem><para>Define multi-table/single-class joins</para></listitem>
+                    <listitem><para>Define embedded object mappings</para></listitem>
+                    <listitem><para>Generate a database schema based on their entity definitions</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </preface>
+
+    <toc/>
+
+    <xi:include href="jpa-entityex-setup.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entityex-entity.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entityex-properties.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entityex-enum.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entityex-date.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entityex-lob.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entityex-pkgen.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entityex-pkcompound.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entityex-embedded.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entityex-mtmapping.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>
