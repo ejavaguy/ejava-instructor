@@ -52,7 +52,7 @@
                <entry namest="topic"><para><link linkend="jpa-dao">Data Access Objects (DAOs)</link></para></entry>
             </row>
             <row rowsep="1">
-              <entry namest="topic"><para>JPA Entity Manager</para></entry>
+              <entry namest="topic"><para><link linkend="jpa-entitymgr">JPA Entity Manager</link></para></entry>
               <entry namest="comment"><para>Rubinger &amp; Burke: Ch 9</para></entry>
             </row>
             <row rowsep="1">

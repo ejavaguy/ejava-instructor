@@ -1,0 +1,245 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-methods-crud">
+    <title>Entity Manager CRUD Methods</title>
+    
+
+    <section id="jpa-crud-persist">
+        <title>persist()</title>
+        <programlisting language="java"><![CDATA[Author author = new Author();
+author.setFirstName("dr");
+author.setLastName("seuss");
+author.setSubject("children");
+author.setPublishDate(new Date());
+
+log.debug("creating author:" + author);
+em.persist(author);
+log.debug("created author:" + author);]]></programlisting>
+
+        <programlisting language=""><![CDATA[
+-creating author:ejava.examples.daoex.bo.Author@17e7691, id=0, fn=dr, ln=seuss, subject=children, pdate=Sun Sep 16 10:14:32 EDT 2012, version=0
+-created author:ejava.examples.daoex.bo.Author@17e7691, id=50, fn=dr, ln=seuss, subject=children, pdate=Sun Sep 16 10:14:32 EDT 2012, version=0
+]]></programlisting>
+        <itemizedlist spacing="compact">
+            <listitem><para>Inserts entity into database</para></listitem>
+            <listitem><para>Actual insert time depends on transaction active and FlushMode</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Extended Persistence Context - queues insert until transaction active</para></listitem>
+                    <listitem><para>Transaction-Scoped Persistence Context - always has transaction active</para></listitem>
+                    <listitem><para>Flush occurs automatically prior to or during commit()</para></listitem>
+                    <listitem><para>Flush can be forced with manual <code>em.flush()</code> call</para></listitem>
+                </itemizedlist>
+            </listitem>
+            
+            <listitem><para>New or removed entity enters managed state</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>All further changes are watched and will update database</para></listitem>
+                </itemizedlist>                   
+        <programlisting language="java"><![CDATA[
+log.debug("em.contains(author)=" + em.contains(author));
+em.persist(author);
+log.debug("created author:" + author);        
+log.debug("em.contains(author)=" + em.contains(author));
+]]></programlisting>
+        <programlisting language=""><![CDATA[
+-em.contains(author)=false
+-created author:...
+-em.contains(author)=true
+]]></programlisting>
+            </listitem>
+            
+            <listitem><para>Existing entity is ignored</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Cascades will still occur for CascadeType.PERSIST and ALL relationships</para></listitem>
+                </itemizedlist>                   
+        <programlisting language="java"><![CDATA[
+        em.persist(author);
+        ...
+        em.persist(author);
+]]></programlisting>
+            </listitem>
+            
+            <listitem><para>Detached entities will be rejected</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Entities with an identity but not associated with a persistence context</para></listitem>
+                </itemizedlist>                   
+                <programlisting language="java"><![CDATA[
+        Author author = new Author(1);
+        author.setFirstName("dr");
+...
+        log.debug("creating author:" + author);
+        log.debug("em.contains(author)=" + em.contains(author));
+        try {
+            em.persist(author);
+            fail("did not detect detached entity");
+        } catch (PersistenceException ex) {
+            log.debug("caught expected exception:" + ex.getLocalizedMessage(), ex);
+        }
+        log.debug("em.contains(author)=" + em.contains(author));
+]]></programlisting>
+                <programlisting language=""><![CDATA[
+-creating author:ejava.examples.daoex.bo.Author@ad339b, id=1, ...
+-em.contains(author)=false
+-caught expected exception:javax.persistence.PersistenceException: org.hibernate.PersistentObjectException: 
+        detached entity passed to persist: ejava.examples.daoex.bo.Author
+-em.contains(author)=false
+]]></programlisting>
+            </listitem>
+        </itemizedlist>                   
+    </section>
+
+
+
+    <section id="jpa-crud-find">
+        <title>find()</title>
+        <programlisting language="java"><![CDATA[
+<T> T find(Class<T> entityClass, Object primaryKey);
+<T> T find(Class<T> entityClass, Object primaryKey, Map<String, Object> properties);
+        ]]></programlisting>
+        <itemizedlist spacing="compact">
+            <listitem><para>Searches for the entity by primary key value</para></listitem>
+            <listitem><para>Returns managed entity if found, else null</para></listitem>
+            <listitem><para>Properties permitted for vendor-specific values and ignored if not understood</para></listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="jpa-crud-getReference">
+        <title>getReference()</title>
+        <programlisting language="java"><![CDATA[
+<T> T getReference(Class<T> entityClass, Object primaryKey);
+        ]]></programlisting>
+        <itemizedlist spacing="compact">
+            <listitem><para>Searches for the entity by primary key</para></listitem>
+            <listitem><para>Returns a LAZY load reference if found</para></listitem>
+            <listitem><para>Throws EntityNotFoundException if not exist</para></listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="jpa-crud-merge">
+        <title>merge()</title>
+        <programlisting language="java"><![CDATA[
+//create initial author
+Author author = new Author();
+...
+em.persist(author);
+
+//create detached author with changes
+Author author2 = new Author(author.getId());
+author2.setFirstName("updated " + author.getFirstName());
+...
+//merge changes 
+Author tmp = em.merge(author2);
+em.getTransaction().begin();
+em.getTransaction().commit();
+...
+//verify results
+assertFalse("author2 is managed", em.contains(author2));
+assertTrue("tmp Author is not managed", em.contains(tmp));
+assertSame("merged result not existing managed", author, tmp);
+...
+//verify changes were made to the DB
+Author author3 = em.find(Author.class, author.getId());
+assertEquals("updated " + firstName, author3.getFirstName());            
+]]></programlisting>
+        <itemizedlist spacing="compact">
+            <listitem><para>Update database with state of detached object</para></listitem>
+            <listitem><para>State of detached object copied into managed entity or new instance created</para></listitem>
+            <listitem><para>Merging a managed entity is ignored. CascadeType.MERGE and ALL relationships are propagated</para></listitem>
+            <listitem><para>Merging a removed entity instance results in an IllegalArgumentException</para></listitem>
+            <listitem><para>Includes automatic checking of <code>@Version</code> property</para></listitem>
+            <listitem><para>Could be replaced with manual merge</para>
+            <programlisting language="java"><![CDATA[
+public Author update(Author author) {
+    Author dbAuthor = em.find(Author.class, author.getId());
+    dbAuthor.setFirstName(author.getFirstName());
+    dbAuthor.setLastName(author.getLastName());
+    dbAuthor.setSubject(author.getSubject());
+    dbAuthor.setPublishDate(author.getPublishDate());
+    return dbAuthor;
+}
+]]></programlisting>
+                <note>
+                    <para>The above manual merge will successfully merge a transient
+                        entity -- but what errors and conditions does it not 
+                        account for?
+                    </para>
+                </note>
+            </listitem>
+        </itemizedlist>                   
+    </section>
+
+
+
+    <section id="jpa-crud-remove">
+        <title>remove()</title>
+        <programlisting language="java"><![CDATA[
+void remove(Object entity);
+        ]]></programlisting>
+        <itemizedlist spacing="compact">
+            <listitem><para>Managed entity is removed from database</para></listitem>
+            <listitem><para>Actual delete time depends on transaction active and FlushMode</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Extended Persistence Context - queues delete until transaction active</para></listitem>
+                </itemizedlist>
+            </listitem>
+            
+            <listitem><para>New entities are ignored but CascadeType.REMOVE and ALL relationships are cascaded</para>
+        <programlisting language="java"><![CDATA[
+log.debug("em.contains(author)=" + em.contains(author));
+em.remove(author);
+log.debug("em.contains(author)=" + em.contains(author));
+]]></programlisting>
+        <programlisting language=""><![CDATA[
+-em.contains(author)=false
+-HHH000114: Handling transient entity in delete processing
+-em.contains(author)=false
+]]></programlisting>
+            </listitem>
+            
+            <listitem><para>Detached entities are rejected</para>
+        <programlisting language="java"><![CDATA[
+Author author = new Author(1);
+...
+try {
+    em.remove(author);
+    fail("did not reject removal of detached object");
+} catch (IllegalArgumentException ex) {
+    log.debug("caught expected exception:" + ex);
+}
+]]></programlisting>
+        <programlisting language=""><![CDATA[
+-caught expected exception:java.lang.IllegalArgumentException: 
+        Removing a detached instance ejava.examples.daoex.bo.Author#1
+]]></programlisting>
+            </listitem>
+            
+            
+            <listitem><para>Removed entities are ignored</para>
+        <programlisting language="java"><![CDATA[
+Author author = new Author();
+...
+log.debug("peristed:" + author);
+
+log.debug("em.contains(author)=" + em.contains(author));
+em.remove(author);
+log.debug("em.contains(author)=" + em.contains(author));
+
+//entity managers will ignore the removal of a removed entity
+em.remove(author);
+log.debug("em.contains(author)=" + em.contains(author));
+]]></programlisting>
+        <programlisting language=""><![CDATA[
+-peristed:ejava.examples.daoex.bo.Author@6c5356, id=50, ...
+-em.contains(author)=true
+-em.contains(author)=false
+-em.contains(author)=false
+]]></programlisting>
+            </listitem>
+
+        </itemizedlist>                   
+    </section>
+</chapter>
+  
+
+  

@@ -1,0 +1,64 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="jpa-entitymgr">
+    <bookinfo>
+        <title>Java Persistence API</title>
+        <subtitle>Entities and EntityManager</subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>This presentation provides and introduction to JPA and coverage of the 
+                 methods of the EntityManager.
+            </para>
+        </abstract>
+    </bookinfo>
+    <preface id="jpa-entitymgr-purpose">
+        <title>Purpose</title>
+
+        <section id="jpa-entitymgr-goals">
+            <title>Goals</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Introduce the Java Persistence API
+                    and its capabilities</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="jpa-entitymgr-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>have an understanding of:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Requirements for entity classes</para></listitem>
+                        <listitem><para>How to define a persistence unit</para></listitem>
+                        <listitem><para>How to obtain an entity manager</para></listitem>
+                        <listitem><para>Persistence methods available from EntityManager</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>be able to:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Define a Java class as an entity</para></listitem>
+                        <listitem><para>Define a persistence unit with entity class(es)</para></listitem>
+                        <listitem><para>Implement DAO operations in terms of javax.persistence.Persistence API</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+    </preface>
+
+    <toc/>
+
+    <xi:include href="jpa-overview.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-methods-crud.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-methods-membership.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-methods-sync.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-methods-locking.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-methods-query.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-methods-other.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-maven.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>

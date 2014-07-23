@@ -21,7 +21,7 @@
     <preface id="jpa-dao-purpose">
         <title>Purpose</title>
 
-        <section id="jpa-entitymgr-goals">
+        <section id="jpa-dao-goals">
             <title>Goals</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Introduce DAO Pattern</para></listitem>
@@ -30,7 +30,7 @@
             </itemizedlist>
         </section>
 
-        <section id="jpa-entitymgr-objectives">
+        <section id="jpa-dao-objectives">
             <title>Objectives</title>
             <para>At the completion of this topic, the student shall</para>
             <itemizedlist spacing="compact">
