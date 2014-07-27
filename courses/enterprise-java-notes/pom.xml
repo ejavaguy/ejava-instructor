@@ -75,6 +75,12 @@
             <version>${project.version}</version>
             <classifier>docsrc</classifier>
         </dependency>
+        <dependency>
+            <groupId>info.ejava.docs.jpa</groupId>
+            <artifactId>jpa-query-notes</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
     </dependencies>
 
     <build>

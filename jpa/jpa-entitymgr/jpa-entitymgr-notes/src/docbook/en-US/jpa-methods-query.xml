@@ -1,11 +1,11 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="jpa-methods-query">
+<chapter id="jpa-entitymgr-methods-query">
     <title>Entity Manager Query Methods</title>
     
 
-    <section id="jpa-query-jpa">
+    <section id="jpa-entitymgr-query-jpa">
         <title>JPA Queries</title>
         <programlisting language="java"><![CDATA[
 javax.persistence.Query createQuery(String jpaql);
@@ -19,7 +19,7 @@ javax.persistence.Query createNamedQuery(String name);
     </section>
 
 
-    <section id="jpa-query-native">
+    <section id="jpa-entitymgr-query-native">
         <title>Native Queries</title>
         <programlisting language="java"><![CDATA[
 javax.persistence.Query createNativeQuery(String sql);
@@ -31,7 +31,7 @@ javax.persistence.Query createNativeQuery(String sql, String resultMapping);
         </itemizedlist>                   
     </section>
 
-    <section id="jpa-query-criteria">
+    <section id="jpa-entitymgr-query-criteria">
         <title>Criteria Queries</title>
         <programlisting language="java"><![CDATA[
 <T> javax.persistence.TypedQuery<T> createQuery(javax.persistence.criteria.CriteriaQuery<T> criteria);
