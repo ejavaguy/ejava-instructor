@@ -80,14 +80,14 @@
             <row rowsep="1">
               <entry namest="session">5</entry>
               <entry namest="date"></entry>
-              <entry namest="topic"><para>JPA Relationships</para></entry>
+              <entry namest="topic"><para><link linkend="jpa-relation">JPA Relationships</link></para></entry>
               <entry namest="comment"><para>Rubinger &amp; Burke: Ch 11</para></entry>
             </row>
             <row rowsep="1">
               <entry namest="comment"><para>Exercise: Relationship Mapping Exercise</para></entry>
             </row>
             <row rowsep="1">
-              <entry namest="topic"><para>JPA Inheritance</para></entry>
+              <entry namest="topic"><para><link linkend="jpa-inheritance">JPA Inheritance</link></para></entry>
               <entry namest="comment"><para>Rubinger &amp; Burke: Ch 12</para></entry>
             </row>
 

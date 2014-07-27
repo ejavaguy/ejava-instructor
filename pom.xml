@@ -32,36 +32,6 @@
         <build-helper-maven-plugin.version>1.8</build-helper-maven-plugin.version>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>jboss-nexus</id>
-            <name>JBoss Nexus Repository</name>
-            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </snapshots>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>jboss-nexus</id>
-            <name>JBoss Nexus Repository</name>
-            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
 
     <build>
         <pluginManagement>
@@ -135,6 +105,36 @@
                     </dependency>
                 </dependencies>
             </dependencyManagement>
+            <repositories>
+                <repository>
+                    <id>jboss-nexus</id>
+                    <name>JBoss Nexus Repository</name>
+                    <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </snapshots>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>jboss-nexus</id>
+                    <name>JBoss Nexus Repository</name>
+                    <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </snapshots>
+                </pluginRepository>
+            </pluginRepositories>
             <build>
                 <pluginManagement>
                     <plugins>

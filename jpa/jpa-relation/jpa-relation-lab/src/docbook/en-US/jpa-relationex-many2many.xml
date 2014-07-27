@@ -1,0 +1,1431 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-relationex-many2many">
+    <title>Mapping Many-to-Many Relationships</title>
+    <para>By the time you hit this chapter, you should have had the opportunity to see
+       many relationship combinations and now we will cover the last official one: many-to-many.
+       The many-to-many relationship is not a common relationship because it relates entities
+       without any properties associated with the relationships. Commonly a relationship that
+       starts off being a many-to-many will turn into a many-to-one and one-to-many to allow
+       for properties to be assigned to the relationship. In UML data modeling they would refer to the 
+       "one"/entity in the middle as an <ulink url="http://www.agilemodeling.com/style/classDiagram.htm">Associated Class</ulink></para>
+        
+        
+    <section id="jpa-relationex-m2m-setup">
+        <title>Setup</title>
+        <para>Create a JUnit test class to host tests for the many-to-many mappings.</para>
+
+        <orderedlist>
+            <listitem><para>Put the following JUnit test case base class in your src/test tree.
+                You can delete the sample test method once we add our first real test. JUnit
+                will fail a test case if it cannot locate a @Test to run.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex;
+
+import static org.junit.Assert.*;
+
+import javax.persistence.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.*;
+
+public class Many2ManyBiTest extends JPATestBase {
+    private static Log log = LogFactory.getLog(Many2ManyBiTest.class);
+    @Test
+    public void testSample() {
+        log.info("testSample");
+    }
+}
+]]></programlisting>                        
+                </listitem>
+ 
+                <listitem><para>Verify the new JUnit test class builds and executes to completion</para>
+<programlisting language=""><![CDATA[
+relationEx]$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2ManyBiTest
+
+...
+ -HHH000401: using driver [org.h2.Driver] at URL [jdbc:h2:tcp://localhost:9092/h2db/ejava]
+...
+[INFO] BUILD SUCCESS                
+]]></programlisting>                        
+                </listitem>
+        
+        </orderedlist>
+    </section>
+        
+        
+    <section id="jpa-relationex-many2many-uni">
+        <title>Many-to-Many Uni-directional</title>
+        <para>In this section we are going to form a many-to-many, uni-directional relationship. As 
+            always with uni-directional relationships, that means we will be able to navigate the 
+            relationships from only the owning side. The only way to access the owning side from
+            the inverse side is through a JPA query.</para>
+  
+        <orderedlist>
+
+            <listitem><para>Place the following class in your src/main tree. This class provides an example
+                of the inverse side of a many-to-many, uni-directional relationship so there will be no
+                reference to the relationship within this class. This class, however, has implemented
+                a hashCode() and equals() method so that instances can be correctly identified within 
+                multiple collections.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.many2many;
+
+import javax.persistence.*;
+
+/**
+ * This class provides an example of the inverse side of a many-to-many, uni-directional relationship
+ */
+@Entity
+@Table(name="RELATIONEX_INDIVIDUAL")
+public class Individual {
+    @Id @GeneratedValue
+    private int id;
+    
+    @Column(length=32, nullable=false)
+    private String name;
+    
+    protected Individual() {}
+    public Individual(String name) {
+        this.name = name;
+    }
+
+    public int getId() { return id; }
+
+    public String getName() { return name; }
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    @Override
+    public int hashCode() {
+        return name==null? 0 : name.hashCode();
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        try {
+            if (this == obj)  return true;
+            Individual rhs = (Individual) obj;
+            if (name==null && rhs.name != null) { return false; }
+            return name.equals(rhs.name);
+        } catch (Exception ex) { return false; }
+    }
+}
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following class to your src/main tree. This class provides an example
+                of the owning side of a many-to-many, uni-directional relationship. Therefore it defines
+                the mapping from the entities to the database. The current implementation of the class
+                relies on default mapping. We will make that more explicit shortly.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.many2many;
+
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.*;
+/**
+ * This class provides an example of the owning side of a many-to-many, uni-directional relationship.
+ */
+@Entity
+@Table(name="RELATIONEX_GROUP")
+public class Group {
+    @Id @GeneratedValue
+    private int id;
+    
+    @ManyToMany
+//  @JoinTable(name="RELATIONEX_GROUP_MEMBER", 
+//          joinColumns=@JoinColumn(name="GROUP_ID"),
+//          inverseJoinColumns=@JoinColumn(name="MEMBER_ID"))
+    Set<Individual> members;
+    
+    @Column(length=32, nullable=false)
+    private String name;
+    
+    protected Group() {}
+    public Group(String name) {
+        this.name = name;
+    }
+    
+    public int getId() { return id; }
+    public Set<Individual> getMembers() {
+        if (members == null) {
+            members = new HashSet<Individual>();
+        }
+        return members;
+    }
+    
+    public String getName() { return name; }
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the new entitiy classes to your persistence unit.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.relex.many2many.Group</class>
+        <class>myorg.relex.many2many.Individual</class>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Generate schema for the new entities and their relationship. Notice
+                how the provider chose to use a join table mapping with foreign keys back to the
+                individual entity class tables.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl 
+...
+    create table RELATIONEX_GROUP (
+        id integer generated by default as identity,
+        name varchar(32) not null,
+        primary key (id)
+    );
+
+    create table RELATIONEX_GROUP_RELATIONEX_INDIVIDUAL (
+        RELATIONEX_GROUP_id integer not null,
+        members_id integer not null,
+        primary key (RELATIONEX_GROUP_id, members_id)
+    );
+...
+    create table RELATIONEX_INDIVIDUAL (
+        id integer generated by default as identity,
+        name varchar(32) not null,
+        primary key (id)
+    );
+...
+    alter table RELATIONEX_GROUP_RELATIONEX_INDIVIDUAL 
+        add constraint FK4DBB1EB9B0D6112E 
+        foreign key (members_id) 
+        references RELATIONEX_INDIVIDUAL;
+
+    alter table RELATIONEX_GROUP_RELATIONEX_INDIVIDUAL 
+        add constraint FK4DBB1EB9CE0046D6 
+        foreign key (RELATIONEX_GROUP_id) 
+        references RELATIONEX_GROUP;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Make the database mapping more explicit by defining the name for the 
+                join table and its individual columns.</para>
+<programlisting language="java"><![CDATA[
+public class Group {
+...
+    @ManyToMany
+    @JoinTable(name="RELATIONEX_GROUP_MEMBER", 
+            joinColumns=@JoinColumn(name="GROUP_ID"),
+            inverseJoinColumns=@JoinColumn(name="MEMBER_ID"))
+    Set<Individual> members;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Regenerate database schema for the two entities and their relation.
+                Note that this time, the name of the join table and its columns follow what
+                was specified in the mapping.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl 
+...
+    create table RELATIONEX_GROUP (
+        id integer generated by default as identity,
+        name varchar(32) not null,
+        primary key (id)
+    );
+
+    create table RELATIONEX_GROUP_MEMBER (
+        GROUP_ID integer not null,
+        MEMBER_ID integer not null,
+        primary key (GROUP_ID, MEMBER_ID)
+    );
+...
+    create table RELATIONEX_INDIVIDUAL (
+        id integer generated by default as identity,
+        name varchar(32) not null,
+        primary key (id)
+    );
+...
+    alter table RELATIONEX_GROUP_MEMBER 
+        add constraint FK2ADA1F0A50B9540D 
+        foreign key (MEMBER_ID) 
+        references RELATIONEX_INDIVIDUAL;
+
+    alter table RELATIONEX_GROUP_MEMBER 
+        add constraint FK2ADA1F0AD00E5846 
+        foreign key (GROUP_ID) 
+        references RELATIONEX_GROUP;
+]]></programlisting>                        
+                <para>Note too -- the many-to-many mapping prevents
+                    a single entity from being related multiple times to another entity. This is
+                    enforced by the two foreign keys of the join table being used as a compound 
+                    primary key for that table.
+                </para>            
+            </listitem>
+
+            <listitem><para>Add the following test method to the existing JUnit test case. This method
+                will create an owning and inverse instance and relate the two.</para>
+<programlisting language="java"><![CDATA[
+    @Test
+    public void testManyToManyUni() {
+        log.info("*** testManyToManyUni ***");
+        
+        log.debug("persisting owner");
+        Group group = new Group("board");
+        em.persist(group);
+        em.flush();
+        log.debug("persisting inverse");
+        Individual individual = new Individual("manny");
+        em.persist(individual);
+        em.flush();
+        log.debug("relating parent to inverse");
+        group.getMembers().add(individual);
+        em.flush();
+    }
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Build the module and run the test method. Notice how the owning side 
+                and inverse side are persisted and then related through the join table.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2ManyTest#testManyToManyUni
+...
+-*** testManyToManyUni ***
+ -persisting owner
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_GROUP
+        (id, name) 
+    values
+        (null, ?)
+ -persisting inverse
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_INDIVIDUAL
+        (id, name) 
+    values
+        (null, ?)
+ -relating parent to inverse
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_GROUP_MEMBER
+        (GROUP_ID, MEMBER_ID) 
+    values
+        (?, ?)
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following lines to your test method. This will get new instances from
+                the database and verify what what was done in the previous block was correctly performed.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("getting new instances");
+        em.clear();
+        Group group2 = em.find(Group.class, group.getId());
+        log.debug("checking owner");
+        assertEquals("unexpected group.name", group.getName(), group2.getName());
+        log.debug("checking inverse");
+        assertEquals("unexpected size", 1, group2.getMembers().size());
+        assertEquals("unexpected member.name", individual.getName(), group2.getMembers().iterator().next().getName());
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice how the owning 
+               entity is first LAZY loaded during the find() and then the join table and inverse
+               entity table is queried for once we navigate the collection.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2ManyTest#testManyToManyUni
+...
+ -getting new instances
+Hibernate: 
+    select
+        group0_.id as id43_0_,
+        group0_.name as name43_0_ 
+    from
+        RELATIONEX_GROUP group0_ 
+    where
+        group0_.id=?
+ -checking owner
+ -checking inverse
+Hibernate: 
+    select
+        members0_.GROUP_ID as GROUP1_43_1_,
+        members0_.MEMBER_ID as MEMBER2_1_,
+        individual1_.id as id44_0_,
+        individual1_.name as name44_0_ 
+    from
+        RELATIONEX_GROUP_MEMBER members0_ 
+    inner join
+        RELATIONEX_INDIVIDUAL individual1_ 
+            on members0_.MEMBER_ID=individual1_.id 
+    where
+        members0_.GROUP_ID=?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+                <para>Note that the LAZY load was because of our (default fetch specification and does not 
+                    have anything directly to do with the many-to-many relationship formed.</para>                        
+            </listitem>
+
+            <listitem><para>Add the following lines to your test method this will add two (2)
+               additional members to the original owning entity.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("adding inverse members");
+        Individual individualB = new Individual("moe");     
+        Individual individualC = new Individual("jack");        
+        group2.getMembers().add(individualB);
+        group2.getMembers().add(individualC);
+        em.persist(individualB);
+        em.persist(individualC);
+        em.flush();
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice how the persist
+                and the addition to the owning entity collection caused an insert into both the 
+                entity and join table for both entities added.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2ManyTest#testManyToManyUni
+...
+ -adding inverse members
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_INDIVIDUAL
+        (id, name) 
+    values
+        (null, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_INDIVIDUAL
+        (id, name) 
+    values
+        (null, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_GROUP_MEMBER
+        (GROUP_ID, MEMBER_ID) 
+    values
+        (?, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_GROUP_MEMBER
+        (GROUP_ID, MEMBER_ID) 
+    values
+        (?, ?)
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following lines to your test method to add a second owning entity and
+                add a few of the existing inverse entities to the new entity. This is where the many-to-many
+                is unique. Many-to-many allows a single entity to be related to multiple parents.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("adding owning members");
+        Group groupB = new Group("night shift");
+        groupB.getMembers().add(individualB);
+        groupB.getMembers().add(individualC);
+        em.persist(groupB);
+        em.flush();
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice how there was 
+                an insert for the new owning entity and then followed only by inserts into the 
+                join table to form the relationships.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2ManyTest#testManyToManyUni
+...
+ -adding owning members
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_GROUP
+        (id, name) 
+    values
+        (null, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_GROUP_MEMBER
+        (GROUP_ID, MEMBER_ID) 
+    values
+        (?, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_GROUP_MEMBER
+        (GROUP_ID, MEMBER_ID) 
+    values
+        (?, ?)
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following lines to the test method to verify the number of
+                collections each inverse entity is a member of.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("checking relations");
+        assertEquals("unexpected relations for member 1", 1, em.createQuery(
+                "select count(g) from Group g where :individual member of g.members", Number.class)
+                .setParameter("individual", individual)
+                .getSingleResult().intValue());
+        assertEquals("unexpected relations for member 2", 2, em.createQuery(
+                "select count(g) from Group g where :individual member of g.members", Number.class)
+                .setParameter("individual", individualB)
+                .getSingleResult().intValue());
+        assertEquals("unexpected relations for member 3", 2, em.createQuery(
+                "select count(g) from Group g where :individual member of g.members", Number.class)
+                .setParameter("individual", individualC)
+                .getSingleResult().intValue());
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Observe the selects being
+                done to determine which entities each is associated with and the evaluation of that
+                result passes.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2ManyTest#testManyToManyUni
+...
+Hibernate: 
+    select
+        count(group0_.id) as col_0_0_ 
+    from
+        RELATIONEX_GROUP group0_ 
+    where
+        ? in (
+            select
+                individual2_.id 
+            from
+                RELATIONEX_GROUP_MEMBER members1_,
+                RELATIONEX_INDIVIDUAL individual2_ 
+            where
+                group0_.id=members1_.GROUP_ID 
+                and members1_.MEMBER_ID=individual2_.id
+        ) limit ?
+(x3)
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following lines to the test method. This will remove the 
+               relationship between one of the inverse entities and both owning entities. At the 
+               conclusion we verify the entity relation we removed does not exist.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("removing relations");
+        assertTrue(group2.getMembers().remove(individualB));
+        assertTrue(groupB.getMembers().remove(individualB));
+        log.debug("verifying relation removal");
+        assertEquals("unexpected relations for member 1", 0, em.createQuery(
+                "select count(g) from Group g, IN (g.members) m where m = :individual", Number.class)
+                .setParameter("individual", individualB)
+                .getSingleResult().intValue());
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the unit test. Notice the two join table
+                rows being deleted to officially remove the entity from the two collections. Notice 
+                also with the different query -- we changed the subquery to an INNER JOIN.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2ManyTest#testManyToManyUni
+...
+ -removing relations
+ -verifying relation removal
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_GROUP_MEMBER 
+    where
+        GROUP_ID=? 
+        and MEMBER_ID=?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_GROUP_MEMBER 
+    where
+        GROUP_ID=? 
+        and MEMBER_ID=?
+Hibernate: 
+    select
+        count(group0_.id) as col_0_0_ 
+    from
+        RELATIONEX_GROUP group0_ 
+    inner join
+        RELATIONEX_GROUP_MEMBER members1_ 
+            on group0_.id=members1_.GROUP_ID 
+    inner join
+        RELATIONEX_INDIVIDUAL individual2_ 
+            on members1_.MEMBER_ID=individual2_.id 
+    where
+        individual2_.id=? limit ?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following lines to the test method to verify the removed
+                relationship did not impact the inverse entity. Also added is a delete of the 
+                initial entity.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("verifying inverse was not removed");
+        em.flush(); em.clear();
+        assertNotNull(em.find(Individual.class, individualB.getId()));
+        log.debug("removing initial owner");
+        em.remove(em.find(Group.class, group.getId()));
+        em.flush();
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice the check
+                for the inverse still existing passes.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2ManyTest#testManyToManyUni
+...
+ -verifying inverse was not removed
+Hibernate: 
+    select
+        individual0_.id as id44_0_,
+        individual0_.name as name44_0_ 
+    from
+        RELATIONEX_INDIVIDUAL individual0_ 
+    where
+        individual0_.id=?
+]]></programlisting>
+                <para>Notice the removal of one of the owning entities causes a search of
+                    the join table, the removal of the join table rows that are associated
+                    with the owning entity we want to delete, and then the removal of that 
+                    entity.</para>                        
+<programlisting language=""><![CDATA[
+ -removing initial owner
+Hibernate: 
+    select
+        group0_.id as id43_0_,
+        group0_.name as name43_0_ 
+    from
+        RELATIONEX_GROUP group0_ 
+    where
+        group0_.id=?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_GROUP_MEMBER 
+    where
+        GROUP_ID=?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_GROUP 
+    where
+        id=?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+        </orderedlist>
+        <para>You have finished going through a many-to-many, uni-directional relationship. Like
+            all many-to-many relationships, the two sides of the relationship must be linked 
+            through a join table. In this case the foreign keys to to the entities were based on
+            generated simple keys. In the next section we will change the relationship to be 
+            bi-directional so that we can navigate from either direction.</para>
+        
+    </section>
+
+    <section id="jpa-relationex-many2many-bi">
+        <title>Many-to-Many Bi-directional</title>
+        <para>In the previous section we mapped a relationship only from the owning side. In this 
+            exercise we will map the many-to-many relationship from both the owning and inverse 
+            sides.</para>
+  
+        <orderedlist>
+
+            <listitem><para>Put the following class in your src/main tree. This class provides an 
+                example of both the owning and inverse side of a many-to-many relationship because
+                the design of the relationship is to originate and end with an entity class of the
+                same type. The recursive nature of this example has nothing specifically to do with 
+                many-to-many relationships -- but it does make for an interesting example.</para>
+                <para>In this example, the "children" collection is the owning side and the 
+                "parent" collection is the inverse side.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.many2many;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+import javax.persistence.*;
+/**
+ * This class provides an example of a many-to-many, bi-directional relationship that just
+ * happens to be recursive. Both ends of the relationship reference an instance of this class. 
+ */
+@Entity
+@Table(name="RELATIONEX_NODE")
+public class Node {
+    @Id
+    @Column(length=36, nullable=false)
+    private String id;
+    
+    @ManyToMany(cascade={CascadeType.PERSIST}, fetch=FetchType.LAZY)
+    @JoinTable(name="RELATIONEX_NODE_REL",
+            joinColumns=@JoinColumn(name="PARENT_ID"),
+            inverseJoinColumns=@JoinColumn(name="CHILD_ID"))
+    private Set<Node> children;
+    
+    @ManyToMany(mappedBy="children", fetch=FetchType.EAGER)
+    private Set<Node> parents;
+    
+    @Column(length=32, nullable=false)
+    private String name;
+    
+    public Node() { id=UUID.randomUUID().toString(); }
+    public Node(String name) {
+        this();
+        this.name = name;
+    }
+    public Node(Node parent, String name) {
+        this();
+        this.name = name;
+        parent.getChildren().add(this);
+        getParents().add(parent);
+    }
+
+    public String getId() { return id; }
+    public String getName() { return name; }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Set<Node> getChildren() {
+        if (children==null) {
+            children = new HashSet<Node>();
+        }
+        return children;
+    }
+    
+    public Set<Node> getParents() {
+        if (parents == null) {
+            parents = new HashSet<Node>();
+        }
+        return parents;
+    }
+    
+    @Override
+    public int hashCode() {
+        return id==null?0:id.hashCode();
+    }   
+    @Override
+    public boolean equals(Object obj) {
+        try {
+            if (this == obj) { return true; }
+            Node rhs = (Node)obj;
+            if (id==null && rhs.id != null) { return false; }
+            return id.equals(rhs.id);
+        } catch (Exception ex) { return false; }
+    }
+}
+]]></programlisting>   
+                <para>Note that in this class design -- a convenience constructor
+                    is supplied that accepts a parent node, adds itself to that parent's children,
+                    and then adds the parent to this entity.</para>                     
+            </listitem>
+
+            <listitem><para>Add the new entity to the persistence unit.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.relex.many2many.Node</class>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Generate database schema for the new entity and its relationship. Notice how we 
+                only have a single entity class table and a join table that links to rows from that table
+                to one another. In a real application, we would probably want to add an additional CHECK
+                that parent and child cannot be equal.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl 
+...
+    create table RELATIONEX_NODE (
+        id varchar(36) not null,
+        name varchar(32) not null,
+        primary key (id)
+    );
+
+    create table RELATIONEX_NODE_REL (
+        PARENT_ID varchar(36) not null,
+        CHILD_ID varchar(36) not null,
+        primary key (PARENT_ID, CHILD_ID)
+    );
+...
+    alter table RELATIONEX_NODE_REL 
+        add constraint FK7D1BC34C3F5FCCB4 
+        foreign key (CHILD_ID) 
+        references RELATIONEX_NODE;
+
+    alter table RELATIONEX_NODE_REL 
+        add constraint FK7D1BC34C57DC6666 
+        foreign key (PARENT_ID) 
+        references RELATIONEX_NODE;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following test method to your JUnit test case. This will create two entities
+               and relate them through a business relationship of parent and child.</para>
+<programlisting language="java"><![CDATA[
+    @Test
+    public void testManyToManyBi() {
+        log.info("*** testManyToManyBi ***");
+        
+        log.debug("create instances");
+        Node one = new Node("one");
+        Node two = new Node(one,"two");
+        em.persist(one);
+        em.flush();
+    }
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Build the module and run the test method. Notice how two rows are inserted 
+               into the entity table and then a row that relates them is added to the join table.</para>
+<programlisting language=""><![CDATA[
+ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2ManyTest#testManyToManyBi 
+ ...
+ -*** testManyToManyBi ***
+ -create instances
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_NODE
+        (name, id) 
+    values
+        (?, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_NODE
+        (name, id) 
+    values
+        (?, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_NODE_REL
+        (PARENT_ID, CHILD_ID) 
+    values
+        (?, ?)
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following lines to the test method. This will obtain new instances
+                of the entities in our object tree and verify their contents. It also shows the 
+                impact of EAGER and LAZY fetching.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("getting new instances from owning side");
+        em.clear();
+        Node one2 = em.find(Node.class, one.getId());
+        assertNotNull("owning side not found", one2);
+        log.debug("checking owning side");
+        assertEquals("unexpected owning.name", one.getName(), one2.getName());
+        log.debug("checking parents");
+        assertEquals("unexpected parents.size", 0, one2.getParents().size());
+        log.debug("checking children");
+        assertEquals("unexpected children.size", 1, one2.getChildren().size());
+        assertEquals("unexpected child.name", two.getName(), one2.getChildren().iterator().next().getName());
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice that
+               because of the EAGER fetch specification on parents, the join table and entity table
+               is queried during the find() operation.</para>
+<programlisting language=""><![CDATA[
+ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2ManyTest#testManyToManyBi 
+ ...
+ -getting new instances from owning side
+Hibernate: 
+    select
+        node0_.id as id45_1_,
+        node0_.name as name45_1_,
+        parents1_.CHILD_ID as CHILD2_45_3_,
+        node2_.id as PARENT1_3_,
+        node2_.id as id45_0_,
+        node2_.name as name45_0_ 
+    from
+        RELATIONEX_NODE node0_ 
+    left outer join
+        RELATIONEX_NODE_REL parents1_ 
+            on node0_.id=parents1_.CHILD_ID 
+    left outer join
+        RELATIONEX_NODE node2_ 
+            on parents1_.PARENT_ID=node2_.id 
+    where
+        node0_.id=?
+ -checking owning side
+ -checking parents
+]]></programlisting>                        
+        <para>Because of the LAZY fetch specification on
+               children, the join table and child entities are not searched for until specifically
+               requested.</para>
+<programlisting language=""><![CDATA[
+ -checking children
+Hibernate: 
+    select
+        children0_.PARENT_ID as PARENT1_45_1_,
+        children0_.CHILD_ID as CHILD2_1_,
+        node1_.id as id45_0_,
+        node1_.name as name45_0_ 
+    from
+        RELATIONEX_NODE_REL children0_ 
+    inner join
+        RELATIONEX_NODE node1_ 
+            on children0_.CHILD_ID=node1_.id 
+    where
+        children0_.PARENT_ID=?
+Hibernate: 
+    select
+        parents0_.CHILD_ID as CHILD2_45_1_,
+        parents0_.PARENT_ID as PARENT1_1_,
+        node1_.id as id45_0_,
+        node1_.name as name45_0_ 
+    from
+        RELATIONEX_NODE_REL parents0_ 
+    inner join
+        RELATIONEX_NODE node1_ 
+            on parents0_.PARENT_ID=node1_.id 
+    where
+        parents0_.CHILD_ID=?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following lines to the test method to add a few additional
+                inverse entities. The new entities are registered with the owning side within the 
+                constructor. All are persisted during the subsequent call to persist() on the owning
+                side because of the cascade=PERSIST definition on the owning side.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("adding more inverse instances");
+        Node twoB = new Node(one2, "twoB");
+        Node twoC = new Node(one2, "twoC");
+        em.persist(one2);
+        em.flush();
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the unit test. Notice the two inserts for the 
+               inverse entities and two inserts in the join table relating the new entities to the 
+               owning side. We now have one owning entity and three inverse entities related.</para>
+<programlisting language=""><![CDATA[
+ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2ManyTest#testManyToManyBi 
+ ...
+ -adding more inverse instances
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_NODE
+        (name, id) 
+    values
+        (?, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_NODE
+        (name, id) 
+    values
+        (?, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_NODE_REL
+        (PARENT_ID, CHILD_ID) 
+    values
+        (?, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_NODE_REL
+        (PARENT_ID, CHILD_ID) 
+    values
+        (?, ?)
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following lines to the test method. This tests obtaining 
+               our object tree form the inverse side. This is a feature unique to bi-directional
+               relationships.</para>
+<programlisting language=""><![CDATA[
+        log.debug("getting new instances from inverse side");
+        em.clear();
+        Node two2 = em.find(Node.class, two.getId());
+        assertNotNull("inverse node not found", two2);
+        log.debug("checking inverse side");
+        assertEquals("unexpected name", two.getName(), two2.getName());
+        log.debug("checking parents");
+        assertEquals("unexpected parents.size", 1, two2.getParents().size());
+        log.debug("checking children");
+        assertEquals("unexpected children.size", 0, two2.getChildren().size());
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Note the 
+               entity we call find() on this time has a parent and no children.
+               Most of the work is done during the EAGER fetch on the parent relationship.</para>            
+<programlisting language=""><![CDATA[
+ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2ManyTest#testManyToManyBi 
+ ...
+ -getting new instances from inverse side
+Hibernate: 
+    select
+        node0_.id as id45_1_,
+        node0_.name as name45_1_,
+        parents1_.CHILD_ID as CHILD2_45_3_,
+        node2_.id as PARENT1_3_,
+        node2_.id as id45_0_,
+        node2_.name as name45_0_ 
+    from
+        RELATIONEX_NODE node0_ 
+    left outer join
+        RELATIONEX_NODE_REL parents1_ 
+            on node0_.id=parents1_.CHILD_ID 
+    left outer join
+        RELATIONEX_NODE node2_ 
+            on parents1_.PARENT_ID=node2_.id 
+    where
+        node0_.id=?
+Hibernate: 
+    select
+        parents0_.CHILD_ID as CHILD2_45_1_,
+        parents0_.PARENT_ID as PARENT1_1_,
+        node1_.id as id45_0_,
+        node1_.name as name45_0_ 
+    from
+        RELATIONEX_NODE_REL parents0_ 
+    inner join
+        RELATIONEX_NODE node1_ 
+            on parents0_.PARENT_ID=node1_.id 
+    where
+        parents0_.CHILD_ID=?
+ -checking inverse side
+ -checking parents
+ -checking children
+Hibernate: 
+    select
+        children0_.PARENT_ID as PARENT1_45_1_,
+        children0_.CHILD_ID as CHILD2_1_,
+        node1_.id as id45_0_,
+        node1_.name as name45_0_ 
+    from
+        RELATIONEX_NODE_REL children0_ 
+    inner join
+        RELATIONEX_NODE node1_ 
+            on children0_.CHILD_ID=node1_.id 
+    where
+        children0_.PARENT_ID=?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following lines to the test method to add an additional 
+                owning entity that will share a relation to one of the inverse entities.
+                Since we didn't add a concenience method to add an existing child to a new 
+                parent, all calls here are exposed. We need to add the child to the parent 
+                collection and add the parent to the child collection.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("adding owning entity");
+        Node oneB = new Node("oneB");
+        oneB.getChildren().add(two2);
+        two2.getParents().add(oneB);
+        em.persist(oneB);
+        em.flush();
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice how all
+                we should get is an insert for the new owning entity and a row in the join
+                table relating the new entity to one of the existing ones.</para>
+<programlisting language=""><![CDATA[
+ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2ManyTest#testManyToManyBi 
+ ...
+ -adding owning entity
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_NODE
+        (name, id) 
+    values
+        (?, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_NODE_REL
+        (PARENT_ID, CHILD_ID) 
+    values
+        (?, ?)
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following lines to the test method to verify the number of 
+                relationships that exist.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("checking relationships");
+        assertEquals("unexpected parents", 0,
+                em.createQuery("select count(p) from Node n, IN (n.parents) p where n=:node", Number.class)
+                    .setParameter("node", one)
+                    .getSingleResult().intValue());
+        assertEquals("unexpected parents", 2,
+                em.createQuery("select count(p) from Node n, IN (n.parents) p where n=:node", Number.class)
+                    .setParameter("node", two)
+                    .getSingleResult().intValue());
+        assertEquals("unexpected parents", 1,
+                em.createQuery("select count(p) from Node n, IN (n.parents) p where n=:node", Number.class)
+                    .setParameter("node", twoB)
+                    .getSingleResult().intValue());
+        assertEquals("unexpected parents", 1,
+                em.createQuery("select count(p) from Node n, IN (n.parents) p where n=:node", Number.class)
+                    .setParameter("node", twoC)
+                    .getSingleResult().intValue());     
+        assertEquals("unexpected children", 3,
+                em.createQuery("select count(c) from Node n, IN (n.children) c where n=:node", Number.class)
+                    .setParameter("node", one)
+                    .getSingleResult().intValue());
+        assertEquals("unexpected children", 0,
+                em.createQuery("select count(c) from Node n, IN (n.children) c where n=:node", Number.class)
+                    .setParameter("node", two)
+                    .getSingleResult().intValue());     
+        assertEquals("unexpected children", 1,
+                em.createQuery("select count(c) from Node n, IN (n.children) c where n=:node", Number.class)
+                    .setParameter("node", oneB)
+                    .getSingleResult().intValue());
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the unit test. This shows the assertions
+                on the queuries passing.</para>
+<programlisting language=""><![CDATA[
+ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2ManyTest#testManyToManyBi 
+ ...
+ -checking relationships
+Hibernate: 
+    select
+        count(node2_.id) as col_0_0_ 
+    from
+        RELATIONEX_NODE node0_ 
+    inner join
+        RELATIONEX_NODE_REL parents1_ 
+            on node0_.id=parents1_.CHILD_ID 
+    inner join
+        RELATIONEX_NODE node2_ 
+            on parents1_.PARENT_ID=node2_.id 
+    where
+        node0_.id=? limit ?
+(x3 more)
+Hibernate: 
+    select
+        count(node2_.id) as col_0_0_ 
+    from
+        RELATIONEX_NODE node0_ 
+    inner join
+        RELATIONEX_NODE_REL children1_ 
+            on node0_.id=children1_.PARENT_ID 
+    inner join
+        RELATIONEX_NODE node2_ 
+            on children1_.CHILD_ID=node2_.id 
+    where
+        node0_.id=? limit ?
+(x2 more)
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following lines to the test method. This will remove a relationship
+                between one of the two nodes. None the managed instance for the owning side had to be 
+                obtained from the persistence context so we could actually perform the removal.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("getting managed owning side");
+        assertNotNull(one = em.find(Node.class, one.getId()));
+        log.debug("removing relationship");
+        one.getChildren().remove(two);
+        two.getParents().remove(one);
+        em.flush();
+        assertEquals("unexpected children", 2,
+                em.createQuery("select count(c) from Node n, IN (n.children) c where n=:node", Number.class)
+                    .setParameter("node", one)
+                    .getSingleResult().intValue());
+        assertEquals("unexpected parents", 1,
+                em.createQuery("select count(p) from Node n, IN (n.parents) p where n=:node", Number.class)
+                    .setParameter("node", two)
+                    .getSingleResult().intValue());
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice that the provider
+                appears to be loading the related entities prior to removing the relationship.</para>
+<programlisting language=""><![CDATA[
+ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2ManyTest#testManyToManyBi 
+ ...
+ -removing relationship
+Hibernate: 
+    select
+        children0_.PARENT_ID as PARENT1_45_1_,
+        children0_.CHILD_ID as CHILD2_1_,
+        node1_.id as id45_0_,
+        node1_.name as name45_0_ 
+    from
+        RELATIONEX_NODE_REL children0_ 
+    inner join
+        RELATIONEX_NODE node1_ 
+            on children0_.CHILD_ID=node1_.id 
+    where
+        children0_.PARENT_ID=?
+Hibernate: 
+    select
+        parents0_.CHILD_ID as CHILD2_45_1_,
+        parents0_.PARENT_ID as PARENT1_1_,
+        node1_.id as id45_0_,
+        node1_.name as name45_0_ 
+    from
+        RELATIONEX_NODE_REL parents0_ 
+    inner join
+        RELATIONEX_NODE node1_ 
+            on parents0_.PARENT_ID=node1_.id 
+    where
+        parents0_.CHILD_ID=?
+Hibernate: 
+    select
+        parents0_.CHILD_ID as CHILD2_45_1_,
+        parents0_.PARENT_ID as PARENT1_1_,
+        node1_.id as id45_0_,
+        node1_.name as name45_0_ 
+    from
+        RELATIONEX_NODE_REL parents0_ 
+    inner join
+        RELATIONEX_NODE node1_ 
+            on parents0_.PARENT_ID=node1_.id 
+    where
+        parents0_.CHILD_ID=?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_NODE_REL 
+    where
+        PARENT_ID=? 
+        and CHILD_ID=?
+Hibernate: 
+    select
+        count(node2_.id) as col_0_0_ 
+...
+[INFO] BUILD SUCCESS 
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following lines to the test method to remove one of the owning entities.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("deleting owner");
+        em.remove(oneB);
+        em.flush();
+        assertEquals("unexpected parents", 0,
+                em.createQuery("select count(p) from Node n, IN (n.parents) p where n=:node", Number.class)
+                    .setParameter("node", two)
+                    .getSingleResult().intValue());
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice the provider removed 
+                owned relationships prior to removing the owning entity.</para>
+<programlisting language=""><![CDATA[
+ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2ManyTest#testManyToManyBi 
+ ...
+ -deleting owner
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_NODE_REL 
+    where
+        PARENT_ID=?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_NODE 
+    where
+        id=?
+Hibernate: 
+    select
+        count(node2_.id) as col_0_0_ 
+    from
+        RELATIONEX_NODE node0_ 
+    inner join
+        RELATIONEX_NODE_REL parents1_ 
+            on node0_.id=parents1_.CHILD_ID 
+    inner join
+        RELATIONEX_NODE node2_ 
+            on parents1_.PARENT_ID=node2_.id 
+    where
+        node0_.id=? limit ?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following lines to the test method. They will attempt to 
+                remove the inverse side of a relation while a relationstill exists.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("deleting inverse");
+        assertNotNull(twoB = em.find(Node.class, twoB.getId()));
+        em.remove(twoB);
+        em.flush();
+        assertNull("inverse not deleted", em.find(Node.class, twoB.getId()));
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the test method and re-run the test method. Notice how the 
+                delete never was issued to the database. Worse case -- I would have expected a foreign
+                key violation from the join table but here the delete was never flushed to the 
+                database.</para>
+<programlisting language=""><![CDATA[
+ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2ManyTest#testManyToManyBi 
+ ...
+ -deleting inverse
+...
+Failed tests:   testManyToManyBi(myorg.relex.Many2ManyTest): inverse not deleted
+...
+[INFO] BUILD FAILURE
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Change the test method to remove the relationship after attempting to 
+                remove the inverse side. This will help determine if the delete was waiting for the 
+                removal of the foreign key reference.</para>
+<programlisting language=""><![CDATA[
+        log.debug("deleting inverse");
+        assertNotNull(twoB = em.find(Node.class, twoB.getId()));
+        em.remove(twoB);
+        em.flush();
+//      assertNull("inverse not deleted", em.find(Node.class, twoB.getId()));
+        one.getChildren().remove(twoB);
+        em.flush();
+        assertNull("inverse not deleted", em.find(Node.class, twoB.getId()));
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the test method and re-run the test method. Notice the relationship
+                is removed but nothing occurs to the inverse side because of it.</para>
+<programlisting language=""><![CDATA[
+ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2ManyTest#testManyToManyBi 
+ ...
+ -deleting inverse
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_NODE_REL 
+    where
+        PARENT_ID=? 
+        and CHILD_ID=?
+...
+Failed tests:   testManyToManyBi(myorg.relex.Many2ManyTest): inverse not deleted
+...
+[INFO] BUILD FAILURE
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Change the test method so the inverse entity is removed after the 
+                relationship is removed. At this point in time there are no longer any incomming
+                references to the entity.</para>
+<programlisting language=""><![CDATA[
+        log.debug("deleting inverse");
+        assertNotNull(twoB = em.find(Node.class, twoB.getId()));
+        em.remove(twoB);
+        em.flush();
+//      assertNull("inverse not deleted", em.find(Node.class, twoB.getId()));
+        one.getChildren().remove(twoB);
+        em.flush();
+//        assertNull("inverse not deleted", em.find(Node.class, twoB.getId()));
+        em.remove(twoB);
+        em.flush();
+        assertNull("inverse not deleted", em.find(Node.class, twoB.getId()));
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the test method and re-run the test method. Notice the 
+                removal of the relationship caused the removal of a specific row from the 
+                join table. The successful removal of the entity itself caused a delete from 
+                the entity table and any relationships it owned from the join table.
+                None of this worked, however, when there was a known relationship existing in 
+                the cache. That may have had something to do with the EAGER fetch setting for
+                parent members.</para>
+<programlisting language=""><![CDATA[
+ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2ManyTest#testManyToManyBi 
+ ...
+ -deleting inverse
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_NODE_REL 
+    where
+        PARENT_ID=? 
+        and CHILD_ID=?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_NODE_REL 
+    where
+        PARENT_ID=?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_NODE 
+    where
+        id=?
+Hibernate: 
+    select
+        node0_.id as id45_1_,
+        node0_.name as name45_1_,
+        parents1_.CHILD_ID as CHILD2_45_3_,
+        node2_.id as PARENT1_3_,
+        node2_.id as id45_0_,
+        node2_.name as name45_0_ 
+    from
+        RELATIONEX_NODE node0_ 
+    left outer join
+        RELATIONEX_NODE_REL parents1_ 
+            on node0_.id=parents1_.CHILD_ID 
+    left outer join
+        RELATIONEX_NODE node2_ 
+            on parents1_.PARENT_ID=node2_.id 
+    where
+        node0_.id=?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+
+        </orderedlist>
+        
+        <para>You have finished going through an example of many-to-many, bi-directional relationship.
+           For fun, we used a recursive relationship in this case where the same class was on both
+           side of the relationship and that class had a copy of the owning and inverse side of the 
+           relation so that it could navigate in either direction.</para>
+    </section>
+
+
+    <section id="jpa-relationex-many2many-summary">
+       <title>Summary</title>
+       <para>In this chapter we looked at many-to-many relationships. We stuck to simple primary
+          keys since the details of using other compound primary key types are identical to where we
+          covered them in more detail. The big difference here is that we could relate many entities 
+          to many other entities. As stated previously, this type of relationship is not that common 
+          because one tends to model properties of a relationship. In that case a many-to-many would 
+          turn into a many-to-one/one-to-many relationship with an association class in the middle.
+       </para>
+    </section>    
+</chapter>

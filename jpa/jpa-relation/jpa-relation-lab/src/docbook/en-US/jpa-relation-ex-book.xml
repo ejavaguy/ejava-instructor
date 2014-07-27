@@ -1,0 +1,58 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="jpa-relationex">
+    <bookinfo>
+        <title>Java Persistence API: Relationship Exercise</title>
+        <subtitle>Mapping Entity Relationships to the Database</subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>This document contains instructions for exercises to map Java class relations to the 
+                 database using JPA. It covers the core and corner mapping concepts as well as demonstrates
+                 issues that can occur with JPA relationship mappings.
+            </para>
+        </abstract>
+    </bookinfo>
+    <preface id="jpa-relationex-purpose">
+        <title>Purpose</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>To provide hands on experience</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Mapping relationships between JPA entity classes to a relational database</para></listitem>
+                    <listitem><para>Propagating dependent primary key values derived from a parent relationship</para></listitem>
+                    <listitem><para>Relating entity classes which use built-in and composite primary key types</para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para>Witnessing the functional and potential performance differences between different mapping styles and properties</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>At the completion of this exercise, the student will be able to</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Map OneToOne, OneToMany, ManyToOne, and ManyToMany relationships to the database</para></listitem>
+                    <listitem><para>Map uni-directional and bi-directional relationships to the database</para></listitem>
+                    <listitem><para>Derive and propagate a primary key for a dependent entity from a relation to a parent entity</para></listitem>
+                    <listitem><para>Realize relationships using foreign key joins, primary key joins, and link table joins</para></listitem>
+                    <listitem><para>Realize relationships to a parent entity using a composite primary/foreign key</para></listitem>
+                    <listitem><para>Enforce mandatory and allow optional relationships</para></listitem>
+                    <listitem><para>Reduce interaction with the EntityManager using relationship Cascades</para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para>Impact performance through informed decisions on selecting certain relationship styles and properties</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </preface>
+
+    <toc/>
+
+    <xi:include href="jpa-relationex-setup.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-relationex-one2one.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-relationex-one2many.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-relationex-collections.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-relationex-many2one.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-relationex-one2many-bi.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-relationex-many2many.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>

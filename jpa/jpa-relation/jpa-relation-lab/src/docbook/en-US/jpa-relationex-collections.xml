@@ -1,0 +1,1667 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-relationex-collections">
+    <title>JPA Collections</title>
+    <para>In this chapter we will take a closer look at the collections used within a 
+        relationship and how we can better map them to the business need. We will primarily
+        look at collection ordering and access.
+    </para>
+        
+    <section id="jpa-relationex-coll-setup">
+        <title>Setup</title>
+        <para>Create a JUnit test class to host tests for the collection mappings.</para>
+
+        <orderedlist>
+            <listitem><para>Put the following Junit test case base class in your src/test tree.
+                You can delete the sample test method once we add our first real test. JUnit
+                will fail a test case if it cannot locate a @Test to run.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex;
+
+import static org.junit.Assert.*;
+
+import javax.persistence.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.*;
+
+public class CollectionTest extends JPATestBase {
+    private static Log log = LogFactory.getLog(CollectionTest.class);
+    @Test
+    public void testSample() {
+        log.info("testSample");
+    }
+}
+]]></programlisting>                        
+                </listitem>
+ 
+                <listitem><para>Verify the new JUnit test class builds and executes to completion</para>
+<programlisting language=""><![CDATA[
+relationEx]$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest
+
+...
+ -HHH000401: using driver [org.h2.Driver] at URL [jdbc:h2:tcp://localhost:9092/h2db/ejava]
+...
+[INFO] BUILD SUCCESS                
+]]></programlisting>                        
+                </listitem>
+        
+        </orderedlist>
+    </section>
+
+        
+        
+    <section id="jpa-relationex-coll-entityid">
+        <title>Entity Identity</title>
+        <para>This section will focus on how Java and JPA determine the identity of an entity 
+            and when one instance equals another. To demonstrate the concepts, please the following
+            artifacts in place.</para>
+        
+            <orderedlist>
+    
+                <listitem><para>Place the following mapped superclass in place in your src/main tree. Mapped superclasses
+                    are POJO base classes for entities that are not themselves entities. The reason we did not make this
+                    class an entity is because it is abstract and will never exist within our example tree without a
+                    subclass representing the entity. Each instance of the mapped superclass will be assigned an 
+                    instanceId, a database primary key (when persisted), and a business Id (name).  
+                    </para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.collection;
+
+import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+/**
+ * This class is used as a common base implementation by several implementations
+ * of hashCode/equals.
+ */
+@MappedSuperclass
+public abstract class Ship {
+    @Transient
+    protected final Log log = LogFactory.getLog(getClass());
+    private static AtomicInteger instanceId = new AtomicInteger();
+    @Transient
+    private int oid = instanceId.getAndAdd(1);
+    
+    @Id
+    @GeneratedValue
+    protected int id;
+    
+    @Column(length = 16)
+    protected String name; //businessId
+    
+    @Temporal(TemporalType.TIMESTAMP)
+    protected Date created;
+
+    
+    public int getId() { return id; }
+    public Ship setId(int id) {
+        this.id = id;
+        return this;
+    }
+
+    public String getName() { return name; }
+    public Ship setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public Date getCreated() { return created; }
+    public Ship setCreated(Date created) {
+        this.created = created;
+        return this;
+    }
+    
+    public abstract int peekHashCode();
+    protected int objectHashCode() {
+        return super.hashCode();
+    }
+    
+    @Override
+    public int hashCode() {
+        return logHashCode(peekHashCode());
+    }
+    
+    public int logHashCode(int hashCode) {
+        log.info(toString() +
+                ".hashCode=" + hashCode);
+        return hashCode;
+    }
+    
+    public boolean logEquals(Object obj, boolean equals) {
+        log.info(new StringBuilder()
+            .append(toString())
+            .append(".equals(id=")
+            .append(obj==null?null : ((Ship)obj).id + ",oid=" + ((Ship)obj).oid)
+            .append(")=")
+            .append(equals));
+        return equals;
+    }
+    
+    public String toString() {
+        return getClass().getSimpleName() + "(id=" + id + ",oid=" + oid + ")";
+    }
+}]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Place the following entity class in you src/main tree. This class will be used
+                    to represent a parent/one end of a one-to-many relationship. It is currently incomplete. 
+                    We will add more to it later.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.collection;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import javax.persistence.*;
+
+/**
+ * This class provides an example one/parent entity with a relationship to many child/dependent
+ * objects -- with the members in each collection based on a different hashCode/equals method.
+ */
+@Entity
+@Table(name="RELATIONEX_FLEET")
+public class Fleet {
+    @Id @GeneratedValue
+    private int id;
+    @Column(length=16)
+    private String name;
+
+    public int getId() { return id; }
+    public void setId(int id) {
+        this.id = id;
+    }
+    
+    public String getName() { return name;}
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add only the entity class to the persistence unit. Do not add the 
+                    mapped superclass.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.relex.collection.Fleet</class>
+]]></programlisting>                        
+                </listitem>
+            </orderedlist>
+
+        <section id="jpa-relationex-coll-entityid-instanceId">
+            <title>Instance Id</title>
+            <para>In this section we will demonstrate how using the default java.lang.Object
+                hashCode and equals methods is used within Java collections and impacts JPA code.
+                This technique works when working with a single instance that represents a real 
+                object. If two objects are of the same class but different instances -- then they
+                will have a different hashCode identity and equals will be returned as false even
+                if every Java attribute they host has an equivalent value. 
+            </para>
+            <orderedlist>
+    
+                <listitem><para>Add the following entity class to your src/main tree. This class
+                    represents an entity that implements hashCode and equals using the default
+                    java.lang.Object hashCode/equals implementation except it will print some debug
+                    when these methods are called. Notice that it extends the managed superclass you
+                    added earlier.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.collection;
+
+import javax.persistence.*;
+
+/**
+ * This class is provides an example of an entity that implements hashCode/equals 
+ * using the default java.lang.Object implementation. Note this implementation is instance-specific. 
+ * No other instance will report the same value even if they represent the same row in the DB.
+ */
+@Entity
+@Table(name="RELATIONEX_SHIP")
+public class ShipByDefault extends Ship {
+    @Override
+    public int peekHashCode() {
+        return super.objectHashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        try {
+            if (this == obj) { return logEquals(obj, true); }
+            boolean equals = super.equals(obj);
+            return logEquals(obj, equals);
+        } catch (Exception ex) {
+            return logEquals(obj, false);
+        }
+    }
+}
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add the entity class to your persistence unit.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.relex.collection.ShipByDefault</class>
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add the following test method and initial code to your collections JUnit 
+                    test case. This test provides a simple demonstration how two instances with the 
+                    same values will report they are different when using the default java.lang.Object
+                    implementations of hashCode and equals.</para>
+<programlisting language="java"><![CDATA[
+    @Test
+    public void testByDefault() {
+        log.info("*** testByDefault ***");
+        
+        Ship ship1 = new ShipByDefault();
+        Ship ship2 = new ShipByDefault();
+        assertFalse("unexpected hashCode", ship1.hashCode() == ship2.hashCode());
+        assertFalse("unexpected equality", ship1.equals(ship2));
+    }
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Build the module, run the new JUnit test case, and observe the results.
+                    Notice how the two instances have the same databaseId (unassigned at this point) but
+                    a different instanceId, significantly different hashCodes and an equals that does
+                    not match.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testByDefault
+...
+ -*** testByDefault ***
+ -ShipByDefault(id=0,oid=4).hashCode=1215713589
+ -ShipByDefault(id=0,oid=5).hashCode=1100908089
+ -ShipByDefault(id=0,oid=4).equals(id=0,oid=5)=false
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add the following lines of code to the existing test method to 
+                   persist the entity and attempt to retrieve it while still in the cache.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("persisting entity");
+        em.persist(ship1);
+        em.flush();
+        Ship ship3 = em.find(ShipByDefault.class, ship1.getId());
+        assertTrue("unexpected hashCode", ship1.hashCode() == ship3.hashCode());
+        assertTrue("unexpected inequality", ship1.equals(ship3));
+]]></programlisting>                        
+                </listitem>
+                
+                <listitem><para>Rebuild the module, re-run the test method and observe the equality 
+                    that occurs. The two variable instances have the same hashCode and are equal because
+                    they reference the same entity instance.</para>
+<programlisting language=""><![CDATA[
+ -persisting entity
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_SHIP
+        (id, created, name) 
+    values
+        (null, ?, ?)
+ -ShipByDefault(id=1,oid=4).hashCode=1341189399
+ -ShipByDefault(id=1,oid=4).hashCode=1341189399
+ -ShipByDefault(id=1,oid=4).equals(id=1,oid=4)=true
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+                </listitem>
+                
+                <listitem><para>Add the following lines of code to your existing test method to 
+                    show how the equality of the instances depends on whether the cache is still in place.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("getting new instance of entity");
+        em.clear();
+        Ship ship4 = em.find(ShipByDefault.class, ship1.getId());
+        assertFalse("unexpected hashCode", ship1.hashCode() == ship4.hashCode());
+        assertFalse("unexpected equality", ship1.equals(ship4));
+]]></programlisting>                        
+                </listitem>
+    
+    
+                <listitem><para>Rebuild the module, re-run the test method, and observe the fact we now have
+                    inequality now that we have different instances. We can be sure they are different instances 
+                    -- even though they both represent the same database Id -- by the value printed for the oid.</para>
+<programlisting language=""><![CDATA[
+ -getting new instance of entity
+Hibernate: 
+    select
+        shipbydefa0_.id as id29_0_,
+        shipbydefa0_.created as created29_0_,
+        shipbydefa0_.name as name29_0_ 
+    from
+        RELATIONEX_SHIP shipbydefa0_ 
+    where
+        shipbydefa0_.id=?
+ -ShipByDefault(id=1,oid=4).hashCode=368668382
+ -ShipByDefault(id=1,oid=6).hashCode=346534810
+ -ShipByDefault(id=1,oid=4).equals(id=1,oid=6)=false
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+                
+            </orderedlist>
+            <para>You have finished demonstrating how entities using the default java.lang.Object
+                implementation of hashCode and equals identify themselves as equal only if they are
+                referencing the same instance. This works as long as the instance is available to 
+                be referenced but would not work in cases where we want the identity to span instances
+                that might share the same properties. In the next section we will look at factoring in
+                database Id into the hashCode and equality implementations.</para>
+        </section>
+        
+        <section id="jpa-relationex-coll-entityid-pk">
+            <title>Primary Key Id</title>
+            <para>In this section we will will demonstrate an attempt at modeling the hashCode
+                and equals property through the database-assigned primary key. After all -- this value 
+                is meant to be our Id for the entity.</para>
+            <orderedlist>
+    
+                <listitem><para>Add the following entity class to your src/main tree. This class will
+                    base its hashCode and equals solely on the assigned (or unassigned) primary key.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.collection;
+
+
+import javax.persistence.*;
+
+/**
+ * This class is provides an example of an entity that implements hashCode/equals 
+ * using its database assigned primary key. Note the PK is not assigned until the 
+ * entity is inserted into the database -- so there will be a period of time prior
+ * to persist() when all instances of this class report the same hashCode/equals. 
+ */
+@Entity
+@Table(name="RELATIONEX_SHIP")
+public class ShipByPK extends Ship {
+    @Override
+    public int peekHashCode() {
+        return id;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        try {
+            if (this == obj) { return logEquals(obj, true); }
+            boolean equals = id==((ShipByPK)obj).id;
+            return logEquals(obj, equals);
+        } catch (Exception ex) {
+            return logEquals(obj, false);
+        }
+    }
+}
+]]></programlisting>                        
+                </listitem>
+        
+                <listitem><para>Add the entity class to your persistence unit.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.relex.collection.ShipByPK</class>
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add the following test method to your existing unit test. This test will 
+                    demonstrate how we can get two instances to logically represent the same thing.</para>
+<programlisting language="java"><![CDATA[
+    @Test
+    public void testByPK() {
+        log.info("*** testByPK ***");
+        
+        Ship ship1 = new ShipByPK();
+        Ship ship2 = new ShipByPK();
+        assertTrue("unexpected hashCode", ship1.hashCode() == ship2.hashCode());
+        assertTrue("unexpected equality", ship1.equals(ship2));
+    }
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Rebuild the module and run the new test method. Notice how two object 
+                   instances with the same database primary key value can easily report the same hashCode 
+                   and report they are equal.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testByPK
+...
+ -*** testByPK ***
+ -ShipByPK(id=0,oid=4).hashCode=0
+ -ShipByPK(id=0,oid=5).hashCode=0
+ -ShipByPK(id=0,oid=4).equals(id=0,oid=5)=true
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add the following lines of code to your existing test method. This
+                    code will demonstrate how an earlier unmanaged instance and a newly found
+                    managed instance will report they are the same.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("persisting entity");
+        em.persist(ship1);
+        em.flush();
+        em.clear();
+        log.debug("getting new instance of entity");
+        Ship ship4 = em.find(ShipByPK.class, ship1.getId());
+        assertTrue("unexpected hashCode", ship1.hashCode() == ship4.hashCode());
+        assertTrue("unexpected equality", ship1.equals(ship4));
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Rebuild the module and re-run the test method. Notice how the 
+                    common primary key value causes the two instances to be equal.</para>
+<programlisting language="java"><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testByPK
+...
+ -getting new instance of entity
+Hibernate: 
+    select
+        shipbypk0_.id as id29_0_,
+        shipbypk0_.created as created29_0_,
+        shipbypk0_.name as name29_0_ 
+    from
+        RELATIONEX_SHIP shipbypk0_ 
+    where
+        shipbypk0_.id=?
+ -ShipByPK(id=1,oid=4).hashCode=1
+ -ShipByPK(id=1,oid=6).hashCode=1
+ -ShipByPK(id=1,oid=4).equals(id=1,oid=6)=true
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add the following lines of code to your existing test
+                    method. This will demonstrate that even though the two instances report
+                    they are equal, the provider still treats them as being distinct and 
+                    not interchangeable.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("check if entity manager considers them the same");
+        assertFalse("em contained first entity", em.contains(ship1));
+        assertTrue("em did not contained second entity", em.contains(ship4));
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Rebuild the module and re-run the test method. Note how the 
+                    entity manager is able to tell the two instances apart and is not making
+                    any calls to hashCode or equals to determine if they are contained in the 
+                    persistence context. This is helpful because we don't get confused by 
+                    which instance is actually currently managed.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testByPK
+...
+ -check if entity manager considers them the same
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Up to now, we have been showing all good things about the 
+                    databaseId approach. Add the following code to your existing test method
+                    to demonstrate an issue with the technique. In the following code we attempt
+                    to create two separate, logical instances and add them to a Set. Since elements 
+                    of sets are unique and the implementation of the class is based off of a currently
+                    uninitialized primary key -- only the second entry is added to the set.  
+                    </para>
+<programlisting language="java"><![CDATA[
+        Set<Ship> ships = new HashSet<Ship>();
+        Ship ship5 = new ShipByPK().setName("one");
+        Ship ship6 = new ShipByPK().setName("two");
+        log.debug("add first ship to the set");
+        assertTrue("first entity not accepted into set", ships.add(ship5));
+        log.debug("add second ship to the set");
+        assertFalse("second entity accepted into set", ships.add(ship6));
+        assertEquals("unexpected set.size", 1, ships.size());
+        log.debug("ships=" + ships);
+]]></programlisting>                        
+                </listitem>
+                
+                <listitem><para>Rebuild the module, re-run the test method, and note the final contents of the 
+                    Set only contains the first entity. Since the first entity reported it equaled the second
+                    entity -- the second entity was not added to the set. This can be an issue if we want to
+                    model a relationship as a unique Set prior to the entities being persisted to the database.</para>
+<programlisting language=""><![CDATA[
+ -add first ship to the set
+ -ShipByPK(id=0,oid=7).hashCode=0
+ -add second ship to the set
+ -ShipByPK(id=0,oid=8).hashCode=0
+ -ShipByPK(id=0,oid=8).equals(id=0,oid=7)=true
+ -ships=[ShipByPK(id=0,oid=7)]
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+            </orderedlist>
+            <para>You have finished demonstrating a potential option for deriving hashCode and equals
+                that would make two separate instances logically presenting the same thing to be reported
+                as equal. However, this solution -- as demonstrated -- has issues. It only works for 
+                persisted entities that already have their database identity assigned. This can be a serious
+                issue for entity classes with a @GeneratedValue for a primary key and parents that house those
+                entities within Sets. In the next section we will look at a potential hybrid solution.
+            </para>
+        </section>
+
+
+        <section id="jpa-relationex-coll-entityid-switch">
+            <title>Switching Ids</title>
+            <para>In this section we will demonstrate an option for deriving hashCode and equals that will
+                report two instances for the same logical object and attempt to compensate for addition to
+                a set prior to being assigned a primary key.</para>
+            <orderedlist>
+    
+                <listitem><para>Add the following class to your src/main tree. This class will default to the 
+                    java.lang.Object approach prior to being given a primary key -- and then switch to the 
+                    primary key from that point forward. It sounds good -- but will also have some issues we
+                    will demonstrate.</para>
+                    <note>
+                        <title>Is changing result of hashCode/equals legal?</title>
+                        <para>The Internet is not short on discussion of hashCode/equals and whether its 
+                            value and result can be changed during the lifetime of an object. The 
+                            <ulink url="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html#hashCode()">java.lang.Object.hashCode javadoc</ulink>
+                            states that "...the hashCode method must consistently return the same integer, 
+                            provided no information used in equals comparisons on the object is modified".
+                            The first part of that phrase makes the following solution suspect. The last
+                            part of the phrase at least makes it a legal option.</para>
+                    </note>
+<programlisting language="java"><![CDATA[
+package myorg.relex.collection;
+
+
+import javax.persistence.*;
+
+/**
+ * This class is provides an example of an entity that implements hashCode/equals 
+ * using its database assigned primary key if it exists and defaults to the 
+ * java.lang.Object definition if not yet assigned.  Note that this technique causes
+ * a change in hashCode/equals after the persist() takes place -- invalidating anything
+ * previously cached for the identity.
+ */
+@Entity
+@Table(name="RELATIONEX_SHIP")
+public class ShipBySwitch extends Ship {
+    @Override
+    public int peekHashCode() {
+        return id==0 ? super.objectHashCode() : id;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        try {
+            if (this == obj) { return logEquals(obj, true); }
+            boolean equals = (id==0) ? super.equals(obj) :
+                id==((ShipBySwitch)obj).id;
+            return logEquals(obj, equals);
+        } catch (Exception ex) {
+            return logEquals(obj, false);
+        }
+    }
+}
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add the entity class to your persistence unit.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.relex.collection.ShipBySwitch</class>
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add the following test method to your existing JUnit test case. It will be used
+                    demonstrate the benefits and issues with having an object switching hashCode values and
+                    equals results.</para>
+<programlisting language="java"><![CDATA[
+    @Test
+    public void testBySwitch() {
+        log.info("*** testBySwitch ***");
+
+        Ship ship1 = new ShipBySwitch().setName("one");
+        Ship ship2 = new ShipBySwitch().setName("two");
+        assertFalse("unexpected hashCode", ship1.hashCode() == ship2.hashCode());
+        assertFalse("unexpected equality", ship1.equals(ship2));
+    }
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Rebuild the module and run the new test method. Notice how the two instances
+                    are immediately determined to be different during the pre-persist state by the fact they
+                    are two different instances. If we wanted them to be the same -- we could have switched to
+                    comparing object properties.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testBySwitch
+...
+ -*** testBySwitch ***
+ -ShipBySwitch(id=0,oid=4).hashCode=734740843
+ -ShipBySwitch(id=0,oid=5).hashCode=744458212
+ -ShipBySwitch(id=0,oid=4).equals(id=0,oid=5)=false
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add the following lines of code to your existing method. This will 
+                    demonstrate how to the two instances can be added to a set -- unlike before.</para>
+<programlisting language="java"><![CDATA[
+        Set<Ship> ships = new HashSet<Ship>();
+        log.debug("add first ship to the set");
+        assertTrue("first entity not accepted into set", ships.add(ship1));
+        log.debug("add second ship to the set");
+        assertTrue("second entity not accepted into set", ships.add(ship2));
+        assertEquals("unexpected set.size", 2, ships.size());
+        log.debug("ships=" + ships);
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Rebuild the module and re-run the test method. Note this time around
+                    we end up with two instances in the set.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testBySwitch
+...
+ -add first ship to the set
+ -ShipBySwitch(id=0,oid=4).hashCode=434276434
+ -add second ship to the set
+ -ShipBySwitch(id=0,oid=5).hashCode=1226345699
+ -ships=[ShipBySwitch(id=0,oid=4), ShipBySwitch(id=0,oid=5)]
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add the following lines of code to your existing test method.
+                    This should demonstrate how the object shifts from using the instanceId
+                    to the databaseId once it has been assigned.</para>
+<programlisting language="java"><![CDATA[
+        em.persist(ship1);
+        em.flush();
+        em.clear();
+        log.debug("getting new instance of entity");
+        Ship ship4 = em.find(ShipBySwitch.class, ship1.getId());
+        assertTrue("unexpected hashCode", ship1.hashCode() == ship4.hashCode());
+        assertTrue("unexpected equality", ship1.equals(ship4));
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Rebuild the module and re-run the updated test method. Notice
+                    how the previously managed from the persist() and the newly managed instance
+                    from the find() report they represent the same object.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testBySwitch
+...
+ -getting new instance of entity
+Hibernate: 
+    select
+        shipbyswit0_.id as id29_0_,
+        shipbyswit0_.created as created29_0_,
+        shipbyswit0_.name as name29_0_ 
+    from
+        RELATIONEX_SHIP shipbyswit0_ 
+    where
+        shipbyswit0_.id=?
+ -ShipBySwitch(id=1,oid=4).hashCode=1
+ -ShipBySwitch(id=1,oid=6).hashCode=1
+ -ShipBySwitch(id=1,oid=4).equals(id=1,oid=6)=true
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add the following of code to the existing unit test. This will
+                    attempt to find the entity that we know exists in the set.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("set=" + ships);
+        log.debug("checking set for entity");
+        assertFalse("set found changed entity after persist", ships.contains(ship1));
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Rebuild the module and re-run the test method. Notice the 
+                    entity can no longer be found in the set. This is because the hashCode has 
+                    changed from when it was originally inserted into the set. This can't be
+                    good. Lets stop here with this solution.</para>
+<programlisting language="java"><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testBySwitch
+...
+ -set=[ShipBySwitch(id=1,oid=4), ShipBySwitch(id=0,oid=5)]
+ -checking set for entity
+ -ShipBySwitch(id=1,oid=4).hashCode=1
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+            </orderedlist>
+            <para>You have finished trying out a technique where we shift the hashCode/equals
+                implementation based on a change in state. The javadoc for java.lang.Object
+                states this is legal for the instance to do this, but this technique obviously
+                does not work when the hashCode is stored separate from the entity -- like in 
+                a HashedSet. This technique represents the last automatic calculation of 
+                hashCode/equals we will try -- and they all had some type of deficiency. We will
+                next look at using business identity within the entity properties to derive the
+                hashCode and equals.</para>
+        </section>
+
+        <section id="jpa-relationex-coll-entityid-busId">
+            <title>Business Id</title>
+            <para>In this section we will look at one last identity mechanism. It is based on a 
+                "business identity". In this approach we model our entity with enough properties
+                such that they may be able to uniquely identity the entity without a database Id.
+                It is possible the designer could use these field(s) as the primary key or just 
+                make them the implementation basis for hashCode and equals. In the following example
+                we will use both a database-assigned primary key and separate identifying business
+                properties.
+                </para>
+            <orderedlist>
+    
+                <listitem><para>Add the following entity class to your src/main tree. This entity class
+                    derives its hashCode and equals using a name and createTime property. It may be 
+                    possible that two entities have the same name -- but no two entities should be 
+                    created with the same name in the same millisecond.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.collection;
+
+
+import javax.persistence.*;
+
+/**
+ * This class is provides an example of an entity that implements hashCode/equals 
+ * using its business identity. Note that it is not always easy to derive a business Id
+ * for an entity class.
+ */
+@Entity
+@Table(name="RELATIONEX_SHIP")
+public class ShipByBusinessId extends Ship {
+    @Override
+    public int peekHashCode() {
+        return (name==null ? 0 : name.hashCode()) + 
+               (created==null ? 0 : (int)created.getTime());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        try {
+            if (this == obj) { return logEquals(obj, true); }
+            boolean equals = name.equals(((ShipByBusinessId)obj).name) &&
+                    created.getTime() == (((ShipByBusinessId)obj).created.getTime());
+            return logEquals(obj, equals);
+        } catch (Exception ex) {
+            return logEquals(obj, false);
+        }
+    }
+    
+    @Override
+    public String toString() {
+        return super.toString() + 
+                ", name=" + name + 
+                ", created=" + (created==null ? 0 : created.getTime()); 
+    }
+}
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add the new entity class to your persistence unit.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.relex.collection.ShipByBusinessId</class>
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add the following test method to your existing JUnit test case.
+                   The first part of the test simply verifies we can determine the two instances
+                   are different. Note that since we are factoring in the createTime into the 
+                   businessId -- a delay is inserted to make sure we get at least one millisecond
+                   different in createTime. Depending on how our entities are created -- this may not
+                   be necessary.</para>
+<programlisting language="java"><![CDATA[
+    @Test
+    public void testByBusinessId() {
+        log.info("*** testByBusinessId ***");
+
+        Ship ship1 = new ShipByBusinessId().setName("one").setCreated(new Date());
+        try { Thread.sleep(1);} catch (InterruptedException e) {}
+        Ship ship2 = new ShipByBusinessId().setName("two").setCreated(new Date());
+        assertFalse("unexpected hashCode", ship1.hashCode() == ship2.hashCode());
+        assertFalse("unexpected equality", ship1.equals(ship2));
+    }
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Build the model and run the new test method. Note that we are 
+                    factoring in both name and createTime into the hashCode/equals and ignoring
+                    the databaseId and instanceId.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testByBusinessId
+...
+ -*** testByBusinessId ***
+ -ShipByBusinessId(id=0,oid=4), name=one, created=1364958763502.hashCode=-840726444
+ -ShipByBusinessId(id=0,oid=5), name=two, created=1364958763503.hashCode=-840721349
+ -ShipByBusinessId(id=0,oid=4), name=one, created=1364958763502.equals(id=0,oid=5)=false
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add the following to your test method. Since we have a unique 
+                    identities at this point, both instances will be placed into the set. We
+                    will also notice later that since the hashCode/equals does not change --
+                    the set will be usable after the calls to persist() complete.</para>
+<programlisting language="java"><![CDATA[
+        Set<Ship> ships = new HashSet<Ship>();
+        log.debug("add first ship to the set");
+        assertTrue("first entity not accepted into set", ships.add(ship1));
+        log.debug("add second ship to the set");
+        assertTrue("second entity not accepted into set", ships.add(ship2));
+        assertEquals("unexpected set.size", 2, ships.size());
+        log.debug("ships=" + ships);
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Rebuild the module and re-run the test method. Of no surprise --
+                    we get both instances inserted into the set.</para>
+<programlisting language="java"><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testByBusinessId
+...
+ -add first ship to the set
+ -ShipByBusinessId(id=0,oid=4), name=one, created=1364959025047.hashCode=-840464899
+ -add second ship to the set
+ -ShipByBusinessId(id=0,oid=5), name=two, created=1364959025048.hashCode=-840459804
+ -ships=[ShipByBusinessId(id=0,oid=4), name=one, created=1364959025047, ShipByBusinessId(id=0,oid=5), name=two, created=1364959025048]
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add the following lines to your test method. In this section
+                    we will be determining whether a managed and unmanaged instance will have
+                    the same Id. Note the extra effort to zero out the databaseId for the 
+                    unmanaged instance.</para>
+<programlisting language="java"><![CDATA[
+        em.persist(ship1);
+        em.flush();
+        em.clear();
+        log.debug("getting new instance of entity");
+        Ship ship4 = em.find(ShipByBusinessId.class, ship1.getId());
+        ship1.setId(0); //making sure that databaseId not used in hashCode/equals
+        assertTrue("unexpected hashCode", ship1.hashCode() == ship4.hashCode());
+        assertTrue("unexpected equality", ship1.equals(ship4));
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Rebuild the module and re-run the test method. Note how the 
+                    instances match even when one does not have the databaseId to work with.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testByBusinessId
+...
+-getting new instance of entity
+Hibernate: 
+    select
+        shipbybusi0_.id as id29_0_,
+        shipbybusi0_.created as created29_0_,
+        shipbybusi0_.name as name29_0_ 
+    from
+        RELATIONEX_SHIP shipbybusi0_ 
+    where
+        shipbybusi0_.id=?
+ -ShipByBusinessId(id=0,oid=4), name=one, created=1364959720863.hashCode=-839769083
+ -ShipByBusinessId(id=1,oid=6), name=one, created=1364959720863.hashCode=-839769083
+ -ShipByBusinessId(id=0,oid=4), name=one, created=1364959720863.equals(id=1,oid=6)=true
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add the following lines to your test method. This is where the
+                    hashCode/equals basis switch failed us last time.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("set=" + ships);
+        log.debug("checking set for entity");
+        assertTrue("entity not found after persist", ships.contains(ship1));
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Rebuild your module and re-run the test method. This time around
+                    you should notice the entity is able to be found within the set.</para>
+<programlisting language="java"><![CDATA[
+-set=[ShipByBusinessId(id=0,oid=5), name=two, created=1364959903295, ShipByBusinessId(id=0,oid=4), name=one, created=1364959903294]
+ -checking set for entity
+ -ShipByBusinessId(id=0,oid=4), name=one, created=1364959903294.hashCode=-839586652
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+            </orderedlist>
+            <para>You have finished working through the business identity solution for calculating
+                hashCode and equals. This technique has the benefit of being stable from the time
+                the instance was created in memory and through persistence into the database. It was
+                a bit harder to calculate because we needed to find enough stable entity properties
+                persisted to the database so we could derive the values. If these values are actually
+                unique -- we could have considered using them for the primary key but that would 
+                have added database complexity/expense.</para>
+        </section>
+        
+    </section>
+
+
+
+    <section id="jpa-relationex-coll-ordered">
+        <title>Collection Ordering</title>
+            <para>In this section we will demonstrate the use of ordering a collection mapped with JPA. 
+                The previous sections mapped the many aspects of the collection but did not represent 
+                any specific ordering within the collection.
+            </para>
+        
+        <section id="jpa-relationex-coll-ordered-xxx">
+            <title>Ordered Collections</title>
+                
+            <orderedlist>
+    
+                <listitem><para>Put the following class in your src/main tree. We will use this 
+                    entity as something we wish to sort within our application. It is currently 
+                    incomplete and does not sort without some external help.</para>
+ <programlisting language="java"><![CDATA[
+package myorg.relex.collection;
+
+import java.util.Comparator;
+import javax.persistence.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+/**
+ * This class represents an example entity that has an order in its parent's list.
+ */
+@Entity
+@Table(name="RELATIONEX_SEGMENT")
+public class Segment {// implements Comparable<Segment>{
+    private static final Log log = LogFactory.getLog(Segment.class);
+    @Id @GeneratedValue
+    private int id;
+    
+    private int number; //a one-up sequence used to order a route
+    
+    @Column(name="TO", length=16)
+    private String to;
+    @Column(name="FM", length=16)
+    private String from;
+    
+    
+    public int getId() { return id; }
+
+    public int getNumber() { return number; }
+    public Segment setNumber(int number) {
+        this.number = number;
+        return this;
+    }
+    
+    public String getTo() { return to; }
+    public Segment setTo(String to) {
+        this.to = to;
+        return this;
+    }
+    
+    public String getFrom() { return from; }
+    public Segment setFrom(String from) {
+        this.from = from;
+        return this;
+    }
+
+    /*
+    @Override
+    public int compareTo(Segment rhs) {
+        if (this == rhs) { return 0; }
+        int result = number - rhs.number;
+        log.debug(getClass().getSimpleName() + toString() + 
+                ".compareTo" + rhs.toString() + 
+                "=" + result
+                );
+        return result;
+    }
+    */
+    
+    @Override
+    public String toString() {
+        return "(id=" + id + ",number=" + number + ")";
+    }
+}
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Put the following entity class in your src/main tree. This class will
+                    be the owning side of a one-to-many relationship of what should be ordered children
+                    entities. It is currently incomplete and we will modify in the following steps.</para>
+ <programlisting language="java"><![CDATA[
+package myorg.relex.collection;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.persistence.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+/**
+ * This entity class provides an example of an ordered list of child entities ordered by a business property
+ * in the child entity.
+ */
+@Entity
+@Table(name="RELATIONEX_PATH")
+public class Path {
+    private static final Log log = LogFactory.getLog(Path.class);
+    @Id @GeneratedValue
+    private int id;
+    
+    @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
+    @JoinColumn
+//    @OrderBy("number ASC")
+    private List<Segment> segments;
+    
+    @Column(length=16)
+    private String name;
+
+    public int getId() { return id; }
+
+    public List<Segment> getSegments() {
+        if (segments==null) { segments = new LinkedList<Segment>(); }
+        return segments; 
+    }
+    //private class SegmentComparator implements Comparator<Segment>
+    
+    public Path addSegment(Segment segment) {
+        getSegments().add(segment);
+/*      
+        Collections.sort(segments, new Comparator<Segment>() {
+            @Override
+            public int compare(Segment lhs, Segment rhs) {
+                if (lhs == rhs || lhs==null && rhs == null) { return 0; }
+                if (lhs != null && rhs == null) { return 1; }
+                if (lhs == null && rhs != null) { return -1; }
+                int result = lhs.getNumber() - rhs.getNumber();
+                log.debug(lhs.getClass().getSimpleName() + lhs.toString() + 
+                        ".compareTo" + rhs.toString() + 
+                        "=" + result
+                        );
+                return result;
+            }});
+*/          
+//      Collections.sort(segments);
+        return this;
+    }
+
+    public String getName() { return name; }
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Add the two entity classes to the persistence unit.</para>
+ <programlisting language="xml"><![CDATA[
+        <class>myorg.relex.collection.Path</class>
+        <class>myorg.relex.collection.Segment</class>
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Add the following test method to your existing JUnit test case.
+                    This test will verify we can add several elements to a list within the 
+                    parent entity and have the list maintain the entry order.</para>
+ <programlisting language="java"><![CDATA[
+    @Test
+    public void testOrderBy() {
+        log.info("*** testOrderBy ***");
+        
+        Segment s1 = new Segment().setNumber(1).setFrom("A").setTo("B");
+        Segment s2 = new Segment().setNumber(2).setFrom("B").setTo("C");
+        Segment s3 = new Segment().setNumber(3).setFrom("C").setTo("D");
+        Path path = new Path();
+        path.addSegment(s2).addSegment(s3).addSegment(s1);
+        log.debug("path.segments=" + path.getSegments());
+        Iterator<Segment> itr = path.getSegments().iterator();
+        assertEquals(2, itr.next().getNumber());
+        assertEquals(3, itr.next().getNumber());
+        assertEquals(1, itr.next().getNumber());
+    }
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Build the module and run the new unit test. Notice the list maintained the 
+                   order we entered the elements even though it may not be the way we wish to have them
+                   ordered later.</para>
+ <programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testOrderBy
+...
+ -*** testOrderBy ***
+ -path.segments=[(id=0,number=2), (id=0,number=3), (id=0,number=1)]
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Add the following to the test method. This will store the entities and 
+                    get a fresh instance from the database.</para>
+ <programlisting language="java"><![CDATA[
+        log.debug("getting new path instance from database");
+        em.persist(path);
+        em.flush(); em.clear();
+        Path path2 = em.find(Path.class, path.getId());
+        itr = path2.getSegments().iterator();
+        log.debug("path2.segments=" + path2.getSegments());
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Re-build the module and re-run the test method. Notice how the 
+                    provider queried for the child entities without any regard for order. They 
+                    come out in a random order (even though it appears somewhat predictable here).</para>
+ <programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testOrderBy
+...
+ -path.segments=[(id=0,number=2), (id=0,number=3), (id=0,number=1)]
+ -getting new path instance from database
+...
+Hibernate: 
+    select
+        path0_.id as id30_1_,
+        path0_.name as name30_1_,
+        segments1_.segments_id as segments5_30_3_,
+        segments1_.id as id3_,
+        segments1_.id as id31_0_,
+        segments1_.FM as FM31_0_,
+        segments1_.number as number31_0_,
+        segments1_.TO as TO31_0_ 
+    from
+        RELATIONEX_PATH path0_ 
+    left outer join
+        RELATIONEX_SEGMENT segments1_ 
+            on path0_.id=segments1_.segments_id 
+    where
+        path0_.id=?
+ -path2.segments=[(id=1,number=2), (id=2,number=3), (id=3,number=1)]
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Lets add a requirement the Segments be ordered by a business property; number.
+                    We can make this happen by adding the following metadata to the list within the parent entity.
+                    Add an @OrderBy("number ASC") to the collection. Note that we can order in an ASCending or 
+                    DESCending order. The default is ASC.</para>
+ <programlisting language="java"><![CDATA[
+    @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
+    @JoinColumn
+    @OrderBy("number ASC")
+    private List<Segment> segments;
+]]></programlisting>
+                </listitem>        
+                
+                <listitem><para>Add the following assertions that verify the returned collection has a list 
+                    of elements ordered by the specified business property.</para>
+<programlisting language=""><![CDATA[
+        log.debug("path2.segments=" + path2.getSegments());
+        ...
+        assertEquals(1, itr.next().getNumber());
+        assertEquals(2, itr.next().getNumber());
+        assertEquals(3, itr.next().getNumber());
+]]></programlisting>                        
+                </listitem>        
+                
+    
+                <listitem><para>Rebuild the module and and re-run the unit test. Notice the provider
+                    has added an "order by" to the SQL query and our list comes back in a stable, predictable
+                    order by number.</para>
+ <programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testOrderBy
+...
+Hibernate: 
+    select
+        path0_.id as id30_1_,
+        path0_.name as name30_1_,
+        segments1_.segments_id as segments5_30_3_,
+        segments1_.id as id3_,
+        segments1_.id as id31_0_,
+        segments1_.FM as FM31_0_,
+        segments1_.number as number31_0_,
+        segments1_.TO as TO31_0_ 
+    from
+        RELATIONEX_PATH path0_ 
+    left outer join
+        RELATIONEX_SEGMENT segments1_ 
+            on path0_.id=segments1_.segments_id 
+    where
+        path0_.id=? 
+    order by
+        segments1_.number asc
+ -path2.segments=[(id=3,number=1), (id=1,number=2), (id=2,number=3)]
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Thats great that we can get the list ordered in a way we want when
+                    pulled from the database. However -- what if we wanted things ordered without
+                    a round-trip to the database. Java Lists are meant to be sorted so lets add a few
+                    extra steps to this section.</para>
+ <programlisting language=""><![CDATA[
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Change the behavior of adding an element to the collection. Add
+                    a sort and a Comparator so adding a new entry causes the list to be re-sorted according
+                    to the business property.</para>
+ <programlisting language=""><![CDATA[
+    public Path addSegment(Segment segment) {
+        getSegments().add(segment);
+        Collections.sort(segments, new Comparator<Segment>() {
+            @Override
+            public int compare(Segment lhs, Segment rhs) {
+                if (lhs == rhs || lhs==null && rhs == null) { return 0; }
+                if (lhs != null && rhs == null) { return 1; }
+                if (lhs == null && rhs != null) { return -1; }
+                int result = lhs.getNumber() - rhs.getNumber();
+                log.debug(lhs.getClass().getSimpleName() + lhs.toString() + 
+                        ".compareTo" + rhs.toString() + 
+                        "=" + result
+                        );
+                return result;
+            }});
+        return this;
+    }
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Change the order of the assert statements in the first section of the 
+                     unit test. We should now have a list that is sorted by business property before 
+                     being stored in the database.</para>
+ <programlisting language="java"><![CDATA[
+        log.debug("path.segments=" + path.getSegments());
+        Iterator<Segment> itr = path.getSegments().iterator();
+        assertEquals(1, itr.next().getNumber());
+        assertEquals(2, itr.next().getNumber());
+        assertEquals(3, itr.next().getNumber());
+]]></programlisting>
+                </listitem>        
+    
+    
+                <listitem><para>Rebuild the module, re-run the unit test, and notice how the elements
+                    of the list are ordered prior to being pulled back. We didn't save the provider or 
+                    database any work -- but we did make our abstraction of the list more consistent.</para>
+ <programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testOrderBy
+...
+ -*** testOrderBy ***
+ -Segment(id=0,number=3).compareTo(id=0,number=2)=1
+ -Segment(id=0,number=3).compareTo(id=0,number=2)=1
+ -Segment(id=0,number=1).compareTo(id=0,number=3)=-2
+ -Segment(id=0,number=1).compareTo(id=0,number=3)=-2
+ -Segment(id=0,number=1).compareTo(id=0,number=2)=-1
+ -path.segments=[(id=0,number=1), (id=0,number=2), (id=0,number=3)]
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+                </listitem>        
+    
+    
+                <listitem><para>Add the following to your child entity class. We are going to make the 
+                     entities be able to order themselves. This works find if there is a standard,
+                     comparable property (or set of properties) and can clean up the parent classes
+                     from having to define sort information.</para>
+ <programlisting language="java"><![CDATA[
+public class Segment implements Comparable<Segment>{
+...
+]]></programlisting>
+ <programlisting language="java"><![CDATA[
+...
+    @Override
+    public int compareTo(Segment rhs) {
+        if (this == rhs) { return 0; }
+        int result = number - rhs.number;
+        log.debug(getClass().getSimpleName() + toString() + 
+                ".compareTo" + rhs.toString() + 
+                "=" + result
+                );
+        return result;
+    }
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Change the implementation of the parent to the following. All we did 
+                    was move the burden of the compare from the container to the elements within the 
+                    container.</para>
+ <programlisting language="java"><![CDATA[
+    public Path addSegment(Segment segment) {
+        getSegments().add(segment);
+        Collections.sort(segments);
+        return this;
+    }
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Rebuild the module and re-run the test method. Observe the ordering 
+                    is still preserved with the new approach.</para>
+ <programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testOrderBy
+...
+ -*** testOrderBy ***
+ -Segment(id=0,number=3).compareTo(id=0,number=2)=1
+ -Segment(id=0,number=3).compareTo(id=0,number=2)=1
+ -Segment(id=0,number=1).compareTo(id=0,number=3)=-2
+ -Segment(id=0,number=1).compareTo(id=0,number=3)=-2
+ -Segment(id=0,number=1).compareTo(id=0,number=2)=-1
+ -path.segments=[(id=0,number=1), (id=0,number=2), (id=0,number=3)]
+]]></programlisting>
+                </listitem>        
+            </orderedlist>
+            <para>You have finished looking at ordered collections. You saw how a list could be 
+                ordered by the provider when queried by the database. You also saw how implementing
+                the Java Comparator or Comparable interface could provide sorting outside of the 
+                scope of the database query.</para>
+        </section>        
+        
+    </section>
+
+
+
+    <section id="jpa-relationex-coll-iface">
+        <title>Collection Interfaces</title>
+            <para>In this section we will demonstrate the use of different collection interfaces 
+                that can be used with JPA.
+            </para>
+        
+        <section id="jpa-relationex-coll-iface-map">
+            <title>Using Maps with Collections</title>
+            <para>In this section we will demonstrate the mapping of a collection using a java.util.Map
+                interface. This technique is useful for un-ordered collections with elements that are normally
+                accessed by an entity property from the parent/one side of the relationship. Note that access
+                to any entity by any property is always available through the EntityManager and JPAQL.
+            </para>
+                
+            <orderedlist>
+    
+                <listitem><para>Add the following class to your src/main tree. This entity class will be referenced 
+                    via a Map from its parent in a one-to-many, uni-directional relationship.</para>
+ <programlisting language="java"><![CDATA[
+package myorg.relex.collection;
+
+import javax.persistence.*;
+
+/**
+ * This class is an example of an entity that will be referenced from the parent in its relationship
+ * through a Map which uses a value unique to that parent.
+ */
+@Entity
+@Table(name="RELATIONEX_POSITION")
+public class Position {
+    @Id @GeneratedValue
+    private int id;
+    
+    @Column(length=12, nullable=false)
+    private String position; //this is not unique within this table
+    
+    @Column(length=32, nullable=false, unique=true)
+    private String player; //this is unique within the table
+    
+    protected Position() {}
+    public Position(String position, String player) {
+        this.position = position;
+        this.player = player;
+    }
+
+    public int getId() { return id; }
+
+    public String getPosition() { return position; }
+    public void setPosition(String position) { this.position = position; }
+
+    public String getPlayer() { return player; }
+    public void setPlayer(String player) {
+        this.player = player;
+    }
+    
+    @Override
+    public int hashCode() {
+        return position==null?0:position.hashCode() + player==null?0:player.hashCode(); 
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        try {
+            if (this == obj) { return true; }
+            Position rhs = (Position) obj;
+            if (position==null || player==null) { return false; }
+            return position.equals(rhs.position) && player.equals(rhs.player);
+        } catch (Exception ex) { return false; }
+    }
+}
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Put the following class in your src/main tree. This entity class implements
+                    the one-to-many, uni-directional relationship as a Map. Since the parent uses a Map keyed
+                    by an entity property, there can only be a relationship to children from a common parent where
+                    the children have different property values. Since the property being used is not unique within the 
+                    child table -- then not all children will be allowed to be associated with this parent entity 
+                    at the same time.</para>
+ <programlisting language="java"><![CDATA[
+package myorg.relex.collection;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.persistence.*;
+
+/**
+ * This class provides an example of a parent that uses a Map to reference child members.
+ */
+@Entity
+@Table(name="RELATIONEX_LINEUP")
+public class Lineup {
+    @Id @GeneratedValue
+    private int id;
+    
+    @OneToMany
+    @MapKey(name="position")
+    @JoinColumn(name="LINEUP_ID")
+    private Map<String, Position> positions;
+    
+    @Column(length=10)
+    private String team;
+
+    public int getId() { return id; }
+
+    public Map<String, Position> getPositions() {
+        if (positions==null) { positions = new HashMap<String, Position>(); }
+        return positions; 
+    }
+    public Lineup addPosition(Position position) {
+        if (position==null) { return this; }
+        getPositions().put(position.getPosition(), position);
+        return this;
+    }
+
+    public String getTeam() { return team; }
+    public void setTeam(String team) {
+        this.team = team;
+    }
+}
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Add the entity classes to the persistence unit.</para>
+ <programlisting language="xml"><![CDATA[
+        <class>myorg.relex.collection.Position</class>
+        <class>myorg.relex.collection.Lineup</class>
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Add the following test method to your existing JUnit test method.</para>
+ <programlisting language="java"><![CDATA[
+    @Test
+    public void testMap() {
+        log.info("*** testMap ***");
+
+        Position players[] = new Position[] {
+                new Position("1st", "who"),
+                new Position("2nd", "what"),
+                new Position("3rd", "idontknow"),
+                new Position("1st", "whom"),
+                new Position("1st", "whoever")
+        };
+        log.debug("persisting players");
+        for (Position p: players) {
+            em.persist(p);
+        }
+
+        Lineup lineup = new Lineup();
+        lineup.setTeam("today");
+        lineup.addPosition(players[0]);
+        lineup.addPosition(players[1]);
+        lineup.addPosition(players[2]);
+        log.debug("persisting lineup");
+        em.persist(lineup);
+    }
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Build the module and run the new unit test method. Nothing significant at this 
+                    point to observe other than to possibly notice the foreign key assignments with some of the 
+                    child table rows.</para>
+ <programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testMap
+...
+ -*** testMap ***
+ -persisting players
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Add the following lines to the test method. This will verify the 
+                    expected entities from the child table are associated with the parent and accessible
+                    through the map using a property of the child entity.</para>
+ <programlisting language="java"><![CDATA[
+        log.debug("getting new lineup instance");
+        em.flush(); em.clear();
+        Lineup lineup2 = em.find(Lineup.class, lineup.getId());
+        assertEquals("unexpected size", lineup.getPositions().size(), lineup2.getPositions().size());
+        for (int i=0; i<lineup.getPositions().size(); i++) {
+            assertNotNull(players[i].getPlayer() + " not found", lineup2.getPositions().get(players[i].getPosition()));
+        }
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Rebuild the module and re-run the test method. Nothing unique occurs with 
+                    the database, but observe the asserts within the test case should be passing.</para>
+ <programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testMap
+...
+ -getting new lineup instance
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Add the following lines to your unit test. This will attempt to replace an entry in the Map
+                    with a new entry. This should remove the association with the former entity and form an relationship
+                    with the new entity since they share the same entity property.</para>
+ <programlisting language="java"><![CDATA[
+        log.debug("adding new player for position");
+        lineup2.addPosition(players[3]);
+        assertEquals("number of positions changed", lineup.getPositions().size(), lineup2.getPositions().size());
+        em.flush();
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Rebuild the module and re-run the test method. Notice the foreign key being set to null for the 
+                    former entity and the foreign key being set for the new entity being added to the Map.</para>
+ <programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testMap
+...
+ -adding new player for position
+Hibernate: 
+    update
+        RELATIONEX_POSITION 
+    set
+        LINEUP_ID=null 
+    where
+        LINEUP_ID=? 
+        and id=?
+Hibernate: 
+    update
+        RELATIONEX_POSITION 
+    set
+        LINEUP_ID=? 
+    where
+        id=?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Add the following lines to your test method. They will verify the foreign key state of
+                    each row in the child table using the known state of the unit test.</para>
+ <programlisting language=""><![CDATA[
+        log.debug("checking positions");
+        @SuppressWarnings("unchecked")
+        List<Object[]> rows = em.createNativeQuery("select ID, LINEUP_ID from RELATIONEX_POSITION").getResultList();
+        for (Object[] val : rows) {
+            int id = (Integer)val[0];
+            Integer lineupId = (Integer)val[1];
+            if (id==players[1].getId() || id==players[2].getId() || id==players[3].getId()) {
+                assertNotNull("unexpected lineupId", lineupId);
+            } else {
+                assertNull("lineupId was assigned for " + id, lineupId);
+            }
+        }
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Rebuild the module and re-run the unit test. The final asserts should pass.</para>
+ <programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testMap
+...
+ -checking positions
+Hibernate: 
+    select
+        ID,
+        LINEUP_ID 
+    from
+        RELATIONEX_POSITION
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>The following lists the final state of the child table at the completion of the unit test.</para>
+ <programlisting language=""><![CDATA[
+SELECT * FROM RELATIONEX_POSITION;
+ID      PLAYER      POSITION    LINEUP_ID  
+1       who         1st         null
+2       what        2nd         1
+3       idontknow   3rd         1
+4       whom        1st         1
+5       whoever     1st         null
+]]></programlisting>
+                </listitem>        
+            </orderedlist>
+            <para>You have completed a brief look at collection types used by JPA. In this exercise you used a Map which permitted
+                a relationship with child entities that had unique values for the @MapKey. Foreign keys are created when we add a child
+                entity to the Map and removed when we remove or overwrite entries in the Map. Other types of collections supported by 
+                JPA include Set, List, and Collection.</para>        
+        </section>
+    </section>
+
+    <section id="jpa-relationex-coll-summary">
+       <title>Summary</title>
+       <para>In this chapter we took a detour from relationships and took a deeper look at topics specifically related
+           to identity, collection membership, collection ordering, and collection types. During this chapter we found the 
+           significance of hashCode/equals and when it would be important and a non-issue to override. We showed how to 
+           make out collections ordered at all times when desired. We saw how we could access child objects through a Map
+           interface. In the following chapters we will get back into the grind of going through the other relationship types. 
+       </para>
+    </section>    
+</chapter>

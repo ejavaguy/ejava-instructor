@@ -63,6 +63,18 @@
             <version>${project.version}</version>
             <classifier>docsrc</classifier>
         </dependency>
+        <dependency>
+            <groupId>info.ejava.docs.jpa</groupId>
+            <artifactId>jpa-relation-notes</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+        <dependency>
+            <groupId>info.ejava.docs.jpa</groupId>
+            <artifactId>jpa-inheritance-notes</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
     </dependencies>
 
     <build>

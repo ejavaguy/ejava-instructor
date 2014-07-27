@@ -1,0 +1,2220 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-relationex-one2many-bi">
+    <title>Mapping One-to-Many/Many-to-One Bi-directional Relationships</title>
+    <para>In this chapter we are going to combine the aspects of the one-to-many annd many-to-one to
+        form a bi-directional relationship. The "bi-directional" aspects are solely at the Java class 
+        level and do not change anything about the database. Foreign keys and join tables will look
+        just as they did in the uni-directional case. Howevever, in this case, we will be able to 
+        easily navigate from parent to child and child to parent through the use of a variable reference
+        from either direction.</para> 
+    <para>As with the one-to-one, bi-directional relationships we looked at in an earlier chapter, bi-directional
+        relationships have an owning side and and inverse side. The owning side provides the mapping information
+        and is the side of the relationship that drives the provider actions. The inverse side simply references
+        the owning side (via "mappedBy" attribute). The inverse side will get initialized by the provider when 
+        obtaining object trees from the database. However the provider will not update or pay attention to the 
+        current state of the inverse side when it comes to persisting the state of the relation.</para>
+    <para>JPA does have some rules we need to follow when converting from uni-directional to bi-directional
+        relationships. JPA requires the many side of a one-to-many, bi-directional relationship to be the 
+        owning side of that relationship. There is no choice to be made along those lines. That means 
+        the one side will always be the one side.</para>
+        
+    <section id="jpa-relationex-o2mb-setup">
+        <title>Setup</title>
+        <para>Create a JUnit test class to host tests for the one-to-many mappings.</para>
+
+        <orderedlist>
+            <listitem><para>Put the following Junit test case base class in your src/test tree.
+                You can delete the sample test method once we add our first real test. JUnit
+                will fail a test case if it cannot locate a @Test to run.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex;
+
+import static org.junit.Assert.*;
+
+import javax.persistence.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.*;
+
+public class One2ManyBiTest extends JPATestBase {
+    private static Log log = LogFactory.getLog(One2ManyBiTest.class);
+    @Test
+    public void testSample() {
+        log.info("testSample");
+    }
+}
+]]></programlisting>                        
+                </listitem>
+ 
+                <listitem><para>Verify the new JUnit test class builds and executes to completion</para>
+<programlisting language=""><![CDATA[
+relationEx]$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest
+
+...
+ -HHH000401: using driver [org.h2.Driver] at URL [jdbc:h2:tcp://localhost:9092/h2db/ejava]
+...
+[INFO] BUILD SUCCESS                
+]]></programlisting>                        
+                </listitem>
+        
+        </orderedlist>
+    </section>
+        
+        
+    <section id="jpa-relationex-o2m-bi-fk">
+        <title>One-to-Many Bi-directional using Foreign Key Join</title>
+        <para>In this section we will demonstrate the use of a simple foreign key mapping
+            from the owning/dependent entity table to the inverse/parent entity table.</para>
+        <orderedlist>
+
+            <listitem><para>Put the following class in your src/main tree. This class provides an example
+                of the one/parent side of a one-to-many, bi-directional relationship. It is currently incomplete
+                and we will fix shortly. This biggest issue is the lack of a "mappedBy" attribute in the 
+                @OneToMany mapping. That attribute is required to form the bi-directional relationship.</para>
+ <programlisting language="java"><![CDATA[
+package myorg.relex.one2manybi;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.*;
+/**
+ * This class provides an example of the one/parent side of a one-to-many, bi-directional relationship
+ * that will be realized through a foreign key from the many/child side of the relationship. Being the 
+ * one side of the one-to-many relationship, this class must implement the inverse side.
+ */
+@Entity
+@Table(name="RELATIONEX_BORROWER")
+public class Borrower {
+    @Id @GeneratedValue
+    private int id;
+    
+    @OneToMany(
+//          mappedBy="borrower"
+//          , cascade={CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REMOVE}
+//          , orphanRemoval=true
+//          , fetch=FetchType.EAGER
+            )
+    private List<Loan> loans;
+    
+    @Column(length=12)
+    private String name;
+
+    public int getId() { return id; }
+
+    public List<Loan> getLoans() {
+        if (loans == null) {
+            loans = new ArrayList<Loan>();
+        }
+        return loans;
+    }
+
+    public void setLoans(List<Loan> loans) {
+        this.loans = loans;
+    }
+
+    public String getName() { return name; }
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Put the following class in your src/main tree. This class provides an example
+                of the many/child side of a many-to-one, bi-directional relationship. Thus, this class
+                will define the mapping to the database and does so using a simple foreign key.</para>
+ <programlisting language="java"><![CDATA[
+package myorg.relex.one2manybi;
+
+import java.util.Date;
+import javax.persistence.*;
+/**
+ * This class provides an example of the many/child side of a many-to-one, bi-directional relationship.
+ * Being the many side of the many-to-one relationship, this class must implementing the owning side.
+ */
+@Entity
+@Table(name="RELATIONEX_LOAN")
+public class Loan {
+    @Id @GeneratedValue
+    private int id;
+    
+    @ManyToOne(fetch=FetchType.EAGER, optional=false)
+//    @JoinColumn(name="BORROWER_ID")
+    private Borrower borrower;
+    
+    @Temporal(TemporalType.DATE)
+    @Column(nullable=false)
+    private Date checkout;
+    @Temporal(TemporalType.DATE)
+    private Date checkin;
+    
+    public Loan() {}
+    public Loan(Borrower borrower) {
+        this.borrower=borrower;
+        this.checkout=new Date();
+    }
+    
+    public int getId() { return id; }
+    public boolean isOut() { return checkin==null; }
+    
+    public Borrower getBorrower() { return borrower; }
+    public void setBorrower(Borrower borrower) {
+        this.borrower = borrower;
+    }
+    
+    public Date getCheckout() { return checkout; }
+    public void setCheckout(Date checkout) {
+        this.checkout = checkout;
+    }
+    
+    public Date getCheckin() { return checkin; }
+    public void setCheckin(Date checkin) {
+        this.checkin = checkin;
+    }
+}
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Add the new entity classes to the persistence unit.</para>
+ <programlisting language="xml"><![CDATA[
+        <class>myorg.relex.one2manybi.Borrower</class>
+        <class>myorg.relex.one2manybi.Loan</class>
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Generate schema for the module. Note the dual one-way relationships defined
+               rather than a single bi-directional one. The foreign key from the child entity table to
+               the parent entity table is correct. However, the link table from the parent entity table
+               is not correct. This was added because of the lack of the the "mappedBy" attribute earlier.
+               </para>
+ <programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl
+...
+   create table RELATIONEX_BORROWER (
+        id integer generated by default as identity,
+        name varchar(12),
+        primary key (id)
+    );
+
+    create table RELATIONEX_BORROWER_RELATIONEX_LOAN ( <!== WRONG!!!!
+        RELATIONEX_BORROWER_id integer not null,
+        loans_id integer not null,
+        unique (loans_id)
+    );
+...
+    create table RELATIONEX_LOAN (
+        id integer generated by default as identity,
+        checkin date,
+        checkout date not null,
+        borrower_id integer not null,                  <!== CORRECT
+        primary key (id)
+    );
+...
+    alter table RELATIONEX_BORROWER_RELATIONEX_LOAN    <!== WRONG!!!! 
+        add constraint FKC555B9339909D56E 
+        foreign key (RELATIONEX_BORROWER_id) 
+        references RELATIONEX_BORROWER;
+
+    alter table RELATIONEX_BORROWER_RELATIONEX_LOAN    <!== WRONG!!!! 
+        add constraint FKC555B933458DDBCB 
+        foreign key (loans_id) 
+        references RELATIONEX_LOAN;
+    alter table RELATIONEX_LOAN                        <!== CORRECT 
+        add constraint FK355D0780BC290DFE 
+        foreign key (borrower_id) 
+        references RELATIONEX_BORROWER;
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Correct the mapping by adding "mappedBy" to the one/parent
+                side of the relation.</para>
+ <programlisting language="java"><![CDATA[
+public class Borrower {
+...
+    @OneToMany(
+            mappedBy="borrower"
+            )
+    private List<Loan> loans;
+]]></programlisting>
+                <para>Also make the foreign key mapping from the many/child side to the 
+                    one/parent side more obvious by adding a @JoinColumn declaration.</para>
+ <programlisting language="java"><![CDATA[
+public class Loan {
+...
+    @ManyToOne(fetch=FetchType.EAGER, optional=false)
+    @JoinColumn(name="BORROWER_ID")
+    private Borrower borrower;
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Regenerate schema for the module. Notice how we now only have 
+                the single foreign key to the parent entity table in the child entity table.</para>
+ <programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl
+...
+    create table RELATIONEX_BORROWER (
+        id integer generated by default as identity,
+        name varchar(12),
+        primary key (id)
+    );
+...
+    create table RELATIONEX_LOAN (
+        id integer generated by default as identity,
+        checkin date,
+        checkout date not null,
+        BORROWER_ID integer not null,
+        primary key (id)
+    );
+...
+    alter table RELATIONEX_LOAN 
+        add constraint FK355D0780BC290DFE 
+        foreign key (BORROWER_ID) 
+        references RELATIONEX_BORROWER;
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Add the following test method to your JUnit test case. The initial version simply
+                persists the object tree with a parent and single child. Notice how the parent is set on the 
+                child (the owning side) and the child is set on the parent (the inverse side).</para>
+ <programlisting language="java"><![CDATA[
+    @Test
+    public void testOneToManyBiFK() {
+        log.info("*** testOneToManyBiFK ***");
+        
+        log.debug("persisting borrower");
+        Borrower borrower = new Borrower();
+        borrower.setName("fred");
+        em.persist(borrower);
+        em.flush();
+        
+        log.debug("persisting loan");
+        Loan loan = new Loan(borrower);
+        borrower.getLoans().add(loan);
+        em.persist(borrower); //cascade.PERSIST
+        em.flush();
+]]></programlisting>
+                <para>Notice how we are attempting to persist the child -- by associating it with the 
+                    parent and then calling em.persist() again on the parent. This is legal. Calling
+                    persist on an already managed entity causes nothing to happen to the already managed
+                    entity but it will execute all cascades.</para>
+            </listitem>        
+
+            <listitem><para>If you build the module and run the test method you will notice a problem.
+                The child is never saved to the database. We will fix shortly.</para>
+ <programlisting language=""><![CDATA[
+ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiFK
+ ...
+ -*** testOneToManyBiFK ***
+ -persisting borrower
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_BORROWER
+        (id, name) 
+    values
+        (null, ?)
+ -persisting loan
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Add the following lines to your test method to help detect the error with
+                the persist above.</para>
+ <programlisting language="java"><![CDATA[
+        log.debug("getting new instances from parent side");
+        em.detach(borrower);
+        Borrower borrower2 = em.find(Borrower.class, borrower.getId());
+        log.debug("checking parent");
+        assertNotNull("borrower not found", borrower2);
+        log.debug("checking parent collection");
+        assertEquals("no loans found", 1, borrower2.getLoans().size());
+        log.debug("checking child");
+        assertEquals("unexpected child id", loan.getId(), borrower2.getLoans().get(0).getId());
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice in this output
+                the provider first retrieves the parent during the find and then LAZY loads the 
+                child. The test fails because no child was found.</para>
+ <programlisting language=""><![CDATA[
+ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiFK
+ ...
+ -getting new instances from parent side
+Hibernate: 
+    select
+        borrower0_.id as id36_0_,
+        borrower0_.name as name36_0_ 
+    from
+        RELATIONEX_BORROWER borrower0_ 
+    where
+        borrower0_.id=?
+ -checking parent
+ -checking parent collection
+Hibernate: 
+    select
+        loans0_.BORROWER_ID as BORROWER4_36_1_,
+        loans0_.id as id1_,
+        loans0_.id as id37_0_,
+        loans0_.BORROWER_ID as BORROWER4_37_0_,
+        loans0_.checkin as checkin37_0_,
+        loans0_.checkout as checkout37_0_ 
+    from
+        RELATIONEX_LOAN loans0_ 
+    where
+        loans0_.BORROWER_ID=?
+...
+Failed tests:   testOneToManyBiFK(myorg.relex.One2ManyBiTest): no loans found expected:<1> but was:<0>
+...
+[INFO] BUILD FAILURE
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Fix the persist issue above by adding cascade=PERSIST from the parent to
+                the child. Add cascade.DETACH to cover the detach() call from the parent in the test
+                method and cascade.DELETE in case we wish to delete the object tree from the parent.</para>
+ <programlisting language="java"><![CDATA[
+public class Borrower {
+    @Id @GeneratedValue
+    private int id;
+    
+    @OneToMany(
+            mappedBy="borrower"
+            , cascade={CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REMOVE}
+            )
+    private List<Loan> loans;
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice how setting the cascade=PERSIST
+                causes the second call of persist() on the parent entity to have the child persisted to the 
+                database.</para>
+ <programlisting language=""><![CDATA[
+ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiFK
+ ...
+ -persisting borrower
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_BORROWER
+        (id, name) 
+    values
+        (null, ?)
+ -persisting loan
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_LOAN
+        (id, BORROWER_ID, checkin, checkout) 
+    values
+        (null, ?, ?, ?)
+]]></programlisting>
+            <para>The parent is still LAZY loaded and attempts to load the child will
+                not occur until the child collection is accessed. This, obviously, is 
+                efficient for when the children are not commonly accessed.</para>                        
+<programlisting language=""><![CDATA[
+ -getting new instances from parent side
+Hibernate: 
+    select
+        borrower0_.id as id36_0_,
+        borrower0_.name as name36_0_ 
+    from
+        RELATIONEX_BORROWER borrower0_ 
+    where
+        borrower0_.id=?
+ -checking parent
+]]></programlisting>
+            <para>Once the test method accesses the child collection, the provider must 
+                query the database to obtain the children in the collection.</para>                        
+<programlisting language=""><![CDATA[
+ -checking parent collection
+Hibernate: 
+    select
+        loans0_.BORROWER_ID as BORROWER4_36_1_,
+        loans0_.id as id1_,
+        loans0_.id as id37_0_,
+        loans0_.BORROWER_ID as BORROWER4_37_0_,
+        loans0_.checkin as checkin37_0_,
+        loans0_.checkout as checkout37_0_ 
+    from
+        RELATIONEX_LOAN loans0_ 
+    where
+        loans0_.BORROWER_ID=?
+ -checking child
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Change the fetch mode of the parent to EAGER to see how this impacts our 
+                queries.</para>
+ <programlisting language="java"><![CDATA[
+public class Borrower {
+...
+    @OneToMany(
+            mappedBy="borrower"
+            , cascade={CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REMOVE}
+            , fetch=FetchType.EAGER
+            )
+    private List<Loan> loans;
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice how the two queries
+                have been replaced with a single query (with a join) for both the parent and child
+                tables. This obviously is more efficient if *all* children are always accessed as 
+                a part of accessing the parent. </para>
+ <programlisting language=""><![CDATA[
+ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiFK
+ ...
+ -getting new instances from parent side
+Hibernate: 
+    select
+        borrower0_.id as id36_1_,
+        borrower0_.name as name36_1_,
+        loans1_.BORROWER_ID as BORROWER4_36_3_,
+        loans1_.id as id3_,
+        loans1_.id as id37_0_,
+        loans1_.BORROWER_ID as BORROWER4_37_0_,
+        loans1_.checkin as checkin37_0_,
+        loans1_.checkout as checkout37_0_ 
+    from
+        RELATIONEX_BORROWER borrower0_ 
+    left outer join
+        RELATIONEX_LOAN loans1_ 
+            on borrower0_.id=loans1_.BORROWER_ID 
+    where
+        borrower0_.id=?
+ -checking parent
+ -checking parent collection
+ -checking child
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Add the following lines to your test method to add an additional child to 
+               the collection. Notice how both sides of the relation are being set by the application.
+               The provider only insists the owning/many side be set, but consistency within the application
+               requires the inverse to be set as well. Both the inverse and owning side are initialized
+               by the provider -- as demonstrated by the previous block of asserts.</para>
+ <programlisting language="java"><![CDATA[
+        log.debug("adding new child");
+        Loan loanB = new Loan(borrower2);
+        borrower2.getLoans().add(loanB);
+        em.persist(borrower2);
+        em.flush();
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice how a persist of the 
+                managed parent with one managed child and one un-managed child causes only the un-managed
+                child to be persisted to the database (because we have cascade=PERSIST set on the parent)</para>
+ <programlisting language=""><![CDATA[
+ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiFK
+ ...
+ -adding new child
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_LOAN
+        (id, BORROWER_ID, checkin, checkout) 
+    values
+        (null, ?, ?, ?)
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Add the following lines to your test method. They demonstrate how, because
+                of the bi-directional relationship, we can access the object graph from the child side
+                as well as the parent.</para>
+ <programlisting language="java"><![CDATA[
+        log.debug("getting new instances from child side");
+        em.detach(borrower2);
+        Loan loan2 = em.find(Loan.class, loan.getId());
+        log.debug("checking child");
+        assertNotNull("child not found", loan2);
+        assertNotNull("parent not found", loan2.getBorrower());
+        log.debug("checking parent");
+        assertEquals("unexpected number of children", 2, loan2.getBorrower().getLoans().size());
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice how the first child,
+                parent, and all its children were queried for during the first find() and prior to any
+                accesses to the object tree. This is because of EAGER fetches defined on both sides.</para>
+ <programlisting language=""><![CDATA[
+ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiFK
+ ...
+ -getting new instances from child side
+Hibernate: 
+    select
+        loan0_.id as id37_1_,
+        loan0_.BORROWER_ID as BORROWER4_37_1_,
+        loan0_.checkin as checkin37_1_,
+        loan0_.checkout as checkout37_1_,
+        borrower1_.id as id36_0_,
+        borrower1_.name as name36_0_ 
+    from
+        RELATIONEX_LOAN loan0_ 
+    inner join
+        RELATIONEX_BORROWER borrower1_ 
+            on loan0_.BORROWER_ID=borrower1_.id 
+    where
+        loan0_.id=?
+Hibernate: 
+    select
+        loans0_.BORROWER_ID as BORROWER4_36_1_,
+        loans0_.id as id1_,
+        loans0_.id as id37_0_,
+        loans0_.BORROWER_ID as BORROWER4_37_0_,
+        loans0_.checkin as checkin37_0_,
+        loans0_.checkout as checkout37_0_ 
+    from
+        RELATIONEX_LOAN loans0_ 
+    where
+        loans0_.BORROWER_ID=?
+ -checking child
+ -checking parent
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Change the fetch to LAZY on the child.</para>
+ <programlisting language="java"><![CDATA[
+public class Loan {
+...
+    @ManyToOne(fetch=FetchType.LAZY, optional=false)
+    @JoinColumn(name="BORROWER_ID")
+    private Borrower borrower;
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice how only the initial
+                child is loaded for during the find() and then the parent is loaded (with children) 
+                once accessed.</para>
+ <programlisting language=""><![CDATA[
+ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiFK
+ ...
+ -getting new instances from child side
+Hibernate: 
+    select
+        loan0_.id as id37_0_,
+        loan0_.BORROWER_ID as BORROWER4_37_0_,
+        loan0_.checkin as checkin37_0_,
+        loan0_.checkout as checkout37_0_ 
+    from
+        RELATIONEX_LOAN loan0_ 
+    where
+        loan0_.id=?
+ -checking child
+ -checking parent
+Hibernate: 
+    select
+        borrower0_.id as id36_1_,
+        borrower0_.name as name36_1_,
+        loans1_.BORROWER_ID as BORROWER4_36_3_,
+        loans1_.id as id3_,
+        loans1_.id as id37_0_,
+        loans1_.BORROWER_ID as BORROWER4_37_0_,
+        loans1_.checkin as checkin37_0_,
+        loans1_.checkout as checkout37_0_ 
+    from
+        RELATIONEX_BORROWER borrower0_ 
+    left outer join
+        RELATIONEX_LOAN loans1_ 
+            on borrower0_.id=loans1_.BORROWER_ID 
+    where
+        borrower0_.id=?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+                <para>Feel free to experiment with a few more combinations of LAZY and EAGER
+                    to make sure you understand the implications of choosing one over the other.</para>
+            </listitem>        
+
+            <listitem><para>Add the following lines to your test method. This code orphans one of the  
+                children by removing it from the parent collection. We would like to see the orphaned 
+                child deleted by the provider, but we have to fix our mapping specification first.</para>
+ <programlisting language="java"><![CDATA[
+        log.debug("orphaning one of the children");
+        int startCount = em.createQuery("select count(l) from Loan l", Number.class).getSingleResult().intValue();
+        Borrower borrower3 = loan2.getBorrower();
+        borrower3.getLoans().remove(loan2);
+        em.flush();
+        assertEquals("orphaned child not deleted", startCount-1,
+                em.createQuery("select count(l) from Loan l", Number.class).getSingleResult().intValue());
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice how nothing changed
+                in the database and our test failed. The fact the child was removed from the inverse side
+                of the relation meant nothing the way our relationship is currently mapped.</para>
+ <programlisting language=""><![CDATA[
+ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiFK
+ ...
+ -orphaning one of the children
+Hibernate: 
+    select
+        count(loan0_.id) as col_0_0_ 
+    from
+        RELATIONEX_LOAN loan0_ limit ?
+Hibernate: 
+    select
+        count(loan0_.id) as col_0_0_ 
+    from
+        RELATIONEX_LOAN loan0_ limit ?
+...
+[INFO] BUILD FAILURE
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Enable orphanRemoval on the parent collection.</para>
+ <programlisting language="java"><![CDATA[
+public class Borrower {
+    @Id @GeneratedValue
+    private int id;
+    
+    @OneToMany(
+            mappedBy="borrower"
+            , cascade={CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REMOVE}
+            , orphanRemoval=true
+            , fetch=FetchType.EAGER
+            )
+    private List<Loan> loans;
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice how the orphaned
+                child is now deleted when removed form the collection.</para>
+ <programlisting language=""><![CDATA[
+ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiFK
+ ...
+ -orphaning one of the children
+Hibernate: 
+    select
+        count(loan0_.id) as col_0_0_ 
+    from
+        RELATIONEX_LOAN loan0_ limit ?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_LOAN 
+    where
+        id=?
+Hibernate: 
+    select
+        count(loan0_.id) as col_0_0_ 
+    from
+        RELATIONEX_LOAN loan0_ limit ?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Add the final lines to the test method. This will attempt to 
+               delete the entire object graph by removing just the parent. This will work because
+               we added cascade=DELETE earlier.</para>
+ <programlisting language="java"><![CDATA[
+        log.debug("deleting parent");
+        em.remove(borrower3);
+        em.flush();
+        assertEquals("orphaned child not deleted", startCount-2,
+                em.createQuery("select count(l) from Loan l", Number.class).getSingleResult().intValue());
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice how each child 
+                gets deleted from the database by ID and then the parent is removed.</para>
+<programlisting language=""><![CDATA[
+ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiFK
+ ...
+ -deleting parent
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_LOAN 
+    where
+        id=?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_BORROWER 
+    where
+        id=?
+Hibernate: 
+    select
+        count(loan0_.id) as col_0_0_ 
+    from
+        RELATIONEX_LOAN loan0_ limit ?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+        </orderedlist>
+        <para>You have finished going through a one-to-many/many-to-one, bi-directional relationship
+            that is realized through a foreign key column in the child entity table. We also added 
+            fetch, cascade, and orphanRemoval features to show some build-in provider functionality
+            that can save some code when working with large object graphs.</para>
+    </section>
+  
+    <section id="jpa-relationex-o2m-bi-jointable">
+        <title>One-to-Many Bi-directional using Join Table</title>
+        <para>In this section we will demonstrate mapping a one-to-many relationship using a join table
+            and a bi-directional relationship. From the database perspective, this will look identical
+            to the one-to-many, uni-directional case. However, from the JPA-perspective the relationship
+            is being owned (i.e, defined) by the child/many side. In the uni-directional case there was
+            no property in the child/many entity class that represented the relationship. Now there is. 
+        </para>
+        <orderedlist>
+
+            <listitem><para>Put the following class in your src/main tree. This entity class provides an
+                example of the one/inverse side of a one-to-many, bi-directional relationship mapped using 
+                a join-table. Or at least it will be. The current version below has a few errors we need to 
+                correct.</para>
+ <programlisting language="java"><![CDATA[
+package myorg.relex.one2manybi;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import javax.persistence.*;
+/**
+ * This class provides an example of the one/inverse side of a one-to-many, bi-directional 
+ * relationship realized through a join-table mapped from the owning/many side.
+ */
+@Entity
+@Table(name="RELATIONEX_PURCHASE")
+public class Purchase {
+    @Id @GeneratedValue
+    private int id;
+    
+    @OneToMany(
+//          mappedBy="purchase", 
+//          cascade={CascadeType.PERSIST, CascadeType.DETACH},
+//          orphanRemoval=true
+        )
+    private List<SaleItem> items;
+    
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable=false, updatable=false)
+    private Date date;
+    
+    protected Purchase() {}
+    public Purchase(Date date) {
+        this.date = date;
+    }
+
+    public int getId() { return id; }
+    public Date getDate() { return date; }
+    public List<SaleItem> getItems() {
+        if (items == null) {
+            items = new ArrayList<SaleItem>();
+        }
+        return items;
+    }
+    public Purchase addItem(SaleItem item) {
+        getItems().add(item);
+        return this;
+    }
+}
+]]></programlisting>
+            </listitem>        
+
+            <listitem><para>Place the following class in your src/main tree. This class provides an example of 
+                the many/owning side of a many-to-one relationship mapped using a join table. It is currently
+                incomplete and we will work to expose the issues and correct in the following steps.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.one2manybi;
+
+import java.math.BigDecimal;
+
+import javax.persistence.*;
+
+/**
+ * This class provides and example of the many/owning side of a many-to-one, bi-directional 
+ * relationship that is realized using a join-table.
+ */
+@Entity
+@Table(name="RELATIONEX_SALEITEM")
+public class SaleItem {
+    @Id @GeneratedValue
+    private int id;
+    
+    @ManyToOne//(optional=false, fetch=FetchType.EAGER)
+//  @JoinTable(
+//      name="RELATIONEX_SALEITEM_PURCHASE", 
+//      joinColumns=@JoinColumn(name="SALEITEM_ID"),
+//      inverseJoinColumns=@JoinColumn(name="PURCHASE_ID")
+//  )
+    private Purchase purchase;
+    
+    @Column(length=16)
+    private String name;
+    @Column(precision=5, scale=2)
+    private BigDecimal price;
+    
+    protected SaleItem() {}
+    public SaleItem(Purchase purchase) {
+        this.purchase = purchase;
+    }
+
+    public int getId() { return id; }
+    
+    public Purchase getPurchase() { return purchase; }
+    public void setPurchase(Purchase purchase) {
+        this.purchase = purchase;
+    }
+
+    public String getName() { return name; }
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    public double getPrice() { return price==null? 0 : price.doubleValue(); }
+    public void setPrice(double price) {
+        this.price = new BigDecimal(price);
+    }
+}
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the new entity classes to the persistence unit.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.relex.one2manybi.Purchase</class>
+        <class>myorg.relex.one2manybi.SaleItem</class>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Generate schema for the new entity classes and their relationship. Notice how
+                we don't have a bi-directional relationship. We have two uni-directional relationships.
+                The owned relationship by the one side has formed a join-table and the owned relationship
+                from the many side has formed a foreign key relationship.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl
+...
+    create table RELATIONEX_PURCHASE (                                                                                                                                                        
+        id integer generated by default as identity,
+        date timestamp not null,
+        primary key (id)
+    );
+
+    create table RELATIONEX_PURCHASE_RELATIONEX_SALEITEM ( <!== WRONG, missing @OneToMany.mappedBy
+        RELATIONEX_PURCHASE_id integer not null,
+        items_id integer not null,
+        unique (items_id)
+    );
+...
+    create table RELATIONEX_SALEITEM (
+        id integer generated by default as identity,
+        name varchar(16),
+        price decimal(5,2),
+        purchase_id integer,                               <!== WRONG, missing @JoinTable
+        primary key (id)
+    );
+...
+   alter table RELATIONEX_PURCHASE_RELATIONEX_SALEITEM 
+        add constraint FK8157C4BCB4DABD0E 
+        foreign key (RELATIONEX_PURCHASE_id) 
+        references RELATIONEX_PURCHASE;
+
+    alter table RELATIONEX_PURCHASE_RELATIONEX_SALEITEM 
+        add constraint FK8157C4BC3F0D578 
+        foreign key (items_id) 
+        references RELATIONEX_SALEITEM;
+
+    alter table RELATIONEX_SALEITEM 
+        add constraint FKAD87326AD7F9F59E 
+        foreign key (purchase_id) 
+        references RELATIONEX_PURCHASE;
+
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Correct the bi-directional relationship by adding mappedBy to the 
+                @OneToMany mapping in the parent.</para>
+<programlisting language="java"><![CDATA[
+public class Purchase {
+    @OneToMany(
+            mappedBy="purchase" 
+        )
+    private List<SaleItem> items;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Generate schema for the new entity classes and their relationship. Notice how the 
+                join table implementing the owned relationship from the parent/one side has been removed.
+                However, what remains is a foreign key join owned by the child/many side.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl
+...
+    create table RELATIONEX_PURCHASE (
+        id integer generated by default as identity,
+        date timestamp not null,
+        primary key (id)
+    );
+...
+    create table RELATIONEX_SALEITEM (
+        id integer generated by default as identity,
+        name varchar(16),
+        price decimal(5,2),
+        purchase_id integer,      <!=== WRONG, missing @JoinTable
+        primary key (id)
+    );
+...
+    alter table RELATIONEX_SALEITEM 
+        add constraint FKAD87326AD7F9F59E 
+        foreign key (purchase_id) 
+        references RELATIONEX_PURCHASE;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Attempt to correct the mapping (remember -- we wanted this example to use a join table), by
+                adding a @JoinTable mapping in the child/many side. We will start by allowing the provider to generate
+                default table names.</para>
+<programlisting language="java"><![CDATA[
+public class SaleItem {
+...
+    @ManyToOne
+    @JoinTable
+    private Purchase purchase;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Regenerate schema for the entity classes and their relationship. Notice by the error 
+                produced that the link table name must be provided when defined from the child/many side. There
+                is no default for this case.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl
+...
+Unable to configure EntityManagerFactory: JoinTable.name() on a @ToOne association has to be explicit: myorg.relex.one2manybi.SaleItem.purchase ]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add a table name for the join table.</para>
+<programlisting language="java"><![CDATA[
+public class SaleItem {
+...
+    @ManyToOne//(optional=false, fetch=FetchType.EAGER)
+    @JoinTable(
+        name="RELATIONEX_SALEITEM_PURCHASE" 
+    )
+    private Purchase purchase;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Regenerate schema for the entity classes and their relationship. Notice
+               how we now have regained our link table (from when it use to be generated from the 
+               parent side), specified a name for it, and have default names for foreign keys to 
+               the parent and child tables. Notice too that since this is a many-to-one relationship,
+               the reference to the child is a primary key for the link table -- which means the 
+               child can only be mapped once by the joint table. The same was true when the child 
+               table contained a foreign key column.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl
+...
+    create table RELATIONEX_PURCHASE (
+        id integer generated by default as identity,
+        date timestamp not null,
+        primary key (id)
+    );
+...
+    create table RELATIONEX_SALEITEM (
+        id integer generated by default as identity,
+        name varchar(16),
+        price decimal(5,2),
+        primary key (id)
+    );
+
+    create table RELATIONEX_SALEITEM_PURCHASE (
+        purchase_id integer,       <!=== many references to same parent legacy (many-to-one)
+        id integer not null,
+        primary key (id)           <!=== reference to child is unique
+    );
+...
+    alter table RELATIONEX_SALEITEM_PURCHASE 
+        add constraint FKB4CE0B36BDB37099 
+        foreign key (id) 
+        references RELATIONEX_SALEITEM;
+
+    alter table RELATIONEX_SALEITEM_PURCHASE 
+        add constraint FKB4CE0B36D7F9F59E 
+        foreign key (purchase_id) 
+        references RELATIONEX_PURCHASE;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Make a few final tweaks to the database mapping. Lets provide explicit names
+                for the foreign key columns within the join table </para>
+<programlisting language="java"><![CDATA[
+public class SaleItem {
+    @Id @GeneratedValue
+    private int id;
+    
+    @ManyToOne(optional=false, fetch=FetchType.EAGER)
+    @JoinTable(
+        name="RELATIONEX_SALEITEM_PURCHASE", 
+        joinColumns=@JoinColumn(name="SALEITEM_ID"),
+        inverseJoinColumns=@JoinColumn(name="PURCHASE_ID")
+    )
+    private Purchase purchase;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Regenerate schema for the entity classes and their relationship. Notice this
+                time that the foreign key column names now have explicitly assigned names and with the 
+                @ManyToOne.optional=false the definition of the column back to the parent class became 
+                non-null.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl
+...
+    create table RELATIONEX_PURCHASE (
+        id integer generated by default as identity,
+        date timestamp not null,
+        primary key (id)
+    );
+...
+    create table RELATIONEX_SALEITEM (
+        id integer generated by default as identity,
+        name varchar(16),
+        price decimal(5,2),
+        primary key (id)
+    );
+
+    create table RELATIONEX_SALEITEM_PURCHASE (
+        PURCHASE_ID integer not null,
+        SALEITEM_ID integer not null,
+        primary key (SALEITEM_ID)
+    );
+...
+    alter table RELATIONEX_SALEITEM_PURCHASE 
+        add constraint FKB4CE0B36D7F9F59E 
+        foreign key (PURCHASE_ID) 
+        references RELATIONEX_PURCHASE;
+
+    alter table RELATIONEX_SALEITEM_PURCHASE 
+        add constraint FKB4CE0B36371BCF1E 
+        foreign key (SALEITEM_ID) 
+        references RELATIONEX_SALEITEM;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following test method to your existing JUnit test case. This method will
+                create instances of the parent and child entities and relate them.</para>
+<programlisting language="java"><![CDATA[
+    @Test
+    public void testOneToManyBiJoinTable() {
+        log.info("*** testOneToManyBiJoinTable ***");
+        
+        log.debug("persisting parent");
+        Purchase purchase = new Purchase(new Date());
+        em.persist(purchase);
+        em.flush();
+        
+        log.debug("persisting child");
+        SaleItem item = new SaleItem(purchase);
+        item.setPrice(10.02);
+        purchase.addItem(item);
+        em.persist(purchase); //cascade.PERSIST
+        em.flush();
+    }
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Build the module and run the test method. Notice how only the 
+                parent class got persisted. This is because we did not enable any cascades from the 
+                parent to the child entity.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiJoinTable
+...
+-*** testOneToManyBiJoinTable ***
+ -persisting parent
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_PURCHASE
+        (id, date) 
+    values
+        (null, ?)
+ -persisting child
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Make the error more obvious by adding the following lines to the 
+               test method. Among other things, this section of code will check to see if the child entity exists in the database.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("getting new instances");
+        em.detach(purchase);
+        Purchase purchase2 = em.find(Purchase.class, purchase.getId());
+        assertNotNull("parent not found", purchase2);
+        log.debug("checking parent");
+        assertTrue("unexpected date", purchase.getDate().equals(purchase2.getDate()));
+        log.debug("checking child");
+        assertEquals("unexpected number of children", 1, purchase2.getItems().size());
+        assertEquals("", item.getPrice(), purchase2.getItems().get(0).getPrice(),.01);
+        log.debug("verify got new instances");
+        assertFalse("same parent instance returned", purchase == purchase2);
+        assertFalse("same child instance returned", item == purchase2.getItems().get(0));
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice the initial find() 
+               simply does a LAZY load on the parent table. Once the test method accesses the child
+               collection -- the related child entities are loaded along with the join-table and the 
+               parent table. The join table is queried to locate the parent table and the parent table
+               is queried for because of the EAGER fetch specified in the child mapping.</para>
+<programlisting language=""><![CDATA[
+ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiJoinTable
+ ...
+ -getting new instances
+Hibernate: 
+    select
+        purchase0_.id as id38_0_,
+        purchase0_.date as date38_0_ 
+    from
+        RELATIONEX_PURCHASE purchase0_ 
+    where
+        purchase0_.id=?
+ -checking parent
+ -checking child
+Hibernate: 
+    select
+        items0_.PURCHASE_ID as PURCHASE1_38_2_,
+        items0_.SALEITEM_ID as SALEITEM2_2_,
+        saleitem1_.id as id39_0_,
+        saleitem1_.name as name39_0_,
+        saleitem1_.price as price39_0_,
+        saleitem1_1_.PURCHASE_ID as PURCHASE1_40_0_,
+        purchase2_.id as id38_1_,
+        purchase2_.date as date38_1_ 
+    from
+        RELATIONEX_SALEITEM_PURCHASE items0_ 
+    inner join
+        RELATIONEX_SALEITEM saleitem1_ 
+            on items0_.SALEITEM_ID=saleitem1_.id 
+    left outer join
+        RELATIONEX_SALEITEM_PURCHASE saleitem1_1_ 
+            on saleitem1_.id=saleitem1_1_.SALEITEM_ID 
+    inner join
+        RELATIONEX_PURCHASE purchase2_ 
+            on saleitem1_1_.PURCHASE_ID=purchase2_.id 
+    where
+        items0_.PURCHASE_ID=?
+...
+[INFO] BUILD FAILURE    <!== We expected this -- caused by no cascade=PERSIST
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Correct the cascade specification by allowing entity manager persist()
+                 commands to cascade to related children.</para>
+<programlisting language="java"><![CDATA[
+public class Purchase {
+    @OneToMany(
+            mappedBy="purchase", 
+            cascade={CascadeType.PERSIST}
+        )
+    private List<SaleItem> items;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice how we now
+                persist the child and a row in the join table to form the relationship back to the 
+                parent.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiJoinTable
+...
+ -*** testOneToManyBiJoinTable ***
+ -persisting parent
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_PURCHASE
+        (id, date) 
+    values
+        (null, ?)
+ -persisting child
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_SALEITEM
+        (id, name, price) 
+    values
+        (null, ?, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_SALEITEM_PURCHASE
+        (PURCHASE_ID, SALEITEM_ID) 
+    values
+        (?, ?)
+]]></programlisting>
+                    <para>The next block of code was able to locate the parent, relationship, and child 
+                        entities. This is the same query as before except this one returned a child entity.</para>                        
+<programlisting language=""><![CDATA[
+ -getting new instances
+Hibernate: 
+    select
+        purchase0_.id as id38_0_,
+        purchase0_.date as date38_0_ 
+    from
+        RELATIONEX_PURCHASE purchase0_ 
+    where
+        purchase0_.id=?
+ -checking parent
+ -checking child
+Hibernate: 
+    select
+        items0_.PURCHASE_ID as PURCHASE1_38_2_,
+        items0_.SALEITEM_ID as SALEITEM2_2_,
+        saleitem1_.id as id39_0_,
+        saleitem1_.name as name39_0_,
+        saleitem1_.price as price39_0_,
+        saleitem1_1_.PURCHASE_ID as PURCHASE1_40_0_,
+        purchase2_.id as id38_1_,
+        purchase2_.date as date38_1_ 
+    from
+        RELATIONEX_SALEITEM_PURCHASE items0_ 
+    inner join
+        RELATIONEX_SALEITEM saleitem1_ 
+            on items0_.SALEITEM_ID=saleitem1_.id 
+    left outer join
+        RELATIONEX_SALEITEM_PURCHASE saleitem1_1_ 
+            on saleitem1_.id=saleitem1_1_.SALEITEM_ID 
+    inner join
+        RELATIONEX_PURCHASE purchase2_ 
+            on saleitem1_1_.PURCHASE_ID=purchase2_.id 
+    where
+        items0_.PURCHASE_ID=?
+]]></programlisting>                
+                    <para>The test fails, however, because we received the same instance of the child that was 
+                       related to the original parent. This is because our detach() call was not cascaded to the child.</para>
+<programlisting language=""><![CDATA[
+ -verify got new instances
+...
+Failed tests:   testOneToManyBiJoinTable(myorg.relex.One2ManyBiTest): same child instance returned
+...
+[INFO] BUILD FAILURE
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add cascade=DETACH to the parent side. This will cause any detach() call on the parent to also 
+                detach() the child entitities.</para>
+<programlisting language=""><![CDATA[
+public class Purchase {
+    @Id @GeneratedValue
+    private int id;
+    
+    @OneToMany(
+            mappedBy="purchase", 
+            cascade={CascadeType.PERSIST, CascadeType.DETACH}
+        )
+    private List<SaleItem> items;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice we now get a new instance for
+               both the parent and child because of the call of detach on the parent and the cascade of the call
+               to the child.</para>
+<programlisting language=""><![CDATA[
+ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiJoinTable
+ ...
+ -verify got new instances
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following lines to your test method. This will add a new child entity
+                to the parent.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("adding new child");
+        SaleItem itemB = new SaleItem(purchase2);
+        purchase2.addItem(itemB);
+        em.persist(purchase2);
+        em.flush();
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice this looks much
+                like the first child that was persisted. A row in the child table is added -- followed 
+                by a row in the join table.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiJoinTable
+...
+ -adding new child
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_SALEITEM
+        (id, name, price) 
+    values
+        (null, ?, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_SALEITEM_PURCHASE
+        (PURCHASE_ID, SALEITEM_ID) 
+    values
+        (?, ?)
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following lines to the test method. This will obtain a access to the 
+                object graph based on a reference from the child.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("getting new instances from child side");
+        em.detach(purchase2);
+        SaleItem item2 = em.find(SaleItem.class, item.getId());
+        log.debug("checking child");
+        assertNotNull("child not found", item2);
+        assertNotNull("parent not found", item2.getPurchase());
+        log.debug("checking parent");
+        assertEquals("unexpected number of children", 2, item2.getPurchase().getItems().size());
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice how the find() is implementing
+                an EAGER fetch of the relation and parent in addition the the state of the child.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiJoinTable
+...
+ -getting new instances from child side
+Hibernate: 
+    select
+        saleitem0_.id as id39_1_,
+        saleitem0_.name as name39_1_,
+        saleitem0_.price as price39_1_,
+        saleitem0_1_.PURCHASE_ID as PURCHASE1_40_1_,
+        purchase1_.id as id38_0_,
+        purchase1_.date as date38_0_ 
+    from                                 <!==== query for child
+        RELATIONEX_SALEITEM saleitem0_ 
+    left outer join                      <!==== EAGER fetch of relation
+        RELATIONEX_SALEITEM_PURCHASE saleitem0_1_ 
+            on saleitem0_.id=saleitem0_1_.SALEITEM_ID 
+    inner join                           <!==== EAGER fetch of parent
+        RELATIONEX_PURCHASE purchase1_ 
+            on saleitem0_1_.PURCHASE_ID=purchase1_.id 
+    where
+        saleitem0_.id=?
+]]></programlisting>   
+                <para>However -- even though the first child, relation, and parent of that child was
+                    eagerly fetched, the remaing children for the parent must be fetched once we inspect
+                    the state of the parent.</para>                     
+<programlisting language=""><![CDATA[
+ -checking child
+ -checking parent
+Hibernate: 
+    select
+        items0_.PURCHASE_ID as PURCHASE1_38_2_,
+        items0_.SALEITEM_ID as SALEITEM2_2_,
+        saleitem1_.id as id39_0_,
+        saleitem1_.name as name39_0_,
+        saleitem1_.price as price39_0_,
+        saleitem1_1_.PURCHASE_ID as PURCHASE1_40_0_,
+        purchase2_.id as id38_1_,
+        purchase2_.date as date38_1_ 
+    from
+        RELATIONEX_SALEITEM_PURCHASE items0_ 
+    inner join
+        RELATIONEX_SALEITEM saleitem1_ 
+            on items0_.SALEITEM_ID=saleitem1_.id 
+    left outer join
+        RELATIONEX_SALEITEM_PURCHASE saleitem1_1_ 
+            on saleitem1_.id=saleitem1_1_.SALEITEM_ID 
+    inner join
+        RELATIONEX_PURCHASE purchase2_ 
+            on saleitem1_1_.PURCHASE_ID=purchase2_.id 
+    where
+        items0_.PURCHASE_ID=?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Change the mapping from EAGER to LAZY from the child.</para>
+<programlisting language="java"><![CDATA[
+public class SaleItem {
+...
+    @ManyToOne(optional=false, fetch=FetchType.LAZY)
+    @JoinTable(
+        name="RELATIONEX_SALEITEM_PURCHASE", 
+        joinColumns=@JoinColumn(name="SALEITEM_ID"),
+        inverseJoinColumns=@JoinColumn(name="PURCHASE_ID")
+    )
+    private Purchase purchase;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice in this case
+                the parent is not part of the initial query caused by the find().</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiJoinTable
+...
+ -getting new instances from child side
+Hibernate: 
+    select
+        saleitem0_.id as id39_0_,
+        saleitem0_.name as name39_0_,
+        saleitem0_.price as price39_0_,
+        saleitem0_1_.PURCHASE_ID as PURCHASE1_40_0_ 
+    from
+        RELATIONEX_SALEITEM saleitem0_ 
+    left outer join
+        RELATIONEX_SALEITEM_PURCHASE saleitem0_1_ 
+            on saleitem0_.id=saleitem0_1_.SALEITEM_ID 
+    where
+        saleitem0_.id=?
+ ]]></programlisting>  
+                <para>But notice how the LAZY fatch from the child seemed to change the 
+                    behavior of the parent. It did an initial LAZY fetch and then followed
+                    up with a query for state for the children.</para>                      
+<programlisting language=""><![CDATA[
+ -checking child
+ -checking parent
+Hibernate: 
+    select
+        purchase0_.id as id38_0_,
+        purchase0_.date as date38_0_ 
+    from
+        RELATIONEX_PURCHASE purchase0_ 
+    where
+        purchase0_.id=?
+Hibernate: 
+    select
+        items0_.PURCHASE_ID as PURCHASE1_38_1_,
+        items0_.SALEITEM_ID as SALEITEM2_1_,
+        saleitem1_.id as id39_0_,
+        saleitem1_.name as name39_0_,
+        saleitem1_.price as price39_0_,
+        saleitem1_1_.PURCHASE_ID as PURCHASE1_40_0_ 
+    from
+        RELATIONEX_SALEITEM_PURCHASE items0_ 
+    inner join
+        RELATIONEX_SALEITEM saleitem1_ 
+            on items0_.SALEITEM_ID=saleitem1_.id 
+    left outer join
+        RELATIONEX_SALEITEM_PURCHASE saleitem1_1_ 
+            on saleitem1_.id=saleitem1_1_.SALEITEM_ID 
+    where
+        items0_.PURCHASE_ID=?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following lines to your test method. This will provide a test of orphan 
+                processing where we look the container to delete the child when the child is no longer referenced by the 
+                parent.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("orphaning one of the children");
+        int startCount = em.createQuery("select count(s) from SaleItem s", Number.class).getSingleResult().intValue();
+        Purchase purchase3 = item2.getPurchase();
+        purchase3.getItems().remove(item2);
+        em.flush();
+        assertEquals("orphaned child not deleted", startCount-1,
+                em.createQuery("select count(s) from SaleItem s", Number.class).getSingleResult().intValue());
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice that only the count(*) selects
+                show up in the SQL when the commands execute and the test fails because the orphaned child is not 
+                removed. There is a reason for this -- and we will fix.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiJoinTable
+...
+ -orphaning one of the children
+Hibernate: 
+    select
+        count(saleitem0_.id) as col_0_0_ 
+    from
+        RELATIONEX_SALEITEM saleitem0_ 
+    left outer join
+        RELATIONEX_SALEITEM_PURCHASE saleitem0_1_ 
+            on saleitem0_.id=saleitem0_1_.SALEITEM_ID limit ?
+Hibernate: 
+    select
+        count(saleitem0_.id) as col_0_0_ 
+    from
+        RELATIONEX_SALEITEM saleitem0_ 
+    left outer join
+        RELATIONEX_SALEITEM_PURCHASE saleitem0_1_ 
+            on saleitem0_.id=saleitem0_1_.SALEITEM_ID limit ?
+...
+Failed tests:   testOneToManyBiJoinTable(myorg.relex.One2ManyBiTest): orphaned child not deleted expected:<1> but was:<2>
+...
+[INFO] BUILD FAILURE
+]]></programlisting>   
+                <para>Hold on here!?!? We admit that we didn't tell the provider to remove the orphan 
+                    child, but didn't the code remove the relationship? NO! it did not. The child was removed
+                    from the parent collection, but that is the inverse side. With the way we currently have it
+                    mapped the relationship can only be removed by actions on the child and the only way to 
+                    do that with a required (optional=false) parent is to manually remove the child or set
+                    orphanRemoval as we will do next.</para>                     
+            </listitem>
+
+            <listitem><para>Fix the mapping by enabling orphanRemoval from the parent to the child.</para>
+<programlisting language="java"><![CDATA[
+public class Purchase {
+...
+    @OneToMany(
+            mappedBy="purchase", 
+            cascade={CascadeType.PERSIST, CascadeType.DETACH},
+            orphanRemoval=true)
+    private List<SaleItem> items;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice how the child is now removed 
+                from the database when it is removed from the parent (and the transaction is commited/flushed).
+                Notice also the row out of the relationship table is removed as well when the child is removed.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiJoinTable
+...
+ -orphaning one of the children
+Hibernate: 
+    select
+        count(saleitem0_.id) as col_0_0_ 
+    from
+        RELATIONEX_SALEITEM saleitem0_ 
+    left outer join
+        RELATIONEX_SALEITEM_PURCHASE saleitem0_1_ 
+            on saleitem0_.id=saleitem0_1_.SALEITEM_ID limit ?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_SALEITEM_PURCHASE 
+    where
+        SALEITEM_ID=?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_SALEITEM 
+    where
+        id=?
+Hibernate: 
+    select
+        count(saleitem0_.id) as col_0_0_ 
+    from
+        RELATIONEX_SALEITEM saleitem0_ 
+    left outer join
+        RELATIONEX_SALEITEM_PURCHASE saleitem0_1_ 
+            on saleitem0_.id=saleitem0_1_.SALEITEM_ID limit ?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following lines to the test method. These will remove the parent and test 
+                to see if removing the parent also removed the remaining child.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("deleting parent");
+        em.remove(purchase3);
+        em.flush();
+        assertEquals("orphaned child not deleted", startCount-2,
+                em.createQuery("select count(s) from SaleItem s", Number.class).getSingleResult().intValue());
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice how the child and the relation
+                were deleted even though there was not a cascade=DELETE on the parent to child relationship.
+                That is because cascade=DELETE is not necessary with orphanDelete. They serve the same purpose
+                when the parent is being deleted.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiJoinTable
+...
+ -deleting parent
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_SALEITEM_PURCHASE 
+    where
+        SALEITEM_ID=?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_SALEITEM 
+    where
+        id=?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_PURCHASE 
+    where
+        id=?
+Hibernate: 
+    select
+        count(saleitem0_.id) as col_0_0_ 
+    from
+        RELATIONEX_SALEITEM saleitem0_ 
+    left outer join
+        RELATIONEX_SALEITEM_PURCHASE saleitem0_1_ 
+            on saleitem0_.id=saleitem0_1_.SALEITEM_ID limit ?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+        </orderedlist>
+        <para>You have finished looking at one-to-many/many-to-one, bi-directional relationships mapped
+            using a join table. This was functionally no different at the Java class level than the 
+            foreign key case and very similar to the one-to-many, uni-directional join table case.
+            However, this mapping leveraged a relationship from the child that formed the mapping
+            to the database and could be used to easily access the parent.</para>
+    </section>
+  
+
+    <section id="jpa-relationex-o2m-bi-composite">
+        <title>One-to-Many Bi-directional using Derived Composite Primary</title>
+        <para>In this section we will demonstrate a one-to-many, bi-directional relationship
+            where the primary key of the owning/dependent entity is derived from the 
+            one side. </para>
+            
+        <orderedlist>
+            <listitem><para>Place the following class in your src/main tree. It provides an example of the
+                one/parent/inverse side of a one-to-many, bi-directional relationship. We are going to skip
+                making any errors with the entity and move straight to a reasonable solution. The key aspects
+                to remember about one-to-many, bi-directional relationships are</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>The many/child side is required to be the owning side and the one/parent side is the inverse</para></listitem>
+                    <listitem><para>The one/parent side declares it is the inverse side by adding the @OneToMany.mappedBy attribute</para></listitem>
+                    <listitem><para>Without the parent declaring the mappedBy attribute, you end up with a dual uni-directional relationship and chaos</para></listitem>
+                </itemizedlist>
+                
+<programlisting language="java"><![CDATA[
+package myorg.relex.one2manybi;
+
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.*;
+/**
+ * This class is an example of the one/inverse side of a one-to-many, bi-directional
+ * relationship mapped using a compound foreign key that is partially derived from the 
+ * parent primary key.
+ */
+@Entity
+@Table(name="RELATIONEX_CAR")
+public class Car {
+    @Id @GeneratedValue
+    private int id;
+    
+    @OneToMany(
+            mappedBy="car",
+            cascade={CascadeType.PERSIST, CascadeType.DETACH}, 
+            orphanRemoval=true,
+            fetch=FetchType.LAZY)
+    private Set<Tire> tires;
+    
+    @Column(length=16)
+    private String model;
+    @Temporal(TemporalType.DATE)
+    private Date year;
+
+    public int getId() { return id; }
+    public Set<Tire> getTires() {
+        if (tires==null) {
+            tires=new HashSet<Tire>();
+        }
+        return tires;
+    }
+
+    public String getModel() { return model; }
+    public void setModel(String model) {
+        this.model = model;
+    }
+    
+    public Date getYear() { return year; }
+    public void setYear(Date year) {
+        this.year = year;
+    }
+    
+    @Override
+    public int hashCode() {
+        return (model==null?0:model.hashCode()) + (year==null?0:year.hashCode());
+    }
+    @Override
+    public boolean equals(Object obj) {
+        try {
+            if (this==obj) { return true; }
+            Car rhs = (Car)obj;
+            return id==0 ? super.equals(obj) : id==rhs.id;
+        } catch (Exception ex) { return true; }
+    }
+}
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Put the following Enum in place in your src/main tree. This will be used 
+                by the example to help define the primary key of the child entity.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.one2manybi;
+
+public enum TirePosition {
+    LEFT_FRONT,
+    RIGHT_FRONT,
+    LEFT_REAR,
+    RIGHT_REAR
+}
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Put the following class in your src/main tree. This provides an example
+                of the many/child/owning side of a many-to-one, bi-directional relationship that 
+                is mapped using a foreign that is used to partially derive the child's compound 
+                primary key. The child, in this case, uses an @IdClass to model the compound primary
+                key. That means the primary key values will be exposed in the entity class as regular
+                @Id values. Note, however, the foreign key is mapped as a relationship and not an ID
+                Java value. We model the relationship in the entity class. We will model the foreign
+                key value in the @IdClass -- but the names must match.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.one2manybi;
+
+import javax.persistence.*;
+
+/**
+ * This class provides an example of the many/owning side of a many-to-one, bi-directional 
+ * relationship mapped using a foreign key and that foreign key is used to derive the 
+ * primary key of this class.
+ */
+@Entity
+@Table(name="RELATIONEX_TIRE")
+@IdClass(TirePK.class)
+public class Tire {
+    @Id
+    @ManyToOne
+    @JoinColumn(name="CAR_ID", nullable=false)
+    private Car car;
+    
+    @Id @Enumerated(EnumType.STRING)
+    @Column(length=16)
+    private TirePosition position;
+    
+    private int miles;
+    
+    protected Tire() {}
+    public Tire(Car car, TirePosition position) {
+        this.car = car;
+        this.position = position;
+    }
+
+    public TirePosition getPosition() { return position; }
+    public Car getCar() { return car; }
+    
+    public int getMiles() { return miles; }
+    public void setMiles(int miles) {
+        this.miles = miles;
+    }
+    
+    @Override
+    public int hashCode() {
+        return position.hashCode();
+    }
+    @Override
+    public boolean equals(Object obj) {
+        try {
+            if (this==obj) { return true; }
+            Tire rhs = (Tire)obj;
+            return car.equals(rhs.car) && position==rhs.position; 
+        } catch (Exception ex) { return false; }
+    }
+}
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Put the following class in place. This class represents an primary key 
+                class that will be used as an @IdClass. That means</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>The properties must be modeled with the same property names as the entity class</para></listitem>
+                    <listitem><para>The properties must be modeled with the same property access (FIELD or PROPERTY) as the entity class</para></listitem>
+                    <listitem><para>The class must implement Serializable</para></listitem>
+                    <listitem><para>The class must provide an implementation for hashCode() and equals()</para></listitem>
+                </itemizedlist>
+                
+<programlisting language="java"><![CDATA[
+package myorg.relex.one2manybi;
+
+import java.io.Serializable;
+
+/**
+ * This class provides an example of an IdClass used by a child entity in a 
+ * many-to-one, bi-directional relationship where half of its primary key is
+ * derived form the parentId;
+ */
+public class TirePK implements Serializable {
+    private static final long serialVersionUID = -6028270454708159105L;
+    private int car;   //shared primary key value from parent and child, name matches child rel
+    private TirePosition position; //child primary key value unique within parent
+    
+    protected TirePK() {}
+    public TirePK(int carId, TirePosition position) {
+        this.car=carId;
+        this.position=position;
+    }
+    
+    public int getAutoId() { return car; }
+    public TirePosition getPosition() { return position; }
+    
+    @Override
+    public int hashCode() {
+        return car + (position==null?0:position.hashCode());
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        try {
+            if (this==obj) { return true; }
+            TirePK rhs = (TirePK)obj;
+            return car==rhs.car && position==rhs.position;
+        } catch (Exception ex) { return false; }
+    }   
+}
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the entity classes to the persistence unit. Do not list the enum or primary key class here.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.relex.one2manybi.Car</class>
+        <class>myorg.relex.one2manybi.Tire</class>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Generate database schema for the entity classes and their relationship. Notice the foreign 
+                key is in the child entity table and is also being used as the primary key for the child entity table.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl 
+...
+    create table RELATIONEX_CAR (
+        id integer generated by default as identity,
+        model varchar(16),
+        year date,
+        primary key (id)
+    );
+...
+    create table RELATIONEX_TIRE (
+        CAR_ID integer not null,
+        position varchar(16) not null,
+        miles integer not null,
+        primary key (CAR_ID, position) <!== Foreign key is also part of primary key
+    );
+...
+    alter table RELATIONEX_TIRE 
+        add constraint FK356095F89CA49F36 
+        foreign key (CAR_ID) 
+        references RELATIONEX_CAR;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following test method to your JUnit test case. This test method is similar
+                to the previous sections. It creates an instance of the parent and child and relates the two.</para>
+<programlisting language="java"><![CDATA[
+    @Test
+    public void testOneToManyBiDerivedClass() {
+        log.info("*** testOneToManyBiDerivedClass ***");
+        
+        log.debug("persisting parent");
+        Car car = new Car();
+        car.setModel("DeLorean");
+        car.setYear(new GregorianCalendar(1983, 0, 0).getTime());
+        em.persist(car);
+        em.flush();
+        
+        log.debug("persisting child");
+        Tire tire = new Tire(car, TirePosition.RIGHT_FRONT);
+        tire.setMiles(2000);
+        car.getTires().add(tire);
+        em.persist(car); //cascade.PERSIST
+        em.flush();
+    }
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Build the module and run the test method. Notice that when the child
+               is created -- the values for the parentId (CAR_ID) and other primary key value (position)
+               are stored with the child. The parentId (CAR_ID) is serving as the foreign key and 
+               part of the primary key.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiDerivedIdClass
+...
+ -creating entity manager
+ -*** testOneToManyBiDerivedClass ***
+ -persisting parent
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_CAR
+        (id, model, year) 
+    values
+        (null, ?, ?)
+ -persisting child
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_TIRE
+        (miles, CAR_ID, position) 
+    values
+        (?, ?, ?)
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+                <para>Both the parent and child were successfully inserted into the database
+                   during repeated calls to persist() and passing the parent because we enabled
+                   cascade=PERSIST in the parent relationship mapping.</para>                        
+            </listitem>
+
+            <listitem><para>Add the following lines to your test method. This section will verify
+                the parent and child exist and can be used to demonstrate the impact of a LAZY or
+                EAGER fetch.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("getting new instances");
+        em.detach(car);
+        Car car2 = em.find(Car.class, car.getId());
+        assertNotNull("parent not found", car2);
+        log.debug("checking parent");
+        assertTrue("unexpected date", car.getYear().equals(car2.getYear()));
+        log.debug("checking child");
+        assertEquals("unexpected number of children", 1, car2.getTires().size());
+        assertEquals("unexpected child state", tire.getMiles(), car2.getTires().iterator().next().getMiles());
+        log.debug("verify got new instances");
+        assertFalse("same parent instance returned", car == car2);
+        assertFalse("same child instance returned", tire == car2.getTires().iterator().next());
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice the parent can be located 
+               by primary key through the find() and a LAZY fetch is performed when navigating to the 
+               child. Notice when the child is accessed -- the query is issued for members of the child
+               table that match the foreign key and not each child individually. </para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiDerivedIdClass
+...
+-getting new instances
+Hibernate: 
+    select
+        car0_.id as id41_0_,
+        car0_.model as model41_0_,
+        car0_.year as year41_0_ 
+    from
+        RELATIONEX_CAR car0_ 
+    where
+        car0_.id=?
+ -checking parent
+ -checking child
+Hibernate: 
+    select
+        tires0_.CAR_ID as CAR1_41_1_,
+        tires0_.CAR_ID as CAR1_1_,
+        tires0_.position as position1_,
+        tires0_.CAR_ID as CAR1_42_0_,
+        tires0_.position as position42_0_,
+        tires0_.miles as miles42_0_ 
+    from
+        RELATIONEX_TIRE tires0_ 
+    where
+        tires0_.CAR_ID=?
+ -verify got new instances
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following lines to your test method to add a second child to the 
+               relationship.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("adding new child");
+        Tire tireB = new Tire(car2, TirePosition.LEFT_FRONT);
+        car2.getTires().add(tireB);
+        em.persist(car2);
+        em.flush();
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice the insert of the 
+                child and the creation of the relationship was done by a single insert into the 
+                child table (with the foreign key assigned). The child is persisted during the 
+                call to persist() on the already managed parent because of the cascade=PERSIST defined
+                on the parent relationship mapping.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiDerivedIdClass
+...
+ -adding new child
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_TIRE
+        (miles, CAR_ID, position) 
+    values
+        (?, ?, ?)
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following lines to your test method to verify we can gain
+                acess to the object tree through access from the child. This shows the power of 
+                the bi-directional relationship.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("getting new instances from child side");
+        em.detach(car2);
+        Tire tire2 = em.find(Tire.class, new TirePK(car.getId(), tire.getPosition()));
+        log.debug("checking child");
+        assertNotNull("child not found", tire2);
+        assertNotNull("parent not found", tire2.getCar());
+        log.debug("checking parent");
+        assertEquals("unexpected number of children", 2, tire2.getCar().getTires().size());
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice that when 
+               we issue find() on the child -- both columns of the compound primary key are used
+               in the where clause.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiDerivedIdClass
+...
+ -getting new instances from child side
+Hibernate: 
+    select
+        tire0_.CAR_ID as CAR1_42_1_,
+        tire0_.position as position42_1_,
+        tire0_.miles as miles42_1_,
+        car1_.id as id41_0_,
+        car1_.model as model41_0_,
+        car1_.year as year41_0_ 
+    from
+        RELATIONEX_TIRE tire0_ 
+    inner join
+        RELATIONEX_CAR car1_ 
+            on tire0_.CAR_ID=car1_.id 
+    where
+        tire0_.CAR_ID=? 
+        and tire0_.position=?
+ -checking child
+ -checking parent
+Hibernate: 
+    select
+        tires0_.CAR_ID as CAR1_41_1_,
+        tires0_.CAR_ID as CAR1_1_,
+        tires0_.position as position1_,
+        tires0_.CAR_ID as CAR1_42_0_,
+        tires0_.position as position42_0_,
+        tires0_.miles as miles42_0_ 
+    from
+        RELATIONEX_TIRE tires0_ 
+    where
+        tires0_.CAR_ID=?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following lines to your test method to verify orphan removal when
+                the child is removed from the parent collection.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("orphaning one of the children");
+        int startCount = em.createQuery("select count(t) from Tire t", Number.class).getSingleResult().intValue();
+        Car car3 = tire2.getCar();
+        car3.getTires().remove(tire2);
+        em.flush();
+        assertEquals("orphaned child not deleted", startCount-1,
+                em.createQuery("select count(t) from Tire t", Number.class).getSingleResult().intValue());
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice the child is successfully
+                deleted when it is orphaned by the removal from the parent collection. This works because
+                we have added orphanRemoval=true to the parent relationship mapping.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiDerivedIdClass
+...
+ -orphaning one of the children
+Hibernate: 
+    select
+        count((tire0_.CAR_ID,
+        tire0_.position)) as col_0_0_ 
+    from
+        RELATIONEX_TIRE tire0_ limit ?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_TIRE 
+    where
+        CAR_ID=? 
+        and position=?
+Hibernate: 
+    select
+        count((tire0_.CAR_ID,
+        tire0_.position)) as col_0_0_ 
+    from
+        RELATIONEX_TIRE tire0_ limit ?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following lines to your test method to test cascade delete.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("deleting parent");
+        em.remove(car3);
+        em.flush();
+        assertEquals("orphaned child not deleted", startCount-2,
+                em.createQuery("select count(t) from Tire t", Number.class).getSingleResult().intValue());
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and re-run the test method. Notice how the parent and 
+                child both get deleted by the single delete on the parent. This is because we supplied
+                the cascade=DELETE on the parent relationship mapping.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiDerivedIdClass
+...
+ -deleting parent
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_TIRE 
+    where
+        CAR_ID=? 
+        and position=?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_CAR 
+    where
+        id=?
+Hibernate: 
+    select
+        count((tire0_.CAR_ID,
+        tire0_.position)) as col_0_0_ 
+    from
+        RELATIONEX_TIRE tire0_ limit ?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+            </listitem>
+        </orderedlist>
+        <para>You have finished going through the derived compound primary key case with an @IdClass
+            for a one-to-may/many-to-one, bi-directional relationship mapped using a foreign key. 
+            The primary example here was to derive the primary key from the parent for use in the child's 
+            identity. We annotated the @ManyToOne with @Id to show the foreign key mapping for the 
+            parent property was part of the child's primary key.</para>
+    </section>
+
+
+    <section id="jpa-relationex-o2mb-summary">
+       <title>Summary</title>
+       <para>In this chapter we took a look at mapping bi-directional relationships that combined 
+           one-to-many and many-to-one. We mapped them with foreign keys and join tables. We also 
+           included a case where the child derived its primary key from the parent. Much of what we 
+           covered here overlaps with what was provided in the one-to-many and many-to-one, uni-directional
+           chapters. However, in the bi-directional variant, it is easy to navigate from either side of 
+           the relationship to the other.
+       </para>
+    </section>    
+</chapter>
