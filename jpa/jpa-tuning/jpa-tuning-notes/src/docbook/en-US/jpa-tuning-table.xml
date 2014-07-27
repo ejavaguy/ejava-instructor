@@ -1,0 +1,681 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-tuning-table">
+    <title>Table Access</title>
+    <itemizedlist spacing="compact">
+        <listitem><para>Access paths - strategies used to access data within table</para></listitem>
+        <listitem><para>Indexes - good for when accessing small amounts of data out of much larger data set</para></listitem>
+        <listitem><para>Full table scans - good for small tables and unrestricted row access</para></listitem>
+        <listitem><para>Any row can be *functionally* accessed with either method</para></listitem>
+        <listitem><para>Use execution plans to help use the appropriate technique</para></listitem>
+    </itemizedlist>
+        
+    <section id="jpa-tuning-table-fullscan">
+        <title>Full Table Scan</title>
+        <para>Database engine derives all information from the table directly from the physical 
+            storage location for the table. Table storage is not arranged in any guaranteed order.</para>
+  
+        <section id="jpa-tuning-table-fullscan-unconstrained">
+            <title>Full Table Scan: Unconstrained Access</title>
+            <para>Request N rows of data from a table with no defined order</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Full Table Scan selected when:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>There is no where clause</para></listitem>
+                        <listitem><para>There is no suitable index</para>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>calling functions on row data (ex. upper(title)='TREMORS')</para></listitem>
+                                <listitem><para>comparing column against data type requiring conversion</para></listitem>
+                                <listitem><para>using wildcard in leading character (ex. title like '%emors')</para></listitem>
+                                <listitem><para>searching for null column values (ex. rating is null) with single column indexes</para></listitem>
+                            </itemizedlist>
+                        </listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>Full Table Scan optimal when:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Using small tables</para></listitem>
+                        <listitem><para>Majority of the rows in a larger table must be read (e.g., no where clause)</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+
+            <figure>
+                <title>JPA Query</title>
+<programlisting language=""><![CDATA["select m from Movie m", limit=1000]]></programlisting>                        
+            </figure>
+            
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select * from 
+    ( select
+        movie0_.ID as ID1_2_,
+        movie0_.DIRECTOR_ID as DIRECTOR7_2_,
+        movie0_.MINUTES as MINUTES2_2_,
+        movie0_.PLOT as PLOT3_2_,
+        movie0_.RATING as RATING4_2_,
+        movie0_.RELEASE_DATE as RELEASE5_2_,
+        movie0_.TITLE as TITLE6_2_ 
+    from
+        JPATUNE_MOVIE movie0_ ) 
+where
+    rownum <= ?]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-fulltable-unrestricted.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>DB scans table as a part of getting data to resolve select clause</para></listitem>
+                <listitem><para>No added cost for where or order-by clauses</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+Table Access without Index.Unrestricted Scan:warmups=2, rounds=11, ave=0.73 [+- 0.03]
+]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title>No need for an Index for Unconstrained Access to a Table</title>
+                <para>Since the DB's job in this case is to obtain data from all rows
+                    of the table in any order -- an index would not add value.</para>
+            </tip>
+        </section>
+
+        <section id="jpa-tuning-table-fullscan-where-noindex">
+            <title>Full Table Scan: Using Where (without Index)</title>
+            <para>Request N rows of data matching a condition on an un-indexed column</para>
+
+            <figure>
+                <title>JPA Query</title>
+<programlisting language=""><![CDATA["select m from Movie m
+where m.rating = :rating", 
+params={rating=R}, limit=1000]]></programlisting>                        
+            </figure>
+            
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select * from 
+    ( select
+        movie0_.ID as ID1_2_,
+        movie0_.DIRECTOR_ID as DIRECTOR7_2_,
+        movie0_.MINUTES as MINUTES2_2_,
+        movie0_.PLOT as PLOT3_2_,
+        movie0_.RATING as RATING4_2_,
+        movie0_.RELEASE_DATE as RELEASE5_2_,
+        movie0_.TITLE as TITLE6_2_ 
+    from
+        JPATUNE_MOVIE movie0_ 
+    where
+        movie0_.RATING=? ) 
+where
+    rownum <= ?
+]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-fulltable-where-noindex.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Where constraint adds cost to unconstrained query</para></listitem>
+                <listitem><para>DB must scan the rows in the table for a match to query</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+Table Access without Index.Value Access:warmups=2, rounds=11, ave=0.80 [+- 0.04]
+]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title>Where Clauses without a Matching Index results in a Full Table Scan</title>
+                <para>Full table scans are the most inefficient way to obtain certain rows from
+                     a large DB table.</para>
+            </tip>
+        </section>
+
+        <section id="jpa-tuning-table-fullscan-whereindex">
+            <title>RowId Scan: Using Where (with Index)</title>
+            <para>Request N rows of data matching a condition on an indexed column</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Uses an exact location for a row -- normally obtained from an index</para></listitem>
+                <listitem><para>Fastest way to locate an individual row in a table</para></listitem>
+                <listitem><para>Note: rows can be moved during an update -- requiring multiple locations to be accessed when using former rowId</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movie_rating_idx on jpatune_movie(rating)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>JPA Query</title>
+<programlisting language=""><![CDATA["select m from Movie m 
+where m.rating = :rating", 
+params={rating=R}, limit=1000]]></programlisting>                        
+            </figure>
+            
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select * from 
+    ( select
+        movie0_.ID as ID1_2_,
+        movie0_.DIRECTOR_ID as DIRECTOR7_2_,
+        movie0_.MINUTES as MINUTES2_2_,
+        movie0_.PLOT as PLOT3_2_,
+        movie0_.RATING as RATING4_2_,
+        movie0_.RELEASE_DATE as RELEASE5_2_,
+        movie0_.TITLE as TITLE6_2_ 
+    from
+        JPATUNE_MOVIE movie0_ 
+    where
+        movie0_.RATING=? ) 
+where
+    rownum <= ?
+]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-rowid-where-index.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Index on where clause search term avoids scanning table -- index scanned instead</para></listitem>
+                <listitem><para>DB row is accessed to satisfy select clause</para></listitem>
+                <listitem><para>DB row is located by rowId from index</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+Table Access with Single Indexes.Value Access:warmups=2, rounds=11, ave=0.75 [+- 0.03]
+]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title>Match Indexes for Where Clauses Selecting Small Row Subset from Table</title>
+                <para>An index will speed access to rows within a table when selecting a small 
+                    subset of a larger table.</para>
+            </tip>
+        </section>
+
+
+        <section id="jpa-tuning-table-fullscan-function-noindex">
+            <title>Full Table Scan: Invalidating Index using Function applied to Row Column</title>
+            <para>Request N rows of data matching a condition on an indexed column invalidated by a function</para>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movie_rating_idx on jpatune_movie(rating)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>JPA Query</title>
+<programlisting language=""><![CDATA["select m from Movie m 
+where upper(m.rating) = :rating", 
+params={rating=R}, limit=1000]]></programlisting>                        
+            </figure>
+            
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select * from 
+    ( select
+        movie0_.ID as ID1_2_,
+        movie0_.DIRECTOR_ID as DIRECTOR7_2_,
+        movie0_.MINUTES as MINUTES2_2_,
+        movie0_.PLOT as PLOT3_2_,
+        movie0_.RATING as RATING4_2_,
+        movie0_.RELEASE_DATE as RELEASE5_2_,
+        movie0_.TITLE as TITLE6_2_ 
+    from
+        JPATUNE_MOVIE movie0_ 
+    where
+        upper(movie0_.RATING)=? ) 
+where
+    rownum <= ?]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-fulltable-where-function-noindex.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Applying function to column indexed by value invalidates use of index</para></listitem>
+                <listitem><para>DB reverts to full table scan to locate row</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+Table Access with Single Indexes.Unindexed Function Access:warmups=2, rounds=11, ave=0.79 [+- 0.04]
+]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title>Avoid using Functions on DB Rows within Where Clause</title>
+                <para>Calling a function on a DB column within the where clause will invalidate
+                    the use of an index on that column -- unless it is a function-based index
+                    (matching what is being used in the where)</para>
+            </tip>
+        </section>
+
+
+
+
+
+
+        <section id="jpa-tuning-table-fullscan-function-findex">
+            <title>RowId Scan: Using Index with Function applied to Row Column</title>
+            <para>Request N rows of data matching a functional condition on a function-indexed column</para>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movie_rating_lower_idx on jpatune_movie(lower(rating))]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>JPA Query</title>
+<programlisting language=""><![CDATA["select m from Movie m 
+where lower(m.rating) = :rating", 
+params={rating=r}, limit=1000]]></programlisting>                        
+            </figure>
+            
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select * from 
+    ( select
+        movie0_.ID as ID1_2_,
+        movie0_.DIRECTOR_ID as DIRECTOR7_2_,
+        movie0_.MINUTES as MINUTES2_2_,
+        movie0_.PLOT as PLOT3_2_,
+        movie0_.RATING as RATING4_2_,
+        movie0_.RELEASE_DATE as RELEASE5_2_,
+        movie0_.TITLE as TITLE6_2_ 
+    from
+        JPATUNE_MOVIE movie0_ 
+    where
+        lower(movie0_.RATING)=? ) 
+where
+    rownum <= ?]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-fulltable-where-function-index.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Where clause satisfied by scanning function index</para></listitem>
+                <listitem><para>DB row accessed to satisfy select clause</para></listitem>
+                <listitem><para>DB row accessed by RowId</para></listitem>
+                <listitem><para>COST is same order of magnitude (but )as non-function index</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+Table Access with Single Indexes.Indexed Function Access:warmups=2, rounds=11, ave=0.76 [+- 0.04]
+]]></programlisting>                        
+            </figure>
+            
+            
+            <tip>
+                <title>Define Function Index where Calling Functions on DB rows cannot be Avoided</title>
+                <para>The DB will store the pre-calculated value in the index for use during
+                   the query.</para>
+            </tip>
+            
+        </section>
+
+
+
+        <section id="jpa-tuning-table-fullscan-wildcards">
+            <title>Full Table Scan: Invalidating Index by using Leading Wildcards</title>
+            <para>Request N rows of data matching a like condition containing a leading wildcard</para>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movie_title_idx on jpatune_movie(title)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>JPA Query</title>
+<programlisting language=""><![CDATA["select m from Movie m 
+where m.title like :title", 
+params={title=%eventeen: The Faces for Fall}, limit=1000]]></programlisting>                        
+            </figure>
+            
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select * from
+    ( select
+        movie0_.ID as ID1_2_,
+        movie0_.DIRECTOR_ID as DIRECTOR7_2_,
+        movie0_.MINUTES as MINUTES2_2_,
+        movie0_.PLOT as PLOT3_2_,
+        movie0_.RATING as RATING4_2_,
+        movie0_.RELEASE_DATE as RELEASE5_2_,
+        movie0_.TITLE as TITLE6_2_ 
+    from
+        JPATUNE_MOVIE movie0_ 
+    where
+        movie0_.TITLE like ? ) 
+where
+    rownum <= ?]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-fulltable-leading-wildcard.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Row located using full table scan</para></listitem>
+                <listitem><para>Leading wildcard in like invalidates use of indexed column</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+Table Access with Single Indexes.Ending Wildcard:warmups=2, rounds=11, ave=0.22 [+- 0.04]
+Table Access with Single Indexes.Exact Equals:warmups=2, rounds=11, ave=0.20 [+- 0.02]
+Table Access with Single Indexes.Exact Like:warmups=2, rounds=11, ave=0.22 [+- 0.05]
+Table Access with Single Indexes.Leading Wildcard:warmups=2, rounds=11, ave=0.66 [+- 0.05]
+
+]]></programlisting>                        
+            </figure>
+            
+            <tip>
+                <title>Avoid Leading Wildcards when using Like</title>
+                <para>Leading wildcards invalidate the use of column indexes. Indexes are still used
+                    with non-leading wildcards.</para>
+            </tip>
+            
+        </section>
+
+
+
+
+
+
+
+    </section>
+    
+    
+    
+    <section id="jpa-tuning-table-orderby">
+        <title>Order By</title>
+        <para>Order returned results by one or more columns</para>
+
+        <section id="jpa-tuning-table-fullscan-orderby">
+            <title>Order By using Sort</title>
+            <para>Request N rows of data ordered by (ASC) a column</para>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movie_title_idx on jpatune_movie(title)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>JPA Query</title>
+<programlisting language=""><![CDATA["select m from Movie m 
+order by title ASC", 
+limit=1000]]></programlisting>                        
+            </figure>
+            
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select * from 
+    ( select
+        movie0_.ID as ID1_2_,
+        movie0_.DIRECTOR_ID as DIRECTOR7_2_,
+        movie0_.MINUTES as MINUTES2_2_,
+        movie0_.PLOT as PLOT3_2_,
+        movie0_.RATING as RATING4_2_,
+        movie0_.RELEASE_DATE as RELEASE5_2_,
+        movie0_.TITLE as TITLE6_2_ 
+    from
+        JPATUNE_MOVIE movie0_ 
+    order by
+        movie0_.TITLE ASC ) 
+where
+    rownum <= ?]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-fulltable-sort-orderby.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>DB table is scanned as before when unconstrained by where clause</para></listitem>
+                <listitem><para>Output is sorted at a noticeable cost increase</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+Table Access with Single Indexes.OrderBy Non-Null Column:warmups=2, rounds=11, ave=0.76 [+- 0.03]
+]]></programlisting>                        
+            </figure>
+            
+            <tip>
+                <title>Sorting adds Cost</title>
+                <para>Look to reduce the number of rows required to be sorted or to use an 
+                    index (see next topic).</para>
+            </tip>
+        </section>
+
+
+        <section id="jpa-tuning-table-fullscan-orderby-where">
+            <title>Order By using Index</title>
+            <para>Request N rows of data ordered by (ASC) indexed column (ASC) from where</para>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movie_title_idx on jpatune_movie(title)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>JPA Query</title>
+<programlisting language=""><![CDATA["select m from Movie m 
+where m.title like :title 
+order by title ASC", 
+params={title=A%}, limit=1000]]></programlisting>                        
+            </figure>
+            
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select * from 
+    ( select
+        movie0_.ID as ID1_2_,
+        movie0_.DIRECTOR_ID as DIRECTOR7_2_,
+        movie0_.MINUTES as MINUTES2_2_,
+        movie0_.PLOT as PLOT3_2_,
+        movie0_.RATING as RATING4_2_,
+        movie0_.RELEASE_DATE as RELEASE5_2_,
+        movie0_.TITLE as TITLE6_2_ 
+    from
+        JPATUNE_MOVIE movie0_ 
+    where
+        movie0_.TITLE like ? 
+    order by
+        movie0_.TITLE ASC ) 
+where
+    rownum <= ?]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-rangescan-nosort.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Range scan of index is used to satisfy where clause</para></listitem>
+                <listitem><para>Order of index used to satisfy order by clause</para></listitem>
+                <listitem><para>Cost significantly less that sort</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+Table Access with Single Indexes.OrderBy Non-null Where Column ASC:warmups=2, rounds=11, ave=0.69 [+- 0.02]
+]]></programlisting>                        
+            </figure>
+            
+            <tip>
+                <title>Index-based Sorts are more Efficient</title>
+                <para>It is more efficient to sort results by the indexed values in the where clause
+                    because the index is already maintained in sort order.</para>
+            </tip>
+        </section>
+
+
+        <section id="jpa-tuning-table-fullscan-orderby-where-desc">
+            <title>Order By using Index DESC</title>
+            <para>Request N rows of data ordered by (DESC) indexed column (ASC) from where</para>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movie_title_idx on jpatune_movie(title)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>JPA Query</title>
+<programlisting language=""><![CDATA["select m from Movie m 
+where m.title like :title 
+order by title DESC", 
+params={title=A%}, limit=1000
+]]></programlisting>                        
+            </figure>
+            
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select * from 
+    ( select
+        movie0_.ID as ID1_2_,
+        movie0_.DIRECTOR_ID as DIRECTOR7_2_,
+        movie0_.MINUTES as MINUTES2_2_,
+        movie0_.PLOT as PLOT3_2_,
+        movie0_.RATING as RATING4_2_,
+        movie0_.RELEASE_DATE as RELEASE5_2_,
+        movie0_.TITLE as TITLE6_2_ 
+    from
+        JPATUNE_MOVIE movie0_ 
+    where
+        movie0_.TITLE like ? 
+    order by
+        movie0_.TITLE DESC ) 
+where
+    rownum <= ?]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-rowid-where-index-desc.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Normal (ASC) indexes can be efficiently traversed in DESC order</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+Table Access with Single Indexes.OrderBy Non-null Where Column DESC:warmups=2, rounds=11, ave=0.72 [+- 0.04]
+]]></programlisting>                        
+            </figure>
+        </section>
+
+
+        <section id="jpa-tuning-table-fullscan-orderby-where-desc-ridx">
+            <title>Order By using Reverse Index DESC</title>
+            <para>Request N rows of data ordered by (DESC) indexed column (DESC) from where</para>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movie_title_ridx on jpatune_movie(title desc)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>JPA Query</title>
+<programlisting language=""><![CDATA["select m from Movie m 
+where m.title like :title 
+order by title DESC", 
+params={title=A%}, limit=1000
+]]></programlisting>                        
+            </figure>
+            
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select * from 
+    ( select
+        movie0_.ID as ID1_2_,
+        movie0_.DIRECTOR_ID as DIRECTOR7_2_,
+        movie0_.MINUTES as MINUTES2_2_,
+        movie0_.PLOT as PLOT3_2_,
+        movie0_.RATING as RATING4_2_,
+        movie0_.RELEASE_DATE as RELEASE5_2_,
+        movie0_.TITLE as TITLE6_2_ 
+    from
+        JPATUNE_MOVIE movie0_ 
+    where
+        movie0_.TITLE like ? 
+    order by
+        movie0_.TITLE DESC ) 
+where
+    rownum <= ?]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-rowid-where-desc-index-desc.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>DESC index implementedas a function index</para></listitem>
+                <listitem><para>Function indexes are not handled as efficiently as normal indexes
+                    <citation>"...cardinality estimates are not as accurate and the SYS_OP_DESCEND and SYS_OP_UNDESCEND 
+                    functions are used as access/filter conditions as they’re the functions implemented in the function-based index"                     
+                    <ulink url="http://richardfoote.wordpress.com/category/descending-indexes/"></ulink></citation></para>
+                    </listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+Table Access with Single Indexes DESC.OrderBy Non-null Where Column DESC:warmups=2, rounds=11, ave=0.99 [+- 0.03]
+]]></programlisting>                        
+            </figure>
+            <tip>
+                <title>Choose Ascending Indexes (over Descending) for Single Columns</title>
+                <para>Ascending indexes can be efficiently traversed in ascending and descending order.</para>
+            </tip>
+        </section>
+    </section>
+
+
+
+
+    <section id="jpa-tuning-table-summary">
+       <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Full table scans efficient when required to access most rows</para></listitem>
+            <listitem><para>Indexes access more efficient when selecting small subset of table</para></listitem>
+            <listitem><para>Indexes can be invalidated - resulting in full table scans</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>using functions on columns (without a function index)</para></listitem>
+                    <listitem><para>using leading wildcards</para></listitem>
+                    <listitem><para>searching/counting for null column values (single column indexes do not store null values)</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Indexes can be used to bypass expensive sort operations. Either:</para>
+               <orderedlist spacing="compact">
+                    <listitem><para>Column must be non-nullable</para></listitem>
+                    <listitem><para>Where clause excludes null values</para></listitem>
+               </orderedlist>
+            </listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  

@@ -1,0 +1,84 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="jpa-tuning">
+    <bookinfo>
+        <title>JPA Tuning</title>
+        <subtitle>Performance Topics Related to JPA and SQL</subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>This presentation provides information for JPA/SQL developers to better 
+                 understand how database constructs and database access decisions can impact 
+                 application performance. It provides a brief discussion of tools that can be 
+                 used and how to review an execution plan. Relative comparisons between 
+                 approaches are provided to help show the costs and benefits of different
+                 approaches.
+            </para>
+        </abstract>
+    </bookinfo>
+    <preface id="jpa-tuning-topics">
+        <title>Topics</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Why DB access can be inefficient</para></listitem>
+            <listitem><para>What is an execution plan</para></listitem>
+            <listitem><para>How to access an execution plan</para></listitem>
+            <listitem><para>How to analyze an execution plan</para></listitem>
+            <listitem><para>Impact of Indexes</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>to access tables</para></listitem>
+                    <listitem><para>to access joins</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>JPA performance pitfalls</para></listitem>
+        </itemizedlist>
+        <note>
+            <title>Target Audience: JPA/SQL Developers</title>
+            <para>The material in this paper/presentation is geared towards making
+                JPA/SQL developers more aware of issues that can impact performance
+                in the applications they develop. The material in this paper is not
+                intended to be a performance benchmark for any database or JPA provider 
+                -- thus the environment used is not described (and quite far from 
+                production standards). Use all reported measurements as relative across 
+                the alternatives within the example they are presented. The material covered 
+                in this paper should be an excellent start for developers to better 
+                understand what costs what, how you can better know when there are
+                issues or success, and where to look for solutions. Some topics were
+                purposely left out to help concentrate on the primary scenarios.
+           </para>
+        </note>
+    </preface>
+
+    <xi:include href="jpa-tuning-db.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-tuning-domain.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-tuning-table.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-tuning-index.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-tuning-join.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-tuning-jpa.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-tuning-h2.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+ 
+     <chapter id="jpa-tuning-summary">
+        <title>JPA/SQL Tuning Summary</title>
+        
+        <section id="jpa-tuning-summary-other">
+            <title>Other Topics</title>
+            <para>Some topics of possible interest that we did not cover.</para>
+            
+            <itemizedlist spacing="compact">
+                <listitem><para>Dynamic SQL - parsing penalties paid by building complete SQL
+                    strings rather than using a prepared statement template and value 
+                    parameters.</para></listitem>
+                <listitem><para>Cluster Indexes - structurally organize parent and child tables 
+                    within same data block when commonly accessed together through join operations
+                    and rarely alone.</para></listitem>
+                <listitem><para>Concurrency - sessions blocked inadvertently by concurrent sessions</para></listitem>
+                <listitem><para>...</para></listitem>
+            </itemizedlist>
+        </section>
+     </chapter>    
+        
+</book>

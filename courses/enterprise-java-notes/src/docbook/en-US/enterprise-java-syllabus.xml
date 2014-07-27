@@ -106,7 +106,7 @@
             </row>
                  -->
             <row rowsep="1">
-              <entry namest="topic"><para>JPA/SQL Tuning</para></entry>
+              <entry namest="topic"><para><link linkend="jpa-tuning">JPA/SQL Tuning</link></para></entry>
             </row>
         </tbody>
         </tgroup>

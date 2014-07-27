@@ -1,0 +1,217 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-tuning-db">
+    <title>SQL Tuning</title>
+        
+    <section id="jpa-tuning-db-reasonsbad">
+        <title>Reasons for Inefficient SQL Performance</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Poorly constructed data model</para></listitem>
+            <listitem><para>Poorly constructed access for the data model</para></listitem>
+            <listitem><para>Missing access structures</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Indexes</para></listitem>
+                    <listitem><para>Materialized views</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Missing constraints</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Unique Constraints</para></listitem>
+                    <listitem><para>NOT null</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Sub-optimal execution plan</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Incorrect estimates of cost, cardinality, or predictive selectivity</para></listitem>
+                    <listitem><para>Stale or missing optimizer statistics</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>
+    
+    <section id="jpa-tuning-db-execplan">
+       <title>Execution Plan</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Output of the optimizer</para></listitem>
+            <listitem><para>Instructions of what execution engine must perform to complete query</para></listitem>
+            <listitem><para>Parent-child relationship between steps showing</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Ordering of tables referenced</para></listitem>
+                    <listitem><para>Table access methods used</para></listitem>
+                    <listitem><para>Join methods used</para></listitem>
+                    <listitem><para>Data operations (e.g., filter, sort, aggregation)</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Cardinality = number of rows selected (based on count of unique columns)</para></listitem>
+            <listitem><para>Cost = disk access, I/O and CPU cost estimates for number of rows selected</para></listitem>
+            <listitem><para>Partition access</para></listitem>
+            <listitem><para>Parallel execution</para></listitem>
+        </itemizedlist>
+    </section>    
+    
+
+    <section id="jpa-tuning-db-tools">
+       <title>Diagnostic Tools</title>
+
+        <section id="jpa-tuning-db-tools-clientbenchmark">
+            <title>Client/DAO Result</title>
+    <figure>
+        <title>JUnit Benchmark Tool</title>
+<programlisting language=""><![CDATA[NoColumnIndex.queryForMovieAndDir: [measured 1 out of 1 rounds, threads: 1 (sequential)]
+ round: 3.85 [+- 0.00], round.block: 0.00 [+- 0.00], round.gc: 0.00 [+- 0.00], GC.calls: 0, GC.time: 0.00, time.total: 3.85, time.warmup: 0.00, time.bench: 3.85]]></programlisting>                        
+    </figure>
+        
+        </section>
+
+        <section id="jpa-tuning-db-tools-explainplan">
+           <title>EXPLAIN PLAN</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Helps you determine which execution plan selected by optimizer</para></listitem>
+                <listitem><para>Statement is not executed</para></listitem>
+                <listitem><para>Plan is theoretical</para></listitem>
+            </itemizedlist>
+            <figure>
+                <title>EXPLAIN PLAN Example with GUI</title>
+                <graphic scalefit="1" fileref="images/jpa-tuning-explain-plan.png"/>
+            </figure>
+            <figure>
+                <title>EXPLAIN PLAN Example using Text SQL Commands</title>
+<programlisting language=""><![CDATA[ 
+EXPLAIN PLAN FOR
+select * from
+    ( select
+        movie0_.TITLE as col_0_0_,
+        person2_.FIRST_NAME as col_1_0_,
+        person2_.LAST_NAME as col_2_0_ 
+    from JPATUNE_MOVIE movie0_ 
+    inner join JPATUNE_DIRECTOR director1_ on movie0_.DIRECTOR_ID=director1_.PERSON_ID 
+    inner join JPATUNE_PERSON person2_ on director1_.PERSON_ID=person2_.ID 
+    order by title DESC ) 
+where
+    rownum <= :limit;
+SET LINESIZE 100
+SET PAGESIZE 0
+select * from table(DBMS_XPLAN.DISPLAY());]]></programlisting>                        
+
+<programlisting language=""><![CDATA[plan FOR succeeded.
+Plan hash value: 857441453
+ 
+----------------------------------------------------------------------------------------------------
+| Id  | Operation                 | Name           | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     |
+----------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT          |                |   774K|   477M|       | 25766   (1)| 00:05:10 |
+|*  1 |  COUNT STOPKEY            |                |       |       |       |            |          |
+|   2 |   VIEW                    |                |   774K|   477M|       | 25766   (1)| 00:05:10 |
+|*  3 |    SORT ORDER BY STOPKEY  |                |   774K|    45M|    53M| 25766   (1)| 00:05:10 |
+|*  4 |     HASH JOIN             |                |   774K|    45M|    11M| 14333   (1)| 00:02:52 |
+|*  5 |      HASH JOIN            |                |   271K|  8746K|  5568K|  5115   (1)| 00:01:02 |
+|   6 |       INDEX FAST FULL SCAN| DIRECTOR_PK    |   271K|  2385K|       |   191   (1)| 00:00:03 |
+|   7 |       TABLE ACCESS FULL   | JPATUNE_PERSON |  1637K|    37M|       |  1854   (1)| 00:00:23 |
+|*  8 |      TABLE ACCESS FULL    | JPATUNE_MOVIE  |   774K|    20M|       |  7169   (1)| 00:01:27 |
+----------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - filter(ROWNUM<=TO_NUMBER(:LIMIT))
+   3 - filter(ROWNUM<=TO_NUMBER(:LIMIT))
+   4 - access("MOVIE0_"."DIRECTOR_ID"="DIRECTOR1_"."PERSON_ID")
+   5 - access("DIRECTOR1_"."PERSON_ID"="PERSON2_"."ID")
+   8 - filter("MOVIE0_"."DIRECTOR_ID" IS NOT NULL)
+]]></programlisting>                        
+    </figure>
+    <figure>
+                <title>EXPLAIN PLAN Example using Named Plan</title>
+<programlisting language=""><![CDATA[EXPLAIN PLAN 
+SET STATEMENT_ID='myplan01'
+FOR
+select * from
+    ( select
+        movie0_.TITLE as col_0_0_,
+        person2_.FIRST_NAME as col_1_0_,
+        person2_.LAST_NAME as col_2_0_ 
+...]]></programlisting>                        
+<programlisting language=""><![CDATA[select * from table(DBMS_XPLAN.DISPLAY('PLAN_TABLE','myplan01','typical',null));]]></programlisting>                        
+    </figure>
+        </section>    
+        <section id="jpa-tuning-db-tools-autotrace">
+           <title>AUTOTRACE</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Produces execution plan and statistics after running statement(s)</para></listitem>
+                <listitem><para>Statement(s) are actually run -- not theoretical like EXPLAIN PLAN</para></listitem>
+            </itemizedlist>
+            <figure>
+                <title>AUTOTRACE Example with GUI</title>
+                <graphic scalefit="1" fileref="images/jpa-tuning-autotrace.png"/>
+            </figure>
+            <note>
+                <title>AUTO TRACE Requires Special Role and Permission</title>
+<programlisting language=""><![CDATA[grant SELECT_CATALOG_ROLE to (user);
+grant SELECT ANY DICTIONARY to (user);]]></programlisting>                        
+            </note>
+        </section>    
+
+        <section id="jpa-tuning-db-vplan">
+           <title>Display Cursor Execution Plan within V$PLAN</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Runtime cursors store execution plans within V$PLAN</para></listitem>
+            </itemizedlist>
+            <note>
+                <para>DISPLAY_CURSOR requires select privileges on: V$SQL_PLAN, V$SESSION and V$SQL_PLAN_STATISTICS_ALL</para>
+            </note>
+    <figure>
+        <title>Example: Connection Generates SQL Commands</title>
+<programlisting language=""><![CDATA[select poo.first_name, poo.last_name
+from jpatune_person poo;]]></programlisting>                        
+    </figure>
+
+    <figure>
+        <title>Example: SQL Commands of Interest Located in V$PLAN</title>
+<programlisting language=""><![CDATA[select sql_id, sql_fulltext from V$SQL where sql_fulltext like '%from jpatune_person poo%';]]></programlisting>                        
+<programlisting language=""><![CDATA[87d246wux9qag   "select poo.first_name, poo.last_name from jpatune_person poo"
+9bzam4xu5q7p5   select sql_id, sql_fulltext from V$SQL where sql_fulltext like '%from jpatune_person poo%']]></programlisting>                        
+            </figure>
+        
+            <figure>
+                <title>Example: SQL_ID from V$PLAN Used to Display Execution Plan</title>
+<programlisting language=""><![CDATA[select PLAN_TABLE_OUTPUT from
+TABLE(DBMS_XPLAN.DISPLAY_CURSOR('87d246wux9qag',null, 'TYPICAL'));]]></programlisting>                        
+<programlisting language=""><![CDATA[
+SQL_ID  87d246wux9qag, child number 0
+-------------------------------------
+select poo.first_name, poo.last_name from jpatune_person poo
+ 
+Plan hash value: 1628338048
+ 
+------------------------------------------------------------------------------------
+| Id  | Operation         | Name           | Rows  | Bytes | Cost (%CPU)| Time     |
+------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |                |       |       |     3 (100)|          |
+|   1 |  TABLE ACCESS FULL| JPATUNE_PERSON |    10 |   680 |     3   (0)| 00:00:01 |
+------------------------------------------------------------------------------------
+ 
+Note
+-----
+   - dynamic sampling used for this statement (level=2)]]></programlisting>                        
+            </figure>
+            <figure>
+                <title>Example: DISPLAY_CURSOR witin Single Command</title>
+<programlisting language=""><![CDATA[SELECT t.*
+FROM v$sql s, table(DBMS_XPLAN.DISPLAY_CURSOR(s.sql_id, s.child_number)) t WHERE sql_text LIKE '%JPATUNE_MOVIEGENRE%';]]></programlisting>                        
+            </figure>
+            
+        </section>    
+    </section>    
+
+
+    <section id="jpa-tuning-db-summary">
+       <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>SQL implementations can be inefficient for many reasons</para></listitem>
+            <listitem><para>Administrative and Developer tools available to access execution plans</para></listitem>
+            <listitem><para>Looking at execution plans can aid discovery of issues and solutions</para></listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  

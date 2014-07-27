@@ -1,0 +1,1585 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-tuning-jpa">
+    <title>JPA</title>
+    <para>Avoiding inefficient uses of JPA.</para>
+        
+    <section id="jpa-tuning-jpa-fetch">
+        <title>Lazy and Eager Fetching</title>
+        <para>Cost impacts of lazy and eager fetch joins</para>
+        
+
+        <section id="jpa-tuning-jpa-fetch-parent">
+            <title>Get Parent</title>
+            <para>Get just the root parent of an object graph</para>
+
+            <section id="jpa-tuning-jpa-fetch-parent-query">
+                <title>Query Parts</title>
+    
+                <figure>    
+                    <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[alter table jpatune_moviegenre add constraint moviegenre_unique UNIQUE (movie_id, genre)
+create index movie_role_movie_fdx on jpatune_movierole(movie_id)]]></programlisting>                        
+                </figure>
+    
+                <figure>    
+                    <title>Service Tier Code</title>
+<programlisting language="java"><![CDATA[for (String id: movieIds) {
+    Movie m = dao.getMovieById(id);
+    m.getTitle();
+}]]></programlisting>                        
+                </figure>
+
+                <figure>    
+                    <title>DAO Code</title>
+<programlisting language="java"><![CDATA[public Movie getMovieById(String id) {
+    return em.find(Movie.class, id);
+}]]></programlisting>                        
+                </figure>
+
+            </section>    
+
+
+            
+            <section id="jpa-tuning-jpa-fetch-parent-lazy">
+                <title>Get Parent with Lazy Load</title>
+                <para>Get just the root parent of an object graph with fetch=LAZY relationships</para>
+
+                <figure id="jpa-tuning-jpa-fetch-parent-lazy-figure-relations">    
+                    <title>Relationships</title>
+<programlisting language="java"><![CDATA[public class Movie {
+...
+    @ElementCollection(fetch=FetchType.LAZY)
+    @CollectionTable(
+        name="JPATUNE_MOVIEGENRE",
+          joinColumns=@JoinColumn(name="MOVIE_ID"), 
+          uniqueConstraints=@UniqueConstraint(columnNames={"MOVIE_ID", "GENRE"}))
+    @Column(name="GENRE", length=20)
+    private Set<String> genres;
+
+    @ManyToOne(fetch=FetchType.LAZY,
+            cascade={CascadeType.PERSIST, CascadeType.DETACH})
+    @JoinColumn(name="DIRECTOR_ID")
+    private Director director;
+    
+    @OneToMany(fetch=FetchType.LAZY,mappedBy="movie", 
+            cascade={CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REMOVE})  
+    private Set<MovieRole> cast;]]></programlisting>                        
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Two one-to-many relationships (cast and genres) -- genres is a non-entity ElementCollection</para></listitem>
+                    <listitem><para>One one-to-one relationship (director) </para></listitem>
+                    <listitem><para>All use fetch=LAZY</para></listitem>
+                </itemizedlist>
+
+
+                <figure>    
+                    <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    movie0_.ID as ID1_2_0_,
+    movie0_.DIRECTOR_ID as DIRECTOR6_2_0_,
+    movie0_.MINUTES as MINUTES2_2_0_,
+    movie0_.RATING as RATING3_2_0_,
+    movie0_.RELEASE_DATE as RELEASE4_2_0_,
+    movie0_.TITLE as TITLE5_2_0_ 
+from
+    JPATUNE_MOVIE movie0_ 
+where
+    movie0_.ID=?]]></programlisting>                        
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Only parent table is queried</para></listitem>
+                    <listitem><para>Children are lazily loaded</para></listitem>
+                </itemizedlist>
+
+
+                <figure>
+                    <title>Explain Plan</title>
+                    <graphic scalefit="1" fileref="images/jpatune-plan-jpa-fetch-parent-lazy.png"/>
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Unique scan of Movie primary key index to satisfy where clause and locate rowId</para></listitem>
+                    <listitem><para>Row access by rowId to satisfy select clause</para></listitem>
+                </itemizedlist>
+
+
+                <figure>    
+                    <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+- 20 movies
+Fetch Lazy Thin Parent.Get Parent:warmups=2, rounds=10, ave=0.32 [+- 0.03]
+Fetch Lazy Thick Parent.Get Parent:warmups=2, rounds=10, ave=0.58 [+- 0.03]
+]]></programlisting>                        
+                </figure>
+                <para>* "Thick" parent has an extra Movie.plot text property mapped to potentially make
+                    child joins more expensive. Thin parent does not have Movie plot mapped so the 
+                    results can focus on access to smaller, related entities.</para>
+    
+                <tip>
+                    <title>Fetch=LAZY Speeds Access to Single Entity Core Information</title>
+                    <para>Choosing fetch=LAZY for relationships allows efficient access to the core
+                        information for that entity without paying a price for loading 
+                        unnecessary relations.</para>
+                </tip>
+            </section>    
+
+
+
+            <section id="jpa-tuning-jpa-fetch-parent-eager">
+               <title>Get Parent with Eager Load</title>
+               <para>Get just the root parent of an object graph with fetch=EAGER relationships</para>
+
+                <figure id="jpa-tuning-jpa-fetch-parent-eager-figure-rels">    
+                    <title>Relationships</title>
+<programlisting language="xml"><![CDATA[<entity class="ejava.jpa.examples.tuning.bo.Movie">
+    <attributes>
+        <many-to-one name="director" fetch="EAGER">
+            <join-column name="DIRECTOR_ID"/>
+        </many-to-one>
+        <one-to-many name="cast" fetch="EAGER" mapped-by="movie"/>
+        
+        <element-collection name="genres" fetch="EAGER">
+            <column name="GENRE"/>
+            <collection-table name="JPATUNE_MOVIEGENRE">
+                <join-column name="MOVIE_ID"/>
+                <unique-constraint>
+                    <column-name>MOVIE_ID</column-name>
+                    <column-name>GENRE</column-name>
+                </unique-constraint>
+            </collection-table>
+        </element-collection>
+
+        <transient name="plot"/>
+    </attributes>
+</entity>]]></programlisting>                        
+
+<programlisting language="java"><![CDATA[public class MovieRole {
+...
+    @ManyToOne(optional=false, fetch=FetchType.LAZY,
+            cascade={CascadeType.DETACH})
+    @JoinColumn(name="ACTOR_ID")
+    private Actor actor;
+]]></programlisting>    
+
+<programlisting language="xml"><![CDATA[<entity class="ejava.jpa.examples.tuning.bo.MovieRole">
+    <attributes>
+        <many-to-one name="actor" fetch="EAGER">
+            <join-column name="ACTOR_ID"/>
+        </many-to-one>
+    </attributes>
+</entity>]]></programlisting>                        
+
+<programlisting language="java"><![CDATA[public class Actor {
+...
+    @OneToOne(optional=false, fetch=FetchType.EAGER,
+            cascade={CascadeType.PERSIST, CascadeType.DETACH})
+    @MapsId
+    @JoinColumn(name="PERSON_ID")
+    private Person person;
+]]></programlisting>    
+<programlisting language="java"><![CDATA[public class Director {
+...
+    @OneToOne(optional=false, fetch=FetchType.EAGER,
+            cascade={CascadeType.PERSIST, CascadeType.DETACH})
+    @JoinColumn(name="PERSON_ID")
+    @MapsId
+    private Person person;
+]]></programlisting>    
+                    
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Movie.director, Movie.genres, Movie.cast relationships overridden in XML to be fetch=EAGER</para></listitem>
+                    <listitem><para>MovieRole.actor relationship overridden in XML to be fetch=EAGER</para></listitem>
+                    <listitem><para>Director.person and Actor.person already fetch=EAGER</para></listitem>
+                </itemizedlist>
+
+
+                <figure id="jpa-tuning-jpa-fetch-parent-eager-figure-sql">    
+                    <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    movie0_.ID as ID1_2_5_,
+    movie0_.DIRECTOR_ID as DIRECTOR6_2_5_,
+    movie0_.MINUTES as MINUTES2_2_5_,
+    movie0_.RATING as RATING3_2_5_,
+    movie0_.RELEASE_DATE as RELEASE4_2_5_,
+    movie0_.TITLE as TITLE5_2_5_,
+    cast1_.MOVIE_ID as MOVIE4_2_7_,
+    cast1_.ID as ID1_4_7_,
+    cast1_.ID as ID1_4_0_,
+    cast1_.ACTOR_ID as ACTOR3_4_0_,
+    cast1_.MOVIE_ID as MOVIE4_4_0_,
+    cast1_.MOVIE_ROLE as MOVIE2_4_0_,
+    actor2_.PERSON_ID as PERSON1_0_1_,
+    person3_.ID as ID1_5_2_,
+    person3_.BIRTH_DATE as BIRTH2_5_2_,
+    person3_.FIRST_NAME as FIRST3_5_2_,
+    person3_.LAST_NAME as LAST4_5_2_,
+    person3_.MOD_NAME as MOD5_5_2_,
+    director4_.PERSON_ID as PERSON1_1_3_,
+    person5_.ID as ID1_5_4_,
+    person5_.BIRTH_DATE as BIRTH2_5_4_,
+    person5_.FIRST_NAME as FIRST3_5_4_,
+    person5_.LAST_NAME as LAST4_5_4_,
+    person5_.MOD_NAME as MOD5_5_4_,
+    genres6_.MOVIE_ID as MOVIE1_2_8_,
+    genres6_.GENRE as GENRE2_3_8_ 
+from
+    JPATUNE_MOVIE movie0_ 
+left outer join
+    JPATUNE_MOVIEROLE cast1_ 
+        on movie0_.ID=cast1_.MOVIE_ID 
+left outer join
+    JPATUNE_ACTOR actor2_ 
+        on cast1_.ACTOR_ID=actor2_.PERSON_ID 
+left outer join
+    JPATUNE_PERSON person3_ 
+        on actor2_.PERSON_ID=person3_.ID 
+left outer join
+    JPATUNE_DIRECTOR director4_ 
+        on movie0_.DIRECTOR_ID=director4_.PERSON_ID 
+left outer join
+    JPATUNE_PERSON person5_ 
+        on director4_.PERSON_ID=person5_.ID 
+left outer join
+    JPATUNE_MOVIEGENRE genres6_ 
+        on movie0_.ID=genres6_.MOVIE_ID 
+where
+    movie0_.ID=?]]></programlisting>                        
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Single query (as before), but this time it also brings in the entire object graph</para></listitem>
+                </itemizedlist>
+
+
+                <figure id="jpa-tuning-jpa-fetch-parent-eager-figure-explain">
+                    <title>Explain Plan</title>
+                    <graphic scalefit="1" fileref="images/jpatune-plan-jpa-fetch-parent-eager.png"/>
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Explain plan shows use of indexes and no full table scans (a missing FK index for MovieRole.movie could have been costly)</para></listitem>
+                    <listitem><para>Execution plan is significantly more costly than lazy alternative</para></listitem>
+                </itemizedlist>
+
+
+                <figure>    
+                    <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+- 20 movies
+Fetch Eager Thin Parent.Get Parent:warmups=2, rounds=10, ave=2.43 [+- 0.47]
+Fetch Eager Thick Parent.Get Parent:warmups=2, rounds=10, ave=2.59 [+- 0.06]
+]]></programlisting>                        
+                </figure>
+    
+                <tip>
+                    <title>Fetch=EAGER for Single Entity adds Noticeable Overhead</title>
+                    <para>Choosing fetch=EAGER for relationships will make access to 
+                        a single entity within the relationship more expensive to access.
+                        Consider creating a value query, value query with a result class,
+                        or a native query when querying for only single entity under these 
+                        conditions.
+                    </para>
+                </tip>
+            </section>
+            
+            
+            <section id="jpa-tuning-jpa-fetch-parent-eager-resultclass">
+               <title>Get Parent with NativeQuery and Result Class</title>
+               <para>Get just the root parent and *ONLY* the parent of an object graph with fetch=EAGER 
+                   relationships by using a NativeQuery and Result Class</para>
+                   
+                <figure>    
+                    <title>Relationships</title>
+                    <link linkend="jpa-tuning-jpa-fetch-parent-eager-figure-rels">Same as fetch=EAGER example above</link>
+                </figure>
+                
+                <figure>    
+                    <title>DAO Code</title>
+<programlisting language="java"><![CDATA[public Movie getMovieByIdUnfetched(String id) {
+    List<Movie> movies=createQuery(
+            String.format("select new %s(m.id, m.minutes, m.rating, m.releaseDate, m.title) ", Movie.class.getName()) +
+            "from Movie m " +
+            "where id=:id", Movie.class)
+            .setParameter("id", id)
+            .getResultList();
+    return movies.isEmpty() ? null : movies.get(0);
+}]]></programlisting>                        
+<programlisting language="java"><![CDATA[public Movie(String id, Integer minutes, String rating, Date releaseDate, String title) {
+    this.id=id;
+    this.minutes = minutes;
+    this.rating=rating;
+    this.mrating=MovieRating.getFromMpaa(rating);
+    this.releaseDate = releaseDate;
+    this.title=title;
+}]]></programlisting>                        
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para>We define an alternate JPA-QL query for provider to use that does not include relationships</para></listitem>
+                    <listitem><para>Result class not mapped beyond this query -- does not have to be an entity class</para></listitem>
+                </itemizedlist>
+
+                <figure>    
+                    <title>Generated JPAQL and SQL</title>
+<programlisting language=""><![CDATA[
+"select new ejava.jpa.examples.tuning.bo.Movie(m.id, m.minutes, m.rating, m.releaseDate, m.title) 
+from Movie m where id=:id", 
+params={id=m270003}
+]]></programlisting>                 
+       
+<programlisting language=""><![CDATA[select
+    movie0_.ID as col_0_0_,
+    movie0_.MINUTES as col_1_0_,
+    movie0_.RATING as col_2_0_,
+    movie0_.RELEASE_DATE as col_3_0_,
+    movie0_.TITLE as col_4_0_ 
+from
+    JPATUNE_MOVIE movie0_ 
+where
+    movie0_.ID=?]]></programlisting>                        
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Value query with result class constructor permits a bypass of fetch=EAGER relationships</para></listitem>
+                </itemizedlist>
+                
+                <figure>
+                    <title>Explain Plan</title>
+                    <graphic scalefit="1" fileref="images/jpatune-plan-jpa-fetch-parent-eager-resultclass.png"/>
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Execution plan identical to fetch=LAZY case</para></listitem>
+                </itemizedlist>
+
+
+                <figure>    
+                    <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+Fetch Eager Thin Parent.Get Just Parent:warmups=2, rounds=10, ave=0.32 [+- 0.02]
+Fetch Eager Thick Parent.Get Just Parent:warmups=2, rounds=10, ave=0.32 [+- 0.02]
+Fetch Lazy Thin Parent.Get Just Parent:warmups=2, rounds=10, ave=0.34 [+- 0.03]
+Fetch Lazy Thick Parent.Get Just Parent:warmups=2, rounds=10, ave=0.32 [+- 0.02]
+]]></programlisting>                        
+                </figure>
+                <para>* Thick/Thin or Eager/Lazy should not matter to this approach since we only access
+                    a specific set of fields in the Movie that does not include Movie.plot.</para>
+    
+                <tip>
+                    <title>Use JPA Value or Native Queries to Override Relationship Definitions</title>
+                    <para>JPA provides many escape hatches to achieve desired results. Use JPAQL value 
+                        queries with Object[], Tuple, or custom result class -or- use SQL to provide
+                        efficient override of fetch=EAGER definitions. 
+                    </para>
+                </tip>
+                <note>
+                    <title>Result Class Instances are not Managed</title>
+                    <para>Even though we used an entity class in this example, it is being used as 
+                        a simple POJO and the returned instance is not managed. Result Classes for 
+                        value queries provide convenient type-safe access to results. However, 
+                        they are unmanaged and cannot be used for follow-on entity operations.</para>
+                </note>
+                
+            </section>            
+                
+        </section>    
+
+
+
+
+
+
+
+
+        
+        <section id="jpa-tuning-jpa-fetch-children">
+            <title>Get Parent and Children</title>
+            <para>Get parent and children in an object graph</para>
+            
+
+            <section id="jpa-tuning-jpa-fetch-children-query">
+                <title>Query Parts</title>
+    
+                <figure>    
+                    <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[alter table jpatune_moviegenre add constraint moviegenre_unique UNIQUE (movie_id, genre)
+create index movie_role_movie_fdx on jpatune_movierole(movie_id)]]></programlisting>                        
+                </figure>
+    
+                <figure>    
+                    <title>Service Tier Code</title>
+<programlisting language="java"><![CDATA[for (String id: movieIds) {
+    Movie m = dao.getMovieById(id);
+    if (m.getDirector()!=null) { m.getDirector().getPerson().getLastName(); }
+    m.getGenres().iterator().next();
+    for (MovieRole role: m.getCast()) {
+        if (role.getActor()!=null) { role.getActor().getPerson().getLastName(); }
+    }
+}]]></programlisting>                        
+                </figure>
+
+                <figure>    
+                    <title>DAO Code</title>
+<programlisting language="java"><![CDATA[public Movie getMovieById(String id) {
+    return em.find(Movie.class, id);
+}]]></programlisting>                        
+                </figure>
+
+            </section>    
+
+
+
+            <section id="jpa-tuning-jpa-fetch-children-lazy">
+                <title>Get Parent and Children with Lazy Load</title>
+                <para>Get parent and children in an object graph with fetch=LAZY relationships</para>
+
+                <section id="jpa-tuning-jpa-fetch-children-lazy-sqlexplain">
+                    <title>Generated SQL</title>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Query for parent</para>
+<programlisting language=""><![CDATA[select
+    movie0_.ID as ID1_2_0_,
+    movie0_.DIRECTOR_ID as DIRECTOR6_2_0_,
+    movie0_.MINUTES as MINUTES2_2_0_,
+    movie0_.RATING as RATING3_2_0_,
+    movie0_.RELEASE_DATE as RELEASE4_2_0_,
+    movie0_.TITLE as TITLE5_2_0_
+from
+    JPATUNE_MOVIE movie0_
+where
+    movie0_.ID=?]]></programlisting>
+                        <figure>
+                            <title>Explain Plan</title>
+                            <graphic scalefit="1" fileref="images/jpatune-plan-jpa-fetch-children-lazy-movie.png"/>
+                        </figure>
+                    </listitem>
+
+
+
+
+                    <listitem><para>Query for Movie.director role</para>
+<programlisting language=""><![CDATA[select
+    director0_.PERSON_ID as PERSON1_1_0_
+from
+    JPATUNE_DIRECTOR director0_
+where
+    director0_.PERSON_ID=?;]]></programlisting>
+                        <figure>
+                            <title>Explain Plan</title>
+                            <graphic scalefit="1" fileref="images/jpatune-plan-jpa-fetch-children-lazy-dir.png"/>
+                        </figure>
+                    </listitem>
+            
+            
+                    <listitem><para>Query for Movie.director.person identity</para>
+<programlisting language=""><![CDATA[select
+    person0_.ID as ID1_5_0_,
+    person0_.BIRTH_DATE as BIRTH2_5_0_,
+    person0_.FIRST_NAME as FIRST3_5_0_,
+    person0_.LAST_NAME as LAST4_5_0_,
+    person0_.MOD_NAME as MOD5_5_0_
+from
+    JPATUNE_PERSON person0_
+where
+    person0_.ID=?;]]></programlisting>
+                        <figure>
+                            <title>Explain Plan</title>
+                            <graphic scalefit="1" fileref="images/jpatune-plan-jpa-fetch-children-lazy-person.png"/>
+                        </figure>
+                    </listitem>
+            
+            
+            
+                    <listitem><para>Query for Movie.genre values</para>
+<programlisting language=""><![CDATA[select
+    genres0_.MOVIE_ID as MOVIE1_2_0_,
+    genres0_.GENRE as GENRE2_3_0_
+from
+    JPATUNE_MOVIEGENRE genres0_
+where
+    genres0_.MOVIE_ID=?;]]></programlisting>
+                        <figure>
+                            <title>Explain Plan</title>
+                            <graphic scalefit="1" fileref="images/jpatune-plan-jpa-fetch-children-lazy-genre.png"/>
+                        </figure>
+                    </listitem>
+            
+            
+                    <listitem><para>Query for Movie.cast entities</para>
+<programlisting language=""><![CDATA[
+select
+    cast0_.MOVIE_ID as MOVIE4_2_1_,
+    cast0_.ID as ID1_4_1_,
+    cast0_.ID as ID1_4_0_,
+    cast0_.ACTOR_ID as ACTOR3_4_0_,
+    cast0_.MOVIE_ID as MOVIE4_4_0_,
+    cast0_.MOVIE_ROLE as MOVIE2_4_0_
+from
+    JPATUNE_MOVIEROLE cast0_
+where
+    cast0_.MOVIE_ID=?;]]></programlisting>                        
+                        <figure>
+                            <title>Explain Plan</title>
+                            <graphic scalefit="1" fileref="images/jpatune-plan-jpa-fetch-children-lazy-cast.png"/>
+                        </figure>
+                    </listitem>
+                    
+                    <listitem><para>Query for MovieRole.actor entity</para>
+<programlisting language=""><![CDATA[select
+    actor0_.PERSON_ID as PERSON1_0_0_
+from
+    JPATUNE_ACTOR actor0_
+where
+    actor0_.PERSON_ID=?
+...   
+--repeated for each member of the Movie.cast]]></programlisting>
+                        <figure>
+                            <title>Explain Plan</title>
+                            <graphic scalefit="1" fileref="images/jpatune-plan-jpa-fetch-children-lazy-actor.png"/>
+                        </figure>
+                    </listitem>
+
+                    <listitem><para>Query for Actor.person entity</para>
+<programlisting language=""><![CDATA[
+select
+    person0_.ID as ID1_5_0_,
+    person0_.BIRTH_DATE as BIRTH2_5_0_,
+    person0_.FIRST_NAME as FIRST3_5_0_,
+    person0_.LAST_NAME as LAST4_5_0_,
+    person0_.MOD_NAME as MOD5_5_0_
+from
+    JPATUNE_PERSON person0_
+where
+    person0_.ID=?;
+...   
+--repeated for each member of the Movie.cast]]></programlisting>
+                        <figure>
+                            <title>Explain Plan</title>
+                            <graphic scalefit="1" fileref="images/jpatune-plan-jpa-fetch-children-lazy-person.png"/>
+                        </figure>
+                    </listitem>
+                </itemizedlist>
+                </section>
+
+
+                <section id="jpa-tuning-jpa-fetch-children-lazy-benchmark">
+                    <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+Fetch Lazy Thin Parent.Get Parent and Children:warmups=2, rounds=10, ave=7.25 [+- 0.91]
+Fetch Lazy Thick Parent.Get Parent and Children:warmups=2, rounds=10, ave=7.25 [+- 0.92]
+]]></programlisting>                        
+                    <tip>
+                        <title>Make Sparse use of Object Graphs when using fetch=LAZY</title>
+                        <para>Fetch=LAZY is intended for access to a minimal set of objects within
+                             a graph. Although each individual query by primary key is quite 
+                             inexpensive, the sum total (factoring in cardinality) is significant.
+                             Consider adding a JOIN FETCH query to your DAO when accessing entire 
+                             object graph declared with fetch=LAZY.</para>
+                    </tip>
+                </section>
+            </section>    
+
+
+
+
+
+
+
+            <section id="jpa-tuning-jpa-fetch-children-eager">
+                <title>Get Parent and Children with Eager Load</title>
+                <para>Get parent and children in an object graph with fetch=EAGER relationships</para>
+
+                <figure>    
+                    <title>Generated SQL</title>
+                    <link linkend="jpa-tuning-jpa-fetch-parent-eager-figure-sql">Same as previous fetch=EAGER example</link>
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Loading of the object graph occurs in single DB call</para></listitem>
+                </itemizedlist>
+
+
+                <figure>
+                    <title>Explain Plan</title>
+                    <link linkend="jpa-tuning-jpa-fetch-parent-eager-figure-explain">Same as previous fetch=EAGER example</link>
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Same cost loading  object graph -- whether accessing single or all entities</para></listitem>
+                </itemizedlist>
+
+
+                <figure>    
+                    <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+Fetch Eager Thin Parent.Get Parent and Children:warmups=2, rounds=10, ave=2.26 [+- 0.06]
+Fetch Eager Thick Parent.Get Parent and Children:warmups=2, rounds=10, ave=2.57 [+- 0.06]
+]]></programlisting>                        
+                </figure>
+    
+                <tip>
+                    <title>Fetch=EAGER Efficient when Accessing Relations</title>
+                    <para>Use fetch=EAGER if related entity *always*/*mostly* accessed. Suggest 
+                        using a JOIN FETCH query when fetch=LAZY is defined and need entire object
+                        graph.</para>
+                </tip>
+            </section>    
+
+
+
+            <section id="jpa-tuning-jpa-fetch-children-joinfetch">
+                <title>Get Parent and Children with JOIN FETCH Query</title>
+                <para>Get parent and children in an object graph with JOIN FETCH query</para>
+
+                <figure>    
+                    <title>Relationships</title>
+                    <link linkend="jpa-tuning-jpa-fetch-parent-lazy-figure-relations">Relationships defined as fetch=LAZY</link>
+                </figure>
+
+                <figure>    
+                    <title>DAO Code/JPAQL</title>
+<programlisting language="java"><![CDATA[public Movie getMovieFetchedByIdFetched(String id) {
+    List<Movie> movies = createQuery(
+            "select m from Movie m " +
+            "left join fetch m.genres " +
+            "left join fetch m.director d " +
+            "left join fetch d.person " +
+            "left join fetch m.cast role " +
+            "left join fetch role.actor a " +
+            "left join fetch a.person " +
+            "where m.id=:id", Movie.class)
+            .setParameter("id", id)
+            .getResultList();
+    return movies.isEmpty() ? null : movies.get(0);
+}]]></programlisting>                        
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para>EAGER aspects adding by query adding FETCH to JOIN query construct</para></listitem>
+                </itemizedlist>
+
+
+                <figure>    
+                    <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    movie0_.ID as ID1_2_0_,
+    director2_.PERSON_ID as PERSON1_1_1_,
+    person3_.ID as ID1_5_2_,
+    cast4_.ID as ID1_4_3_,
+    actor5_.PERSON_ID as PERSON1_0_4_,
+    person6_.ID as ID1_5_5_,
+    movie0_.DIRECTOR_ID as DIRECTOR6_2_0_,
+    movie0_.MINUTES as MINUTES2_2_0_,
+    movie0_.RATING as RATING3_2_0_,
+    movie0_.RELEASE_DATE as RELEASE4_2_0_,
+    movie0_.TITLE as TITLE5_2_0_,
+    genres1_.MOVIE_ID as MOVIE1_2_0__,
+    genres1_.GENRE as GENRE2_3_0__,
+    person3_.BIRTH_DATE as BIRTH2_5_2_,
+    person3_.FIRST_NAME as FIRST3_5_2_,
+    person3_.LAST_NAME as LAST4_5_2_,
+    person3_.MOD_NAME as MOD5_5_2_,
+    cast4_.ACTOR_ID as ACTOR3_4_3_,
+    cast4_.MOVIE_ID as MOVIE4_4_3_,
+    cast4_.MOVIE_ROLE as MOVIE2_4_3_,
+    cast4_.MOVIE_ID as MOVIE4_2_1__,
+    cast4_.ID as ID1_4_1__,
+    person6_.BIRTH_DATE as BIRTH2_5_5_,
+    person6_.FIRST_NAME as FIRST3_5_5_,
+    person6_.LAST_NAME as LAST4_5_5_,
+    person6_.MOD_NAME as MOD5_5_5_ 
+from
+    JPATUNE_MOVIE movie0_ 
+left outer join
+    JPATUNE_MOVIEGENRE genres1_ 
+        on movie0_.ID=genres1_.MOVIE_ID 
+left outer join
+    JPATUNE_DIRECTOR director2_ 
+        on movie0_.DIRECTOR_ID=director2_.PERSON_ID 
+left outer join
+    JPATUNE_PERSON person3_ 
+        on director2_.PERSON_ID=person3_.ID 
+left outer join
+    JPATUNE_MOVIEROLE cast4_ 
+        on movie0_.ID=cast4_.MOVIE_ID 
+left outer join
+    JPATUNE_ACTOR actor5_ 
+        on cast4_.ACTOR_ID=actor5_.PERSON_ID 
+left outer join
+    JPATUNE_PERSON person6_ 
+        on actor5_.PERSON_ID=person6_.ID 
+where
+    movie0_.ID=?;]]></programlisting>                        
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Query identical to fetch=EAGER case</para></listitem>
+                </itemizedlist>
+
+
+                <figure>
+                    <title>Explain Plan</title>
+                    <link linkend="jpa-tuning-jpa-fetch-parent-eager-figure-explain">Same query plan as fetch=EAGER</link>
+                </figure>
+
+
+                <figure>    
+                    <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+Fetch Lazy Thin Parent.Get Parent with Fetched Children:warmups=2, rounds=10, ave=2.56 [+- 0.80]
+Fetch Lazy Thick Parent.Get Parent with Fetched Children:warmups=2, rounds=10, ave=2.54 [+- 0.08]
+Fetch Eager Thin Parent.Get Parent with Fetched Children:warmups=2, rounds=10, ave=2.24 [+- 0.06]
+Fetch Eager Thick Parent.Get Parent with Fetched Children:warmups=2, rounds=10, ave=2.58 [+- 0.05]
+]]></programlisting>                        
+                </figure>
+    
+                <tip>
+                    <title>Make use of JPA Queries to Achieve Tuned-for-Use Query</title>
+                    <para>JPA provides several means to access an entity and its relationships. The 
+                        properties defined for the relationship help define the default query
+                        semantics -- which may not be appropriate for all uses. Leverage JOIN FETCH
+                        queries when needing to fully load specific relationships prior to 
+                        ending the transaction.</para>
+                </tip>
+            </section>    
+        </section>    
+    </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <section id="jpa-tuning-jpa-count">
+        <title>Obtaining Instance Counts</title>
+        <para>Pulling back entire rows from table rather than just the count</para>
+
+        <section id="jpa-tuning-jpa-count-query">
+            <title>Query Parts</title>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[alter table jpatune_moviegenre add constraint moviegenre_unique UNIQUE (movie_id, genre)
+create index movie_role_movie_fdx on jpatune_movierole(movie_id)]]></programlisting>                        
+            </figure>
+
+            <figure>    
+                <title>Service Tier Code</title>
+<programlisting language="java"><![CDATA[for (String movieId: movieIds) {
+    dao.getMovieCastCount(movieId);
+}]]></programlisting>                        
+            </figure>
+
+        </section>    
+
+
+
+        <section id="jpa-tuning-jpa-count-dao-relation-size">
+            <title>Collection Size in DAO from Relation</title>
+            <para>Get size of a relationship collection.</para>
+
+            <figure>    
+                <title>DAO Code/JPAQL</title>
+<programlisting language="java"><![CDATA[public int getMovieCastCountByDAORelation(String movieId) {
+    Movie m = em.find(Movie.class, movieId);
+    return m==null ? 0 : m.getCast().size();
+}]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>DAO first gets Movie by primary key</para></listitem>
+                <listitem><para>DAO follows up by accessing size of relationship</para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Generated SQL - Fetch=LAZY</title>
+<programlisting language=""><![CDATA[select
+    movie0_.ID as ID1_2_0_,
+    movie0_.DIRECTOR_ID as DIRECTOR6_2_0_,
+    movie0_.MINUTES as MINUTES2_2_0_,
+    movie0_.RATING as RATING3_2_0_,
+    movie0_.RELEASE_DATE as RELEASE4_2_0_,
+    movie0_.TITLE as TITLE5_2_0_ 
+from
+    JPATUNE_MOVIE movie0_ 
+where
+    movie0_.ID=?]]></programlisting>                        
+<programlisting language=""><![CDATA[select
+    cast0_.MOVIE_ID as MOVIE4_2_1_,
+    cast0_.ID as ID1_4_1_,
+    cast0_.ID as ID1_4_0_,
+    cast0_.ACTOR_ID as ACTOR3_4_0_,
+    cast0_.MOVIE_ID as MOVIE4_4_0_,
+    cast0_.MOVIE_ROLE as MOVIE2_4_0_ 
+from
+    JPATUNE_MOVIEROLE cast0_ 
+where
+    cast0_.MOVIE_ID=?]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Provider will issue follow-on query for all entities in relation</para></listitem>
+                <listitem><para>Entity data not used by DAO -- i.e. wasted</para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Generated SQL - Fetch=EAGER</title>
+                <link linkend="jpa-tuning-jpa-fetch-parent-eager-figure-sql">Same as fetch=EAGER SQL shown above</link>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Provider will issue one query for entire object graph, to include entities in relation</para></listitem>
+                <listitem><para>Entity data not used by DAO -- i.e. even more data is wasted</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+Size Lazy.DAO Relation Count:warmups=2, rounds=10, ave=1.83 [+- 0.82]
+Size Eager.DAO Relation Count:warmups=2, rounds=10, ave=5.40 [+- 0.83]
+]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title>Using Relation Collections to Just Obtain Size is Inefficient</title>
+                <para>Pulling back relationship graphs to just obtain the count in that 
+                    relationship is inefficient and requires DB to do much more work 
+                    than it has to.</para>
+            </tip>
+        </section>
+
+
+
+
+
+
+
+
+        <section id="jpa-tuning-jpa-count-dao-row-size">
+            <title>Row Count in DAO from Query</title>
+            <para>Query for relationships and count resulting rows</para>
+
+            <figure>    
+                <title>DAO Code/JPAQL</title>
+<programlisting language="java"><![CDATA[public int getMovieCastCountByDAO(String movieId) {
+    return createQuery(
+            "select role " +
+            "from Movie m " +
+            "join m.cast role " +
+            "where m.id=:id", MovieRole.class)
+            .setParameter("id", movieId)
+            .getResultList().size();
+}]]></programlisting>                        
+<programlisting language=""><![CDATA["select role from Movie m join m.cast role where m.id=:id", params={id=m48306}]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>DAO forms query for just related entities</para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Generated SQL - Fetch=LAZY</title>
+<programlisting language=""><![CDATA[select
+    cast1_.ID as ID1_4_,
+    cast1_.ACTOR_ID as ACTOR3_4_,
+    cast1_.MOVIE_ID as MOVIE4_4_,
+    cast1_.MOVIE_ROLE as MOVIE2_4_ 
+from
+    JPATUNE_MOVIE movie0_ 
+inner join
+    JPATUNE_MOVIEROLE cast1_ 
+        on movie0_.ID=cast1_.MOVIE_ID 
+where
+    movie0_.ID=?]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Provider forms query for related entities</para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Generated SQL - Fetch=EAGER</title>
+<programlisting language=""><![CDATA[select
+    cast1_.ID as ID1_4_,
+    cast1_.ACTOR_ID as ACTOR3_4_,
+    cast1_.MOVIE_ID as MOVIE4_4_,
+    cast1_.MOVIE_ROLE as MOVIE2_4_ 
+from
+    JPATUNE_MOVIE movie0_ 
+inner join
+    JPATUNE_MOVIEROLE cast1_ 
+        on movie0_.ID=cast1_.MOVIE_ID 
+where
+    movie0_.ID=?]]></programlisting>                        
+
+<programlisting language=""><![CDATA[--this is repeated for each MovieRole.actor
+select
+    actor0_.PERSON_ID as PERSON1_0_0_ 
+from
+    JPATUNE_ACTOR actor0_ 
+where
+    actor0_.PERSON_ID=?
+
+select
+    person0_.ID as ID1_5_0_,
+    person0_.BIRTH_DATE as BIRTH2_5_0_,
+    person0_.FIRST_NAME as FIRST3_5_0_,
+    person0_.LAST_NAME as LAST4_5_0_,
+    person0_.MOD_NAME as MOD5_5_0_ 
+from
+    JPATUNE_PERSON person0_ 
+where
+    person0_.ID=?]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Provider forms query for related entities and fetch=EAGER relationship specification 
+                    causes additional MovieRole.actor to be immediately obtained -- except through separate queries
+                    by primary key.</para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+Size Lazy.DAO Count:warmups=2, rounds=10, ave=1.37 [+- 0.03]
+Size Eager.DAO Count:warmups=2, rounds=10, ave=16.82 [+- 1.33]
+]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title>Using fetch=EAGER Relationships can Magnify Data Retrieval Issues</title>
+                <para>When the entity model over-uses fetch=EAGER, the negative results can 
+                    be magnified when pulling back unnecessary information from the database.</para>
+            </tip>
+        </section>
+
+
+
+
+
+
+
+
+        <section id="jpa-tuning-jpa-count-db-count-query">
+            <title>Row Count in DB using Count() Query</title>
+            <para>Issue query to DB to return relationship count</para>
+
+            <figure>    
+                <title>DAO Code/JPAQL</title>
+<programlisting language="java"><![CDATA[public int getMovieCastCountByDB(String movieId) {
+    return createQuery(
+            "select count(role) " +
+            "from Movie m " +
+            "join m.cast role " +
+            "where m.id=:id", Number.class)
+            .setParameter("id", movieId)
+            .getSingleResult().intValue();
+}]]></programlisting>                        
+<programlisting language=""><![CDATA["select count(role) from Movie m join m.cast role where m.id=:id", params={id=m48306}]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Requesting count(role) rather than returning all roles and counting in DAO.</para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    count(cast1_.ID) as col_0_0_ 
+from
+    JPATUNE_MOVIE movie0_ 
+inner join
+    JPATUNE_MOVIEROLE cast1_ 
+        on movie0_.ID=cast1_.MOVIE_ID 
+where
+    movie0_.ID=?]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Produces a single result/row</para></listitem>
+            </itemizedlist>
+
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-jpa-count-db-query.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>DB has already optimized the query to remove unnecessary JOIN</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+Size Lazy.DB Count:warmups=2, rounds=10, ave=0.50 [+- 0.04]
+Size Eager.DB Count:warmups=2, rounds=10, ave=0.45 [+- 0.02]
+]]></programlisting>                        
+            </figure>
+            <para>* fetch=LAZY or EAGER has no impact in this solution</para>
+
+            <tip>
+                <title>Perform Counts within DB</title>
+                <para>It is much more efficient to perform counts within database than to count rows 
+                     from data returned.</para>
+            </tip>
+        </section>
+
+
+
+
+        <section id="jpa-tuning-jpa-count-dao-count-query-nojoin">
+            <title>Row Count in DB using Count Query without JOIN</title>
+            <para>Restructure query to DB to count relations without JOIN</para>
+
+            <figure>    
+                <title>DAO Code/JPAQL</title>
+<programlisting language="java"><![CDATA[public int getCastCountForMovie(String movieId) {
+    return createQuery(
+            "select count(*) " +
+            "from MovieRole role " +
+            "where role.movie.id=:id", Number.class)
+            .setParameter("id", movieId)
+            .getSingleResult().intValue();
+}]]></programlisting>                        
+
+<programlisting language=""><![CDATA["select count(*) from MovieRole role where role.movie.id=:id", params={id=m48306}]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Querying from MovieRole side allows removal of unnecessary JOIN</para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    count(*) as col_0_0_ 
+from
+    JPATUNE_MOVIEROLE movierole0_ 
+where
+    movierole0_.MOVIE_ID=?]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>SQL generated queries single table</para></listitem>
+            </itemizedlist>
+
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-jpa-count-db-query.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>No improvement in execution plan since DB already performed this optimization in our last attempt</para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+Size Lazy.DB Count no Join:warmups=2, rounds=10, ave=0.47 [+- 0.01]
+Size Eager.DB Count no Join:warmups=2, rounds=10, ave=0.44 [+- 0.02]
+]]></programlisting>                        
+            </figure>
+            <para>* fetch=LAZY or EAGER has no impact in this solution</para>
+
+            <tip>
+                <title>Look to Remove Unnecessary JOINs</title>
+                <para>Although in this and the previous case the DB looks to have already 
+                    optimized the query, try to eliminate unnecessary complexity within the query.</para>
+            </tip>
+        </section>
+    </section>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <section id="jpa-tuning-jpa-queryloops">
+        <title>Query Loops</title>
+        <para>Performing separate subqueries off initial query</para>
+
+        <section id="jpa-tuning-jpa-queryloops-query">
+            <title>Query Parts</title>
+            <para>Get people who have acted in same movie as a specific actor</para>
+            
+                <figure>    
+                    <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movierole_actor_movie_cdx on jpatune_movierole(actor_id, movie_id)
+create index movierole_movie_actor_cdx on jpatune_movierole(movie_id, actor_id)]]></programlisting>                        
+                </figure>
+    
+                <figure>    
+                    <title>Service Tier Code</title>
+<programlisting language="java"><![CDATA[List<Person> actors=dao.oneStepFromPerson(kevinBacon);]]></programlisting>                        
+                </figure>
+        </section>
+
+        <section id="jpa-tuning-jpa-queryloops-dao">
+            <title>Query Loops in DAO</title>
+            <para>Using DAO to perform initial query and follow-on queries based on results</para>
+
+            <figure>    
+                <title>DAO Code/JPAQL</title>
+<programlisting language="java"><![CDATA[public Collection<Person> oneStepFromPersonByDAO(Person p) {
+    Collection<Person> result = new HashSet<Person>();
+    //performing core query
+    List<String> movieIds = createQuery(
+            "select role.movie.id from MovieRole role " +
+            "where role.actor.person.id=:personId", String.class)
+            .setParameter("personId", p.getId())
+            .getResultList();
+    
+    //loop through results and issue sub-queries
+    for (String mid: movieIds) {
+        List<Person> people = createQuery(
+                "select role.actor.person from MovieRole role " +
+                "where role.movie.id=:movieId", Person.class)
+                .setParameter("movieId", mid)
+                .getResultList();
+        result.addAll(people);
+    }
+    return result;
+}]]></programlisting>                        
+
+<programlisting language=""><![CDATA["select role.movie.id from MovieRole role where role.actor.person.id=:personId", params={personId=p73897}]]></programlisting>                        
+<programlisting language=""><![CDATA[//repeated for each returned movie above
+"select role.actor.person from MovieRole role where role.movie.id=:movieId", params={movieId=m239584}]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>DAO makes N separate queries based on results of first query</para></listitem>
+                <listitem><para>Distinct was not required in query since it was issued per-movie. Distinct 
+                    was handed within the DAO using a Java Set to hold the results and hashcode()/equals()
+                    implemented within Person class.</para></listitem>
+            </itemizedlist>
+
+
+            <figure id="jpa-tuning-jpa-queryloops-dao-figure-sql">    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    movierole0_.MOVIE_ID as col_0_0_ 
+from
+    JPATUNE_MOVIEROLE movierole0_,
+    JPATUNE_ACTOR actor1_ 
+where
+    movierole0_.ACTOR_ID=actor1_.PERSON_ID 
+    and actor1_.PERSON_ID=?]]></programlisting>                        
+<programlisting language=""><![CDATA[--repeated for each returned movie above
+select
+    person2_.ID as ID1_5_,
+    person2_.BIRTH_DATE as BIRTH2_5_,
+    person2_.FIRST_NAME as FIRST3_5_,
+    person2_.LAST_NAME as LAST4_5_,
+    person2_.MOD_NAME as MOD5_5_ 
+from
+    JPATUNE_MOVIEROLE movierole0_,
+    JPATUNE_ACTOR actor1_ 
+inner join
+    JPATUNE_PERSON person2_ 
+        on actor1_.PERSON_ID=person2_.ID 
+where
+    movierole0_.ACTOR_ID=actor1_.PERSON_ID 
+    and movierole0_.MOVIE_ID=?
+]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>SQL generated queries single table</para></listitem>
+            </itemizedlist>
+
+
+            <figure id="jpa-tuning-jpa-queryloops-dao-figure-execplan">
+                <title>Explain Plan (Initial Query)</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-jpa-loop-dao-outer-lazy.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Range scan of compound index(actor_id, person_id) used to satisfy the person_id in where clause and movie_id for select clause</para></listitem>
+            </itemizedlist>
+            <para>* Query was optimized to bypass Actor table</para>
+
+            <figure>
+                <title>Explain Plan (Follow-on/Repeated Query)</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-jpa-loop-dao-inner-lazy.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Range scan on compound_index(movie_id, actor_id) to satisfy where condition for Movie.id and locate MovieRole rowId</para></listitem>
+                <listitem><para>Unique scan of Person primary key index to obtain rowId for Person.id=MovieRole.actor.id</para></listitem>
+                <listitem><para>Person row accessed by rowId to satisfy select clause</para></listitem>
+            </itemizedlist>
+            <para>* Query was optimized to bypass Actor table</para>
+            <para>** Compound index(movie_id, actor_id) permitted MovieRole table and lookup of MovieRole.actorId to be bypassed.</para>
+
+
+            <figure>    
+                <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+-3924 people found
+Loop Lazy.DAO Loop:warmups=2, rounds=10, ave=4.91 [+- 0.88]
+]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title>Beware of Query Loops Driven from Query Results</title>
+                <para>Query loops driven off of previous query results can be a sign the 
+                    follow-queries could have been combined with the initial query to be 
+                    accomplished within the database within a single statement.</para>
+                <para>Also beware of how the loop size can grow over the lifetime 
+                    of the application. The number may grow significantly after
+                    testing/initial deployment to a significant size (i.e., from 100 to 100K loops).
+                    Defining as a single statement and applying paging limits can 
+                    help speed the originally flawed implementation.</para>
+            </tip>
+        </section>
+
+        <section id="jpa-tuning-jpa-queryloops-db">
+            <title>Query Loops using DB Subquery</title>
+            <para>Expressing nest query as subquery to resolve within database.</para>
+
+            <figure>    
+                <title>DAO Code/JPAQL</title>
+<programlisting language="java"><![CDATA[public List<Person> oneStepFromPersonByDB(Person p) {
+    return createQuery(
+            "select distinct role.actor.person from MovieRole role " +
+            "where role.movie.id in (" +
+                "select m.id from Movie m " +
+                "join m.cast role2 " +
+                "where role2.actor.person.id=:id)", Person.class)
+         .setParameter("id", p.getId())
+         .getResultList();
+}]]></programlisting>                        
+
+<programlisting language=""><![CDATA[
+"select distinct role.actor.person from MovieRole role 
+where role.movie.id in (
+    select m.id from Movie m join m.cast role2 
+    where role2.actor.person.id=:id
+    )", 
+params={id=p73897}
+]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Distinct was required to remove duplicates</para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    distinct person2_.ID as ID1_5_,
+    person2_.BIRTH_DATE as BIRTH2_5_,
+    person2_.FIRST_NAME as FIRST3_5_,
+    person2_.LAST_NAME as LAST4_5_,
+    person2_.MOD_NAME as MOD5_5_ 
+from
+    JPATUNE_MOVIEROLE movierole0_,
+    JPATUNE_ACTOR actor1_ 
+inner join
+    JPATUNE_PERSON person2_ 
+        on actor1_.PERSON_ID=person2_.ID 
+where
+    movierole0_.ACTOR_ID=actor1_.PERSON_ID 
+    and (
+        movierole0_.MOVIE_ID in (
+            select
+                movie3_.ID 
+            from
+                JPATUNE_MOVIE movie3_ 
+            inner join
+                JPATUNE_MOVIEROLE cast4_ 
+                    on movie3_.ID=cast4_.MOVIE_ID,
+                JPATUNE_ACTOR actor5_ 
+            where
+                cast4_.ACTOR_ID=actor5_.PERSON_ID 
+                and actor5_.PERSON_ID=?
+        )
+    )]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>SQL generated uses a non-correlated subquery</para></listitem>
+            </itemizedlist>
+
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-jpa-loop-db-lazy.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Range scan of MovieRole composite(actor_id, movie_id) used to satisfy subquery where clause for person_id and obtain movie_id</para></listitem>
+                <listitem><para>Range scan of MovieRole composite(movie_id, actor_id) used to join movie_ids with root query and obtain person_id</para></listitem>
+                <listitem><para>Unique scan of Person primary key index to locate rowId</para></listitem>
+                <listitem><para>Person row accessed by rowId</para></listitem>
+            </itemizedlist>
+            <para>* cast4_ and movierole0_ are both MovieRoles. cast4_ is joined with Movie and subject Person in subquery. 
+            movierole0_ is joined with Movie and associated Person in root query.</para>
+            <para>** execution plan indicates subquery could have been re-written as a JOIN</para>
+
+
+            <figure>    
+                <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+-3924 people found
+Loop Lazy.DB Loop Distinct:warmups=2, rounds=10, ave=2.52 [+- 0.09]
+]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title>Delegate Query Logic to Database</title>
+                <para>If possible, express query as a single transaction to the database rather than
+                     pulling data back and re-issuing subqueries from the DAO. Apply paging constraints
+                     in order to address issues with excess growth over time.</para>
+            </tip>
+        </section>
+        
+        
+        
+    </section>
+    
+    
+    
+    
+    
+    
+    <section id="jpa-tuning-jpa-paging">
+        <title>Paging</title>
+        <para>Placing reasonable limits on amount of data returned</para>
+
+        <section id="jpa-tuning-jpa-paging-query">
+            <title>Query Parts</title>
+            
+                <figure>    
+                    <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[alter table jpatune_moviegenre add constraint moviegenre_unique UNIQUE (movie_id, genre)
+create index movie_role_movie_fdx on jpatune_movierole(movie_id)]]></programlisting>                        
+                </figure>
+    
+                <figure>    
+                    <title>Service Tier Code</title>
+<programlisting language="java"><![CDATA[dao.oneStepFromPerson(kevinBacon, offset, PAGE_SIZE, "role.actor.person.lastName ASC")]]></programlisting>                        
+                </figure>
+                <para>* Service tier provides not only offset and limit information, but would also benefit from
+                    using a sort. The DAO would have to pull back all rows in order to implement the sort within
+                    the DAO -- while the DB-based solution can leave all data within the database. Sort will only 
+                    be implemented here in the DB-based solution.</para>
+        </section>
+
+
+        <section id="jpa-tuning-jpa-paging-dao">
+            <title>Paging within DAO</title>
+            <para>Implementing paging within the DAO</para>
+
+            <figure>    
+                <title>DAO Code/JPAQL</title>
+<programlisting language="java"><![CDATA[public Collection<Person> oneStepFromPersonByDAO(Person p, Integer offset, Integer limit, String orderBy) {
+    Collection<Person> result = new HashSet<Person>();
+    //performing core query
+    List<String> movieIds = createQuery(
+            "select role.movie.id from MovieRole role " +
+            "where role.actor.person.id=:personId", String.class)
+            .setParameter("personId", p.getId())
+            .getResultList();
+    
+    //loop through results and issue sub-queries
+    int pos=0;
+    for (String mid: movieIds) {
+        List<Person> people = createQuery(
+                "select role.actor.person from MovieRole role " +
+                "where role.movie.id=:movieId", Person.class)
+                .setParameter("movieId", mid)
+                .getResultList();
+        if (offset==null || (offset!=null && pos+people.size() > offset)) {
+            for(Person pp: people) {
+                if (offset==null || pos>=offset) {
+                    result.add(pp);
+                    if (limit!=null && result.size() >= limit) { break; }
+                }
+                pos+=1; 
+            }
+        } else {
+            pos+=people.size();
+        }
+        if (limit!=null && result.size() >= limit) { break; }
+    }
+    return result;
+}]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>DAO logic gets complicated when self-implementing paging.</para></listitem>
+                <listitem><para>OrderBy is not implemented by this DAO algorithm. All rows in the table would 
+                   be required in order to perform ordering within the DAO.</para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Generated SQL</title>
+                <link linkend="jpa-tuning-jpa-queryloops-dao-figure-sql">The generated schema is the same as the looping/subquery example</link>
+            </figure>
+
+
+            <figure>
+                <title>Explain Plan</title>
+                <link linkend="jpa-tuning-jpa-queryloops-dao-figure-execplan">The execution plan is the same as the looping/subquery example</link>
+            </figure>
+
+
+            <figure>    
+                <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+Loop Lazy.DAO Page 0:warmups=1, rounds=10, ave=0.39 [+- 0.09]
+Loop Lazy.DAO Page 10:warmups=1, rounds=10, ave=1.01 [+- 0.45]
+Loop Lazy.DAO Page 50:warmups=1, rounds=10, ave=2.80 [+- 0.79]
+
+Loop Eager.DAO Page 0:warmups=1, rounds=10, ave=0.38 [+- 0.10]
+Loop Eager.DAO Page 10:warmups=1, rounds=10, ave=1.10 [+- 0.64]
+Loop Eager.DAO Page 50:warmups=1, rounds=10, ave=2.53 [+- 0.06]
+]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>This example performs better or equal to previous loop/subquery example when 
+                    earlier pages are requested -- thus fewer rows returned</para></listitem>
+                <listitem><para>fetch=EAGER/LAZY have no impact on this test since the 
+                    entity queried for has no relationships</para></listitem>
+            </itemizedlist>
+
+            <tip>
+                <title>Performance Degrades in DAO as Row Sizes Increase</title>
+                <para>Paging within the Java code starts off near equivalent to the database
+                    solution for small row sizes but gradually gets worse when row sizes 
+                    increase and later pages are requested.</para>
+            </tip>
+        </section>
+
+        <section id="jpa-tuning-jpa-paging-db">
+            <title>Paging within DB</title>
+            <para>Implementing paging within the database</para>
+
+            <figure>    
+                <title>DAO Code/JPAQL</title>
+<programlisting language="java"><![CDATA[public List<Person> oneStepFromPersonByDB(Person p, Integer offset, Integer limit, String orderBy) {
+    return withPaging(createQuery(
+            "select distinct role.actor.person from MovieRole role " +
+            "where role.movie.id in (" +
+                "select m.id from Movie m " +
+                "join m.cast role2 " +
+                "where role2.actor.person.id=:id)", Person.class), offset, limit, orderBy)
+         .setParameter("id", p.getId())
+         .getResultList();
+}]]></programlisting>                        
+<programlisting language=""><![CDATA[
+"select distinct role.actor.person from MovieRole role 
+where role.movie.id in (
+    select m.id from Movie m join m.cast role2 
+    where role2.actor.person.id=:id
+) order by role.actor.person.lastName ASC", 
+params={id=p73897}, offset=500, limit=50
+]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>JPA calls to TypedQuery.setFirstResult(), setMaxResults(), and adding the 
+                    orderBy to the text of the query are abstracted behind withQuery() and createQuery() 
+                    helper functions within the DAO example class and are not shown here</para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    * 
+from
+    ( select
+        row_.*,
+        rownum rownum_ 
+    from
+        ( select
+            distinct person2_.ID as ID1_5_,
+            person2_.BIRTH_DATE as BIRTH2_5_,
+            person2_.FIRST_NAME as FIRST3_5_,
+            person2_.LAST_NAME as LAST4_5_,
+            person2_.MOD_NAME as MOD5_5_ 
+        from
+            JPATUNE_MOVIEROLE movierole0_,
+            JPATUNE_ACTOR actor1_ 
+        inner join
+            JPATUNE_PERSON person2_ 
+                on actor1_.PERSON_ID=person2_.ID,
+            JPATUNE_PERSON person7_ 
+        where
+            movierole0_.ACTOR_ID=actor1_.PERSON_ID 
+            and actor1_.PERSON_ID=person7_.ID 
+            and (
+                movierole0_.MOVIE_ID in (
+                    select
+                        movie3_.ID 
+                    from
+                        JPATUNE_MOVIE movie3_ 
+                    inner join
+                        JPATUNE_MOVIEROLE cast4_ 
+                            on movie3_.ID=cast4_.MOVIE_ID,
+                        JPATUNE_ACTOR actor5_ 
+                    where
+                        cast4_.ACTOR_ID=actor5_.PERSON_ID 
+                        and actor5_.PERSON_ID=?
+                )
+            ) 
+        order by
+            person7_.LAST_NAME ASC ) row_ 
+        where
+            rownum <= ?) 
+    where
+        rownum_ > ?]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Generated SQL is essentially the same as the looping/subquery example except with the 
+                    addition of "order by" and paging constructs.</para></listitem>
+            </itemizedlist>
+
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-jpa-paging-db-lazy.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Execution plan is similar as described in the looping/subquery example</para></listitem>
+                <listitem><para>Extra cost to sort rows prior to paging operation added</para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Relative Test Result</title>
+<programlisting language=""><![CDATA[
+Loop Lazy.DB Page 0:warmups=1, rounds=10, ave=0.32 [+- 0.02]
+Loop Lazy.DB Page 10:warmups=1, rounds=10, ave=0.31 [+- 0.01]
+Loop Lazy.DB Page 50:warmups=1, rounds=10, ave=0.32 [+- 0.01]
+
+Loop Eager.DB Page 0:warmups=1, rounds=10, ave=0.32 [+- 0.01]
+Loop Eager.DB Page 10:warmups=1, rounds=10, ave=0.32 [+- 0.01]
+Loop Eager.DB Page 50:warmups=1, rounds=10, ave=0.32 [+- 0.00]
+]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title>DB-based Paging Scales</title>
+                <para>Since only the requested page of rows is returned, delegating paging to the 
+                    database provides consistent performance for varying row quantities.</para>
+            </tip>
+            <tip>
+                <title>Doing Paging within DB enables Sorting</title>
+                <para>Implementing paging across multiple subquery calls to the database can get 
+                    ugly and error-prone. Implementing paging for a single query issued to the 
+                    database is quite trivial.</para>
+            </tip>
+        </section>
+
+    </section>
+
+    <section id="jpa-tuning-jpa-summary">
+       <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Hidden performance costs for fetch and resolving with JOIN FETCH and value queries</para></listitem>
+            <listitem><para>Hidden performance costs for row counts and resolving with a query function</para></listitem>
+            <listitem><para>Performance costs when issuing repeated queries of an initial query from DAO and resolving using subqueries in database</para></listitem>
+            <listitem><para>Performance and functional costs when implementing paging in DAO and resolving by delegating paging to database</para></listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  
