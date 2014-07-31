@@ -17,6 +17,7 @@
     </description>
 
     <modules>
+        <module>enterprise-java-syllabus</module>
         <module>enterprise-java-notes</module>
         <module>enterprise-java-lab</module>
     </modules>

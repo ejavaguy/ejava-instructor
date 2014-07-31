@@ -1,0 +1,26 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="enterprise-java-courseintro">
+    <bookinfo>
+        <title>Enterprise Java (JavaEE) Course Syllabus</title>
+        <subtitle></subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+    </bookinfo>
+    <preface id="enterprise-java-topics">
+        <title>Welcome!</title>
+        <itemizedlist>
+            <listitem><para>Course combines a mixture of presentation, discussion, and lab exercises to provide an introduction
+                and thorough coverage of Enterprise Java (JavaEE)</para></listitem>
+            <listitem><para>Concepts are based on JavaEE standards and grounded using a specific JavaEE provider (JBoss/Wildfly Application Server)</para></listitem>
+            <listitem><para>Lab environment is based on Maven and IDE agnostic (this is not an IDE wizard course)</para></listitem>
+        </itemizedlist>
+    </preface>
+    
+    <xi:include href="enterprise-java-syllabus.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>

@@ -21,17 +21,7 @@
             </para>
         </abstract>
     </bookinfo>
-    <preface id="enterprise-java-topics">
-        <title>Welcome!</title>
-        <itemizedlist>
-            <listitem><para>Course combines a mixture of presentation, discussion, and lab exercises to provide an introduction
-                and thorough coverage of Enterprise Java (JavaEE)</para></listitem>
-            <listitem><para>Concepts are based on JavaEE standards and grounded using a specific JavaEE provider (JBoss/Wildfly Application Server)</para></listitem>
-            <listitem><para>Lab environment is based on Maven and IDE agnostic (this is not an IDE wizard course)</para></listitem>
-        </itemizedlist>
-    </preface>
-    
-    <xi:include href="enterprise-java-syllabus.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="enterprise-java-syllabus-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="javaee-intro-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="devenv-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="business-logic-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />

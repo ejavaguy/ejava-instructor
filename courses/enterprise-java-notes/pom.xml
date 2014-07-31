@@ -22,6 +22,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>info.ejava.docs.courses</groupId>
+            <artifactId>enterprise-java-syllabus</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+        <dependency>
             <groupId>info.ejava.docs.intro</groupId>
             <artifactId>javaee-intro-notes</artifactId>
             <version>${project.version}</version>
