@@ -16,7 +16,7 @@
     </description>
     
     <properties>
-       <doc.base>enterprise-java-lab</doc.base>
+       <doc.base>enterprise-java-lab-book</doc.base>
     </properties>
 
     <dependencies>
