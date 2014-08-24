@@ -8,7 +8,7 @@
     </parent>
 
     <groupId>info.ejava.docs.jpa</groupId>
-    <artifactId>jpa-root</artifactId>
+    <artifactId>jpa</artifactId>
     <packaging>pom</packaging>
 
     <name>Java Persistence API Root</name>

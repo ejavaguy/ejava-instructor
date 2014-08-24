@@ -9,7 +9,7 @@
     <artifactId>jpa-entitymgr-notes</artifactId>
     <packaging>pom</packaging>
 
-    <name>JPA EntityManager::Notes</name>
+    <name>JPA::EntityManager::Notes</name>
     <description>
         This module provides an intro to JPA and coverage of the 
         EntityManager.
