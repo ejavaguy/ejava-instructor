@@ -1,0 +1,294 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-entitymgrex-pu">
+    <title>JPA Persistence Unit Setup</title>
+    <para>
+        This chapter will add an entity class, the persistence.xml, 
+        and associated property file to define the persistence unit.
+    </para>
+    <para>The entity class represents one or more tables in the database
+        and each instance of the entity class represents a specific row
+        in those tables.</para>
+    <para>The persistence.xml defines a JPA persistence unit (along with
+        other related XML files and entity class annotations). Instances 
+        of a persistence unit is called a persistence context. Instances
+        of the persistence unit are accessed through an EntityManager.</para>
+<programlisting language=""><![CDATA[`-- src
+    |-- main
+    |   |-- java
+    |   |   `-- myorg
+    |   |       `-- entitymgrex
+    |   |           `-- Auto.java
+    |   `-- resources
+    |       `-- META-INF
+    |           `-- persistence.xml
+    `-- test
+        |-- java
+        `-- resources
+            `-- hibernate.properties]]></programlisting>
+        
+    <orderedlist>
+
+        <listitem><para>
+            Create a (Plain Old Java Object (POJO)) class to represent an
+            automobile. Use class annotations to provide the following:
+            </para>
+<programlisting language="java"><![CDATA[package myorg.entitymgrex;
+
+import java.io.Serializable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GenerationType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity @Table(name="EM_AUTO")
+public class Auto implements Serializable {
+    private static final long serialVersionUID = 1L;
+    @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
+    private long id;
+    private String make;
+    private String model;
+    private String color;
+    private int mileage;
+
+    public Auto(){}
+    public Auto(int id) { this.id=id; }
+    public long getId() { return id; }
+
+    //more getter/setters go here
+}]]></programlisting>
+
+            <note>
+                <para>
+                    @Entity, @Id, and a default constructor are the only requirements
+                    on an entity class. The implementation of java.io.Serializable is
+                    not a JPA requirement but will be leveraged by a later example
+                    within this exercise.
+                </para>
+            </note>
+        </listitem>
+
+        <listitem><para>
+            Add the remaining setter/getter methods to the class. If you are
+            using Eclipse to author the class -- right click->Source->Generate
+            Getters and Setters will generate all of this for you.  Since we
+            are using generated primary key values, there is no immediate need
+            for a constructor to set the id. If you add this later, remember to
+            also add a default constructor, which was removed by the compiler
+            when you manually add the first constructor.
+            </para>
+<programlisting language="java"><![CDATA[    public void setMake(String make) {
+        this.make = make;
+    }
+    
+    public int getMileage() { return mileage; }
+    public void setMileage(int mileage) {
+        this.mileage = mileage;
+    }
+    
+    public String getModel() { return model; }
+    public void setModel(String model) {
+        this.model = model;
+    }
+    
+    public String getColor() { return color; }
+    public void setColor(String color) {
+        this.color = color;
+    }]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            You may also want to add a public toString():String method to 
+            conveniently print your Auto objects. Eclipse can also generate 
+            that on demand and configurable.
+            </para>
+<programlisting language="java"><![CDATA[    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder
+            .append("id=").append(id)
+            .append(", make=").append(make)
+            .append(", model=").append(model)
+            .append(", color=").append(color)
+            .append(", mileage=").append(mileage);
+        return builder.toString();
+    }]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Create a META-INF/persistence.xml file to define the 
+            persistence unit for our jar file.
+            </para>
+
+            <itemizedlist spacing="compact">
+                <listitem><para>
+                    persistence-unit name: must match what we place in our JUnit test
+                    </para></listitem>
+                <listitem><para>
+                    provider: specify that this persistence unit is defined for 
+                    the org.hibernate.ejb.HibernatePersistence provider.
+                    </para></listitem>
+                <listitem><para>
+                    define provider-specific properties that tell the provider how to 
+                    obtain a connection to the database as well as some other configuration
+                    properties. 
+                </para></listitem>
+            </itemizedlist>
+            <note>
+                <para>
+                    The technique to add the provider-specific properties
+                    includes somewhat sensitive information like user credentials.
+                    If we place them in the persistence.xml file within the src/main
+                    tree, these properties will become part of our deployed 
+                    artifact. To avoid this, we will define them in a separate
+                    hibernate.properties file placed in the src/test tree.
+                </para>
+            </note>
+
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" version="2.0">
+
+    <persistence-unit name="entityMgrEx">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+
+        <properties>
+           <!-- defined in src/test/resources/hibernate.properties -->
+        </properties>
+    </persistence-unit>            
+</persistence>]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Create a hibernate.properties file in src/test/resources to hold 
+            information we want to support testing, but may not want to be 
+            part of the deployed artifact. Leave the volatile values as variables
+            so they can be expanded into the target tree during compile time.
+            </para>
+            <itemizedlist spacing="compact">
+                <listitem><para>
+                    the variables will be filled in during the build process using
+                    "filtering" and the resources plugin.
+                    </para></listitem>
+                <listitem><para>
+                    the show and format_sql options are only turned on during
+                    early development and debug.
+                    </para></listitem>
+                <listitem><para>
+                    the jdbc.batch_size property set to 0 is also used during
+                    debug. Setting it to this value will eliminate any batching
+                    of SQL commands, allowing errors about the commands to be 
+                    better reported to the developer. 
+                </para></listitem>
+            </itemizedlist>
+
+<programlisting language=""><![CDATA[hibernate.dialect=${hibernate.dialect}
+hibernate.connection.url=${jdbc.url}
+hibernate.connection.driver_class=${jdbc.driver}
+hibernate.connection.password=${jdbc.password}
+hibernate.connection.username=${jdbc.user}
+#hibernate.hbm2ddl.auto=create
+#hibernate.hbm2ddl.import_files=/ddl/emauto-tuningdrop.ddl,/ddl/emauto-tuning.ddl 
+hibernate.show_sql=true
+hibernate.format_sql=true
+#hibernate.jdbc.batch_size=0]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Make sure your project still builds. Your area should look something
+            like the following after the build.
+            </para>
+<programlisting language=""><![CDATA[$ mvn clean install -P\!h2db -Ph2srv]]></programlisting>
+<programlisting language=""><![CDATA[
+|-- pom.xml
+|-- src
+|   |-- main
+|   |   |-- java
+|   |   |   `-- myorg
+|   |   |       `-- entitymgrex
+|   |   |           `-- Auto.java
+|   |   `-- resources
+|   |       |-- ddl
+|   |       |   |-- emauto_create.ddl
+|   |       |   |-- emauto_delete.ddl
+|   |       |   |-- emauto_drop.ddl
+|   |       |   |-- emauto_tuningadd.ddl
+|   |       |   `-- emauto_tuningremove.ddl
+|   |       `-- META-INF
+|   |           `-- persistence.xml
+|   `-- test
+|       `-- resources
+|           `-- hibernate.properties
+`-- target
+    |-- classes
+    |   |-- ddl
+    |   |   |-- emauto_create.ddl
+    |   |   |-- emauto_delete.ddl
+    |   |   |-- emauto_drop.ddl
+    |   |   |-- emauto_tuningadd.ddl
+    |   |   `-- emauto_tuningremove.ddl
+    |   |-- META-INF
+    |   |   `-- persistence.xml
+    |   `-- myorg
+    |       `-- entitymgrex
+    |           `-- Auto.class
+   ...
+    `-- test-classes
+        `-- hibernate.properties
+]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            You should also check that your hibernate.properties file was filtered
+            by your build.testResources definition provided earlier. The variable definitions
+            within your src/test/resources source file(s) should be replaced with 
+            property values from your environment.
+            </para>
+<programlisting language=""><![CDATA[$ more src/test/resources/hibernate.properties target/test-classes/hibernate.properties 
+::::::::::::::
+src/test/resources/hibernate.properties
+::::::::::::::
+hibernate.dialect=${hibernate.dialect}
+hibernate.connection.url=${jdbc.url}
+hibernate.connection.driver_class=${jdbc.driver}
+hibernate.connection.password=${jdbc.password}
+hibernate.connection.username=${jdbc.user}
+#hibernate.hbm2ddl.auto=create
+hibernate.show_sql=true
+hibernate.format_sql=true
+#hibernate.jdbc.batch_size=0
+
+::::::::::::::
+target/test-classes/hibernate.properties
+::::::::::::::
+hibernate.dialect=org.hibernate.dialect.H2Dialect
+hibernate.connection.url=jdbc:h2:tcp://127.0.0.1:9092/h2db/ejava
+hibernate.connection.driver_class=org.h2.Driver
+hibernate.connection.password=
+hibernate.connection.username=sa
+#hibernate.hbm2ddl.auto=create
+#hibernate.hbm2ddl.import_files=/ddl/emauto-tuningdrop.ddl,/ddl/emauto-tuning.ddl 
+hibernate.show_sql=true
+hibernate.format_sql=true
+#hibernate.jdbc.batch_size=0]]></programlisting>
+        </listitem>
+    </orderedlist>
+        
+    <section id="jpa-entitymgrex-pu-summary">
+       <title>Summary</title>
+       <para>In this chapter you defined a JPA entity class, persistence unit, and
+           properties specific to your database instance. With these tackled, you
+           have the core building blocks in place to begin instantiating the 
+           JPA EntityManager in the next chapter. You will notice that the specification
+           of your database properties came from your Maven pom properties instead 
+           of hard-coded into individual files. This leveraged the filtering feature
+           of resource files during the build. In the last chapter of this exercise
+           you will be asked to re-factor the Maven database properties into a parent
+           Maven project to be re-used across several projects.
+       </para>
+    </section>    
+</chapter>

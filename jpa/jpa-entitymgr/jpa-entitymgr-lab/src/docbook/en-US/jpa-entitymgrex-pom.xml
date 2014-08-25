@@ -1,0 +1,419 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-entitymgrex-pom">
+    <title>Create Core Project POM</title>
+    <para>This chapter will put in place a couple of core constructs that will allow
+        Maven and the IDE recognize the elements of your source tree.
+    </para>
+        
+        <orderedlist>
+            <listitem><para>Create a root directory for your project and populate with a pom.xml file</para>
+<programlisting language="xml"><![CDATA[<?xml version="1.0"?>
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>myorg.jpa</groupId>
+    <artifactId>entityMgrEx</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <name>Entity Manager Exercise</name>
+
+</project>]]></programlisting>
+            </listitem>
+            
+
+            <listitem><para>Define a remote repository to use to download hibernate artifacts</para>
+ <programlisting language="xml"><![CDATA[ <!-- needed to resolve some hibernate dependencies -->
+    <repositories>
+        <repository>
+            <id>jboss-nexus</id>
+            <name>JBoss Nexus Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+        </repository>
+    </repositories> ]]></programlisting>
+            </listitem>
+
+            <listitem><para>Add property definitions for versions of dependencies and plugins we will be using.</para>
+ <programlisting language="xml"><![CDATA[
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.source.version>1.7</java.source.version>
+        <java.target.version>1.7</java.target.version>
+
+        <jboss.host>localhost</jboss.host>
+        <db.host>${jboss.host}</db.host>
+
+        <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
+        <maven-jar-plugin.version>2.5</maven-jar-plugin.version>
+        <maven-surefire-plugin.version>2.17</maven-surefire-plugin.version>
+        <sql-maven-plugin.version>1.5</sql-maven-plugin.version>        
+
+        <commons-logging.version>1.1.1</commons-logging.version>
+        <h2db.version>1.3.168</h2db.version>
+        <hibernate-jpa-2.1-api.version>1.0.0.Final</hibernate-jpa-2.1-api.version>
+        <hibernate-entitymanager.version>4.3.4.Final</hibernate-entitymanager.version>
+        <hibernate3-maven-plugin.version>3.0</hibernate3-maven-plugin.version>
+        <hibernate3.version>3.6.10.Final</hibernate3.version>
+        <junit.version>4.10</junit.version>
+        <log4j.version>1.2.13</log4j.version>
+        <slf4j.version>1.6.1</slf4j.version>
+    </properties>
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>
+                    Add a dependencyManagement section to define and configure the 
+                    dependencies we will be using to work with JPA. These are passive definitions
+                    -- meaning they don't actually add any dependencies to your project. They
+                    just define the version and possible exclusions for artifacts so all 
+                    child/leaf projects stay consistent.
+                </para>
+ <programlisting language="xml"><![CDATA[ <dependencyManagement>
+        <dependencies>
+            <dependency>
+              <groupId>commons-logging</groupId>
+              <artifactId>commons-logging</artifactId>
+              <version>${commons-logging.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.javax.persistence</groupId>
+                <artifactId>hibernate-jpa-2.1-api</artifactId>
+                <version>${hibernate-jpa-2.1-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-entitymanager</artifactId>
+                <version>${hibernate-entitymanager.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>log4j</groupId>
+              <artifactId>log4j</artifactId>
+              <version>${log4j.version}</version>
+            </dependency>    
+        </dependencies>
+    </dependencyManagement> ]]></programlisting>
+
+                <note>
+                    <para>
+                        Knowing this exercise will always be a single module -- we 
+                        could do this simpler. However, it is assumed that you will soon take
+                        the information you learn here to a real enterprise project and that 
+                        will have many modules and could benefit from reusing a standard parent
+                        configuration. All definitions will be housed in a single module during
+                        the conduct of this exercise but the properties, dependencyManagement,
+                        and pluginManagement sections we will build below can be lifted and moved
+                        to a parent pom in a multi-module project. 
+                    </para>
+                </note>
+            </listitem>
+
+            <listitem><para>
+                   Add pluginManagement definitions for certain plugins we will use in 
+                   this module. Like above -- these are passive definitions that define
+                   the configuration for certain plugins when the child/leaf projects 
+                   chose to use them. Lets start with a simple example and add a few more
+                   complex ones later. In this example, we are making sure all uses
+                   of the jar plugin are of a specific version.
+                </para>
+ <programlisting language="xml"><![CDATA[ <build>
+        <pluginManagement>
+            <plugins>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven-jar-plugin.version}</version>
+                </plugin>
+
+            </plugins>    
+        </pluginManagement>
+    </build> ]]></programlisting>
+            </listitem>
+
+            <listitem><para>
+                Add the src/main dependencies. This represents what your code depends
+                upon at compile time and runtime. 
+                </para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>
+                        scope=compile is used when your src/main code depends on
+                        the artifact to compile and you wish the design of transitive
+                        dependency to automatically bring this dependency with the module.
+                        </para></listitem>
+                    <listitem><para>
+                        scope=provided is used when your src/main code depends on the
+                        artifact to compile but you do not wish this automatically 
+                        be brought along when used with downstream clients. Normally
+                        this type of artifact is an API and the downstream client will
+                        be providing their own version of the API packaged with their
+                        provider.
+                        </para></listitem>
+                </itemizedlist>
+
+ <programlisting language="xml"><![CDATA[ <dependencies>
+        <dependency>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+          <scope>compile</scope>
+        </dependency>
+    
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.1-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        ...
+    </dependencies> ]]></programlisting>
+
+                <note>
+                    <para>
+                        Notice how the definitions above are lacking a version element.
+                        The dependency declaration actively brings the dependency into the 
+                        project and inherits the definition specified by the dependencyManagement
+                        section above.
+                    </para>
+                </note>
+            </listitem>
+
+            <listitem><para>Add the src/test standard dependencies.</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>
+                        scope=test is used for anything that your src/test code
+                        depends upon (but not your src/main) or what your unit tests
+                        need at runtime to operate the test. For example, a module
+                        may declare a scope=test dependency on h2 database (later) to do 
+                        some local unit testing and then be ultimately deployed to
+                        a postgres server in a downstream client. In this case
+                        we are picking JUnit4 as the testing framework, log4j
+                        as the logging implementation for commons-logging, and 
+                        hibernate as the JPA implementation for the jpa-api. We are
+                        also adding an extra dependency to allow hibernate slf4j logging to
+                        be integrated with log4j.
+                        </para></listitem>
+                </itemizedlist>
+
+ <programlisting language="xml"><![CDATA[ <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <scope>test</scope>
+        </dependency>    ]]></programlisting>
+            </listitem>
+
+            <listitem><para>
+                    Add a testResources definition to the build section to get src/test/resource
+                    files filtered when copied into the target tree. We do this so we have a chance
+                    to replace the variables in the persistence.xml and hibernate.properties file.
+                </para>
+
+ <programlisting language="xml"><![CDATA[ <build>
+        <!-- filtering will replace URLs, credentials, etc in the 
+             files copied to the target directory and used during testing.
+            -->
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
+
+        <pluginManagement>
+        ...
+    </build> ]]></programlisting>
+            </listitem>
+
+            <listitem><para>
+                    Add a compiler specification to control the source and target
+                    java versions. In this case we are picking up the specific value
+                    from property variables set above and can be overridden in the 
+                    developer's settings.xml or on the command line using system
+                    properties.
+                </para>
+ <programlisting language="xml"><![CDATA[ <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                            <source>${java.source.version}</source>
+                            <target>${java.target.version}</target>
+                    </configuration>	                
+                </plugin>      
+            ...      
+            </plugins>
+        </pluginManagement>
+    </build> ]]></programlisting>
+            </listitem>
+
+            <listitem><para>
+                    Add a definition for the maven-surefire-plugin so we can set 
+                    properties needed for testing. 
+                </para>
+ <programlisting language="xml"><![CDATA[ <build>
+        <pluginManagement>
+            <plugins>
+                ...
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin.version}</version>
+                    <configuration>
+                        <argLine>${surefire.argLine}</argLine>
+                    </configuration>
+                </plugin>            
+
+            </plugins>    
+        </pluginManagement>
+    </build> ]]></programlisting>
+
+                <note>
+                    <para>
+                        At this point, we are just allowing the argLine defined 
+                        elsewhere to be optionally specified (for debugging).  We do not 
+                        yet have a need for system properties, but if we did 
+                        the example shows how -Dname=value would be specified within the 
+                        plugin configuration. The plugin (not pluginManagement) definition 
+                        in the child pom will include any necessary system properties
+                        to be passed to the unit test. 
+                    </para>
+                </note>
+
+ <programlisting language="xml"><![CDATA[ <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <name1>value1</name1>
+                        <name2>value2</name2>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>            
+        </plugins>    
+    </build> ]]></programlisting>
+            </listitem>
+
+
+            <listitem><para>
+                    Add a set of profiles that define H2 and Hibernate as our database and 
+                    persistence provider. In the example below we are adding two database
+                    definitions (that happen to both be the same vendor). One requires the
+                    server to be running and the other uses an embedded server and a local
+                    filesystem. The embedded version can be easier to test with. The server
+                    version can be easier to debug. Activate which one you want with either
+                    your settings.xml#activeProfile settings or using a -Pprofile-name argument
+                    on the command line. If you already have a settings.xml#activeProfile
+                    setting, you can turn it off using -P\!deactivated-profile-name ((bash) or 
+                    -P!deactivated-profile-name (dos)) and
+                    follow it up with -Pactivated-profile-name.
+                </para>
+
+ <programlisting language="xml"><![CDATA[ <profiles>
+        <profile> <!-- H2 server-based DB -->
+            <id>h2srv</id>
+            <properties>
+                  <jdbc.driver>org.h2.Driver</jdbc.driver>
+                  <jdbc.url>jdbc:h2:tcp://${db.host}:9092/h2db/ejava</jdbc.url>
+                  <jdbc.user>sa</jdbc.user>
+                  <jdbc.password/>
+                  <hibernate.dialect>org.hibernate.dialect.H2Dialect</hibernate.dialect>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
+                    <version>${h2db.version}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile> <!-- H2 file-based DB -->
+            <id>h2db</id>
+            <activation>
+                <property> 
+                    <name>!jdbcdb</name>
+                </property>
+            </activation>
+            <properties>
+                  <jdbc.driver>org.h2.Driver</jdbc.driver>
+                  <jdbc.url>jdbc:h2:${basedir}/target/h2db/ejava</jdbc.url>
+                  <jdbc.user>sa</jdbc.user>
+                  <jdbc.password/>
+                  <hibernate.dialect>org.hibernate.dialect.H2Dialect</hibernate.dialect>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
+                    <version>${h2db.version}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles> ]]></programlisting>
+
+                <note>
+                    <para>
+                        Profiles can be used to control which options are enabled at
+                        build time to make the module more portable. I also use them to help
+                        identify which dependencies are brought in for what reason -- especially
+                        for profiles that are configure to always activate.
+                    </para>
+                </note>
+
+            </listitem>
+
+            <listitem><para>
+                Perform a test of your pom.xml by issuing a sample build command.
+                All should complete even though there is nothing yet in your source tree.
+                </para>
+    
+<programlisting language="xml"><![CDATA[$ mvn clean test]]></programlisting>
+            </listitem>
+    </orderedlist>
+
+        
+    <section id="jpa-entitymgrex-pom-summary">
+       <title>Summary</title>
+       <para>In this chapter you created a core Maven project definition with the ability
+           to resolve dependencies, build, and potentially test a JPA module. At this 
+           point you have an empty but valid Maven project/module. In the following chapters
+           we will add more artifacts to make to build something useful.
+       </para>
+    </section>    
+</chapter>
+  

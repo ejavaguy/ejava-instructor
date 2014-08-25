@@ -17,12 +17,19 @@
     
     <properties>
        <doc.base>enterprise-java-lab-book</doc.base>
+       <content.version>v2014-08-25</content.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>info.ejava.docs.intro</groupId>
             <artifactId>605-784-devenv-setup-lab</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+        <dependency>
+            <groupId>info.ejava.docs.jpa</groupId>
+            <artifactId>jpa-entitymgr-lab</artifactId>
             <version>${project.version}</version>
             <classifier>docsrc</classifier>
         </dependency>

@@ -1,0 +1,33 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-entitymgrex-testcase">
+    <title></title>
+    <para>This chapter will 
+    </para>
+        
+    <section id="jpa-entitymgrex-testcase-">
+        <title></title>
+
+        <orderedlist>
+            <listitem><para></para>
+<programlisting language="java"><![CDATA[
+]]></programlisting>
+            </listitem>
+            
+            <listitem><para></para></listitem>
+            <listitem><para></para>
+ <programlisting language="java"><![CDATA[
+]]></programlisting>
+            </listitem>
+        </orderedlist>
+    </section>
+
+        
+    <section id="jpa-entitymgrex-testcase-summary">
+       <title>Summary</title>
+       <para>In this chapter you ...
+       </para>
+    </section>    
+</chapter>
+  

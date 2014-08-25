@@ -1,0 +1,100 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-entitymgrex-eclipse">
+    <title>Ready Project for Import into Eclipse</title>
+    <para>
+        Over the years/versions, Eclipse has progressed from being ignorant of Maven
+        (with all integration coming from the Maven side) to being very much integrated
+        with Maven. In that later/integrated mode, Eclipse will try really hard to 
+        do the right thing within Eclipse for what was defined to be done outside 
+        of Eclipse. For example, Eclipse will turn Maven dependencies directly into
+        an Eclipse build path. There exists, however, some plugins that Eclipse 
+        has yet to learn about and will alert you to that fact. Many of these 
+        have no role within Eclipse and you simply need to explicitly give Eclipse
+        instruction to ignore the plugin. Luckily these cases get fewer and fewer 
+        each year and Eclipse will update your pom.xml with the necessary configuration
+        when it is needed. 
+    </para>
+    <para>
+        In this chapter we will practively tell Eclipse to ignore the sql-maven-plugin
+        but feel free to wait until Eclipse complains (Who knows, there may be an update
+        that makes this step unecessary).
+    </para>
+        
+        <listitem><para>Add the following profile to your pom.xml. The profile is 
+            activated when the m2e.version property is defined -- which is a property
+            m2e (Maven To Eclipse) sets within Eclipse.</para>
+<programlisting language="xml"><![CDATA[    <profiles>
+       ...
+        <!--  tell Eclipse what to do with some of the plugins -->
+        <profile>
+          <id>m2e</id>
+          <activation>
+            <property>
+              <name>m2e.version</name>
+            </property>
+          </activation>
+          <build>
+            <pluginManagement>
+                <plugins>
+                    <plugin>
+                      <groupId>org.eclipse.m2e</groupId>
+                      <artifactId>lifecycle-mapping</artifactId>
+                      <version>1.0.0</version>
+                      <configuration>
+                        <lifecycleMappingMetadata>
+                          <pluginExecutions>
+                            
+                            <pluginExecution>
+                              <pluginExecutionFilter>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>hibernate3-maven-plugin</artifactId>
+                                <versionRange>[3.0,)</versionRange>
+                                <goals>
+                                  <goal>run</goal>
+                                </goals>
+                              </pluginExecutionFilter>
+                              <action>
+                                <ignore/>
+                              </action>
+                            </pluginExecution>
+
+                            <pluginExecution>
+                              <pluginExecutionFilter>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>sql-maven-plugin</artifactId>
+                                <versionRange>[1.0.0,)</versionRange>
+                                <goals>
+                                  <goal>execute</goal>
+                                </goals>
+                              </pluginExecutionFilter>
+                              <action>
+                                <ignore />
+                              </action>
+                            </pluginExecution>
+
+                          </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                      </configuration>
+                    </plugin>
+
+                </plugins>
+            </pluginManagement>
+           </build>
+        </profile>
+    ...
+    </profiles>]]></programlisting>
+        </listitem>
+
+        <listitem><para>Import the project into Eclipse using "Existing Maven Projects" option.</para></listitem>
+        
+    <section id="jpa-entitymgrex-eclipse-summary">
+       <title>Summary</title>
+       <para>In this chapter you imported your JPA project into Eclipse and took care of any issues
+           getting Eclipse to understand what to do with plugins that it did not understand or need
+           to understand.
+       </para>
+    </section>    
+</chapter>
+  

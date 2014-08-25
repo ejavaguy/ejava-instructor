@@ -1,0 +1,204 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-entitymgrex-dbschemagen">
+    <title>Automatically Generate Database Schema</title>
+    <para>
+        In a previous chapter, you manually created a set of DDL files to
+        create schema, delete rows from the schema in the database, and
+        drop the schema from the database. Since your persistence provider
+        knows how to work with schema, you can optionally get it to create
+        schema for you rather than generating it manually. Even if you are
+        working with legacy schema (and won't be changing the database),
+        it is extremely helpful to see the persistence providers version
+        of the schema to be able to more quickly determine a mis-match in
+        the mapping rather than waiting until runtime testing. In order
+        to add schema generation to your projects you can add one of
+        the following; runtime schema generation or compile-time schema
+        generation. Runtime schema generation is fine for examples and
+        small prototypes, but compile-time generation is suitable for
+        more realistic development scenarios.
+    </para>
+        
+    <orderedlist>
+        <listitem><para>
+                runtime schema generation can be added to your project by adding the
+                following property to your persistence-unit or hibernate.properties.
+                Coldstart your database, comment out your SQL plugin, and re-run
+                your tests if you want to verify the above will create the database
+                at runtime.
+            </para>
+<programlisting language="xml"><![CDATA[#persistence.xml
+   <property name="hibernate.hbm2ddl.auto" value="create"/> 
+
+#hibernate.properties
+    hibernate.hbm2ddl.auto=create]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            compile-time schema generation can be added to your project with
+            the following plugin entry. Add the following to your pluginManagement
+            section. The following passive definition defines the reusable details
+            for how we want to setup the hibernate plugin for generating database
+            schema. It will write a drop script in a file called ...dropJPA.ddl
+            and a create script called ...createJPA.ddl. It cannot create a delete
+            script.
+            </para>
+<programlisting language="xml"><![CDATA[    <build>
+        <pluginManagement>
+            <plugins>
+                ...
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>hibernate3-maven-plugin</artifactId>
+                    <version>${hibernate3-maven-plugin.version}</version>
+                    <extensions>true</extensions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.hibernate</groupId>
+                            <artifactId>hibernate-entitymanager</artifactId>
+                            <version>${hibernate3.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <executions>
+                        <execution>
+                            <id>generate-drop-ddl</id>
+                            <phase>process-test-classes</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <hibernatetool>
+                                    <hbm2ddl export="false" create="false" drop="true" format="true" 
+                                        outputfilename="${project.artifactId}-dropJPA.ddl"/>
+                                </hibernatetool>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>generate-create-ddl</id>
+                            <phase>process-test-classes</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <hibernatetool>
+                                    <hbm2ddl export="false" create="true" drop="false" format="true" 
+                                        outputfilename="${project.artifactId}-createJPA.ddl"/>
+                                </hibernatetool>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                ...
+            </plugins>
+        </pluginManagement>
+    </build>]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Add the following active declaration to you pom to activate the
+            plugin and fill in the module-specifics. Since this plugin can operate 
+            without a database server -- add it to the global build.plugins section
+            and not within a profile.
+            </para>
+<programlisting language="xml"><![CDATA[    <build>
+        ...
+        <plugins>
+            <plugin>
+                <artifactId>hibernate3-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <configuration>
+                    <hibernatetool destdir="target/classes/ddl">
+                        <classpath>
+                            <path location="${project.build.directory}/classes" />
+                            <path location="${project.build.directory}/test-classes" />
+                        </classpath>
+                        <jpaconfiguration persistenceunit="entityMgrEx"
+                            propertyfile="${basedir}/target/test-classes/hibernate.properties" />
+                    </hibernatetool>
+                </configuration>
+            </plugin>
+        <plugins>]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Build your module and notice the generated JPA.ddl files
+            </para>
+<programlisting language="java"><![CDATA[$ mvn clean process-test-classes
+
+...
+[hibernatetool] Executing Hibernate Tool with a JPA Configuration
+[hibernatetool] 1. task: hbm2ddl (Generates database schema)
+(...SLF4J warnings...)
+[INFO] Executed tasks
+[INFO] 
+[INFO] --- hibernate3-maven-plugin:3.0:run (generate-create-ddl) @ entityMgrEx ---
+[INFO] Executing tasks
+
+main:
+[hibernatetool] Executing Hibernate Tool with a JPA Configuration
+[hibernatetool] 1. task: hbm2ddl (Generates database schema)
+...
+---
+---
+`-- target
+   ...
+    |-- classes
+    |   |-- ddl
+    |   |   |-- emauto_create.ddl
+    |   |   |-- emauto_delete.ddl
+    |   |   |-- emauto_drop.ddl
+    |   |   |-- emauto_tuningadd.ddl
+    |   |   |-- emauto_tuningremove.ddl
+    |   |   |-- entityMgrEx-createJPA.ddl
+    |   |   `-- entityMgrEx-dropJPA.ddl]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            (Optionally) update your SQL plugin defintion added in previous chapter to reference
+            the dynamically generated schema in the target tree.
+            </para>
+        </listitem>
+
+        <listitem><para>
+            If Eclipse reports an error for the plugin, add a lifecycle
+            mapping for the hibernate3-maven-plugin to tell Eclipse to ignore
+            the functionality of the plugin and eliminate any errors Eclipse
+            might display. This goes with the definition you created for the
+            sql-maven-plugin.
+            </para>
+<programlisting language="xml"><![CDATA[
+                            <pluginExecution>
+                              <pluginExecutionFilter>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>hibernate3-maven-plugin</artifactId>
+                                <versionRange>[2.2,)</versionRange>
+                                <goals>
+                                  <goal>run</goal>
+                                </goals>
+                              </pluginExecutionFilter>
+                              <action>
+                                <ignore/>
+                              </action>
+                            </pluginExecution>]]></programlisting>
+        </listitem>
+    </orderedlist>
+
+        
+    <section id="jpa-entitymgrex-dbschemagen-summary">
+       <title>Summary</title>
+       <para>
+           In this chapter you configured a Maven project to create a set
+           of file artifacts as a part of the build that represent what
+           the persistence provider believes the database should look
+           like. You can optionally directly use this as a part of your
+           module's database schema population, use it as a starting
+           reference to manually create schema, or *most important*
+           gain insight into what the persistence provider thinks your
+           persistence unit is defined. This will save you some ignorant
+           bliss that is usually followed by hours of debugging an
+           incorrect mapping.
+       </para>
+    </section>    
+</chapter>
+  

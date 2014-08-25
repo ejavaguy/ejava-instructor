@@ -1,0 +1,329 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-entitymgrex-crud">
+    <title>Test EntityManager Methods</title>
+    <para>This chapter will demonstrate various methods to perform create, read, update, and delete
+        (CRUD) operations on the database using the EntityManager, the persistence unit/context,
+        and the entity class.
+    </para>
+
+    <note>
+        <para>
+            The following changes are all made to the EntityMgrTest.java
+            JUnit test class. Everything is being done within this file to 
+            keep things simple. This test case is playing the role of the 
+            business and persistence (Data Access Object (DAO)) logic.
+        </para>
+    </note>
+        
+    <orderedlist>
+        <listitem><para>
+            add a testCreate() method to test the functionality of
+            EntityManager.create(). This will add an object to the
+            database once associated with a transaction.
+            </para>
+<programlisting language="java"><![CDATA[    @Test
+    public void testCreate() {
+        log.info("testCreate");
+        
+        Auto car = new Auto();
+        car.setMake("Chrysler");
+        car.setModel("Gold Duster");
+        car.setColor("Gold");
+        car.setMileage(60*1000);
+        
+        log.info("creating auto:" + car);                        
+        em.persist(car);        
+    }]]></programlisting>
+<programlisting language=""><![CDATA[ -testCreate
+ -creating auto:myorg.entitymgrex.Auto@140984b, id=0, make=Chrysler, model=Gold Duster, color=Gold, mileage=60000
+ -tearDown() started, em=org.hibernate.ejb.EntityManagerImpl@3ac93e
+ -EM_AUTO:myorg.entitymgrex.Auto@140984b, id=1, make=Chrysler, model=Gold Duster, color=Gold, mileage=60000
+ -removed 1 rows]]></programlisting>
+        </listitem>
+        
+        <listitem><para>
+            add a testMultiCreate() to test creating several objects. This should 
+            also help verify that unique primary keys are being generated.
+            </para>
+<programlisting language="java"><![CDATA[    @Test
+    public void testMultiCreate() {
+        log.info("testMultiCreate");
+        for(int i=0; i<5; i++) {
+            Auto car = new Auto();
+            car.setMake("Plymouth " + i);
+            car.setModel("Grand Prix");
+            car.setColor("Green");
+            car.setMileage(80*1000);            
+            log.info("creating auto:" + car);                        
+            em.persist(car);        
+        }
+    }]]></programlisting>
+<programlisting language=""><![CDATA[ -testMultiCreate
+ -creating auto:myorg.entitymgrex.Auto@c3e9e9, id=0, make=Plymouth 0, model=Grand Prix, color=Green, mileage=80000
+ -creating auto:myorg.entitymgrex.Auto@31f2a7, id=0, make=Plymouth 1, model=Grand Prix, color=Green, mileage=80000
+ -creating auto:myorg.entitymgrex.Auto@131c89c, id=0, make=Plymouth 2, model=Grand Prix, color=Green, mileage=80000
+ -creating auto:myorg.entitymgrex.Auto@1697b67, id=0, make=Plymouth 3, model=Grand Prix, color=Green, mileage=80000
+ -creating auto:myorg.entitymgrex.Auto@24c4a3, id=0, make=Plymouth 4, model=Grand Prix, color=Green, mileage=80000
+ -tearDown() started, em=org.hibernate.ejb.EntityManagerImpl@1e9c82e
+ -EM_AUTO:myorg.entitymgrex.Auto@c3e9e9, id=2, make=Plymouth 0, model=Grand Prix, color=Green, mileage=80000
+ -EM_AUTO:myorg.entitymgrex.Auto@31f2a7, id=3, make=Plymouth 1, model=Grand Prix, color=Green, mileage=80000
+ -EM_AUTO:myorg.entitymgrex.Auto@131c89c, id=4, make=Plymouth 2, model=Grand Prix, color=Green, mileage=80000
+ -EM_AUTO:myorg.entitymgrex.Auto@1697b67, id=5, make=Plymouth 3, model=Grand Prix, color=Green, mileage=80000
+ -EM_AUTO:myorg.entitymgrex.Auto@24c4a3, id=6, make=Plymouth 4, model=Grand Prix, color=Green, mileage=80000]]></programlisting>
+        </listitem>
+        
+        <listitem><para>
+            add a testFind() to test the ability to find an object by its 
+            primary key value.
+            </para>
+<programlisting language="java"><![CDATA[    @Test
+    public void testFind() {
+        log.info("testFind");
+        
+        Auto car = new Auto();
+        car.setMake("Ford");
+        car.setModel("Bronco II");
+        car.setColor("Red");
+        car.setMileage(0*1000);
+        log.info("creating auto:" + car);                        
+        em.persist(car);
+        
+        //we need to associate the em with a transaction to get a 
+        //primary key generated and assigned to the auto
+        em.getTransaction().begin();
+        em.getTransaction().commit();
+        
+        Auto car2 = em.find(Auto.class, car.getId());
+        assertNotNull("car not found:" + car.getId(), car2);
+        log.info("found car:" + car2);
+    }]]></programlisting>
+<programlisting language=""><![CDATA[ -testFind
+ -creating auto:myorg.entitymgrex.Auto@aae86e, id=0, make=Ford, model=Bronco II, color=Red, mileage=0
+ -found car:myorg.entitymgrex.Auto@aae86e, id=7, make=Ford, model=Bronco II, color=Red, mileage=0
+ -tearDown() started, em=org.hibernate.ejb.EntityManagerImpl@97d026
+ -EM_AUTO:myorg.entitymgrex.Auto@aae86e, id=7, make=Ford, model=Bronco II, color=Red, mileage=0]]></programlisting>
+        </listitem>
+        
+        <listitem><para>
+            add a getReference() to test the ability to get a reference to an
+            object. With such a shallow object, this will act much like find().
+            </para>
+<programlisting language="java"><![CDATA[    @Test
+    public void testGetReference() {
+        log.info("testGetReference");
+        
+        Auto car = new Auto();
+        car.setMake("Ford");
+        car.setModel("Escort");
+        car.setColor("Red");
+        car.setMileage(0*1000);
+        log.info("creating auto:" + car);                        
+        em.persist(car);
+        
+        //we need to associate the em with a transaction to get a 
+        //primary key generated and assigned to the auto
+        em.getTransaction().begin();
+        em.getTransaction().commit();
+        
+        Auto car2 = em.getReference(Auto.class, car.getId());
+        assertNotNull("car not found:" + car.getId(), car2);
+        log.info("found car:" + car2);        
+    }]]></programlisting>
+<programlisting language=""><![CDATA[ -testGetReference
+ -creating auto:myorg.entitymgrex.Auto@608760, id=0, make=Ford, model=Escort, color=Red, mileage=0
+ -found car:myorg.entitymgrex.Auto@608760, id=8, make=Ford, model=Escort, color=Red, mileage=0
+ -tearDown() started, em=org.hibernate.ejb.EntityManagerImpl@157ea4a
+ -EM_AUTO:myorg.entitymgrex.Auto@608760, id=8, make=Ford, model=Escort, color=Red, mileage=0]]></programlisting>
+        </listitem>
+        
+        <listitem><para>
+            add a testUpdate() method to test the ability to have the setter()
+            of a managed ubject update the database.
+            </para>
+<programlisting language="java"><![CDATA[    @Test
+    public void testUpdate() {
+        log.info("testUpdate");
+        
+        Auto car = new Auto();
+        car.setMake("Pontiac");
+        car.setModel("Gran Am");
+        car.setColor("Red");
+        car.setMileage(0*1000);
+        log.info("creating auto:" + car);                        
+        em.persist(car);
+        
+        //we need to associate the em with a transaction to get a 
+        //primary key generated and assigned to the auto
+        em.getTransaction().begin();
+        em.getTransaction().commit();
+        
+        for(int mileage=car.getMileage(); mileage<(100*1000); mileage+=20000) {
+            //here's where the update is done
+            car.setMileage(mileage);
+            
+            //commit the update to the database for query 
+            em.getTransaction().begin();
+            em.getTransaction().commit();
+            
+            //inspect database for value
+            int value = getMileage(car.getId());
+            assertTrue("unexpected mileage:" + value, value == mileage);
+            log.info("found mileage:" + value);        
+        }
+        
+    }
+
+    private int getMileage(long id) {
+        Query query = 
+            em.createQuery("select a.mileage from Auto as a where a.id=:pk");
+        query.setParameter("pk", id);
+        return (Integer)query.getSingleResult();        
+    }]]></programlisting>
+<programlisting language=""><![CDATA[ -testUpdate
+ -creating auto:myorg.entitymgrex.Auto@6a3960, id=0, make=Pontiac, model=Gran Am, color=Red, mileage=0
+ -found mileage:0
+ -found mileage:20000
+ -found mileage:40000
+ -found mileage:60000
+ -found mileage:80000
+ -EM_AUTO:myorg.entitymgrex.Auto@6a3960, id=9, make=Pontiac, model=Gran Am, color=Red, mileage=80000]]></programlisting>
+        </listitem>
+        
+        <listitem><para>
+            add a testMerge() method to test the ability to perform updates based
+            on the current values of a detached object. Note that we are using
+            Java serialization to simulate sending a copy of the object to/from a
+            remote process and then performing the merge based on the updated
+            object.
+            </para>
+<programlisting language="java"><![CDATA[    @Test
+    public void testMerge() throws Exception {
+        log.info("testMerge");
+        
+        Auto car = new Auto();
+        car.setMake("Chrystler");
+        car.setModel("Concord");
+        car.setColor("Red");
+        car.setMileage(0*1000);
+        log.info("creating auto:" + car);                        
+        car = em.merge(car); //using merge to persist new
+        
+        //we need to associate the em with a transaction to get a 
+        //primary key generated and assigned to the auto
+        em.getTransaction().begin();
+        em.getTransaction().commit();
+        
+        for(int mileage=(10*1000); mileage<(100*1000); mileage+=20000) {
+            //simulate sending to remote system for update
+            Auto car2 = updateMileage(car, mileage);
+            
+            //verify the object is not being managed by the EM
+            assertFalse("object was managed", em.contains(car2));
+            assertTrue("object wasn't managed", em.contains(car));
+            assertTrue("mileage was same", 
+                    car.getMileage() != car2.getMileage());
+            
+            //commit the update to the database for query 
+            em.merge(car2);
+            assertTrue("car1 not merged:" + car.getMileage(), 
+                    car.getMileage() == mileage);
+            em.getTransaction().begin();
+            em.getTransaction().commit();
+            
+            //inspect database for value
+            int value = getMileage(car.getId());
+            assertTrue("unexpected mileage:" + value, value == mileage);
+            log.info("found mileage:" + value);        
+        }        
+    }
+    
+    private Auto updateMileage(Auto car, int mileage) throws Exception {
+        //simulate sending the object to a remote system
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(bos);
+        oos.writeObject(car);
+        oos.close();
+        
+        //simulate receiving an update to the object from remote system
+        ByteArrayInputStream bis = 
+            new ByteArrayInputStream(bos.toByteArray());
+        ObjectInputStream ois = new ObjectInputStream(bis);
+        Auto car2 = (Auto)ois.readObject();
+        ois.close();
+        
+        //here's what they would have changed in remote process 
+        car2.setMileage(mileage);
+        
+        return car2;
+    }]]></programlisting>
+<programlisting language=""><![CDATA[ -testMerge
+ -creating auto:myorg.entitymgrex.Auto@147358f, id=0, make=Chrystler, model=Concord, color=Red, mileage=0
+ -found mileage:10000
+ -found mileage:30000
+ -found mileage:50000
+ -found mileage:70000
+ -found mileage:90000
+ -tearDown() started, em=org.hibernate.ejb.EntityManagerImpl@1b4c1d7
+ -EM_AUTO:myorg.entitymgrex.Auto@147358f, id=10, make=Chrystler, model=Concord, color=Red, mileage=90000
+]]></programlisting>
+        </listitem>
+        
+        <listitem><para>
+            add a testRemove() method to verify that we can delete objects from 
+            the database.
+            </para>
+<programlisting language="java"><![CDATA[    @Test
+    public void testRemove() {
+        log.info("testRemove");
+        
+        Auto car = new Auto();
+        car.setMake("Jeep");
+        car.setModel("Cherokee");
+        car.setColor("Green");
+        car.setMileage(30*1000);
+        log.info("creating auto:" + car);                        
+        em.persist(car);
+
+        //we need to associate the em with a transaction to get a 
+        //primary key generated and assigned to the auto
+        em.getTransaction().begin();
+        em.getTransaction().commit();
+        
+        Auto car2 = em.find(Auto.class, car.getId());
+        assertNotNull("car not found:" + car.getId(), car2);
+        log.info("found car:" + car2);
+        
+        //now remove the car
+        log.info("removing car:" + car);
+        em.remove(car);
+        //we need to associate the em with a transaction to  
+        //physically remove from database
+        em.getTransaction().begin();
+        em.getTransaction().commit();
+        
+        Auto car3 = em.find(Auto.class, car.getId());
+        assertNull("car found", car3);
+    }]]></programlisting>
+<programlisting language=""><![CDATA[ -testRemove
+ -creating auto:myorg.entitymgrex.Auto@28305d, id=0, make=Jeep, model=Cherokee, color=Green, mileage=30000
+ -found car:myorg.entitymgrex.Auto@28305d, id=11, make=Jeep, model=Cherokee, color=Green, mileage=30000
+ -removing car:myorg.entitymgrex.Auto@28305d, id=11, make=Jeep, model=Cherokee, color=Green, mileage=30000
+]]></programlisting>
+        </listitem>
+    </orderedlist>
+
+        
+    <section id="jpa-entitymgrex-crud-summary">
+       <title>Summary</title>
+       <para>In this chapter you worked with several of the EntityManager CRUD
+           methods witin the context of a JUnit test case and Maven project. This
+           should have given you a decent taste of what can be done with the 
+           JPA EntityManager and how to bring this all together within a Maven
+           module. In the next chapter we will tack on a few more useful
+           features to know.
+       </para>
+    </section>    
+</chapter>
+  

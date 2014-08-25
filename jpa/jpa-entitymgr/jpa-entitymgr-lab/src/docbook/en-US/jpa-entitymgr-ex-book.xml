@@ -1,0 +1,79 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="jpa-entitymgr-ex">
+    <bookinfo>
+        <title>Java Persistence API: Entity Manager Exercise</title>
+        <subtitle>An Introduction to JPA and JPA/Maven Modules</subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>
+                This document contains an introductory exercise for building 
+                a Maven-based project for modules that make use of a database
+                and JPA. It will provide step-by-step instructions and explanations
+                of what is being added and why. Many of these steps will become
+                boilerplate for what we need to do for most JPA Maven modules.
+                You go through this in detail here to provide you with exposure 
+                of what is required and why certain things are in place in the 
+                examples. It is also another chance to gain experience building
+                a Maven project from scratch before we start leveraging templates
+                and parent projects to hide much of the details from us.
+            </para>
+        </abstract>
+    </bookinfo>
+
+    <preface id="jpa-entitymgrex-purpose">
+        <title>Purpose</title>
+        <section id="jpa-entitymgrex-goals">
+            <title>Goals</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Provide one more chance to build a Maven module using step-by-step instructions</para></listitem>
+                <listitem><para>Provide step-by-step instructions for setting up a Maven module for JPA</para></listitem>
+                <listitem><para>Provide an introduction to JPA EntityManager CRUD methods</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="jpa-entitymgrex-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall be able to:</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Maven/General project setup</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Setup a database for use with module development</para></listitem>
+                        <listitem><para>Create a Maven project for use with a JPA module</para></listitem>
+                        <listitem><para>Manage module-specific schema within the database</para></listitem>
+                        <listitem><para>Add custom SQL tuning properties to their module schema definition</para></listitem>
+                        <listitem><para>Import a Maven/JPA project into IDE</para></listitem>
+                        <listitem><para>Automatically generate database schema for project</para></listitem>
+                        <listitem><para>Refector single Maven/JPA module into a re-suable parent and individual child modules</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>JPA</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Setup a JPA Persistence Unit</para></listitem>
+                        <listitem><para>Setup a JPA Unit test</para></listitem>
+                        <listitem><para>Implement tests of JPA EntityManager methods</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+    </preface>
+
+    <toc/>
+
+    <xi:include href="jpa-entitymgrex-dbsetup.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entitymgrex-pom.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entitymgrex-dbschema.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entitymgrex-sqltune.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entitymgrex-pu.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entitymgrex-testcase.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entitymgrex-eclipse.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entitymgrex-crud.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entitymgrex-dbschemagen.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entitymgrex-parent.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>

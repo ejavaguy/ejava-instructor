@@ -1,0 +1,84 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-entitymgrex-dbsetup">
+    <title>Setup and Start Database</title>
+    <para>This chapter will cover setup required to start the development
+        database in server-mode. The database has at least three (3) modes.
+    </para>
+    <itemizedlist spacing="compact">
+        <listitem><para>In-memory mode</para></listitem>
+        <listitem><para>File-based mode</para></listitem>
+        <listitem><para>Server-based mode</para></listitem>
+    </itemizedlist>
+    <para>The in-memory option manages all tables within the memory footprint
+    of the JVM. This is very fast and requires no server-process setup -- which
+    makes it a good option for automated unit tests. However, since the DB instance
+    is created and destroyed with each JVM execution it makes a bad choice for
+    modules relying on multiple tools to pre-populate the database prior to executing
+    tests.</para>
+    <para>The file-based option stores all information in the
+    filesystem. It is useful for multi-JVM (sequential) setup and
+    post-mortem analysis. However only a single client may access the
+    files at one time. I have seen this used effectively when simulating
+    external databases -- where an external setup script populates
+    the database and the JVM running the unit tests just queries the
+    information as they would do in production. We will use this as an option
+    to server-based mode since we are using separate plugins to initialize the
+    database.</para>
+    <para>The server-based option requires a separate process activated but
+    allows concurrent connections from database user interface while the JVM
+    is under test. This chapter will focus on the setup required to run the 
+    database in server mode.</para>
+
+
+    <orderedlist spacing="compact">
+        <listitem><para>Prepare your environment to run the database in server mode 
+            for this exercise by following the instructions defined in 
+            Development Environment Setup.</para></listitem>
+            
+        <listitem><para>Start the database and web server server in a directory where 
+            you wish to create database files. Your h2.jar file source be located in
+            M2_REPO/com/h2database/h2/*/h2*.jar to name at least one location. Another 
+            location is JBOSS_HOME/modules/com/h2database/h2/main/h2*.jar</para>
+<programlisting language="java"><![CDATA[cd /tmp
+java -jar h2.jar]]></programlisting>
+            <para>This should result in a database server process and access to a web-based
+                database UI through the following local URL:
+                <ulink url="http://localhost:8082/login.jsp">http://localhost:8082/login.jsp</ulink>
+            </para>
+        </listitem>
+
+        <listitem><para>Connect to the database server from the web-based UI.</para>
+<programlisting language="java"><![CDATA[Driver Class: org.h2.Driver
+JDBC URL: jdbc:h2:tcp://localhost:9092/h2db/ejava</jdbc.url>
+User Name: sa
+Password: ]]></programlisting>
+
+        <para>If you use file-based mode, the connection information would look like the following
+            where "./h2db/ejava" must point to the exact same path your JVM under test uses. This
+            can be a relative or fully-qualified path.</para>
+<programlisting language="java"><![CDATA[Driver Class: org.h2.Driver
+JDBC URL: jdbc:h2:./h2db/ejava
+User Name: sa
+Password: ]]></programlisting>
+        </listitem>
+    </orderedlist>
+        
+    <section id="jpa-entitymgrex-dbsetup-summary">
+       <title>Summary</title>
+       <para>In this chapter you...</para>
+           <itemizedlist spacing="compact">
+               <listitem><para>located a copy of the Java archive required to run the server</para></listitem>
+               <listitem><para>located a scratch area to run the server</para></listitem>
+               <listitem><para>started the server</para></listitem>
+               <listitem><para>launched the web-based UI</para></listitem>
+               <listitem><para>connected to the server using the web-based UI</para></listitem>
+           </itemizedlist>
+       <para>This is the only database mode that requires administrative setup. You cannot
+           connect to the database running in-memory but you can connect to the database
+           using file-mode once all other JVMs have released their exclusive lock on the
+           database storage files.</para>
+    </section>    
+</chapter>
+  

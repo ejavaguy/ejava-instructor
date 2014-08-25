@@ -1,0 +1,341 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-entitymgrex-testcase">
+    <title>Setup JPA TestCase</title>
+    <para>This chapter will create a JUnit test case that will instantiate an EntityManager,
+        perform some basic operations, and log information about the tests.
+    </para>
+<programlisting language=""><![CDATA[`-- src
+    `-- test
+        |-- java
+        |   `-- myorg
+        |       `-- entitymgrex
+        |           `-- EntityMgrTest.java
+        `-- resources
+            `-- log4j.xml]]></programlisting>
+        
+    <orderedlist>
+        <listitem><para>
+            Create a JUnit test case to hold your test code. The following
+            is an example of a 4.x JUnit test case that uses @Annotations.
+            </para>
+<programlisting language="java"><![CDATA[package myorg.entitymgrex;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+
+public class EntityMgrTest {
+    private static Log log = LogFactory.getLog(EntityMgrTest.class);
+
+    @Test
+    public void testTemplate() {
+        log.info("testTemplate");
+    }
+}]]></programlisting>
+        </listitem>
+        
+        <listitem><para>
+            Provide a setUpClass() method that runs once before all tests that
+            can create the entity manager. This method must be static.
+            </para>
+<programlisting language="java"><![CDATA[    private static final String PERSISTENCE_UNIT = "entityMgrEx";
+    private static EntityManagerFactory emf;
+
+    @BeforeClass
+    public static void setUpClass() {
+        log.debug("creating entity manager factory");
+        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
+    }]]></programlisting>
+        </listitem>
+        
+        <listitem><para>
+            Provide a setUp() method that will be called before each testMethod
+            is executed. Have this method create an entity manager
+            for the tests to use.
+            </para>
+<programlisting language="java"><![CDATA[    private EntityManager em;    
+
+    @Before
+    public void setUp() throws Exception {
+        log.debug("creating entity manager");
+        em = emf.createEntityManager();
+        //cleanup();
+    }]]></programlisting>
+        </listitem>
+        
+        <listitem><para>
+            Provide a tearDown() method that will be called after each
+            testMethod.  Have this flush all remaining items in the persistence
+            context to the database and close the entity manager.
+            </para>
+<programlisting language="java"><![CDATA[    @After
+    public void tearDown() throws Exception {
+        try {
+            log.debug("tearDown() started, em=" + em);
+            em.getTransaction().begin();
+            em.flush();            
+            //logAutos();            
+            em.getTransaction().commit();            
+            em.close();
+            log.debug("tearDown() complete, em=" + em);
+        }
+        catch (Exception ex) {
+            log.fatal("tearDown failed", ex);
+            throw ex;
+        }
+     }]]></programlisting>
+        </listitem>
+        
+        <listitem><para>
+            Provide a tearDownClass() method that will be called after all 
+            testMethods have completed. This method must be static and should 
+            close the entity manager factory.
+            </para>
+<programlisting language="java"><![CDATA[    @AfterClass
+    public static void tearDownClass() {
+        log.debug("closing entity manager factory");
+        emf.close();
+    }]]></programlisting>
+        </listitem>
+        
+        <listitem><para>
+            Add in a logAutos() method to query and print all autos in the 
+            database. Do this after flushing the entity manager in the tearDown()
+            method so you can see the changes from the previous test. The following
+            example uses the entity manager to create an ad-hoc EJB-QL statement.
+            </para>
+<programlisting language="java"><![CDATA[    @After
+    public void tearDown() throws Exception {
+...
+            em.flush();            
+            logAutos();            
+            em.getTransaction().commit();            
+...
+     }
+
+    public void logAutos() {
+        Query query = em.createQuery("select a from Auto as a");
+        for (Object o: query.getResultList()) {
+            log.info("EM_AUTO:" + o);
+        }        
+    }]]></programlisting>
+        </listitem>
+        
+        <listitem><para>
+            You might also want to add a cleanup() to clear out the Auto
+            table between tests. The example below uses the entity manager to
+            create a native SQL statement.
+            </para>
+<programlisting language="java"><![CDATA[    @Before
+    public void setUp() throws Exception {
+        ...
+        em = emf.createEntityManager();
+        cleanup();
+    }
+
+    public void cleanup() {
+        em.getTransaction().begin();
+        Query query = em.createNativeQuery("delete from EM_AUTO");
+        int rows = query.executeUpdate();
+        em.getTransaction().commit();
+        log.info("removed " + rows + " rows");
+    }]]></programlisting>
+        </listitem>
+        
+        <listitem><para>
+            Add a log4j.xml file to src/test/resources that has your 
+            desired settings. The one below produces less timestamp information
+            at the console and more details in the logfile.
+            </para>
+
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration
+    xmlns:log4j="http://jakarta.apache.org/log4j/"
+    debug="false">
+
+    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+        <param name="Target" value="System.out"/>
+
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern"
+                   value="(%F:%M:%L)  -%m%n"/>
+        </layout>
+    </appender>
+
+    <appender name="logfile" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="target/log4j-out.txt"/>
+        <param name="Append" value="false"/>
+        <param name="MaxFileSize" value="100KB"/>
+        <param name="MaxBackupIndex" value="1"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern"
+                   value="%-5p %d{dd-MM HH:mm:ss,SSS} [%c] (%F:%M:%L)  -%m%n"/>
+        </layout>
+   </appender>
+
+   <logger name="myorg">
+      <level value="debug"/>
+      <appender-ref ref="logfile"/>
+   </logger>
+
+   <root>
+      <priority value="fatal"/>
+      <appender-ref ref="CONSOLE"/>
+   </root>
+
+</log4j:configuration>]]></programlisting>
+            <note>
+                <para>
+                    Although it might be a bit entertaining to set the priority
+                    of the root appender to debug to see everything the persistence provider
+                    has to say, it is quite noisy. Consider changing to root priority to
+                    fatal so that a majority of the log statements are yours.
+                </para>
+            </note>
+        </listitem>
+        
+        <listitem><para>
+            You should be able to build and test your module at this time.
+            </para>
+<programlisting language=""><![CDATA[$ mvn clean test
+
+Running myorg.entitymgrex.EntityMgrTest
+(EntityMgrTest.java:setUpClass:25)  -creating entity manager factory
+(EntityMgrTest.java:setUp:31)  -creating entity manager
+Hibernate: 
+    delete 
+    from
+        EM_AUTO
+(EntityMgrTest.java:cleanup:58)  -removed 0 rows
+(EntityMgrTest.java:testTemplate:75)  -testTemplate
+(EntityMgrTest.java:tearDown:39)  -tearDown() started, em=org.hibernate.ejb.EntityManagerImpl@3e52a475
+Hibernate: 
+    select
+        auto0_.id as id0_,
+        auto0_.color as color0_,
+        auto0_.make as make0_,
+        auto0_.mileage as mileage0_,
+        auto0_.model as model0_ 
+    from
+        EM_AUTO auto0_
+(EntityMgrTest.java:tearDown:45)  -tearDown() complete, em=org.hibernate.ejb.EntityManagerImpl@3e52a475
+(EntityMgrTest.java:tearDownClass:69)  -closing entity manager factory
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.337 sec
+
+Results :
+
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+...
+[INFO] BUILD SUCCESS]]></programlisting>
+        </listitem>
+        
+        <listitem><para>
+            Check that you have the following artifacts in your project tree.
+            </para>
+<programlisting language="java"><![CDATA[|-- pom.xml
+|-- src
+|   |-- main
+|   |   |-- java
+|   |   |   `-- myorg
+|   |   |       `-- entitymgrex
+|   |   |           `-- Auto.java
+|   |   `-- resources
+|   |       |-- ddl
+|   |       |   |-- emauto_create.ddl
+|   |       |   |-- emauto_delete.ddl
+|   |       |   |-- emauto_drop.ddl
+|   |       |   |-- emauto_tuningadd.ddl
+|   |       |   `-- emauto_tuningremove.ddl
+|   |       `-- META-INF
+|   |           `-- persistence.xml
+|   `-- test
+|       |-- java
+|       |   `-- myorg
+|       |       `-- entitymgrex
+|       |           `-- EntityMgrTest.java
+|       `-- resources
+|           |-- hibernate.properties
+|           `-- log4j.xml
+`-- target
+    |-- antrun
+    |   `-- build-main.xml
+    |-- classes
+    |   |-- ddl
+    |   |   |-- emauto_create.ddl
+    |   |   |-- emauto_delete.ddl
+    |   |   |-- emauto_drop.ddl
+    |   |   |-- emauto_tuningadd.ddl
+    |   |   `-- emauto_tuningremove.ddl
+    |   |-- META-INF
+    |   |   `-- persistence.xml
+    |   `-- myorg
+    |       `-- entitymgrex
+    |           `-- Auto.class
+    |-- generated-sources
+    |   `-- annotations
+    |-- generated-test-sources
+    |   `-- test-annotations
+    |-- h2db
+    |   `-- ejava.h2.db
+    |-- log4j-out.txt
+    |-- maven-status
+    |   `-- maven-compiler-plugin
+    |       |-- compile
+    |       |   `-- default-compile
+    |       |       |-- createdFiles.lst
+    |       |       `-- inputFiles.lst
+    |       `-- testCompile
+    |           `-- default-testCompile
+    |               |-- createdFiles.lst
+    |               `-- inputFiles.lst
+    |-- surefire-reports
+    |   |-- myorg.entitymgrex.EntityMgrTest.txt
+    |   `-- TEST-myorg.entitymgrex.EntityMgrTest.xml
+    `-- test-classes
+        |-- hibernate.properties
+        |-- log4j.xml
+        `-- myorg
+            `-- entitymgrex
+                `-- EntityMgrTest.class]]></programlisting>
+        </listitem>
+    </orderedlist>
+        
+    <section id="jpa-entitymgrex-testcase-summary">
+       <title>Summary</title>
+       <para>In this chapter you created an EntityManager, managed the transaction, and 
+           closed the EntityManager within the JUnit framework set of callbacks. JUnit will
+           create a new instance of the class and execute @Before, @Test, @After in that order
+           for each @Test. @BeforeClass is run before the first @Before/@Test and @AfterClass
+           is run after the last @Test/@After and must be static.
+       </para>
+       <para>There are numerous ways to setup the transaction properties. Some make it 
+            a practice to rollback the transaction as a part of each @After (after an em.flush()
+            of course). There is nothing wrong with managing the transaction within the @Test
+            for certain tests but make it a point *NOT* to attempt to manage the transaction
+            within code placed in the src/main tree without some careful consideration. JavaEE
+            is a framework and transaction management is a key part of that framework. You 
+            would be outside the framework if you attempt to directly manage a tranaction
+            in your src/main production code. Much more on that later.
+       </para>
+    </section>    
+</chapter>
+  
