@@ -1,0 +1,427 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="first-simple-moduleex-ant">
+    <title>Automate Build and Testing with Ant (OPTIONAL!)</title>
+    <para>
+        This chapter demonstrates the basics of automating the manual steps 
+        in the previous chapter using the Apache Ant build tool. If you just
+        skim thru this step, please be sure to take note of how everything
+        gets explicitly defined in Ant. There are not many rules of the road
+        and standard defaults to live by. That will be a big contrast when 
+        working with Maven. 
+    </para>
+    <note>
+        <para>
+            All course examples and projects submitted will use Maven. 
+            Ant will be used to wrap command lines for Java SE clients executed
+            outside the normal build environment. However, this exercise shows
+            Ant only being used as part of the artifact build and test environment
+            as a stepping stone to understanding some of the basic build and
+            test concepts within Maven.
+        </para>
+    </note>
+    <note>
+        <para>
+            If you do not have Ant installed on your system, it can be 
+            from {{http://ant.apache.org/}}
+        </para>
+    </note>
+    
+
+    <warning>
+        <para>
+            This chapter is optional!!! It contains many tedious steps to 
+            setup a module build using the Ant build tool -- which will
+            not be part of class. It is presented here as an example option
+            to building the module with shell scripts.  If you wish to just skim
+            the steps -- please do. Please do not waste time trying to get
+            Ant to build your Java modules for this class.
+        </para>
+    </warning>
+        
+    <orderedlist>
+    <listitem><para>
+            Create a build.properties file in PROJECT_BASEDIR. This will be
+            used to define any non-portable property values. Place the most non-portable
+            base variables (.e.g, M2_REPO location) towards the top and build lower-level 
+            paths from them. This makes the scripts much easier to port to another environment.
+            If you still have your maven repository in your $HOME directory, you can make
+            use of ${user.home} environment variable rather than a hard-coded path.
+            </para>
+<programlisting language=""><![CDATA[#ex1 build.properties
+#M2_REPO=c:/jhu/repository
+M2_REPO=${user.home}/.m2/repository
+
+junit.classpath=${M2_REPO}/junit/junit/4.10/junit-4.10.jar
+commons-logging.classpath=${M2_REPO}/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar
+log4j.classpath=${M2_REPO}/log4j/log4j/1.2.13/log4j-1.2.13.jar]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Create a build.xml file in PROJECT_BASEDIR. Note the following 
+            key elements. 
+            </para>
+            <itemizedlist spacing="compact">
+                <listitem><para>project - a required root for build.xml files</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>name - not significant, but helpful</para></listitem>
+                        <listitem><para>default - the target to run if none is supplied on command line</para></listitem>
+                        <listitem><para>basedir - specifies current directory for all tasks</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>property - defines an immutable name/value</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>
+                            file - imports declarations from a file; in this case 
+                            build.properties created earlier
+                            </para>
+                        </listitem>
+                        <listitem><para>
+                            name/value - specifies a property within the script
+                            </para>
+                        </listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>target - defines an entry point into the build.xml script. It hosts one or more tasks.</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>
+                            name - defines name of target, which can be supplied on 
+                            command line.
+                            </para>
+                        </listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>
+                        echo - a useful Ant task to printout status and debug information.
+                        See <ulink url="http://ant.apache.org/manual/CoreTasks/echo.html">Ant docs</ulink>
+                        for more information.
+                    </para>
+                </listitem>
+            </itemizedlist>
+
+            </para>
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="utf-8" ?> 
+<!-- ex1 build.xml 
+-->
+<project name="ex1" default="" basedir=".">
+    <property file="build.properties"/>
+
+    <property name="artifactId" value="ex1"/>
+    <property name="src.dir"    value="${basedir}/src"/>
+    <property name="build.dir"  value="${basedir}/target"/>
+
+    <target name="echo">
+        <echo>basedir=${basedir}</echo>
+        <echo>artifactId=${artifactId}</echo>
+        <echo>src.dir=${src.dir}</echo>
+        <echo>build.dir=${build.dir}</echo>
+        <echo>junit.classpath=${junit.classpath}</echo>
+    </target>
+</project>]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Sanity check your build.xml and build.properties file with the 
+            echo target.
+            </para>
+<programlisting language=""><![CDATA[$ ant echo
+Buildfile: /home/jcstaff/proj/784/exercises/ex1/build.xml
+
+echo:
+     [echo] basedir=/home/jcstaff/proj/784/exercises/ex1
+     [echo] artifactId=ex1
+     [echo] src.dir=/home/jcstaff/proj/784/exercises/ex1/src
+     [echo] build.dir=/home/jcstaff/proj/784/exercises/ex1/target
+     [echo] junit.classpath=/home/jcstaff/.m2/repository/junit/junit/4.10/junit-4.10.jar
+
+BUILD SUCCESSFUL
+Total time: 0 seconds]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Add the "package" target to compile and archive your /src/main
+            classes. Note the following tasks in this target.
+            </para>
+            <itemizedlist spacing="compact">
+                <listitem><para>
+                    mkdir - creates a directory. See 
+                    <ulink url="http://ant.apache.org/manual/CoreTasks/mkdir.html">Ant docs</ulink>
+                    for more infomation.
+                    </para>
+                </listitem>
+                <listitem><para>
+                    javac - compiles java sources files. See
+                    <ulink url="http://ant.apache.org/manual/CoreTasks/javac.html">Ant docs</ulink>
+                    for more information. Note that we are making sure we get JavaSE 7 classes compiled.
+                    </para>
+                </listitem>
+                <listitem><para>
+                    * jar - builds a java archive. See 
+                    <ulink url="http://ant.apache.org/manual/CoreTasks/jar.html">Ant Docs</ulink>
+                    for more information.
+                    </para>
+                </listitem>
+            </itemizedlist>
+
+<programlisting language="xml"><![CDATA[    <target name="package">
+        <mkdir dir="${build.dir}/classes"/>
+        <javac srcdir="${src.dir}/main/java"
+               destdir="${build.dir}/classes"
+               debug="true"
+               source="1.7"
+               target="1.7"
+               includeantruntime="false">
+               <classpath>
+               </classpath>
+        </javac>
+
+        <jar destfile="${build.dir}/${artifactId}.jar">
+            <fileset dir="${build.dir}/classes"/>
+        </jar>
+    </target>]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Execute the "package" target just added. This should compile the production
+            class from src/main into target/classes and build a Java archive with the 
+            production class in target/.
+            </para>
+<programlisting language=""><![CDATA[$ rm -rf target/; ant package
+Buildfile: /home/jcstaff/proj/784/exercises/ex1/build.xml
+
+package:
+    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/classes
+    [javac] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/classes
+      [jar] Building jar: /home/jcstaff/proj/784/exercises/ex1/target/ex1.jar
+
+BUILD SUCCESSFUL
+Total time: 2 seconds]]></programlisting>
+
+            <note>
+                <para>
+                    You may get the following error when you execute the javac task. If so,
+                    export JAVA_HOME=(path to JDK_HOME) on your system to provide Ant a 
+                    reference to a JDK instance.
+                </para>
+<programlisting language=""><![CDATA[build.xml:26: Unable to find a javac compiler;
+com.sun.tools.javac.Main is not on the classpath.
+Perhaps JAVA_HOME does not point to the JDK.
+It is currently set to ".../jre"]]></programlisting>
+            </note>
+
+<programlisting language=""><![CDATA[$ find . -type f
+./src/main/java/myorg/mypackage/ex1/App.java
+./src/test/java/myorg/mypackage/ex1/AppTest.java
+./build.properties
+./build.xml
+./target/classes/myorg/mypackage/ex1/App.class
+./target/ex1.jar]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Add the "test" target to compile your /src/test classes. Make this
+            the default target for your build.xml file. Note too that it should depend
+            on the successful completion of the "package" target and include 
+            the produced archive in its classpath.
+            </para>
+<programlisting language="xml"><![CDATA[<project name="ex1" default="test" basedir=".">
+...
+    <target name="test" depends="package">
+        <mkdir dir="${build.dir}/test-classes"/>
+        <javac srcdir="${src.dir}/test/java"
+               destdir="${build.dir}/test-classes"
+               debug="true"
+               source="1.7"
+               target="1.7"
+               includeantruntime="false">
+               <classpath>
+                   <pathelement location="${build.dir}/${artifactId}.jar"/>
+                   <pathelement path="${junit.classpath}"/>
+                   <pathelement path="${commons-logging.classpath}"/>
+               </classpath>
+        </javac>
+    </target>]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Execute the new "test" target after clearing out the contents
+            of the target directory.  Note that the target directory gets automatically
+            re-populated with the results of the "compile" target and augmented 
+            with the test class from src/test compiled into target/test-classes.
+            </para>
+<programlisting language=""><![CDATA[$ rm -rf target/; ant
+Buildfile: /home/jcstaff/proj/784/exercises/ex1/build.xml
+
+package:
+    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/classes
+    [javac] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/classes
+      [jar] Building jar: /home/jcstaff/proj/784/exercises/ex1/target/ex1.jar
+
+test:
+    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/test-classes
+    [javac] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/test-classes
+
+BUILD SUCCESSFUL
+Total time: 3 seconds]]></programlisting>
+
+
+<programlisting language=""><![CDATA[
+> find . -type f
+./src/main/java/myorg/mypackage/ex1/App.java
+./src/test/java/myorg/mypackage/ex1/AppTest.java
+./build.properties
+./build.xml
+./target/classes/myorg/mypackage/ex1/App.class
+./target/ex1.jar
+./target/test-classes/myorg/mypackage/ex1/AppTest.class
+]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Add the junit task to the test target.  The junit task is 
+            being configured to run in batch mode and write a TXT and XML reports
+            to the target/test-reports directory.  See
+            {{{http://ant.apache.org/manual/OptionalTasks/junit.html}Ant docs}}
+            for more details on the junit task. Make special note of the following:
+            </para>
+            <itemizedlist spacing="compact">
+                <listitem><para>
+                    printsummary - produce a short summary to standard out showing
+                    the number of tests run and a count of errors, etc.
+                    </para>
+                </listitem>
+                <listitem><para>
+                    fork - since Ant runs in a JVM, any time you run a task that 
+                    requires a custom classpath, it is usually required that it be
+                    forked into a separate process (with its own classpath).
+                    </para>
+                </listitem>
+                <listitem><para>
+                    batchtest - run all tests found and write results of each test
+                    into the test-reports directory.
+                    </para>
+                </listitem>
+                <listitem><para>
+                    formatter - write a text and XML report of results
+                    </para>
+                </listitem>
+            </itemizedlist>
+<programlisting language="xml"><![CDATA[
+        <mkdir dir="${build.dir}/test-reports"/>
+        <taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
+           <classpath>
+               <fileset dir="${ant.library.dir}">
+                    <include name="ant-junit.jar"/>
+               </fileset>
+           </classpath>
+        </taskdef>
+        <junit printsummary="true" fork="true">
+               <classpath>
+                   <pathelement path="${junit.classpath}"/>
+                   <pathelement path="${commons-logging.classpath}"/>
+                   <pathelement path="${log4j.classpath}"/>
+                   <pathelement location="${build.dir}/${artifactId}.jar"/>
+                   <pathelement location="${build.dir}/test-classes"/>
+               </classpath>
+
+            <batchtest fork="true" todir="${build.dir}/test-reports">
+                <fileset dir="${build.dir}/test-classes">
+                    <include name="**/*Test*.class"/>
+                </fileset>
+            </batchtest>
+
+            <formatter type="plain"/>
+            <formatter type="xml"/>
+        </junit>
+]]></programlisting>
+
+            <para>
+                The last time I sanity checked this exercise I got
+                the common error below and upated my definition of the
+                target to what is shown above and copied ant-junit.jar
+                from the binary download into ant.library.dir, which is
+                in /usr/share/ant/lib on my system. I am quite rusty on 
+                Ant these days and do not suggest my definition of the 
+                junit task is correct or required, but it works and
+                will work much better/easier once we update to Maven.
+            </para>
+<programlisting language=""><![CDATA[BUILD FAILED
+
+/home/jcstaff/proj/784/exercises/ex1/build.xml:57: Problem: failed to create task or type junit
+Cause: the class org.apache.tools.ant.taskdefs.optional.junit.JUnitTask was not found.        
+        This looks like one of Ant's optional components.
+Action: Check that the appropriate optional JAR exists in
+        -/usr/share/ant/lib
+        -/home/jcstaff/.ant/lib
+        -a directory added on the command line with the -lib argument
+
+Do not panic, this is a common problem.
+The commonest cause is a missing JAR.
+
+This is not a bug; it is a configuration problem]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Execute the updated "test" target with the JUnit test.
+            </para>
+<programlisting language=""><![CDATA[$ rm -rf target; ant
+Buildfile: /home/jcstaff/proj/784/exercises/ex1/build.xml
+
+package:
+    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/classes
+    [javac] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/classes
+      [jar] Building jar: /home/jcstaff/proj/784/exercises/ex1/target/ex1.jar
+
+test:
+    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/test-classes
+    [javac] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/test-classes
+    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/test-reports
+Trying to override old definition of datatype junit
+    [junit] Running myorg.mypackage.ex1.AppTest
+    [junit] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0 sec
+    [junit] Test myorg.mypackage.ex1.AppTest FAILED
+
+BUILD SUCCESSFUL
+Total time: 18 seconds]]></programlisting>
+
+<programlisting language=""><![CDATA[$ find . -type f
+./src/main/java/myorg/mypackage/ex1/App.java
+./src/test/java/myorg/mypackage/ex1/AppTest.java
+./build.properties
+./build.xml
+./target/classes/myorg/mypackage/ex1/App.class
+./target/ex1.jar
+./target/test-classes/myorg/mypackage/ex1/AppTest.class
+./target/test-reports/TEST-myorg.mypackage.ex1.AppTest.txt
+./target/test-reports/TEST-myorg.mypackage.ex1.AppTest.xml]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            </para>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            </para>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            </para>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+        </listitem>
+
+    </orderedlist>
+
+        
+    <section id="first-simple-moduleex-ant-summary">
+       <title>Summary</title>
+       <para>
+       </para>
+    </section>    
+</chapter>
+  

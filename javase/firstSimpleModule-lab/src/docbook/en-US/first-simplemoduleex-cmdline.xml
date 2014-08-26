@@ -1,0 +1,238 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="first-simple-moduleex-cmdline">
+    <title>Develop and Test Module using Command Line Tools (OPTIONAL!)</title>
+    <para>
+        In this chapter you will be introduced to a standard module file 
+        structure that contains a class we intend to use in production and
+        a unit test to verify the functionality of the production class.
+        You will be asked to form the directory structure of files and 
+        execute the commands required to build and run the unit test.
+    </para>
+    <warning>
+        <para>
+            This chapter is optional!!! It contains many tedious steps that are 
+            somewhat shell-specific. The intent is to simply introduce the raw 
+            data structure and actions that need to take place and then to
+            later automate all of this through Maven. If you wish to just skim
+            the steps -- please do. Please do not waste time trying to port
+            these bash shell commands to your native shell.
+        </para>
+    </warning>
+
+    <note>
+        <para>
+            This part requires junit.jar and commons-logging.jar. These
+            should have been downloaded for you when you
+            built the class examples and can be located in
+            $M2_REPO/junit/junit/(version)/ and 
+            $M2_REPO/commons-logging/commons-logging/(version)/. Where M2_REPO is
+            HOME/.m2/repository or the location you have specified in
+            the localRepository element of HOME/.m2/settings.xml.
+        </para>
+        <para>commons-logging provides a logging API used by the unit test within
+            this exercise. log4j provides a logging implementation that plugs in
+            behind commons-logging.</para>
+    </note>
+
+        <orderedlist>
+            <listitem><para>
+               Set a few logical variables to represent root directories. For the 
+               purposes of the follow-on steps, PROJECT_BASEDIR is the root directory
+               for this exercise. In the example below, the user has chosen a directory of
+               $HOME/proj/784/exercises to be the root directory for all class
+               exercises and named the root directory for this project "ex1". An
+               alternative for CLASS_HOME might be c:/jhu/784.
+                </para>
+<programlisting language=""><![CDATA[
+export CLASS_HOME=$HOME/proj/784
+export PROJECT_BASEDIR=$CLASS_HOME/exercises/ex1
+mkdir -p $PROJECT_BASEDIR
+cd $PROJECT_BASEDIR]]></programlisting>
+            </listitem>
+
+            <listitem><para>
+               Create project directory structure. In this example, the 
+               developer used $HOME/proj/784 for all work in this class.
+                </para>
+
+<programlisting language=""><![CDATA[$PROJECT_BASEDIR
+    +---/src/main/java/myorg/mypackage/ex1
+    +---/src/test/java/myorg/mypackage/ex1
+    +---/target/classes
+    +---/target/test-classes
+    +---/target/test-reports]]></programlisting>
+
+<programlisting language=""><![CDATA[mkdir -p src/main/java/myorg/mypackage/ex1
+mkdir -p src/test/java/myorg/mypackage/ex1
+mkdir -p target/classes
+mkdir -p target/test-classes
+mkdir -p target/test-reports]]></programlisting>
+            </listitem>
+
+<listitem><para>
+               Add the following Java implementation class to
+               PROJECT_BASEDIR/src/main/java/myorg/mypackage/ex1/App.java
+                </para>
+<programlisting language="java"><![CDATA[package myorg.mypackage.ex1;
+
+public class App {
+    public int returnOne() { 
+        System.out.println( "Here's One!" );
+        return 1; 
+    }
+
+    public static void main( String[] args ) {
+        System.out.println( "Hello World!" );
+    }
+}]]></programlisting>
+            </listitem>
+
+            <listitem><para>
+               Add the following Java test class to 
+               PROJECT_BASEDIR/src/test/java/myorg/mypackage/ex1/AppTest.java
+                </para>
+<programlisting language="java"><![CDATA[package myorg.mypackage.ex1;
+
+import static org.junit.Assert.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
+
+/**
+ * Unit test for simple App.
+ */
+public class AppTest {
+    private static Log log = LogFactory.getLog(AppTest.class);
+
+    @Test
+    public void testApp() {
+        System.out.println("testApp");
+        App app = new App();
+        assertTrue("app didn't return 1", app.returnOne() == 1);
+    }
+}]]></programlisting>
+                <note>
+                    <para>
+                        Make sure you put AppTest.java in the src/test tree.
+                    </para>
+                </note>
+            </listitem>
+
+            <listitem><para>
+                Compile the application and place it in target/ex1.jar. The compiled
+                classes will go in target/classes.
+                </para>
+<programlisting language=""><![CDATA[javac src/main/java/myorg/mypackage/ex1/App.java -d target/classes
+jar cvf target/ex1.jar -C target/classes .
+jar tf target/ex1.jar]]></programlisting>
+
+<programlisting language=""><![CDATA[$ javac src/main/java/myorg/mypackage/ex1/App.java -d target/classes
+$ jar cvf target/ex1.jar -C target/classes .
+added manifest
+adding: myorg/(in = 0) (out= 0)(stored 0%)
+adding: myorg/mypackage/(in = 0) (out= 0)(stored 0%)
+adding: myorg/mypackage/ex1/(in = 0) (out= 0)(stored 0%)
+adding: myorg/mypackage/ex1/App.class(in = 519) (out= 350)(deflated 32%)
+
+$ jar tf target/ex1.jar
+META-INF/
+META-INF/MANIFEST.MF
+myorg/
+myorg/mypackage/
+myorg/mypackage/ex1/
+myorg/mypackage/ex1/App.class]]></programlisting>
+            </listitem>
+
+            <listitem><para>
+                Compile the JUnit test and place the compiled tests in 
+                target/test-classes. 
+                </para>
+<programlisting language=""><![CDATA[export JUNIT_JAR="$HOME/.m2/repository/junit/junit/4.10/junit-4.10.jar"
+export COMMONS_LOGGING_JAR="$HOME/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar"
+javac -classpath "target/ex1.jar:$JUNIT_JAR:$COMMONS_LOGGING_JAR" src/test/java/myorg/mypackage/ex1/AppTest.java -d target/test-classes]]></programlisting>
+            </listitem>
+
+            <listitem><para>
+                Verify you have your "production" class from src/main compiled into target/classes,
+                your unit test class from src/test compiled into target/test-classes, and the
+                Java archive with thr production class in target directory.
+                </para>
+<programlisting language=""><![CDATA[target/
+    +---classes/myorg/mypackage/ex1/App.class
+    +---test-classes/myorg/mypackage/ex1/AppTest.class
+    +---test-reports
+    +---ex1.jar]]></programlisting>
+
+            </listitem>
+
+            <listitem><para>
+                Run the JUnit test framework.
+                </para>
+<programlisting language=""><![CDATA[java -classpath "target/ex1.jar:$JUNIT_JAR:$COMMONS_LOGGING_JAR:target/test-classes" org.junit.runner.JUnitCore myorg.mypackage.ex1.AppTest]]></programlisting>
+
+<programlisting language=""><![CDATA[JUnit version 4.10
+.testApp
+Here's One!
+
+Time: 0.005
+
+OK (1 test)]]></programlisting>
+            </listitem>
+
+            <listitem><para>
+                Change add/remove a test that will fail, re-compile the test class
+                and re-run.
+                </para>
+<programlisting language="java"><![CDATA[    //AppTest.java
+    @Test
+    public void testFail() {
+        System.out.println("testFail");
+        App app = new App();
+        assertTrue("app didn't return 0", app.returnOne() == 0);
+    }]]></programlisting>
+
+<programlisting language=""><![CDATA[javac -classpath "target/ex1.jar:$JUNIT_JAR:$COMMONS_LOGGING_JAR" src/test/java/myorg/mypackage/ex1/AppTest.java -d target/test-classes
+java -classpath "target/ex1.jar:$JUNIT_JAR:$COMMONS_LOGGING_JAR:target/test-classes" org.junit.runner.JUnitCore myorg.mypackage.ex1.AppTest]]></programlisting>
+
+<programlisting language=""><![CDATA[JUnit version 4.10
+.testApp
+Here's One!
+.testFail
+Here's One!
+E
+Time: 0.007
+There was 1 failure:
+1) testFail(myorg.mypackage.ex1.AppTest)
+java.lang.AssertionError: app didn't return 0
+        at org.junit.Assert.fail(Assert.java:93)
+        at org.junit.Assert.assertTrue(Assert.java:43)
+        at myorg.mypackage.ex1.AppTest.testFail(AppTest.java:26)
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+...
+        at org.junit.runner.JUnitCore.main(JUnitCore.java:45)
+
+FAILURES!!!
+Tests run: 2,  Failures: 1]]></programlisting>
+            </listitem>
+
+        </orderedlist>
+        
+
+        
+    <section id="first-simple-moduleex-cmdline-summary">
+       <title>Summary</title>
+       <para>
+           In this chapter of the exercise you setup, built, and tested a sample 
+           project with only command-line commands. You did this to help show what
+           higher level tools will need to do as well. Even though the command
+           line provides clarity, it doesn't scale and shell scripts aren't 
+           generally portable and optimized (wrong tool for the job). Hopefully,
+           after going through this, you have an understanding of the low level 
+           structure and usecases and are now interested adding a build environment.
+       </para>
+    </section>    
+</chapter>
+  

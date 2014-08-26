@@ -1,0 +1,69 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="first-simplemodule-ex">
+    <bookinfo>
+        <title>JavaSE: First Simple Module Exercise</title>
+        <subtitle>A Basic Introduction to JavaSE and Maven Modules</subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>
+                This document contains an introductory exercise for building 
+                a Maven-based JavaSE project that is self-contained. The exercise
+                takes a building-block approach that de-mystifies some of the Maven
+                build concepts by breaking down many core concepts into files,
+                directories, and individual commands prior to introducing the 
+                overall framework and its integration with an IDE.
+            </para>
+        </abstract>
+    </bookinfo>
+
+    <preface id="first-simplemoduleex-purpose">
+        <title>Purpose</title>
+        <section id="first-simplemoduleex-goals">
+            <title>Goals</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Identify the core use cases required to develop a Java Archive (JAR) module</para></listitem>
+                <listitem><para>Demonstrate how Maven fits within the development of a JAR module</para></listitem>
+                <listitem><para>Demonstrate how Maven integrates with a sample IDE</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="first-simplemoduleex-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall be able to:</para>
+            <itemizedlist spacing="compact">
+                    <listitem><para>Create a module with directory structure and files to build a Java Archive (JAR)</para></listitem>
+                    <listitem><para>Create a Java class for inclusion in the JAR</para></listitem>
+                    <listitem><para>Create a unit test for the Java class</para></listitem>
+                    <listitem><para>Automate the build using Maven</para></listitem>
+                    <listitem><para>Import the Maven module into an IDE for development</para></listitem>
+                    <listitem><para>Use the IDE to interactively debug the Java class and unit test</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <note>
+            <para>
+                Some of the parts of this exercise are marked OPTIONAL! There is no 
+                need to physically perform the details of these steps if you are already 
+                familiar with the concepts presented. Skim the material and advance to
+                the parts you are not familiar with.
+            </para>
+        </note>
+    </preface>
+
+    <toc/>
+
+    <xi:include href="first-simplemoduleex-cmdline.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <!--
+    <xi:include href="first-simplemoduleex-ant.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="first-simplemoduleex-logging.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="first-simplemoduleex-maven.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="first-simplemoduleex-eclipse.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    -->
+</book>

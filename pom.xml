@@ -17,6 +17,7 @@
     <modules>
         <module>build</module>
         <module>intro</module>
+        <module>javase</module>
         <module>jpa</module>
         <module>courses</module>
     </modules>

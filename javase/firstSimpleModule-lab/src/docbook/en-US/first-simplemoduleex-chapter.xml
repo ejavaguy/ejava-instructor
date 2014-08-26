@@ -1,0 +1,24 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="first-simple-moduleex-chapter">
+    <title></title>
+    <para>
+    </para>
+        
+    <orderedlist>
+        <listitem><para>
+            </para>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+        </listitem>
+    </orderedlist>
+
+        
+    <section id="first-simple-moduleex-chapter-summary">
+       <title>Summary</title>
+       <para>
+       </para>
+    </section>    
+</chapter>
+  
