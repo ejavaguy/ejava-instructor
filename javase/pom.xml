@@ -16,6 +16,6 @@
         This project is the root project for JavaSE materials.
     </description>
     <modules>
-        <module>firstSimpleModule-lab</module>
+        <module>first-simplemodule-lab</module>
     </modules>
 </project>

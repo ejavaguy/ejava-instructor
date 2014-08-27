@@ -24,7 +24,7 @@
     <note>
         <para>
             If you do not have Ant installed on your system, it can be 
-            from {{http://ant.apache.org/}}
+            from <ulink url="http://ant.apache.org/">http://ant.apache.org/</ulink>
         </para>
     </note>
     
@@ -53,9 +53,7 @@
 #M2_REPO=c:/jhu/repository
 M2_REPO=${user.home}/.m2/repository
 
-junit.classpath=${M2_REPO}/junit/junit/4.10/junit-4.10.jar
-commons-logging.classpath=${M2_REPO}/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar
-log4j.classpath=${M2_REPO}/log4j/log4j/1.2.13/log4j-1.2.13.jar]]></programlisting>
+junit.classpath=${M2_REPO}/junit/junit/4.10/junit-4.10.jar]]></programlisting>
         </listitem>
 
         <listitem><para>
@@ -99,8 +97,6 @@ log4j.classpath=${M2_REPO}/log4j/log4j/1.2.13/log4j-1.2.13.jar]]></programlistin
                     </para>
                 </listitem>
             </itemizedlist>
-
-            </para>
 <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="utf-8" ?> 
 <!-- ex1 build.xml 
 -->
@@ -238,7 +234,6 @@ It is currently set to ".../jre"]]></programlisting>
                <classpath>
                    <pathelement location="${build.dir}/${artifactId}.jar"/>
                    <pathelement path="${junit.classpath}"/>
-                   <pathelement path="${commons-logging.classpath}"/>
                </classpath>
         </javac>
     </target>]]></programlisting>
@@ -307,20 +302,10 @@ Total time: 3 seconds]]></programlisting>
                     </para>
                 </listitem>
             </itemizedlist>
-<programlisting language="xml"><![CDATA[
-        <mkdir dir="${build.dir}/test-reports"/>
-        <taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
-           <classpath>
-               <fileset dir="${ant.library.dir}">
-                    <include name="ant-junit.jar"/>
-               </fileset>
-           </classpath>
-        </taskdef>
+<programlisting language="xml"><![CDATA[        <mkdir dir="${build.dir}/test-reports"/>
         <junit printsummary="true" fork="true">
                <classpath>
                    <pathelement path="${junit.classpath}"/>
-                   <pathelement path="${commons-logging.classpath}"/>
-                   <pathelement path="${log4j.classpath}"/>
                    <pathelement location="${build.dir}/${artifactId}.jar"/>
                    <pathelement location="${build.dir}/test-classes"/>
                </classpath>
@@ -336,16 +321,16 @@ Total time: 3 seconds]]></programlisting>
         </junit>
 ]]></programlisting>
 
-            <para>
-                The last time I sanity checked this exercise I got
-                the common error below and upated my definition of the
-                target to what is shown above and copied ant-junit.jar
-                from the binary download into ant.library.dir, which is
-                in /usr/share/ant/lib on my system. I am quite rusty on 
-                Ant these days and do not suggest my definition of the 
-                junit task is correct or required, but it works and
-                will work much better/easier once we update to Maven.
-            </para>
+            <note>
+                <para>
+                    The last time I sanity checked this exercise I got
+                    the common error below. I corrected the issue by 
+                    downloading a full installation from the Ant website
+                    and exporting my ANT_HOME to the root of that installation.
+                    (export ANT_HOME=/opt/apache-ant-1.9.4) and adding 
+                    $ANT_HOME/bin to the PATH (export PATH=$ANT_HOME/bin:$PATH)
+                    ANT_HOME is required for Ant to locate the junit task.
+                </para>
 <programlisting language=""><![CDATA[BUILD FAILED
 
 /home/jcstaff/proj/784/exercises/ex1/build.xml:57: Problem: failed to create task or type junit
@@ -360,14 +345,14 @@ Do not panic, this is a common problem.
 The commonest cause is a missing JAR.
 
 This is not a bug; it is a configuration problem]]></programlisting>
+            </note>
+
         </listitem>
 
         <listitem><para>
             Execute the updated "test" target with the JUnit test.
             </para>
 <programlisting language=""><![CDATA[$ rm -rf target; ant
-Buildfile: /home/jcstaff/proj/784/exercises/ex1/build.xml
-
 package:
     [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/classes
     [javac] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/classes
@@ -377,13 +362,12 @@ test:
     [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/test-classes
     [javac] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/test-classes
     [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/test-reports
-Trying to override old definition of datatype junit
     [junit] Running myorg.mypackage.ex1.AppTest
-    [junit] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0 sec
+    [junit] Tests run: 2, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 15.143 sec
     [junit] Test myorg.mypackage.ex1.AppTest FAILED
 
 BUILD SUCCESSFUL
-Total time: 18 seconds]]></programlisting>
+Total time: 17 seconds]]></programlisting>
 
 <programlisting language=""><![CDATA[$ find . -type f
 ./src/main/java/myorg/mypackage/ex1/App.java
@@ -395,32 +379,119 @@ Total time: 18 seconds]]></programlisting>
 ./target/test-classes/myorg/mypackage/ex1/AppTest.class
 ./target/test-reports/TEST-myorg.mypackage.ex1.AppTest.txt
 ./target/test-reports/TEST-myorg.mypackage.ex1.AppTest.xml]]></programlisting>
+
+                <note>
+                    <para>
+                        Note the 17 seconds it took to run/complete the test seems excessive.
+                        I was able to speed that up to 0.001 sec by commenting out the XML
+                        report option (which we will not use in this exercise).
+                    </para>
+                </note>
+        </listitem>
+
+        <listitem><para>
+            Test output of each test is in the TXT and XML reports.
+            </para>
+<programlisting language=""><![CDATA[$ more target/test-reports/TEST-myorg.mypackage.ex1.AppTest.txt 
+Testsuite: myorg.mypackage.ex1.AppTest
+Tests run: 2, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 15.246 sec
+------------- Standard Output ---------------
+testApp
+Here's One!
+testFail
+Here's One!
+------------- ---------------- ---------------
+
+Testcase: testApp took 0.007 sec
+Testcase: testFail took 0.022 sec
+        FAILED
+app didn't return 0
+junit.framework.AssertionFailedError: app didn't return 0
+        at myorg.mypackage.ex1.AppTest.testFail(AppTest.java:26)]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Add a clean target to the build.xml file to delete built artifacts.
+            See <ulink url="http://ant.apache.org/manual/CoreTasks/delete.html">Ant docs</ulink>
+            for details on the delete task.
+            </para>
+<programlisting language="xml"><![CDATA[    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Re-run and use the new "clean" target you just added.
+            </para>
+<programlisting language=""><![CDATA[
+$ ant clean test
+Buildfile: /home/jcstaff/proj/784/exercises/ex1/build.xml
+
+clean:
+   [delete] Deleting directory /home/jcstaff/proj/784/exercises/ex1/target
+
+package:
+    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/classes
+    [javac] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/classes
+      [jar] Building jar: /home/jcstaff/proj/784/exercises/ex1/target/ex1.jar
+
+test:
+    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/test-classes
+    [javac] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/test-classes
+    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/test-reports
+    [junit] Running myorg.mypackage.ex1.AppTest
+    [junit] Tests run: 2, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 15.123 sec
+    [junit] Test myorg.mypackage.ex1.AppTest FAILED
+
+BUILD SUCCESSFUL
+Total time: 17 seconds]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Comment out the bogus testFail and rerun.
+            </para>
+<programlisting language=""><![CDATA[$ cat src/test/java/myorg/mypackage/ex1/AppTest.java
+...
+    //@Test
+    public void testFail() {]]></programlisting>
         </listitem>
 
         <listitem><para>
             </para>
-<programlisting language=""><![CDATA[
-]]></programlisting>
-        </listitem>
+<programlisting language=""><![CDATA[$ ant clean test
+Buildfile: /home/jcstaff/proj/784/exercises/ex1/build.xml
 
-        <listitem><para>
-            </para>
-<programlisting language=""><![CDATA[
-]]></programlisting>
-        </listitem>
+clean:
+   [delete] Deleting directory /home/jcstaff/proj/784/exercises/ex1/target
 
-        <listitem><para>
-            </para>
-<programlisting language=""><![CDATA[
-]]></programlisting>
-        </listitem>
+package:
+    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/classes
+    [javac] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/classes
+      [jar] Building jar: /home/jcstaff/proj/784/exercises/ex1/target/ex1.jar
 
+test:
+    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/test-classes
+    [javac] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/test-classes
+    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/test-reports
+    [junit] Running myorg.mypackage.ex1.AppTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 15.161 sec
+
+BUILD SUCCESSFUL
+Total time: 17 seconds]]></programlisting>
+        </listitem>
     </orderedlist>
 
         
     <section id="first-simple-moduleex-ant-summary">
        <title>Summary</title>
        <para>
+            In this chapter you performed many of the same action you did in the
+            previous chapter except that you implemented in a portable build tool
+            called Ant. Ant is very powerful and open-ended.  You were shown these 
+            same steps in Ant as an intermediate towards Maven. Ant, being open-ended,
+            does not follow many conventions. Everything must be explicitely specified.
+            You will find that to be in significant contrast with Maven. Ant is a 
+            "build tool" and Maven is a "build system" with conventions/rules.
        </para>
     </section>    
 </chapter>

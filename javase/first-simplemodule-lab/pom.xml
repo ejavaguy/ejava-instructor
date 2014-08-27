@@ -6,7 +6,7 @@
         <version>4.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>firstSimpleModule-lab</artifactId>
+    <artifactId>first-simplemodule-lab</artifactId>
     <packaging>pom</packaging>
 
     <name>JavaSE::Simple Module::Exercise Instructions</name>

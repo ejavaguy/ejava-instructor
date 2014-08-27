@@ -1,0 +1,720 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="first-simple-moduleex-maven">
+    <title>Creating Portable and Repeatable Project Builds with Maven</title>
+    <para>
+        In this chapter you will automate the build using Maven by defining
+        a simple Maven project definition that will go with your project tree.
+        In the previous chapters you worked with a reasonable project tree 
+        that could have looked different in a number of ways and could have 
+        been accounted for by different path constructs. However, why be different?
+        The project tree we put together that accounted for production classes,
+        test classes, resource files, archives, unit tests, test reports, etc.
+        follows Maven's standard build tree almost exactly (with the exception 
+        of the name of the target/test-reports directory). We will be able to
+        add a Maven project definition without much effort.
+    </para>
+
+    <tip>
+        <para>
+        The Maven community has a tremendous amount of documentation,
+        examples, and on-line discussions. This course has many examples
+        that are more specific for the work you will be actively
+        performing. Many of these resources are a quick google search
+        away but know that I go out of my way to make sure you spend as
+        much time as possible on design and JavaEE aspects in class. If
+        you are stuck on Maven -- ask. I know what you are trying to do
+        and can likely point you to an example that is relevant to what
+        you are doing in class. If you are still stuck on Maven issues --
+        send it to me. I will fix it personally. There is nothing more
+        irritating for you than to be fighting with the builds when you
+        want to be spending more time understanding, designing, trying,
+        and mastering the product of what is being built.
+        </para>
+    </tip>
+    <note>
+        <para>
+        Using Maven requires only an initial download and installation.
+        Plugins and dependencies will be downloaded from remote repositories
+        as needed.  Connectivity to the internet is required until all
+        dependencies have been satisfied.
+        </para>
+    </note>
+    <note>
+        <para>
+        Maven will automatically go out and download any missing
+        dependencies and recursively download what they depend upon. If
+        you are running Maven for the first time, this could result in a
+        significant amount of downloading and may encounter an occasional
+        connection failure with repositories. Once a non-SNAPSHOT version
+        is downloaded (e.g., 1.3), Maven will not re-attempt to download
+        it. Maven will, however, go out and check various resources to stay
+        in sync.  If you know you already have everything you need, you can
+        run in off-line mode using the "-o" flag on the command line or its
+        equivalent entry within the settings.xml file. This can save you
+        seconds of build time when disconnected from the Internet.
+        </para>
+    </note>
+        
+    <orderedlist>
+        <listitem><para>
+            Create a pom.xml file in project ${basedir}. This will be used to 
+            define your entire project. Refer to the
+            <ulink url="http://maven.apache.org/ref/current/maven-model/maven.html">Maven POM Reference</ulink> 
+            for details about each element. 
+            </para>
+            <itemizedlist spacing="compact">
+                <listitem><para>
+                    modelVersion - yes; its required
+                    </para>
+                </listitem>
+                <listitem><para>
+                    groupId - just as it sounds, this value is used to group 
+                    related artifacts. groupId is a hierarchical value and the
+                    individual names are used to form a directory structure in the 
+                    Maven repository (e.g., artifacts in the myorg.myproject.foo 
+                    groupId will be located below the 
+                    HOME/.m2/repository/myorg/myproject/foo directory).
+                    </para>
+                </listitem>
+                <listitem><para>
+                    version - Maven has a strong versioning system and versions 
+                    appended with the word SNAPSHOT are handled differently. Projects
+                    with a version ending in -SNAPSHOT are thought to be in constant
+                    change, with no official release yet available. Projects with a 
+                    version lacking the -SNAPSHOT ending are meant to be an official
+                    release, with no other variants available with the same tag.
+                    </para>
+                </listitem>
+                <listitem><para>
+                    dependency.scope - this is used to define the scope the 
+                    dependency gets applied. It defines the visibility within the project for 
+                    the dependency and whether it is carried along with the module through 
+                    transitive dependency analysis. With open-source software, a typical 
+                    JavaEE application could have 10s to 100s of individual modules it 
+                    dependends upon and the proper use of transitive dependencies makes this
+                    manageable.
+                    </para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>
+                            scope=compile is the default and is used to describe artifacts 
+                            that the src/main directory depends upon and will also be visible
+                            by classes in src/test. These dependency artifacts will be brought 
+                            along with the module when transitive dependencies are evaluated. 
+                            </para>
+                        </listitem>
+                        <listitem><para>
+                            scope=test is used to define artifacts which src/test depends upon. 
+                            These will be made available during testing, but will not be visible
+                            to classes in src/main and will not be considered a 
+                            dependency for downstream users of the module. Consult the 
+                            maven documentation for other scopes, but one other that is
+                            commonly used in class is scope=provided. 
+                            </para>
+                        </listitem>
+                        <listitem><para>
+                            scope=provided is similar to scope=compile in that the src/main 
+                            tree can see it, however like scope=test, it is not carried forward. 
+                            Each downstream module is required to know about the dependency and 
+                            provide a replacement. This is common when using JavaEE APIs that 
+                            have been packaged by different vendors used by different module
+                            developers.
+                            </para>
+                        </listitem>
+                        <listitem><para>
+                            maven-compiler-plugin - this declaration is not necessary
+                            for this exercise, but like our Ant script, specify the Java
+                            version to make sure we get what we need.
+                            </para>
+                        </listitem>
+                        <listitem><para>
+                            properties.project.build.sourceEncoding - this defines the
+                            default handling of file content for all plugins within a 
+                            module. The default is platform-specific if left unspecified
+                            and we avoid an annoying warning by specifying it.
+                            </para>
+                        </listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+
+            <note>
+                <para>
+                    Although the m2e Eclipse plugin reads the pom dependency and creates
+                    a classpath within Eclipse, it does not honor the differences
+                    between the different scope values. All dependencies are blended 
+                    together. The result is that something may compile and run
+                    fine within Eclipse and report a missing class when built at
+                    the command line. If that happens, check for classes using 
+                    artifacts that have been brought in as scope=test or for classes
+                    incorrectly placed within the src/main tree.
+                </para>
+            </note>
+
+<programlisting language="xml"><![CDATA[<?xml version="1.0"?>
+<project>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>myorg.myproject</groupId>
+    <artifactId>ex1</artifactId>
+
+    <name>My First Simple Project</name>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.13</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+]]></programlisting>
+
+            <para>Your project tree should look like the following at this point.</para>
+<programlisting language=""><![CDATA[> find . -type f
+./src/main/java/myorg/mypackage/ex1/App.java
+./src/test/java/myorg/mypackage/ex1/AppTest.java
+./src/test/resources/log4j.xml
+./build.properties
+./build.xml
+./pom.xml]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Note that the pom.xml file is not required to have an assigned schema.
+            However, adding one does allow for XML editing tools to better assist 
+            in creating a more detailed POM. Replace the project element from 
+            above with the following declarations to assign an XML schema.
+            </para>
+<programlisting language="xml"><![CDATA[<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Run the package "phase" and watch the project compile, assemble,
+            and test. Maven has many well-known phases that correspond to the 
+            lifecycle of build steps that goes into validating, preparing, 
+            building, testing, and deploying artifacts of a module. You can 
+            find out more about Maven phases 
+            <ulink url="http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html#Lifecycle_Reference">here</ulink>
+            I refer to this page very often.
+            </para>
+<programlisting language=""><![CDATA[$ mvn package
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building My First Simple Project 1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ ex1 ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /home/jcstaff/proj/784/exercises/ex1/src/main/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ ex1 ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/classes
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ ex1 ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 1 resource
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ ex1 ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ ex1 ---
+[INFO] Surefire report directory: /home/jcstaff/proj/784/exercises/ex1/target/surefire-reports
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running myorg.mypackage.ex1.AppTest
+INFO  27-08 00:15:14,277 (AppTest.java:testApp:17)  -testApp
+DEBUG 27-08 00:15:14,283 (App.java:returnOne:11)  -Here's One!
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.383 sec
+
+Results :
+
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] 
+[INFO] --- maven-jar-plugin:2.4:jar (default-jar) @ ex1 ---
+[INFO] Building jar: /home/jcstaff/proj/784/exercises/ex1/target/ex1-1.0-SNAPSHOT.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 5.984 s
+[INFO] Finished at: 2014-08-27T00:15:14-04:00
+[INFO] Final Memory: 16M/174M
+[INFO] ------------------------------------------------------------------------
+]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            </para>
+<programlisting language=""><![CDATA[> find . -type f
+./build.xml
+./build.properties
+./pom.xml
+./target/surefire-reports/TEST-myorg.mypackage.ex1.AppTest.xml
+./target/surefire-reports/myorg.mypackage.ex1.AppTest.txt
+./target/log4j-out.txt
+./target/maven-archiver/pom.properties
+./target/ex1-1.0-SNAPSHOT.jar
+./target/test-classes/myorg/mypackage/ex1/AppTest.class
+./target/test-classes/log4j.xml
+./target/classes/myorg/mypackage/ex1/App.class
+./target/maven-status/...
+./src/test/resources/log4j.xml
+./src/test/java/myorg/mypackage/ex1/AppTest.java
+./src/main/java/myorg/mypackage/ex1/App.java]]></programlisting>
+
+            <itemizedlist spacing="compact">
+                <listitem><para>
+                    src/main/java classes were built in the target/classes directory by convention
+                    by the maven-compiler plugin that is automatically wired into JAR module builds.
+                    We didn't have to configure it because we structured our project using Maven directory 
+                    structure and used the default packaging=jar module type (since packaging=jar is the 
+                    default, it could be left unspecified). Many of the standard features
+                    are enacted when for modules with packaging=jar type.
+                    </para>
+                </listitem>
+                <listitem><para>
+                    src/test/java classes where built in the target/test-classes directory by convention
+                    by the maven-compiler plugin.
+                    </para>
+                </listitem>
+                <listitem><para>
+                    src/test/resources where copied to the target/test-classes directory by convention
+                    by the maven-resources-plugin that is automatically wired into JAR module builds.
+                    </para>
+                </listitem>
+                <listitem><para>
+                    test cases were run and their reports were placed in target/surefire-reports by convention
+                    by the maven-surefire-plugin that is automatically wired into JAR module builds.
+                    </para>
+                </listitem>
+                <listitem><para>
+                    The build.xml and build.properties file from our work with
+                    Ant is still allowed to exist. We could even delegate from
+                    Maven to Ant using the maven-antrun-plugin if we had legacy
+                    build.xml scripts that we wanted to leverage.
+                    </para>
+                </listitem>
+            </itemizedlist>
+        </listitem>
+
+        <listitem><para>
+            </para>
+<programlisting language="xml"><![CDATA[mkdir -p src/site/resources
+$ cat src/site/resources/README.html 
+
+<?xml version="1.0"?>
+<html>
+    <head>
+        <title>My First Project</title>
+    </head>
+<body>
+    <section><h1>My First Project</h1></section>
+    <p/>
+    This is my first project. Take a look at 
+    <p/>
+    <ul>
+        <li>this ....</li>
+        <li>that ....</li>
+        <li>or <a href="./index.html">go home</a></li>
+    </ul>
+    </section>
+</body>
+</html>]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            The above is enough to provide the page. Now add a link to it
+            from the project menu. Add the following content to src/site/site.xml
+            </para>
+<programlisting language="xml"><![CDATA[$ cat src/site/site.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="${project.name}">
+  <body>
+    <menu name="Content">
+        <item name="README" href="README.html"/>
+    </menu>
+  </body>
+</project>]]></programlisting>
+
+            <para>You must also specify a version# for the maven-project-info-reports-plugin.
+                 Maven is extremely version-aware.</para>
+<programlisting language="xml"><![CDATA[            <plugin> 
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.7</version>
+            </plugin>]]></programlisting>
+
+<programlisting language=""><![CDATA[> find . -type f
+./src/main/java/myorg/mypackage/ex1/App.java
+./src/test/java/myorg/mypackage/ex1/AppTest.java
+./src/test/resources/log4j.xml
+./src/site/resources/README.html
+./src/site/site.xml
+./build.properties
+./build.xml
+./pom.xml]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Build the site and open target/site/index.html in your browser.
+            You should see a link to the README on the left side.
+            </para>
+<programlisting language=""><![CDATA[$ mvn site                                                                                                                                                       
+[INFO] Scanning for projects...   
+...
+[INFO] BUILD SUCCESS]]></programlisting>
+<programlisting language=""><![CDATA[$ find target/site/ -name *.html
+
+target/site/plugin-management.html
+target/site/index.html
+target/site/mail-lists.html
+target/site/issue-tracking.html
+target/site/license.html
+target/site/project-info.html
+target/site/dependency-info.html
+target/site/README.html
+target/site/dependencies.html
+target/site/team-list.html
+target/site/source-repository.html
+target/site/integration.html
+target/site/distribution-management.html
+target/site/project-summary.html
+target/site/plugins.html]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Okay, that was a lot of work to just copy an html file. Now lets
+            add javadoc to our project and create a link to it. Add the following 
+            contents to the bottom of the pom.xml file.
+            </para>
+<programlisting language="xml"><![CDATA[    <reporting>
+        <plugins>
+            <plugin> 
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <version>2.9.1</version>
+                <configuration>
+                    <detectLinks/>
+                    <show>private</show>
+                    <source>1.7</source>
+                    <links>
+                        <link>http://download.oracle.com/javaee/7/api/</link>
+                        <link>http://download.oracle.com/javase/7/docs/api/</link>
+                    </links>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            We could create a link the the apidocs/index.html like we did with
+            README.html, but that would be something we'd keep having to update each
+            time we added a new report. Lets add a property to the site.xml menu 
+            so a link to Javadoc and other reports can drop in automatically.
+            </para>
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<project name="${project.name}">
+  <body>
+    <menu name="Content">
+        <item name="README" href="README.html"/>
+    </menu>
+
+    <menu ref="reports"/>
+
+  </body>
+</project>
+]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Re-generate the site documentation with the site target. Open 
+            the target/site/index.html page and you should now see a menu item for
+            "Project Reports" -> "JavaDocs". Our App class should be included in 
+            the Javadoc.
+            </para>
+        </listitem>
+
+        <listitem>
+            <note>
+                <para>
+                    The pom.xml file is the main configuration source
+                    for 99% of what you develop with Maven. There is an
+                    additional $HOME/.m2/settings.xml file where you can
+                    specify build site-specific properties.  These will be
+                    available to all pom.xml files. You want to be careful
+                    not to over-populate the settings.xml file (taking advantage of its
+                    re-usable specification) since it will make you pom.xml
+                    files too dependent on a particulate build site. Refer to the 
+                    <ulink url="http://maven.apache.org/maven-settings/settings.html">Settings Descriptor</ulink>
+                    for detailed information on settings.xml.
+                    The following provides a step-wise generation of the
+                    settings.xml file you put in place during Development Environment Setup. Read thru this
+                    for reference since you likely already have everything in place
+                    you need.
+                </para>
+            </note>
+
+            <para>
+                Let's start a settings.xml file to store properties that 
+                are specific to our build site. You can find details about each setting
+                at the following <ulink url="http://maven.apache.org/settings.html">URL</ulink>.
+            </para>
+<programlisting language="xml"><![CDATA[cat $HOME/.m2/settings.xml
+
+<?xml version="1.0"?>
+<settings xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+</settings>
+]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            If your $HOME directory path contains spaces, you will want to provide an override
+            for the localRepository. Provide a custom path that does not contain spaces.
+            This value will default to a "$HOME/.m2/repository" directory. 
+            </para>
+<programlisting language="xml"><![CDATA[    <!-- this overrides the default $HOME/.m2/repository location. -->
+    <localRepository>c:/jhu/repository</localRepository>]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Add the following specification to either the settings.xml file or the
+            local pom.xml file. If you specify it to the local pom.xml file -- it will
+            only apply to that project. If you specify it in the settings.xml file --
+            it will be global to all projects in your area.  More will
+            be covered on this later. However, it should be noted that this profile
+            is not active unless someone specifically asks for it (-Pdebugger) or the 
+            "debugger" environment variable is set (-Ddebugger=(anything)).
+            </para>
+<programlisting language="xml"><![CDATA[        <profile>
+            <id>debugger</id>
+            <!-- this should only be activated when performing interactive
+                 debugging -->
+            <activation>
+                <property>
+                    <name>debugger</name>
+                </property>
+            </activation>
+            <properties>
+                <surefire.argLine>-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE</surefire.argLine>
+            </properties>                                  
+        </profile>]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Although not needed for this class -- at times you will
+            need access to a dependency that is not available in a
+            Maven repository. COTS libraries are generally not available
+            at ibiblio.org.  You must download it and manually install
+            it locally.
+            </para>
+            <para>
+            This step will go though 
+            importing a stand-alone archive into the repository to resolve
+            any dependencies. Start by declaring a dependency before we do the 
+            import. Note that a new scope property was added. See the
+            <ulink url="http://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html">Dependency Mechanism Intro Page</ulink> 
+            for a discussion of scope, but in this
+            case it is indicating that it should only be present on the command
+            line and not the runtime classpath.
+            </para>
+<programlisting language="xml"><![CDATA[        <dependency>
+            <groupId>foo</groupId>
+            <artifactId>bar</artifactId>
+            <version>1.1</version>
+            <scope>provided</scope>
+        </dependency>]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            Attempt the build the module with the missing dependency. The build should fail
+            but note that Maven attempted all known external repositores.
+            </para>
+<programlisting language=""><![CDATA[> mvn package
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] Building My First Simple Project 1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+Downloading: http://webdev.apl.jhu.edu/~jcs/maven2/foo/bar/1.1/bar-1.1.pom
+Downloading: http://webdev.apl.jhu.edu/~jcs/maven2-snapshot/foo/bar/1.1/bar-1.1.pom
+Downloading: http://repo1.maven.org/maven2/foo/bar/1.1/bar-1.1.pom
+[WARNING] The POM for foo:bar:jar:1.1 is missing, no dependency information available
+Downloading: http://webdev.apl.jhu.edu/~jcs/maven2/foo/bar/1.1/bar-1.1.jar
+Downloading: http://webdev.apl.jhu.edu/~jcs/maven2-snapshot/foo/bar/1.1/bar-1.1.jar
+Downloading: http://repo1.maven.org/maven2/foo/bar/1.1/bar-1.1.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 1.437s
+[INFO] Finished at: Wed Feb 02 12:20:51 EST 2011
+[INFO] Final Memory: 2M/15M
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal on project ex1: Could not resolve dependencies for project myorg.myproject:ex1:jar:1.0-SNAPSHOT: 
+Could not find artifact foo:bar:jar:1.1 in webdev-baseline (http://webdev.apl.jhu.edu/~jcs/maven2) -> [Help 1]]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            The old error message provided for Maven 2 was much better if 
+            a manual install is what you really needed. The newer (Maven 3) one
+            does not provide instruction.  In this case, 
+            manually install a jar file that represents the declaration. Assign it a 
+            groupId of foo, an artifactId of bar, and a version of 1.1. Don't forget to 
+            add the -DgeneratePom=true or you will get a download warning 
+            everytime you try to build. All we need is a valid .jar file. If you 
+            don't have one laying around, just create one with valid structure.
+            </para>
+<programlisting language=""><![CDATA[
+$ touch bar.jar
+$ mvn install:install-file -DgroupId=foo -DartifactId=bar -Dversion=1.1 -Dpackaging=jar -Dfile=bar.jar -DgeneratePom=true
+
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building My First Simple Project 1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-install-plugin:2.4:install-file (default-cli) @ ex1 ---
+[INFO] Installing /home/jcstaff/proj/784/exercises/ex1/bar.jar to /home/jcstaff/.m2/repository2/foo/bar/1.1/bar-1.1.jar
+[INFO] Installing /tmp/mvninstall5322334237902777597.pom to /home/jcstaff/.m2/repository2/foo/bar/1.1/bar-1.1.pom
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 0.975 s
+[INFO] Finished at: 2014-08-27T01:22:06-04:00
+[INFO] Final Memory: 6M/105M
+[INFO] ------------------------------------------------------------------------
+]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            After successfully installing the dummy archive, you should be able to locate the JAR and
+            other supporting files in the local repository. Be sure to look where you have directed 
+            lcoalRepository in $HOME/.m2/settings.xml
+            </para>
+<programlisting language="xml"><![CDATA[$ find /home/jcstaff/.m2/repository2/foo/bar/
+/home/jcstaff/.m2/repository2/foo/bar/
+/home/jcstaff/.m2/repository2/foo/bar/1.1
+/home/jcstaff/.m2/repository2/foo/bar/1.1/bar-1.1.pom.lastUpdated
+/home/jcstaff/.m2/repository2/foo/bar/1.1/_remote.repositories
+/home/jcstaff/.m2/repository2/foo/bar/1.1/bar-1.1.jar.lastUpdated
+/home/jcstaff/.m2/repository2/foo/bar/1.1/bar-1.1.jar
+/home/jcstaff/.m2/repository2/foo/bar/1.1/bar-1.1.pom
+/home/jcstaff/.m2/repository2/foo/bar/maven-metadata-local.xml]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+            </para>
+<programlisting language="xml"><![CDATA[$ more /home/jcstaff/.m2/repository2/foo/bar/1.1/bar-1.1.pom
+
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>foo</groupId>
+  <artifactId>bar</artifactId>
+  <version>1.1</version>
+  <description>POM was created from install:install-file</description>
+</project>]]></programlisting>
+        </listitem>
+
+        <listitem><para>
+             Now try running "mvn package" and it should successfully 
+            resolve the fake dependency on the bar.jar.
+            </para>
+        </listitem>
+
+        <listitem><para>
+            One last thing...Maven pulls in defintions from many places in the
+            build environment. If you ever want to know what the total sum of
+            those sources are (the "effectice POM"), the execute the 
+            help:effective-pom goal.
+            </para>
+<programlisting language="xml"><![CDATA[ $ mvn help:effective-pom
+[INFO] Scanning for projects...
+
+...
+
+<project xmlns...
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>myorg.myproject</groupId>
+  <artifactId>ex1</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <name>My First Simple Project</name>
+  <properties>
+    <jboss.home>/opt/jboss-eap-6.1</jboss.home>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>foo</groupId>
+      <artifactId>bar</artifactId>
+      <version>1.1</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.1.1</version>
+...]]></programlisting>
+        </listitem>
+    </orderedlist>
+
+    <section id="first-simple-moduleex-maven-summary">
+       <title>Summary</title>
+       <para>
+            During this exercise, you were able to establish a project which 
+            was understood by Maven. Once Maven-compliant, each plugin can be added
+            to perform different tasks for development. By the time we start 
+            adding databases, building EARs, and deploying to application servers,
+            we can use all the plugin help we can get.
+       </para>
+    </section>    
+</chapter>
+  

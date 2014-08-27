@@ -28,6 +28,12 @@
             <classifier>docsrc</classifier>
         </dependency>
         <dependency>
+            <groupId>info.ejava.docs.javase</groupId>
+            <artifactId>first-simplemodule-lab</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+        <dependency>
             <groupId>info.ejava.docs.jpa</groupId>
             <artifactId>jpa-entitymgr-lab</artifactId>
             <version>${project.version}</version>

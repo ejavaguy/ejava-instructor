@@ -23,17 +23,12 @@
 
     <note>
         <para>
-            This part requires junit.jar and commons-logging.jar. These
-            should have been downloaded for you when you
-            built the class examples and can be located in
-            $M2_REPO/junit/junit/(version)/ and 
-            $M2_REPO/commons-logging/commons-logging/(version)/. Where M2_REPO is
-            HOME/.m2/repository or the location you have specified in
-            the localRepository element of HOME/.m2/settings.xml.
+            This part requires junit.jar. These should have been
+            downloaded for you when you built the class examples and can
+            be located in $M2_REPO/junit/junit/(version)/. Where M2_REPO
+            is HOME/.m2/repository or the location you have specified
+            in the localRepository element of HOME/.m2/settings.xml.
         </para>
-        <para>commons-logging provides a logging API used by the unit test within
-            this exercise. log4j provides a logging implementation that plugs in
-            behind commons-logging.</para>
     </note>
 
         <orderedlist>
@@ -97,15 +92,12 @@ public class App {
 
 import static org.junit.Assert.*;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 
 /**
  * Unit test for simple App.
  */
 public class AppTest {
-    private static Log log = LogFactory.getLog(AppTest.class);
 
     @Test
     public void testApp() {
@@ -151,8 +143,7 @@ myorg/mypackage/ex1/App.class]]></programlisting>
                 target/test-classes. 
                 </para>
 <programlisting language=""><![CDATA[export JUNIT_JAR="$HOME/.m2/repository/junit/junit/4.10/junit-4.10.jar"
-export COMMONS_LOGGING_JAR="$HOME/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar"
-javac -classpath "target/ex1.jar:$JUNIT_JAR:$COMMONS_LOGGING_JAR" src/test/java/myorg/mypackage/ex1/AppTest.java -d target/test-classes]]></programlisting>
+javac -classpath "target/ex1.jar:$JUNIT_JAR" src/test/java/myorg/mypackage/ex1/AppTest.java -d target/test-classes]]></programlisting>
             </listitem>
 
             <listitem><para>
@@ -171,7 +162,7 @@ javac -classpath "target/ex1.jar:$JUNIT_JAR:$COMMONS_LOGGING_JAR" src/test/java/
             <listitem><para>
                 Run the JUnit test framework.
                 </para>
-<programlisting language=""><![CDATA[java -classpath "target/ex1.jar:$JUNIT_JAR:$COMMONS_LOGGING_JAR:target/test-classes" org.junit.runner.JUnitCore myorg.mypackage.ex1.AppTest]]></programlisting>
+<programlisting language=""><![CDATA[java -classpath "target/ex1.jar:$JUNIT_JAR:target/test-classes" org.junit.runner.JUnitCore myorg.mypackage.ex1.AppTest]]></programlisting>
 
 <programlisting language=""><![CDATA[JUnit version 4.10
 .testApp
@@ -194,8 +185,8 @@ OK (1 test)]]></programlisting>
         assertTrue("app didn't return 0", app.returnOne() == 0);
     }]]></programlisting>
 
-<programlisting language=""><![CDATA[javac -classpath "target/ex1.jar:$JUNIT_JAR:$COMMONS_LOGGING_JAR" src/test/java/myorg/mypackage/ex1/AppTest.java -d target/test-classes
-java -classpath "target/ex1.jar:$JUNIT_JAR:$COMMONS_LOGGING_JAR:target/test-classes" org.junit.runner.JUnitCore myorg.mypackage.ex1.AppTest]]></programlisting>
+<programlisting language=""><![CDATA[javac -classpath "target/ex1.jar:$JUNIT_JAR" src/test/java/myorg/mypackage/ex1/AppTest.java -d target/test-classes
+java -classpath "target/ex1.jar:$JUNIT_JAR:target/test-classes" org.junit.runner.JUnitCore myorg.mypackage.ex1.AppTest]]></programlisting>
 
 <programlisting language=""><![CDATA[JUnit version 4.10
 .testApp
