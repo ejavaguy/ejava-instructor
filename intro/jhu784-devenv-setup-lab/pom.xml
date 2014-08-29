@@ -6,7 +6,7 @@
         <version>4.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>605-784-devenv-setup-lab</artifactId>
+    <artifactId>jhu784-devenv-setup-lab</artifactId>
     <packaging>pom</packaging>
 
     <name>Intro::Enterprise Java (605.784) DevEnv Setup</name>
@@ -18,8 +18,8 @@
     </description>
     
     <properties>
-       <doc.base>605-784-devenv-setup-book</doc.base>
-       <content.version>v2013-09-02</content.version>
+       <doc.base>jhu784-devenv-setup-book</doc.base>
+       <content.version>v2014-08-29</content.version>
     </properties>
 
     <build>

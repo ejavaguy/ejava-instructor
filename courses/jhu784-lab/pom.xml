@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>info.ejava.docs.courses</groupId>
+        <artifactId>courses-root</artifactId>
+        <version>4.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>jhu784-lab</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Courses::JHU 605.784 Exercises Book</name>
+    <description>
+        This project generates a full set of the course exercises.
+    </description>
+    
+    <properties>
+       <doc.base>jhu784-lab-book</doc.base>
+       <content.version>v2014-08-29</content.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>info.ejava.docs.intro</groupId>
+            <artifactId>jhu784-devenv-setup-lab</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+        <dependency>
+            <groupId>info.ejava.docs.javase</groupId>
+            <artifactId>first-simplemodule-lab</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+        <dependency>
+            <groupId>info.ejava.docs.jpa</groupId>
+            <artifactId>jpa-entitymgr-lab</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+        <dependency>
+            <groupId>info.ejava.docs.jpa</groupId>
+            <artifactId>jpa-entity-lab</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+        <dependency>
+            <groupId>info.ejava.docs.jpa</groupId>
+            <artifactId>jpa-relation-lab</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+        <dependency>
+            <groupId>info.ejava.docs.jpa</groupId>
+            <artifactId>jpa-query-lab</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jboss.maven.plugins</groupId>
+                <artifactId>maven-jdocbook-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -20,5 +20,6 @@
 
     <modules>
         <module>ejava-style</module>
+        <module>jhu784-style</module>
     </modules>
 </project>

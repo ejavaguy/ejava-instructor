@@ -17,8 +17,8 @@
     </description>
 
     <modules>
-        <module>enterprise-java-syllabus</module>
-        <module>enterprise-java-notes</module>
-        <module>enterprise-java-lab</module>
+        <module>jhu784-syllabus</module>
+        <module>jhu784-notes</module>
+        <module>jhu784-lab</module>
     </modules>
 </project>

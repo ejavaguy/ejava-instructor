@@ -18,7 +18,7 @@
 
     <modules>
         <module>javaee-intro-notes</module>
-        <module>605-784-devenv-setup-lab</module>
+        <module>jhu784-devenv-setup-lab</module>
         <module>devenv-notes</module>
     </modules>
 </project>

@@ -1,0 +1,63 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="jhu784-notes">
+    <bookinfo>
+        <title>Enterprise Java (JavaEE) Course Notes</title>
+        <subtitle></subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>
+                This book contains course notes covering Enterprise
+                Computing with Java.  This course covers enterprise
+                computing technologies using Java Enterprise Edition
+                (Java EE). The course describes how to build multitier
+                distributed applications, specifically addressing web
+                access, business logic, data access, and applications
+                supporting enterprise service technologies. For the web
+                access tier, the focus will be on integrating the web
+                tier with enterprise applications. For the business logic
+                tier, session beans for synchronous business processing
+                and message-driven beans and timers for asynchronous
+                business processing will be described. The data access
+                tier discussion will focus on data access patterns and the
+                Java Persistence API. Finally, enterprise services will
+                be discussed, including the 
+                Bean Validation API, 
+                Java Naming and Directory Interface (JNDI), 
+                Dependency Injection for Java (JSR-330), 
+                Context and Dependency Injection for JavaEE (CDI; JSR-299), 
+                remote method invocation (RMI), 
+                Java API for XML Binding (JAXB), and 
+                Java API for RESTful Wed Services (JAX-RS),
+                Java Transaction API (JTA), 
+                Java EE security, 
+                and Java Message Service (JMS).
+                Students will build applications using the technologies
+                presented.
+            </para>
+            <para>
+                The material currently covers standards adopted as of 
+                JavaEE 6 and is being actively updated with information
+                from JavaEE 7.
+            </para>
+        </abstract>
+    </bookinfo>
+    <xi:include href="jhu784-syllabus-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="javaee-intro-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="devenv-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="business-logic-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-dao-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entitymgr-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entity-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-validation-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-relation-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-inheritance-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-query-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-tuning-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>

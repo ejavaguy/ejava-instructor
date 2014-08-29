@@ -1,0 +1,18 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="jhu784-syllabus-intro">
+    <bookinfo>
+        <title>Enterprise Computing with Java (605.784.31) Course Syllabus</title>
+        <subtitle></subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+    </bookinfo>
+    
+    <xi:include href="jhu784-description.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jhu784-syllabus.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>
