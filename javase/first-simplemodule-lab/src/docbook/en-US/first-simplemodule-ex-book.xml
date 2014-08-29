@@ -63,7 +63,5 @@
     <xi:include href="first-simplemoduleex-ant.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="first-simplemoduleex-logging.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="first-simplemoduleex-maven.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <!--
     <xi:include href="first-simplemoduleex-eclipse.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    -->
 </book>
