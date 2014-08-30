@@ -80,7 +80,7 @@
                 </file>
             </activation>
             <properties>
-                <docProfile>ejava-style</docProfile>
+                <docProfile>jhu784-style</docProfile>
                 <docProfile.version>${project.version}</docProfile.version>
                 <doc.base>${project.artifactId}</doc.base>
                 <sourceDocumentName>${doc.base}.xml</sourceDocumentName>
