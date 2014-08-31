@@ -7,16 +7,17 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>info.ejava.docs.ejb</groupId>
-    <artifactId>ejb</artifactId>
+    <groupId>info.ejava.docs.async</groupId>
+    <artifactId>async</artifactId>
     <packaging>pom</packaging>
 
-    <name>Enterprise JavaBeans Root</name>
+    <name>Asynchronous Topics Root</name>
     <description>
-        This project is the root project for EJB materials.
+        This project is the root project for async materials.
     </description>
 
     <modules>
-        <module>ejbsessionBank</module>
+        <module>jmsCore</module>
+        <module>asyncEJB</module>
     </modules>
 </project>

@@ -7,10 +7,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>webTier</artifactId>
+    <artifactId>webtier</artifactId>
     <packaging>war</packaging>
 
-    <name>Web Tier</name>
+    <name>EJB::Web Tier</name>
     <description>
      This project demonstrates deploying the data access tier and some
      trivial business logic to a web-only component. It consists of two
