@@ -17,6 +17,6 @@
     </description>
 
     <modules>
-        <module>ejb-intro</module>
+        <module>ejbsessionBank</module>
     </modules>
 </project>
