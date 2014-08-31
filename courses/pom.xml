@@ -8,7 +8,7 @@
     </parent>
 
     <groupId>info.ejava.docs.courses</groupId>
-    <artifactId>courses-root</artifactId>
+    <artifactId>courses</artifactId>
     <packaging>pom</packaging>
 
     <name>Courses</name>
