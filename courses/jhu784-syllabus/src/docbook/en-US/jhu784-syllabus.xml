@@ -132,7 +132,7 @@
             <row rowsep="1">
                 <entry namest="session">7</entry>
                 <entry namest="date">Oct22</entry>
-                <entry namest="topic"><para>Enterprise JavaBean (EJB) Overview</para></entry>
+                <entry namest="topic"><para><ulink url="../ppt/ejbSession.ppt">Enterprise JavaBean (EJB) Overview</ulink></para></entry>
             </row>
             <!--
             <row rowsep="1">
@@ -152,7 +152,7 @@
             <row rowsep="1">
                 <entry namest="session">8</entry>
                 <entry namest="date">Oct29</entry>
-                <entry namest="topic"><para>Configuring EJBs</para></entry>
+                <entry namest="topic"><para><ulink url="../ppt/jndiENC.ppt">Configuring EJBs</ulink></para></entry>
             </row>
             <!--
             <row rowsep="1">
@@ -173,7 +173,7 @@
             <row rowsep="1">
                 <entry namest="session">9</entry>
                 <entry namest="date">Nov05</entry>
-                <entry namest="topic">EJB Transactions</entry>
+                <entry namest="topic"><para><ulink url="../ppt/javaeeTransactions.ppt">JavaEE Transactions</ulink></para></entry>
             </row>
             <!--
             <row rowsep="1">
@@ -185,7 +185,10 @@
             <row rowsep="1">
                 <entry namest="session">10</entry>
                 <entry namest="date"></entry>
-                <entry namest="topic">Web-enabled EJBs with JAX-RS</entry>
+                <entry namest="topic"><para><ulink url="../ppt/webTier.ppt">Web-Tier</ulink></para></entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic"><para><link linkend="webejb">Web-enabled EJBs with JAX-RS</link></para></entry>
             </row>
         </tbody>
         </tgroup>
@@ -211,7 +214,7 @@
             <row rowsep="1">
                 <entry namest="session">11</entry>
                 <entry namest="date">Nov12</entry>
-                <entry namest="topic">JavaEE Security</entry>
+                <entry namest="topic"><para><ulink url="../ppt/javaeeSecurity.ppt">JavaEE Security</ulink></para></entry>
             </row>
             <!--
             <row rowsep="1">
@@ -223,7 +226,7 @@
             <row rowsep="1">
                 <entry namest="session">12</entry>
                 <entry namest="date">Nov19</entry>
-                <entry namest="topic">JMS</entry>
+                <entry namest="topic"><para><ulink url="../jmsCore.ppt">JMS Core</ulink></para></entry>
             </row>
 
             <row rowsep="1">
@@ -236,7 +239,7 @@
             <row rowsep="1">
                 <entry namest="session">13</entry>
                 <entry namest="date">Dec03</entry>
-                <entry namest="topic">EJB and JMS</entry>
+                <entry namest="topic"><para><ulink url="../ppt/asyncEJB.ppt">EJB and JMS</ulink></para></entry>
             </row>
             <row rowsep="1">
                 <entry namest="session"/>
