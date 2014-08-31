@@ -1,14 +1,13 @@
 <!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="javaeeintro-why">
+<chapter id="ejb-intro-why">
     <title>Why Enterprise?</title>
     <para></para>
 
     <figure>
         <title>Needs and JavaEE/EJB Implementation Options</title>
-        <graphic scalefit="1" fileref="images/javaeeintro-impl-needs.png"/>
+        <graphic scalefit="1" fileref="images/ejb-intro-impl-needs.png"/>
     </figure>   
-
 </chapter>
   

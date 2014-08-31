@@ -2,21 +2,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>info.ejava.docs.intro</groupId>
-        <artifactId>intro-root</artifactId>
+        <groupId>info.ejava.docs.ejb</groupId>
+        <artifactId>ejb</artifactId>
         <version>4.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>javaee-intro-notes</artifactId>
+    <artifactId>ejb-intro-notes</artifactId>
     <packaging>pom</packaging>
 
-    <name>Intro::JavaEE Intro</name>
+    <name>EJB::Intro::Notes</name>
     <description>
+        This module provides an intro to server-side EJBs
     </description>
     
     <properties>
-       <doc.base>javaee-intro-book</doc.base>
-       <content.version>v2014-08-30</content.version>
+       <doc.base>ejb-intro-book</doc.base>
+       <content.version>v2013-09-23</content.version>
     </properties>
 
     <build>

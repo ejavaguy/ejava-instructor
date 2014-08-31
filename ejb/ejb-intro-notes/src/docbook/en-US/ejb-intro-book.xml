@@ -1,0 +1,97 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="ejb-intro">
+    <bookinfo>
+        <title>Enterprise JavaBeans (EJB) Overview</title>
+        <subtitle></subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>This presentation provides an introduction to enterprise development
+                using the server-side Enterprise JavaBean (EJB) standard. 
+            </para>
+        </abstract>
+        
+    </bookinfo>
+
+    <preface id="ejb-intro-purpose">
+        <title>Purpose</title>
+        <section id="ejb-intro-goals">
+            <title>Goals</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Introduce the purpose of an EJB (why?)</para></listitem>
+                <listitem><para>Introduce the different EJB styles</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Stateless EJB</para></listitem>
+                        <listitem><para>Stateful EJB</para></listitem>
+                        <listitem><para>Singleton EJB</para></listitem>
+                        <listitem><para>Message Driven EJB</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>Introduce different EJB interface options</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Remote</para></listitem>
+                        <listitem><para>Local</para></listitem>
+                        <listitem><para>No Interface (Local)</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>Introduce different deployment options for EJBs</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Naked EJB Archive (JAR)</para></listitem>
+                        <listitem><para>Enterprise Archive (EAR)</para></listitem>
+                        <listitem><para>Web Archive (WAR)</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>Develop, deploy, and test a simple Stateless EJB</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejb-intro-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall be able to:</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>State reasons for/against adding an EJB to a JavaEE application</para></listitem>
+                <listitem><para>State the four different types of EJBs and reasons for/against using each</para></listitem>
+                <listitem><para>State the three different built-in interface types and when to/not-to use each</para></listitem>
+                <listitem><para>State the three different deployment options and when to/not-to use each</para></listitem>
+                <listitem><para>Develop, deploy, and test a simple Stateless EJB</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>EJB (without resource requirements)</para></listitem>
+                        <listitem><para>Remote interface</para></listitem>
+                        <listitem><para>Naked EJB deployment</para></listitem>
+                        <listitem><para>Integration test (IT)</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+    </preface>
+
+
+    <xi:include href="ejb-intro-why.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-intro-ejb.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+    <appendix id="ejb-intro-sources">
+        <title>Sources</title>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                <emphasis>"JSR 345: Enterprise JavaBeansTM 3.2"</emphasis>,
+                Marina Vatkina, 
+                <ulink url="https://jcp.org/en/jsr/detail?id=345">https://jcp.org/en/jsr/detail?id=345</ulink>,
+                2013 Java Community Press.
+                </para>
+            </listitem>
+            <listitem><para>
+                <emphasis>"EJB Version History"</emphasis>,
+                Wikipedia, 
+                <ulink url="http://en.wikipedia.org/wiki/Enterprise_JavaBeans#Version_history">http://en.wikipedia.org/wiki/Enterprise_JavaBeans#Version_history</ulink>,
+                August 17, 2014.
+                </para>
+            </listitem>
+        </orderedlist>
+    </appendix>
+</book>

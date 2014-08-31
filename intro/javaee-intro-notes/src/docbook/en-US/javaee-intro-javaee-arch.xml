@@ -4,13 +4,13 @@
 <chapter id="javaeeintro-javaee-arch">
     <title>JavaEE Architecture</title>
     <figure>
-        <title>JavaEE Architecture<footnote id="javaee-arch-footnote"><para><ulink url="http://jcp.org/en/jsr/detail?id=316">JavaEE 6 Specification</ulink></para></footnote></title>
-        <graphic scalefit="1" fileref="images/javaeeintro-javaee-arch-size1.png"/>
+        <title>JavaEE Architecture<footnote id="javaee-arch-footnote"><para><ulink url="http://jcp.org/en/jsr/detail?id=342">JavaEE 7 Specification</ulink></para></footnote></title>
+        <graphic scalefit="1" fileref="images/javaeeintro-javaee-arch.png"/>
     </figure>        
     
     <section id="javaeeintro-javaee-profiles">
         <title>Profiles</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Subset of JavaEE APIs targeted at key use cases</para></listitem>
             <listitem><para>Share common underlying APIs for consistency</para></listitem>
             <listitem><para>Provide smaller gates of entry for providers</para></listitem>
@@ -20,11 +20,11 @@
         
         <section id="javaeeintro-javaee-profiles-web">
             <title>Web Profile</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>WAR deployments</para></listitem>
                 <listitem><para>Only JavaEE profile to date</para></listitem>
                 <listitem><para>Noted Exclusions</para>
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>Full EJB support, including remote interfaces and legacy 2.x capabilities</para></listitem>
                         <listitem><para>JMS and Message-Driven Beans (MDBs)</para></listitem>
                         <listitem><para>Web Service Standards</para></listitem>
@@ -38,9 +38,9 @@
     <section id="javaeeintro-javaee-appcomp">
         <title>Application Components</title>
         
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Different types</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Deployed to client (Applets)</para></listitem>
                     <listitem><para>Deployed to data center (Servlets and EJBs)</para></listitem>
                     <listitem><para>Undefined deployment (App Clients)</para></listitem>
@@ -51,7 +51,7 @@
 
         <section id="javaeeintro-javaee-appcomp-appclients">
             <title>Application Clients</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Java programs (e.g., GUI running on client)</para></listitem>
                 <listitem><para>Have access to middle-tier</para></listitem>
             </itemizedlist>                   
@@ -59,7 +59,7 @@
                            
         <section id="javaeeintro-javaee-appcomp-applets">
             <title>Applets</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>GUI components typically running in browser</para></listitem>
                 <listitem><para>Access middle-tier indirectly thru Web container and HTTP</para></listitem>
             </itemizedlist>                   
@@ -67,7 +67,7 @@
                            
         <section id="javaeeintro-javaee-appcomp-servlets">
             <title>Servlets/JSPs/JSF</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Generate content to browser from Web container</para></listitem>
                 <listitem><para>Can be UI/HTML-based</para></listitem>
                 <listitem><para>Can be service/XML (or other structured data forms)-based</para></listitem>
@@ -77,7 +77,7 @@
                            
         <section id="javaeeintro-javaee-appcomp-ejbs">
             <title>Enterprise JavaBeans(tm) (EJB)</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Contain business logic</para></listitem>
                 <listitem><para>Manage transactions, resources, security, etc.</para></listitem>
                 <listitem><para>May provide direct support for RMI and Web service clients</para></listitem>
@@ -87,17 +87,21 @@
 
     <section id="javaeeintro-javaee-container">
         <title>Containers</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Provide runtime support for JavaEE application components</para></listitem>
             <listitem><para>Provide an interpose layer around/between each component</para></listitem>
             <listitem><para>Inject required components</para></listitem>
             <listitem><para>Application developers may think of the Application Server==Container</para></listitem>
             <listitem><para>Containers address specifics of the standards (e.g., deployment artifact structure)</para></listitem>
         </itemizedlist>                   
+        <figure>
+           <title>POJOs, Components, and Container Interpose</title>
+           <graphic scalefit="1" fileref="images/javaeeintro-container-interpose.png"/>
+       </figure>
         
         <section id="javaeeintro-javaee-container-server">
             <title>Servers</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Host the containers and their application clients</para></listitem>
                 <listitem><para>No physical requirements (single server or multiple servers per container/conatiner type)</para></listitem>
                 <listitem><para>May be a general-purpose transaction platform adapted to JavaEE by the containers</para></listitem>
@@ -107,11 +111,11 @@
 
     <section id="javaeeintro-javaee-ra">
         <title>Resource Adapters</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>System-level software component</para></listitem>
             <listitem><para>Extends standard APIs into specific resources (e.g., JDBC)</para></listitem>
             <listitem><para>Framework provided for:</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Connection/Resource Pooling</para></listitem>
                     <listitem><para>Security Management</para></listitem>
                     <listitem><para>Transaction Management</para></listitem>
@@ -122,7 +126,7 @@
 
     <section id="javaeeintro-javaee-db">
         <title>Databases</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Pervasive player in most JavaEE application clients</para></listitem>
             <listitem><para>Not applicable for Applets </para></listitem>
         </itemizedlist>                   

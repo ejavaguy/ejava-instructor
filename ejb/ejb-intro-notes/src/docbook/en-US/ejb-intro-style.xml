@@ -1,16 +1,16 @@
 <!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="javaeeintro-ejb">
-    <title>Overview of EJB</title>
+<chapter id="ejb-intro-ejb">
+    <title>Overview of EJB Styles</title>
 
-    <section id="javaeeintro-ejb-uses">
+    <section id="ejb-intro-ejb-uses">
         <title>Session EJB Uses</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Implement a task</para></listitem>
             <listitem><para>Interact with other beans</para></listitem>
             <listitem><para>Examples:</para>
-		        <itemizedlist>
+		        <itemizedlist spacing="compact">
 		            <listitem><para>TaxDistrict.calcTax(double amount)</para></listitem>
 		            <listitem><para>Teller.transfer(long fromAccount, long toAccount, double amount)</para></listitem>
 		            <listitem><para>Registrar.listStudents(String course, int offset, int limit)</para></listitem>
@@ -19,11 +19,11 @@
         </itemizedlist>
     </section>
 
-    <section id="javaeeintro-ejb-grainularity">
+    <section id="ejb-intro-ejb-grainularity">
         <title>Session EJB Granularity</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Session EJB per Use Case too fine</para>
-		        <itemizedlist>
+		        <itemizedlist spacing="compact">
 		            <listitem><para>CreateAccountEJB</para></listitem>
 		            <listitem><para>DepositEJB</para></listitem>
 		            <listitem><para>WithdrawEJB</para></listitem>
@@ -31,9 +31,9 @@
 		        </itemizedlist>
             </listitem>
             <listitem><para>Group cohesive Use Cases into larger-grain Session EJBs</para>
-		        <itemizedlist>
+		        <itemizedlist spacing="compact">
 		            <listitem><para>Teller</para>
-				        <itemizedlist>
+				        <itemizedlist spacing="compact">
 				            <listitem><para>createAccount()</para></listitem>
 				            <listitem><para>deposit()</para></listitem>
 				            <listitem><para>withdraw()</para></listitem>
@@ -46,17 +46,17 @@
     </section>
 
 
-    <section id="javaeeintro-ejb-types">
+    <section id="ejb-intro-ejb-types">
         <title>EJB Bean Types</title>
         
-	    <section id="javaeeintro-ejb-entity">
+	    <section id="ejb-intro-ejb-entity">
 	        <title>Entities (formerly Entity EJB)</title>
-	        <itemizedlist>
+	        <itemizedlist spacing="compact">
 	            <listitem><para>Represents shared data in the database</para></listitem>
 	            <listitem><para>Typically interact at row/object level</para></listitem>
 	            <listitem><para>Moved to Java Persistence API Spec in EJB 3.0/JavaEE 5</para></listitem>
 	            <listitem><para>Examples:</para>
-			        <itemizedlist>
+			        <itemizedlist spacing="compact">
 			            <listitem><para>Account, Owner</para></listitem>
 			            <listitem><para>Account.deposit(double amount)</para></listitem>
 			            <listitem><para>Account.getOwner()</para></listitem>
@@ -65,24 +65,24 @@
 	        </itemizedlist>
 	    </section>
 
-	    <section id="javaeeintro-ejb-stateless">
+	    <section id="ejb-intro-ejb-stateless">
 	        <title>Stateless Session EJB</title>
-	        <itemizedlist>
+	        <itemizedlist spacing="compact">
 	            <listitem><para>Performs stateless actions on server-side</para></listitem>
 	            <listitem><para>Maintains no conversational state</para>
-			        <itemizedlist>
+			        <itemizedlist spacing="compact">
 			            <listitem><para>Each method ignorant of what went before it and after it</para></listitem>
 			        </itemizedlist>
 	            </listitem>
 	            <listitem><para>Maintains implementation state</para>
-			        <itemizedlist>
+			        <itemizedlist spacing="compact">
 			            <listitem><para>Shared between multiple client calls</para></listitem>
 			            <listitem><para>example: DataSource</para></listitem>
 			        </itemizedlist>
 	            </listitem>
 	            <listitem><para>A set of commands that take in a set of parameters and return a result</para></listitem>
 	            <listitem><para>Examples:</para>
-			        <itemizedlist>
+			        <itemizedlist spacing="compact">
 			            <listitem><para>TaxCalculator.calcTax(doubt amount)</para></listitem>
 			            <listitem><para>BuyerMgmt.placeBid(int auctionId, double amount)</para></listitem>
 			            <listitem><para>Dmv.getExpiredLicenses()</para></listitem>
@@ -91,14 +91,14 @@
 	        </itemizedlist>
 	    </section>
         
-	    <section id="javaeeintro-ejb-stateful">
+	    <section id="ejb-intro-ejb-stateful">
 	        <title>Stateful Session EJB</title>
-	        <itemizedlist>
+	        <itemizedlist spacing="compact">
 	            <listitem><para>Used to cache resources for client on server-side</para></listitem>
 	            <listitem><para>Maintains conversational state</para>
-			        <itemizedlist>
+			        <itemizedlist spacing="compact">
 			            <listitem><para>Object can cache values between calls</para>
-					        <itemizedlist>
+					        <itemizedlist spacing="compact">
 					            <listitem><para>example: iterator</para></listitem>
 					        </itemizedlist>
 			            </listitem>
@@ -106,13 +106,13 @@
 			        </itemizedlist>
 	            </listitem>
 	            <listitem><para>Maintains implementation state</para>
-			        <itemizedlist>
+			        <itemizedlist spacing="compact">
 			            <listitem><para>Not sharable between clients</para></listitem>
 			            <listitem><para>All resources allocated to perform work for one instance</para></listitem>
 			        </itemizedlist>
 	            </listitem>
 	            <listitem><para>Able to react to transaction completion/rollback (i.e., get callback)</para>
-			        <itemizedlist>
+			        <itemizedlist spacing="compact">
 			            <listitem><para>example: commit data cache</para></listitem>
 			            <listitem><para>example: issue message</para></listitem>
 			        </itemizedlist>
@@ -120,12 +120,12 @@
 	        </itemizedlist>
 	    </section>
         
-	    <section id="javaeeintro-ejb-singleton">
+	    <section id="ejb-intro-ejb-singleton">
 	        <title>Singleton Session EJB</title>
-	        <itemizedlist>
+	        <itemizedlist spacing="compact">
 	            <listitem><para>Provides a single Session EJB instance on server-side</para></listitem>
 	            <listitem><para>Single instance shared across all clients</para>
-			        <itemizedlist>
+			        <itemizedlist spacing="compact">
 			            <listitem><para>Has READ/WRITE lock and timeout concerns</para></listitem>
 			        </itemizedlist>
 	            </listitem>
@@ -133,9 +133,9 @@
 	        </itemizedlist>
 	    </section>
         
-	    <section id="javaeeintro-ejb-mdb">
+	    <section id="ejb-intro-ejb-mdb">
 	        <title>Message Driven EJB (MDB)</title>
-	        <itemizedlist>
+	        <itemizedlist spacing="compact">
 	            <listitem><para>Used to receive JMS messages</para></listitem>
 	            <listitem><para>Similar to Stateless EJB, but with no callable interface</para></listitem>
 	            <listitem><para>Typically provides a JMS facade for injected Session EJBs</para></listitem>
@@ -143,56 +143,56 @@
 	    </section>
     </section>
     
-    <section id="javaeeintro-ejb-deploy">
+    <section id="ejb-intro-ejb-deploy">
         <title>EJB Deployments</title>
 
-	    <section id="javaeeintro-ejb-deploy-ejbmodule">
+	    <section id="ejb-intro-ejb-deploy-ejbmodule">
 	        <title>EJB Module</title>
 		    <figure>
 		        <title>EJB Module</title>
-		        <graphic fileref="images/javaeeintro-ejb-module.png"/>
+		        <graphic fileref="images/ejb-module.png"/>
 		    </figure>        
-	        <itemizedlist>
+	        <itemizedlist spacing="compact">
 	            <listitem><para>Contains one or more EJB beans</para></listitem>
 	        </itemizedlist>
 	    </section>
 
-	    <section id="javaeeintro-ejb-deploy-naked">
+	    <section id="ejb-intro-ejb-deploy-naked">
 	        <title>Naked EJB Deployment</title>
 		    <figure>
 		        <title>Naked EJB Deployment</title>
-		        <graphic fileref="images/javaeeintro-naked-ejb-deploy.png"/>
+		        <graphic fileref="images/ejb-intro-naked-ejb-deploy.png"/>
 		    </figure>        
-	        <itemizedlist>
+	        <itemizedlist spacing="compact">
 	            <listitem><para>EJB modules are deployable by themselves</para></listitem>
 	            <listitem><para>Contain no mechanism to bring in dependencies</para></listitem>
 	            <listitem><para>Can only be communicated with using remote interface</para></listitem>
 	        </itemizedlist>
 	    </section>
 
-	    <section id="javaeeintro-ejb-deploy-ear">
+	    <section id="ejb-intro-ejb-deploy-ear">
 	        <title>EJB EAR Deployment</title>
 		    <figure>
 		        <title>EAR Deployment</title>
-		        <graphic scalefit="0" fileref="images/javaeeintro-ear-deploy.png"/>
+		        <graphic scalefit="0" fileref="images/ejb-intro-ear-deploy.png"/>
 		    </figure>        
-	        <itemizedlist>
+	        <itemizedlist spacing="compact">
 	            <listitem><para>Can deploy multiple EJB modules, multiple WARs, and utility libraries</para></listitem>
 	            <listitem><para>Provides means to use local interfaces/pass by reference between EJBs and WAR/WEB</para></listitem>
 	            <listitem><para>Convenient wrapper for entire application</para></listitem>
 	        </itemizedlist>
 	    </section>
 
-	    <section id="javaeeintro-ejb-deploy-war">
+	    <section id="ejb-intro-ejb-deploy-war">
 	        <title>EJB WAR ("flexible") Deployment</title>
 		    <figure>
 		        <title>WAR Deployment</title>
-		        <graphic fileref="images/javaeeintro-war-deploy.png"/>
+		        <graphic fileref="images/ejb-intro-war-deploy.png"/>
 		    </figure>        
-	        <itemizedlist>
+	        <itemizedlist spacing="compact">
 	            <listitem><para>Can deploy multiple EJB modules within WEB-INF/lib</para></listitem>
 	            <listitem><para>Can deploy multiple EJB beans within WEB-INF/classes</para>
-			        <itemizedlist>
+			        <itemizedlist spacing="compact">
 			            <listitem><para>Realistically useful when Servlet or JSP wishes to use declarative JTA transactions 
 			                or security access control within a helper class</para></listitem>
 			            <listitem><para>Ideal use for No-interface Session EJB</para></listitem>

@@ -1,0 +1,457 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-intro-ejb">
+    <title>Overview of EJB</title>
+
+    <section id="ejb-intro-ejb-uses">
+        <title>EJB Uses</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Implement a task</para></listitem>
+            <listitem><para>Interact with other beans</para></listitem>
+            <listitem><para>Examples:</para>
+		        <itemizedlist spacing="compact">
+		            <listitem><para>TaxDistrict.calcTax(double amount)</para></listitem>
+		            <listitem><para>Teller.transfer(long fromAccount, long toAccount, double amount)</para></listitem>
+		            <listitem><para>Registrar.listStudents(String course, int offset, int limit)</para></listitem>
+		        </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="ejb-intro-ejb-grainularity">
+        <title>EJB Granularity</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Session EJB per Use Case too fine</para>
+		        <itemizedlist spacing="compact">
+		            <listitem><para>CreateAccountEJB</para></listitem>
+		            <listitem><para>DepositEJB</para></listitem>
+		            <listitem><para>WithdrawEJB</para></listitem>
+		            <listitem><para>TransferEJB</para></listitem>
+		        </itemizedlist>
+            </listitem>
+            <listitem><para>Group cohesive Use Cases into larger-grain Session EJBs</para>
+		        <itemizedlist spacing="compact">
+		            <listitem><para>Teller</para>
+				        <itemizedlist spacing="compact">
+				            <listitem><para>createAccount()</para></listitem>
+				            <listitem><para>deposit()</para></listitem>
+				            <listitem><para>withdraw()</para></listitem>
+				            <listitem><para>transfer()</para></listitem>
+				        </itemizedlist>
+		            </listitem>
+		        </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>
+
+
+    <section id="ejb-intro-ejb-types">
+        <title>EJB Bean Types</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>All are POJO-based</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>i.e., most Java classes can be made into an EJB</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+        
+        
+	    <section id="ejb-intro-ejb-entity">
+	        <title>Entities (formerly Entity EJB)</title>
+
+            <figure>
+                <title>Example Entity</title>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+            </figure>
+            
+	        <itemizedlist spacing="compact">
+	            <listitem><para>Represents shared data in the database</para></listitem>
+	            <listitem><para>Typically interact at row/object level</para></listitem>
+	            <listitem><para>Moved to Java Persistence API (JPA) Spec in EJB 3.0/JavaEE 5</para></listitem>
+                <listitem><para>Not constrained to server-side</para></listitem>
+	            <listitem><para>Examples:</para>
+			        <itemizedlist spacing="compact">
+			            <listitem><para>Account, Owner</para></listitem>
+			            <listitem><para>Account.deposit(double amount)</para></listitem>
+			            <listitem><para>Account.getOwner()</para></listitem>
+			        </itemizedlist>
+	            </listitem>
+                <listitem><para>Good for representing persistent information</para></listitem>
+                <listitem><para>Contains no means to access external resources other than directly related information</para></listitem>
+	        </itemizedlist>
+	    </section>
+
+	    <section id="ejb-intro-ejb-stateless">
+	        <title>Stateless Session EJB</title>
+            <figure>
+                <title>Example Stateless EJB</title>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+            </figure>
+    
+	        <itemizedlist spacing="compact">
+	            <listitem><para>Performs stateless actions on server-side</para></listitem>
+	            <listitem><para>Maintains no conversational state</para>
+			        <itemizedlist spacing="compact">
+			            <listitem><para>Each method ignorant of what went before it and after it</para></listitem>
+                        <listitem><para>Persistence Context re-instantiated with each call (Transaction-Scope)</para></listitem>
+			        </itemizedlist>
+	            </listitem>
+                <listitem><para>Methods take in a set of parameters and return a result</para></listitem>
+	            <listitem><para>Maintains implementation state</para>
+			        <itemizedlist spacing="compact">
+			            <listitem><para>example: DataSource</para></listitem>
+			            <listitem><para>example: JMS connections</para></listitem>
+                        <listitem><para>example: References to other EJBs</para></listitem>
+			        </itemizedlist>
+	            </listitem>
+	            <listitem><para>Examples:</para>
+			        <itemizedlist spacing="compact">
+			            <listitem><para>TaxCalculator.calcTax(doubt amount)</para></listitem>
+			            <listitem><para>BuyerMgmt.placeBid(int auctionId, double amount)</para></listitem>
+			            <listitem><para>Dmv.getExpiredLicenses()</para></listitem>
+			        </itemizedlist>
+	            </listitem>
+                <listitem><para>Good for implementing stateless access to resources</para></listitem>
+                <listitem><para>Contains no means to provide individualized access other than through separate deployments and call parameters</para></listitem>
+	        </itemizedlist>
+	    </section>
+        
+	    <section id="ejb-intro-ejb-stateful">
+	        <title>Stateful Session EJB</title>
+            <figure>
+                <title>Example Stateful EJB</title>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+            </figure>
+            
+	        <itemizedlist spacing="compact">
+	            <listitem><para>Used to cache resources for client on server-side</para></listitem>
+	            <listitem><para>Maintains conversational state</para>
+			        <itemizedlist spacing="compact">
+			            <listitem><para>Object can cache values between calls</para>
+					        <itemizedlist spacing="compact">
+					            <listitem><para>example: iterator</para></listitem>
+                                <listitem><para>Persistence Context (with cache of entities) can be retained between calls (Extended-Scope)</para></listitem>
+					        </itemizedlist>
+			            </listitem>
+			            <listitem><para>Lifetime ends on timeout or specific client call</para></listitem>
+			        </itemizedlist>
+	            </listitem>
+	            <listitem><para>Maintains implementation state</para>
+			        <itemizedlist spacing="compact">
+			            <listitem><para>Not sharable between clients</para></listitem>
+			            <listitem><para>All resources allocated to perform work for one instance</para></listitem>
+			        </itemizedlist>
+	            </listitem>
+	            <listitem><para>Able to react to transaction completion/rollback (i.e., get callback)</para>
+			        <itemizedlist spacing="compact">
+			            <listitem><para>example: commit data cache</para></listitem>
+			            <listitem><para>example: issue message</para></listitem>
+			        </itemizedlist>
+	            </listitem>
+                <listitem><para>Good for caching client state and back-end resource state over a multi-call session</para></listitem>
+                <listitem><para>Inefficient to scale cached state for each user and across multiple servers</para></listitem>
+	        </itemizedlist>
+	    </section>
+        
+	    <section id="ejb-intro-ejb-singleton">
+	        <title>Singleton Session EJB</title>
+            <figure>
+                <title>Example Singleton EJB</title>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+            </figure>
+            
+	        <itemizedlist spacing="compact">
+	            <listitem><para>Provides a single Session EJB instance on server-side</para></listitem>
+	            <listitem><para>Single instance shared across all clients</para>
+			        <itemizedlist spacing="compact">
+			            <listitem><para>Has READ/WRITE lock and timeout concerns</para></listitem>
+			        </itemizedlist>
+	            </listitem>
+	            <listitem><para>Good for tracking shared state in memory</para></listitem>
+                <listitem><para>Creates a bottleneck for concurrent access</para></listitem>
+	        </itemizedlist>
+	    </section>
+        
+	    <section id="ejb-intro-ejb-mdb">
+	        <title>Message Driven EJB (MDB)</title>
+            <figure>
+                <title>Example Message Driven EJB</title>
+<programlisting language="java"><![CDATA[
+]]></programlisting>
+            </figure>
+            
+	        <itemizedlist spacing="compact">
+	            <listitem><para>Used to receive JMS messages</para></listitem>
+	            <listitem><para>Similar to Stateless EJB, but with no callable interface</para></listitem>
+	            <listitem><para>Typically provides a JMS facade for injected Session EJBs</para></listitem>
+                <listitem><para>Good for implementing a JMS interface facade to business logic</para></listitem>
+                <listitem><para>Unable to be called outside the scope of a JMS/JCA call -- should delegate to Session EJBs</para></listitem>
+                <listitem><para>Has no client context (i.e., anonymous)</para></listitem>
+	        </itemizedlist>
+	    </section>
+    </section>
+    
+    <section id="ejb-intro-iface">
+       <title>EJB Interface Styles</title>
+       
+        <section id="ejb-intro-iface-remote">
+           <title>Remote Interface</title>
+            <figure>
+                <title>Example Remote Interface</title>
+<programlisting language="java"><![CDATA[
+]]></programlisting>
+            </figure>
+            
+            <itemizedlist spacing="compact">
+                <listitem><para>Uses RMI-based technology to provide built-in implementation</para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+
+        </section>    
+       
+        <section id="ejb-intro-iface-local">
+           <title>Local Interface</title>
+            <figure>
+                <title>Example Local Interface</title>
+<programlisting language="java"><![CDATA[
+]]></programlisting>
+            </figure>
+        </section>    
+       
+        <section id="ejb-intro-iface-noiface">
+           <title>No Interface EJB</title>
+            <figure>
+                <title>Example No Interface EJB</title>
+<programlisting language="java"><![CDATA[
+]]></programlisting>
+            </figure>
+        </section>    
+       
+        <section id="ejb-intro-iface-other">
+           <title>Other Interface Types</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>JAX-RS support</para></listitem>
+                <listitem><para>SOAP support</para></listitem>
+                <listitem><para>CORBA/IIOP support</para></listitem>
+            </itemizedlist>
+        </section>    
+        
+    </section>    
+
+    <section id="ejb-intro-patterns">
+       <title>Remote Interface Patterns</title>
+
+        <warning>
+            <title>Design Remote Interfaces for Remote Clients</title>
+            <para>Remote clients are different from local clients and require 
+                 different considerations when designing the remote interface.
+                 Although JavaEE/EJB make it technically possible to implement
+                 location independence the interface hierarchies, this is usually
+                 not feasible when dealing with non-trivial interface requirements.
+                 Design local interfaces for local clients (within the deployed application)
+                 and design remote interfaces for remote clients.
+            </para>
+        </warning>       
+
+        <section id="ejb-intro-patterns-pattern-remotefacade">
+            <title>Pattern: Remote Facade</title>
+            <section id="ejb-intro-patterns-pattern-remote-facade-context">
+                <title>Context</title>
+                <itemizedlist>
+                    <listitem><para>Distributed environment with remote clients</para></listitem>
+                </itemizedlist>
+            </section>
+        
+            <section id="ejb-intro-patterns-pattern-remote-facade-problem">
+                <title>Problem</title>
+                <itemizedlist>
+                    <listitem><para>Remote clients require access to server-side resources.</para></listitem>
+                </itemizedlist>
+                <figure>
+                    <title>Remote Facade Problem</title>
+                    <graphic scale="50" fileref="images/ejb-intro-remote-facade-problem.png"/>
+                </figure>
+            </section>
+        
+            <section id="ejb-intro-patterns-pattern-remote-facade-forces">
+                <title>Forces</title>
+                <itemizedlist>
+                    <listitem><para>Core service layer (business logic and its business objects) contains fine 
+                        grain objects and methods</para></listitem>
+                    <listitem><para>Significant number of fine-grain remote calls will not work</para></listitem>
+                </itemizedlist>
+            </section>
+        
+            <section id="ejb-intro-patterns-pattern-remote-facade-solution">
+                <title>Solution</title>
+                <itemizedlist>
+                    <listitem><para>Provide a Remote Facade</para>
+                        <itemizedlist>
+                            <listitem><para>Coarse-grain facade over service layer</para></listitem>
+                            <listitem><para>Contains no detailed business logic -- it calls it</para></listitem>
+                            <listitem><para>Translates course-grain methods and objects into fine-grain 
+                                method calls and objects to/from service layer</para></listitem>
+                            <listitem><para>Bulk accessors wrap fine-grain access methods</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                    <listitem><para>Service Layer does not have a remote interface</para>
+                        <itemizedlist>
+                            <listitem><para>Fine-grain business objects mapped to database might not be serializable</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </itemizedlist>
+                <figure>
+                    <title>Remote Facade Participants</title>
+                    <graphic scale="75" fileref="images/ejb-intro-remote-facade-roles.png"/>
+                </figure>
+                <figure>
+                    <title>Remote Facade Solution</title>
+                    <graphic scale="50" fileref="images/ejb-intro-remote-facade-solution.png"/>
+                </figure>
+            </section>
+        
+            <section id="ejb-intro-patterns-pattern-remote-facade-consequences">
+                <title>Consequences</title>
+                <itemizedlist>
+                    <listitem><para>Remote clients obtain access to desired resources (functional)</para></listitem>
+                    <listitem><para>Remote client interaction is efficient (appropriate)</para></listitem>
+                </itemizedlist>
+            </section>
+        </section>
+
+        <section id="ejb-intro-patterns-pattern-dto">
+            <title>Pattern: Data Transfer Object (DTO)</title>
+            <section id="ejb-intro-patterns-pattern-dto-context">
+                <title>Context</title>
+                <itemizedlist>
+                    <listitem><para>Business Objects represent too much information or behavior to transfer to remote client</para></listitem>
+                </itemizedlist>
+            </section>
+        
+            <section id="ejb-intro-patterns-pattern-dto-problem">
+                <title>Problem</title>
+                <figure>
+                    <title>DTO Problem</title>
+                    <graphic scale="75" fileref="images/ejb-intro-dto-problem.png"/>
+                </figure>
+                <itemizedlist>
+                    <listitem><para>Client may get information they don't need</para></listitem>
+                    <listitem><para>Client may get information they can't handle</para></listitem>
+                    <listitem><para>Client may get information they are not authorized to use</para></listitem>
+                    <listitem><para>Client may get too much information/behavior to be useful (e.g., entire database serialized to client)</para></listitem>
+                </itemizedlist>
+            </section>
+        
+            <section id="ejb-intro-patterns-pattern-dto-forces">
+                <title>Forces</title>
+                <itemizedlist>
+                    <listitem><para>Some clients are local and can share object references with business logic</para></listitem>
+                    <listitem><para>Handling specifics of remote clients outside of core scope of business logic</para></listitem>
+                </itemizedlist>
+            </section>
+        
+            <section id="ejb-intro-patterns-pattern-dto-solution">
+                <title>Solution</title>
+                <itemizedlist>
+                    <listitem><para>Layer a Remote Facade over Business Logic</para></listitem>
+                    <listitem><para>Remote Facade constructs Data Transfer Objects (DTOs) from Business Objects that are appropriate for remote client view</para></listitem>
+                    <listitem><para>Remote Facade uses DTOs to construct or locate Business Objects to communicate with Business Logic</para></listitem>
+                </itemizedlist>
+                <figure>
+                    <title>DTO Participants</title>
+                    <graphic scalefit="0" fileref="images/ejb-intro-dto-roles.png"/>
+                </figure>
+            </section>
+        
+            <section id="ejb-intro-patterns-pattern-dto-consequences">
+                <title>Consequences</title>
+                <itemizedlist>
+                    <listitem><para>Clients only get what they need</para></listitem>
+                    <listitem><para>Clients only get what they understand</para></listitem>
+                    <listitem><para>Clients only get what they are authorized to use</para></listitem>
+                    <listitem><para>Remote and Local interfaces to services are different</para>
+                        <itemizedlist>
+                            <listitem><para>Makes it harder to provide location transparency</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                    <listitem><para>Lightweight Business Objects can be used as DTOs</para>
+                        <itemizedlist>
+                            <listitem><para>Remote Facade must make sure they are “pruned” of excess related items before transferring to client</para></listitem>
+                            <listitem><para>Remote Facade must make sure they are “cleaned” of DAO persistence classes before transferring to client</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </itemizedlist>
+            </section>
+        </section>
+       
+    </section>    
+    
+    
+    
+    <section id="ejb-intro-ejb-deploy">
+        <title>EJB Deployments</title>
+
+	    <section id="ejb-intro-ejb-deploy-ejbmodule">
+	        <title>EJB Module</title>
+		    <figure>
+		        <title>EJB Module</title>
+		        <graphic fileref="images/ejb-module.png"/>
+		    </figure>        
+	        <itemizedlist spacing="compact">
+	            <listitem><para>Contains one or more EJB beans</para></listitem>
+	        </itemizedlist>
+	    </section>
+
+	    <section id="ejb-intro-ejb-deploy-naked">
+	        <title>Naked EJB Deployment</title>
+		    <figure>
+		        <title>Naked EJB Deployment</title>
+		        <graphic fileref="images/ejb-intro-naked-ejb-deploy.png"/>
+		    </figure>        
+	        <itemizedlist spacing="compact">
+	            <listitem><para>EJB modules are deployable by themselves</para></listitem>
+	            <listitem><para>Contain no mechanism to bring in dependencies</para></listitem>
+	            <listitem><para>Can only be communicated with using remote interface</para></listitem>
+	        </itemizedlist>
+	    </section>
+
+	    <section id="ejb-intro-ejb-deploy-ear">
+	        <title>EJB EAR Deployment</title>
+		    <figure>
+		        <title>EAR Deployment</title>
+		        <graphic scalefit="0" fileref="images/ejb-intro-ear-deploy.png"/>
+		    </figure>        
+	        <itemizedlist spacing="compact">
+	            <listitem><para>Can deploy multiple EJB modules, multiple WARs, and utility libraries</para></listitem>
+	            <listitem><para>Provides means to use local interfaces/pass by reference between EJBs and WAR/WEB</para></listitem>
+	            <listitem><para>Convenient wrapper for entire application</para></listitem>
+	        </itemizedlist>
+	    </section>
+
+	    <section id="ejb-intro-ejb-deploy-war">
+	        <title>EJB WAR ("flexible") Deployment</title>
+		    <figure>
+		        <title>WAR Deployment</title>
+		        <graphic fileref="images/ejb-intro-war-deploy.png"/>
+		    </figure>        
+	        <itemizedlist spacing="compact">
+	            <listitem><para>Can deploy multiple EJB modules within WEB-INF/lib</para></listitem>
+	            <listitem><para>Can deploy multiple EJB beans within WEB-INF/classes</para>
+			        <itemizedlist spacing="compact">
+			            <listitem><para>Realistically useful when Servlet or JSP wishes to use declarative JTA transactions 
+			                or security access control within a helper class</para></listitem>
+			            <listitem><para>Ideal use for No-interface Session EJB</para></listitem>
+			        </itemizedlist>
+	            </listitem>
+	            <listitem><para>Eliminates need for EAR in some cases</para></listitem>
+	        </itemizedlist>
+	    </section>
+    </section>
+</chapter>
+  

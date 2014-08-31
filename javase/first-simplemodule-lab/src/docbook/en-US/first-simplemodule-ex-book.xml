@@ -15,7 +15,7 @@
             <para>
                 This document contains an introductory exercise for building 
                 a Maven-based JavaSE project that is self-contained. The exercise
-                takes a building-block approach that de-mystifies some of the Maven
+                takes a building-block approach that demystifies some of the Maven
                 build concepts by breaking down many core concepts into files,
                 directories, and individual commands prior to introducing the 
                 overall framework and its integration with an IDE.
