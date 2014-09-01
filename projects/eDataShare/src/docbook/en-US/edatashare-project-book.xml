@@ -1,0 +1,36 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="edatashare-project">
+    <bookinfo>
+        <title>EDataShare Project</title>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>This document contains project specifications for the eDataShare project.
+                There are three projects associated with eDataShare; data tier and business logic,
+                server-side deployment, and security plus asynchronous actions. Each will be part
+                of the follow-on project.
+            </para>
+        </abstract>
+    </bookinfo>
+
+    <toc/>
+
+    <part id="edatashare-project1-part">
+        <title>Project 1</title>
+        <xi:include href="edatashare-project1.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    </part>
+    <part id="edatashare-project2-part">
+        <title>Project 2</title>
+        <xi:include href="edatashare-project2.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    </part>
+    <part id="edatashare-project3-part">
+        <title>Project 3</title>
+        <xi:include href="edatashare-project3.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    </part>
+</book>
