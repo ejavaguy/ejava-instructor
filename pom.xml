@@ -34,6 +34,12 @@
         <build-helper-maven-plugin.version>1.8</build-helper-maven-plugin.version>
     </properties>
 
+    <scm>
+        <url>https://github.com/ejavaguy/ejava-instructor</url>
+        <connection>scm:git:git@github-ejavaguy:ejavaguy/ejava-instructor.git</connection>
+        <developerConnection>scm:git:git@github-ejavaguy:ejavaguy/ejava-instructor.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
 
     <build>
         <pluginManagement>

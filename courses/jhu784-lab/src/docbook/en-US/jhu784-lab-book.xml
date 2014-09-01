@@ -35,7 +35,7 @@
             </thead>
             <tbody>
                 <row rowsep="1">
-                  <entry namest="topic"><para><link linkend="605-784-devenv-setup">Development Environment Setup</link></para></entry>
+                  <entry namest="topic"><para><link linkend="jhu784-devenv-setup">Development Environment Setup</link></para></entry>
                 </row>
                 <row rowsep="1">
                   <entry namest="topic"><para><link linkend="first-simplemodule-ex">First Simple Module</link></para></entry>
