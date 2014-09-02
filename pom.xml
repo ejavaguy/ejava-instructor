@@ -20,6 +20,7 @@
         <module>javase</module>
         <module>jpa</module>
         <module>ejb</module>
+        <module>async</module>
         <module>courses</module>
     </modules>
 
