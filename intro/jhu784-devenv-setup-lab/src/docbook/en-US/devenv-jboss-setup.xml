@@ -4,6 +4,11 @@
     
 <chapter id="devenv-jboss-setup">
     <title>JBoss Setup</title>    
+    <para>
+        We will be using the JBoss/Wildfly Application Server this semester. This is a fully-compliant
+        JavaEE 7 application server.
+    </para>
+    <!--
     <note>
         <title>JBoss Application Server (AS) and JBoss Enterprise Application Platform (EAP)</title>
         <para>JBoss has a community version (JBoss AS) and commercial version (JBoss EAP) of 
@@ -11,8 +16,8 @@
             In theory, changes propagate through the community version first in daily changes and 
             short iterations. In theory, commercial version is a roll-up of a stable version of the 
             community version with the ability to purchase support on that specific version. With  
-            commercial version support -- you can receive patches for a specific issue prior to 
-            upgrading to the latest release. With the community version -- you pretty much need to 
+            commercial version support - you can receive patches for a specific issue prior to 
+            upgrading to the latest release. With the community version - you pretty much need to 
             keep up with the latest release to get any patches. Of course, with either version you
             are free to perform your own support and code changes, but you can only get this 
             commercially with the EAP release.</para>        
@@ -33,7 +38,9 @@
             switch versions without much issue. 
             </para>
     </note>
+    -->
 
+<!--
     <section id="devenv-jboss-install">
         <title>Download and Install JBoss EAP 6.1.0.Final</title>
         <orderedlist spacing="compact">
@@ -218,7 +225,7 @@ Listening for transport dt_socket at address: 8787
                     Provide a specification to maven where your JBoss server
                     has been installed in the <code>.m2/settings.xml</code>
                     file using the <code>jboss.home</code> property. *If* you 
-                    have changed the address -- you can specify that using
+                    have changed the address - you can specify that using
                     the <code>jboss.host</code> property. 
                 </para>
                 <programlisting language="xml"><![CDATA[
@@ -240,4 +247,5 @@ Listening for transport dt_socket at address: 8787
             </listitem>
         </orderedlist>
     </section>
+-->
 </chapter>

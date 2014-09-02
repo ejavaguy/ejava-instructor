@@ -4,21 +4,8 @@
 <chapter id="devenv-jdk-setup">
     <title>Java JDK Setup</title>
     <para>
-        You will need a copy of either Java 6 or Java 7 SDK installed. 
-        JavaEE 6 only requires JDK 6 but but JDK 6 will soon hit its end-of-life.
-        The instructions describe downloading JDK 7.
+        You will need a copy of Java 7 SDK installed. 
     </para>
-    <note>
-        <title>Java 6 source environment/Java 7 target environment</title>
-        <para>
-            The Maven configuration for class will default to 
-            Java 6-compliant source while targeting a Java 7 runtime.
-            This should give us a decent fallback option between the 
-            two versions during this transition period. To use a Java 6 runtime,
-            simply override the default "java.target.version=1.7" property
-            using your Maven .m2/settings.xml. 
-        </para>
-    </note>
     <note>
         <title>Keep 32/64-bit choices consistent</title>
         <para>
@@ -100,12 +87,12 @@ javac 1.7.0_25
         <listitem><figure>
             <title>Windows XP Example (TODO:update])</title>
  <programlisting language=""><![CDATA[> java -version
-java version "1.7.0_11"
-Java(TM) SE Runtime Environment (build 1.7.0_11-b21)
-Java HotSpot(TM) Client VM (build 23.6-b04, mixed mode, sharing)
+java version "1.7.0_67"
+Java(TM) SE Runtime Environment (build 1.7.0_67-b01)
+Java HotSpot(TM) Client VM (build 24.65-b04, mixed mode, sharing)
 
 >javac -version
-javac 1.7.0_11
+javac 1.7.0_67
 ]]></programlisting>
             </figure>
 

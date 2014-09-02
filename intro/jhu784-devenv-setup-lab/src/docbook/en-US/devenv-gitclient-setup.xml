@@ -18,7 +18,7 @@ git version 1.7.11.7
 
 //my win8/msysGit system
 $ git --version
-git version 1.8.0.msysgit.0
+git version 1.9.4.msysgit.1
 ]]></programlisting>
     </figure>
 
@@ -46,14 +46,12 @@ git version 1.8.0.msysgit.0
                     Windows Command-Line Users: Git comes in a core
                     layer and then OS-layer add-ons. The core layer is
                     sufficient for class and can be found at
-                    <ulink url="http://msysgit.github.com/">http://msysgit.github.com/</ulink>
+                    <ulink url="http://msysgit.github.io/">http://msysgit.github.io/</ulink>
                 </para>
                 <orderedlist spacing="compact">
                     <listitem>
                         <para>
-                            Download
-                            <ulink
-                                url="https://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git">Full Installer</ulink>
+                            Download and launch the installer
                         </para>
                     </listitem>
                     <listitem>
@@ -83,9 +81,8 @@ git version 1.8.0.msysgit.0
             <listitem>
                 <para>
                     Eclipse GUI Users: There is a git plugin for
-                    Eclipse available called EGit. You can install it by going to
-                    <code>Help->Eclipse Marketplace</code>, typing Git in 
-                    the search field, and clicking Install for EGit.
+                    Eclipse available called EGit. It automatically comes with
+                    Eclipse these days, so no extra installation is required.
                 </para>
             </listitem>
         </itemizedlist>
@@ -96,7 +93,7 @@ git version 1.8.0.msysgit.0
         <para>
             The class repository is located on github and can be browsed
             using the following http URL
-            <ulink url="https://github.com/jcstaff/ejava-javaee">https://github.com/jcstaff/ejava-javaee</ulink>.
+            <ulink url="https://github.com/ejavaguy/ejava-student">https://github.com/ejavaguy/ejava-student</ulink>.
             With a cloned copy, you can receive file updates during the semester.
         </para>
         <orderedlist spacing="compact">
@@ -109,29 +106,31 @@ git version 1.8.0.msysgit.0
             <listitem>
                 <para>
                     Clone the class repository using the following URL
-                    <ulink url="git://github.com/jcstaff/ejava-javaee.git">git://github.com/jcstaff/ejava-javaee.git</ulink>
+                    <ulink url="git://github.com/ejavaguy/ejava-student.git">git://github.com/ejavaguy/ejava-student.git</ulink>
                 </para>
                 <programlisting><![CDATA[
-git clone git://github.com/jcstaff/ejava-javaee.git
+$ git clone git://github.com/ejavaguy/ejava-student.git
+Cloning into 'ejava-student'...
+...
+Checking out files: 100% (1289/1289), done.
 ...
 
-$ ls ejava-javaee/
+$ ls ejava-student/
 ...
 
-$ cd ejava-javaee
+$ cd ejava-student
 $ git branch -a    //list all branches -- local and remote
 * master
-  ...
   remotes/origin/HEAD -> origin/master
   remotes/origin/master
-  remotes/origin/working
 ]]></programlisting>
                 <note>
                     <para>Git leaves you with all branches fetched and a local master
                         branch referencing the class' master branch on github. You will
-                        be using the master branch for the duration of the semester. The 
-                        other branch of interest is 'working'. This contains my in-progress
-                        daily changes. The master branch is usually updated the evening 
+                        be using the master branch for the duration of the semester. 
+                        Other branches may show up, including my working branches where
+                        I am actively working on the next wave of updates.
+                        The master branch is usually updated the evening 
                         before or the day of class and should always be stable.
                     </para>
                 </note>

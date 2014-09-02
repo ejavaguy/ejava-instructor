@@ -20,7 +20,7 @@
                     Unzip the contents into a directory with no spaces in its path.
                 </para>
                 <programlisting><![CDATA[
-$ ls apache-maven-3.2.1/
+$ ls apache-maven-3.2.3/
 bin  boot  conf  lib  LICENSE.txt  NOTICE.txt  README.txt
 ]]></programlisting>
             </listitem>
@@ -54,10 +54,10 @@ OS name: "linux", version: "3.8.13-100.fc17.x86_64", arch: "amd64", family: "uni
 
 //my windows xp system
 > mvn --version
-Apache Maven 3.0.4 (r1232337; 2012-01-17 03:44:56-0500)
-Maven home: C:\apps\apache-maven-3.0.4\bin\..
-Java version: 1.7.0_11, vendor: Oracle Corporation
-Java home: C:\apps\Java\jdk1.7.0_11\jre
+Apache Maven 3.2.3 (33f8c3e1027c3ddde99d3cdebad2656a31e8fdf4; 2014-08-11T16:58:10-04:00)
+Maven home: C:\apps\apache-maven-3.2.3\bin\..
+Java version: 1.7.0_67, vendor: Oracle Corporation
+Java home: C:\apps\Java\jdk1.7.0_67\jre
 Default locale: en_US, platform encoding: Cp1252
 OS name: "windows xp", version: "5.1", arch: "x86", family: "windows"
 ]]></programlisting>
@@ -164,8 +164,8 @@ $ mvn clean
                     repository and make sure you have a current copy. 
                 </para>
                     <programlisting><![CDATA[
-$ ls 
-pom.xml ejava-build ejava-common ...
+$ ls
+README.md  async  build  common  coursedocs  ejb  javase  jpa  pom.xml  projects  src
 $ git pull
 Already up-to-date.
 ]]></programlisting>
@@ -232,5 +232,39 @@ $ mvn install:install-file -Dfile=/home/jcstaff/Downloads/ojdbc6.jar -DgroupId=c
                  in their Nexus or define it as an artifact repository in the pom to avoid having to
                  manually import the artifact.</para>
         </note>
+    </section>
+
+    <section id="devenv-maven-localsite">
+        <title>Build Local Site</title>
+        <para>
+            The class web site will be pre-built with up-to-date information.
+            However, you may wish to have a local version and can do so by 
+            performing the following.
+        </para>
+<programlisting language=""><![CDATA[
+$ mvn clean verify site -DskipTests
+$ mvn site:stage
+//the output will be in target/staging
+]]></programlisting>                        
+
+        <para>
+            If you have more time and wish to generate more detailed reports,
+            execute the following.
+        </para>
+<programlisting language=""><![CDATA[
+$ mvn clean verify site -Preports -Pcobertura
+$ mvn site:stage
+//the output will be in target/staging
+]]></programlisting>                        
+
+        <para>
+            If you have less time and are looking only to get up-to-date 
+            documents, execute the followng from the coursedocs directory.
+        </para>
+<programlisting language=""><![CDATA[
+$ cd coursedocs
+$ mvn site:stage
+//the output will be in target/site
+]]></programlisting>                        
     </section>
 </chapter>

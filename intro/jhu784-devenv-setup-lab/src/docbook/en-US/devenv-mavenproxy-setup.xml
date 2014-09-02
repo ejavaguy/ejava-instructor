@@ -70,17 +70,15 @@
                     caches (<code>sonatype-work</code>)
                 </para>
         <programlisting><![CDATA[
-$ tar tzf ~/Downloads/nexus-2.6.1-02-bundle.tar.gz 
-nexus-2.6.1-02/nexus/WEB-INF/plugin-repository/nexus-healthcheck-oss-plugin-2.6.1-02/nexus-healthcheck-oss-plugin-2.6.1-02.jar
+$ tar tzf ~/Downloads/nexus-x.x.x-xx-bundle.tar.gz 
 ...
 
-
-$ ls nexus-2.6.1-02/ sonatype-work/
-nexus-2.6.1-02/:
-bin  conf  lib  LICENSE.txt  logs  nexus  NOTICE.txt  tmp
+$ ls nexus-x.x.x-xx/ sonatype-work/
+nexus-x.x.x-xx/:
+LICENSE.txt  NOTICE.txt  bin  conf  lib  logs  nexus  tmp
 
 sonatype-work/:
-nexus  README.txt
+README.txt  nexus
 ]]></programlisting>           
             </listitem>
             
@@ -88,10 +86,10 @@ nexus  README.txt
                 <para>
                     The server will listen on port 8081 on all interfaces 
                     (0.0.0.0) by default. Modify
-                    <code>nexus-2.6.1-02/conf/nexus.properties</code> if 
+                    <code>nexus-x.x.x-xx/conf/nexus.properties</code> if 
                     you want something different.</para>
         <programlisting><![CDATA[
-$ more nexus-2.6.1-02/conf/nexus.properties                                                                                                                                       
+$ more nexus-x.x.x-xx/conf/nexus.properties                                                                                                                                       
 ...
 # Jetty section
 application-port=8081
@@ -104,7 +102,7 @@ application-host=0.0.0.0
                     Locate the startup script in the NEXUS_HOME/bin directory.
                 </para>
         <programlisting><![CDATA[
-$ ls nexus-2.6.1-02/bin/
+$ ls nexus-x.x.x-xx/bin/
 jsw  nexus  nexus.bat                 
 ]]></programlisting>
             <tip>
@@ -124,10 +122,10 @@ jsw  nexus  nexus.bat
                     to start and perform other controls on the server.
                 </para>
         <programlisting><![CDATA[
-$ nexus-2.6.1-02/bin/nexus
-Usage: nexus-2.6.1-02/bin/nexus { console | start | stop | restart | status | dump }
+$ nexus-x.x.x-xx/bin/nexus
+Usage: nexus-x.x.x-xx/bin/nexus { console | start | stop | restart | status | dump }
 
-$ nexus-2.6.1-02/bin/nexus start
+$ nexus-x.x.x-xx/bin/nexus start
 Starting Nexus OSS...
 Started Nexus OSS.
 ]]></programlisting>
@@ -138,7 +136,7 @@ Started Nexus OSS.
                     register nexus as a service, you can optionally
                     run it as an interactive command.
         <programlisting><![CDATA[                    
-$ nexus-2.6.1-02/bin/nexus console
+$ nexus-x.x.x-xx/bin/nexus console
 /etc/init.d/nexus console
 Running Nexus OSS...
 wrapper  | --> Wrapper Started as Console
@@ -204,13 +202,13 @@ wrapper | The nexus-webapp service is not installed - The specified service does
                             <entry>webdev-snapshot</entry>
                             <entry>Webdev Snapshot</entry>
                             <entry>Snapshot</entry>
-                            <entry><ulink url="http://webdev.apl.jhu.edu/~jcs/maven2-snapshot/">http://webdev.apl.jhu.edu/~jcs/maven2-snapshot</ulink></entry>
+                            <entry><ulink url="http://webdev.jhuep.com/~jcs/maven2-snapshot/">http://webdev.jhuep.com/~jcs/maven2-snapshot</ulink></entry>
                         </row>
                         <row>
                             <entry>webdev-releases</entry>
                             <entry>Webdev Releases</entry>
                             <entry>Release</entry>
-                            <entry><ulink url="http://webdev.apl.jhu.edu/~jcs/maven2/">http://webdev.apl.jhu.edu/~jcs/maven2/</ulink></entry>
+                            <entry><ulink url="http://webdev.jhuep.com/~jcs/maven2/">http://webdev.jhuep.com/~jcs/maven2/</ulink></entry>
                         </row>
                     </tbody>
                     </tgroup>

@@ -1,0 +1,413 @@
+Project3: eDataShare Secure and Asynchronous N-Tier Application
+
+    2013-01-27 - DRAFT
+
+* Goals
+
+    * Secure access to EJB and Web applications
+
+    * Provide for asynchronous processing.
+
+* Objectives
+
+    * Re-use the eDmv and eMayberry implementations from projects 1 and 2.
+
+    * Define access controls and implement authentication mechanisms for 
+    applications.
+
+    * Implement a publish/subscribe capability between the eMayberry
+    and stand-alone client applications.
+
+    * Trigger certain behaviors based on timers.
+
+* Technical Overview
+
+    The project will build on the core implementation from Projects 1 and
+    2. We will mostly extend existing projects with security and
+    asynchronous logic. 
+
+    Java EE defines authentication and authorization to be independent
+    of the overall API and capability. JBoss and other application
+    servers provide simple, default mechanisms that are easy to
+    demonstrate and more sophisticated mechanisms that are realistic for
+    deployments that require no change to the JavaEE-compliant application code.  
+    We will use the simple, default/"other" security-domain defined
+    within the standard JBoss installation. This uses the RealmUsersRoles
+    login-module -- which is powered by two property files supplied and
+    pre-populated by the class server files from ejava-jboss711.
+
+*----------+-----------------+
+| <<File>> | <<Description>> |
+*----------+-----------------+
+${jboss.server.config.dir}/application-users.properties | defines username=password lines that list the login username and hashed password
+*-------+--------+
+${jboss.server.config.dir}/application-roles.properties | defines username=role1,role2 lines that list the login username and assigned roles
+*-------+--------+
+
+    We are going to have a couple types of users. Some of the users will
+    have zero, one, or more of these roles. Because of the static nature of
+    our authentication, all users will have a login configured before
+    the application is even deployed to the server.
+
+*----------+-----------------+
+| <<Role>> | <<Description>> |
+*----------+-----------------+
+dmv-admin | these users can reset and populate the eDmv database
+*-------+--------+
+dmv-tactical | these users can read/write information in eDmv
+*-------+--------+
+dmv-federated | these users can only read information from eDmv.
+*-------+--------+
+mayberry-admin | these users can reset and populate the eMayberry database
+*-------+--------+
+mayberry-tactical | these users can read/write information in eMayberry (and read information from eDmv through eMayberry).
+*-------+--------+
+mayberry-analytical | these users can only read information from mayberry (and eDmv through eMayberry)
+*-------+--------+
+
+    If a user has a login for one application, they will use the same
+    account to access the other application (e.g., user1 might have
+    both dmv-federated and mayberry-tactical roles).
+
+*-----------+------------+
+| <<Login>> | <<Roles>>  |
+*-----------+------------+
+admin1 | dmv-admin,mayberry-admin
+*-------+--------+
+known | (no roles)
+*-------+--------+
+kathy | dmv-tactical
+*-------+--------+
+sherri | dmv-tactical
+*-------+--------+
+sysRaleigh | dmv-tactical
+*-------+--------+
+sysMayberry | dmv-federated,mayberry-tactical,mayberry-analytical
+*-------+--------+
+andy | mayberry-tactical,mayberry-analytical
+*-------+--------+
+barney | mayberry-tactical
+*-------+--------+
+gomer | mayberry-analytical
+*-------+--------+
+
+    Some actions are open to any users; authenticated or not.
+    Authentication will be performed using a JNDI login.  All users
+    will have a password of "password".
+
+    For some asynchronous activity, we will implement a Topic within
+    eDmv that will be used to provide updates to any of the driver or
+    owner information. eMayberry will listen to this topic with a 
+    Message Driven Bean to keep up to date on POIs. We will also
+    implement a separate Topic where eMayberry will publish messages
+    related to persons of interest when they change.  These topics
+    will be pre-defined in your application server along with the users
+    and roles.  However, you will have to design the type, structure,
+    and payload of the messages sent on the topics.
+
+    eMayberry will use EJB Timers to send out person of interest re-caps.
+
+* Technical Details
+
+    [[1]] Provide all functionality from Projects 1 and 2.
+
+===
+
+    [[1]] Enhance eDmv with access restrictions.
+
+        * Assign the EJB to the "other" security domain.
+
+        * Restrict access to the EJB write methods to appropriate roles
+        using declarative security.
+
+            [[1]] Only the dmv-admin role may run the test utility functions.
+
+            [[1]] Only the dmv-tactical role may create objects
+
+        * Restrict access to the EJB read methods to appropriate roles
+        using declarative security.
+
+            [[1]] dmv-tactical and dmv-federated may read information
+            within eDmv.
+
+===
+
+    [[1]] Extend your existing eDmv RMI Test project and any RMI client(s) to
+    address new authentication requirements.
+
+        * Add a valid login to your existing tests to re-enable them under
+        the newly secure environment.
+
+        * Add a new unit test that verifies the access controls of the
+        protected and open methods. This means that -- after fixing access
+        issues in the previous bullet -- you purposely attempt to violate
+        access restrictions from a new JUnit test to show a test of 
+        access control.
+    
+===
+
+    [[1]] Enhance eMayberry with access restrictions.
+
+        * Assign the EJB to the "other" security domain.
+
+        * Restrict access to the EJB write methods to appropriate roles
+        using declarative security.
+
+            [[1]] Only the mayberry-admin role may run the test utility
+            functions.
+
+            [[1]] Only the mayberry-tactical role may update information.
+
+        * Restrict access to the EJB read methods to appropriate roles
+        using declarative security.
+
+            [[1]] Only the mayberry-tactical and mayberry-analytical roles
+            may execute read options
+            
+===
+
+    [[1]] Extend your existing eMayberry RMI Test project and any RMI
+    client(s) to address new authentication requirements.
+
+        * Add a valid login to your existing tests to re-enable them under 
+        the new secure environment.
+
+        * Add a new unit test that verifies the access controls of the
+        protected and open methods. Same comment as above -- after
+        fixing proper access to Mayberry you should have at least
+        one test that demonstrates how the application is preventing
+        unauthorized access.
+
+===
+
+    [[1]] Enhance eDmvWAR with access restrictions.
+
+        * Assign the WAR to the "other" security-domain.
+
+        * Restrict access beyond the main page to users with
+        the appropriate roles. You may use FORM or BASIC authentication.
+        (I suggest FORM for easy logout/login as new user).
+
+        * Permit only users to only ask the EJB tier for
+        information that is associated with their login. For example,
+        a federated-user should not be given the option to create
+        a driver.
+
+===
+
+    [[1]] Enhance eMayberryWAR with access restrictions.
+
+        * Assign the WAR to the "other" security domain.
+
+        * Restrict access beyond the main page to users with
+        the appropriate roles. You may use FORM or BASIC authentication.
+        (I suggest FORM for easy logout).
+
+        * Permit only users to only ask the EJB tier for information that
+        is associated with their login. For example, a eMayberry
+        analytical user should not see an option to add a person of
+        interest or add an activity.
+
+===
+
+[../images/eDataShare_async.jpg] eDataShare Async
+
+    [[1]] Extend your eMayberry implementations to publish a JMS message
+    to a topic whenever information for a person of interest changes.
+
+        * Use the datashare-mayberry-poi topic (JNDI name: topic/ejava/projects/datashare/mayberry-poi)
+
+        * Design your JMS Message. You can use any JMS Type and JMS/custom
+        properties you wish.  However, know that some subscribers will
+        only want to receive messages for persons that are dangerous.
+
+        * Have your eMayberry EJBs publish JMS Messages to the topic when 
+        a person of interest is added, an activity is added, or there is an
+        change for that person reported by eDmv.
+
+===
+
+    [[1]] Add a Java SE JMS subscriber to eMayberry to consume events about
+    dangerous persons of interest.
+
+        * Implement a Java SE JMS subscriber that listens for changes to
+        persons of interest. Register a JMS selector such that only people
+        with that classification are received by this process. 
+
+        * Simply print the fact that the process was called and the
+        contents reported in the message.
+
+        * You must launch this subscriber using an Ant wrapper script.
+
+===
+
+    [[1]] Extend your eDmv EJB implementations to publish changes to 
+    People.
+
+        * Use the datashare-dmv topic (JNDI name: topic/ejava/projects/datashare/dmv)
+
+        * Design your JMS Message. You can use any JMS Type and JMS/custom
+        properties you wish.  
+
+        * Have your eDmv EJBs publish JMS Messages to the topic when 
+        a Person changes physical details or residency.
+
+===
+
+    [[1]] Implement a Message Driven Bean within eMayberry to subscribe to 
+    changes to eDmv people and trigger changes to persons of interest.
+
+        * Determine whether the identity of the person -or- the name
+        of the person matches one or more persons of interest. Publish a
+        person of interest change for that person if there is a match.
+
+===
+
+    [[1]] Implement an EJB Timer that will allow eMayberry to
+    automatically wake-up and send out a full list of persons of interest
+    to its JMS Topic.
+
+* Testing
+
+    [[1]] Provide JUnit tests that verify the EJB functionality of 
+    eDmv accessed through its remote interface using new
+    access control restrictions.
+
+    [[1]] Provide JUnit tests that verify the EJB functionality of 
+    eMayberry using its new access control restrictions and ability
+    to authenticate with eDmv.
+
+    [[1]] Implement the scripted use case below as an automated JUnit test and
+    manually accessed script through the Web UI. All command
+    line implementations must be wrapped in an Ant runtime script to
+    encapsulate the classpath details in a portable manner (see the
+    class jmsNotifier project for an example of using an Ant runtime script).
+    The <<full>> JSE subscriber need not be part of the automated end-to-end
+    JUnit test.
+
+        * admin1=dmv-admin,mayberry-admin
+
+        * known=(no roles)
+
+        * kathy=dmv-tactical
+
+        * sherri=dmv-tactical
+
+        * sysRaleigh=dmv-tactical
+
+        * sysMayberry=dmv-federated,mayberry-tactical,mayberry-analytical
+
+        * andy=mayberry-tactical,mayberry-analytical
+
+        * barney=mayberry-tactical
+
+        * gomer=mayberry-analytical
+
+        []
+
+        [[1]] eMayberry initializes the EJB Timer
+
+        [[1]] admin1 resets all eDmv tables (using the DmvTestUtilEJB)
+
+        [[1]] admin1 populates the eDmv tables (using the DmvIngestor)
+
+        [[1]] admin1 resets the eMayberry tables (using the
+        MayberryTestUtilEJB)
+
+        [[1]] admin1 populates the eMayberry tables (using the
+        MayberryTestUtilEJB) if necessary
+
+        [[1]] andy adds a person of interest in eMayberry that matches one
+        of the original drivers or vehicle owners ingested.
+
+        [[1]] a new person of interest JMS message is published from
+        eMayberry.
+
+        [[1]] andy adds a non-dangerous activity for the person of interest
+        in eMayberry.
+
+        [[1]] an updated person of interest JMS message is published from
+        eMayberry.
+
+        [[1]] andy searches for information on the person of interest in
+        eDmv using the eMayberry interface. 
+
+        [[1]] kathy creates a new driver in eDmv. 
+
+        [[1]] an updated person JMS message is published from
+        eDmv. This does not trigger eMayberry to do anything since it 
+        does not match a person of interest.
+
+        [[1]] kathy lists all drivers, including the new one created in
+        eDmv
+
+        [[1]] kathy reports that a driver has moved in eDmv. Make this 
+        a driver that matches a person of interest.
+
+        [[1]] an updated person JMS message is published from
+        eDmv.
+
+        [[1]] eMayberry sees the change, determines there is a match with
+        one of its persons of interest, and publishes its own updated
+        person of interest.
+
+        [[1]] andy adds a dangerous activity to the person of interest in
+        eMayberry.
+
+        [[1]] an updated person of interest JMS message is published from
+        eMayberry. This time, with a property indicating the person is
+        dangerous.
+
+        [[1]] gomer sees the Java SE subscriber report activity for a
+        dangerous person of interest and accesses address information for
+        the individual in eMayberry.
+
+        [[1]] gomer sees re-caps of the persons of interest being printed
+        out by the Java SE subscriber.
+        
+[../images/eDataShare_full_sequence.jpg] eDataShare Full Sequence
+
+
+* Grading
+
+    Your project will be graded on completeness and quality of product. In
+    order for you to receive full credit in each area, it must be a)
+    complete, b) done well, and c) tested.  The breakdown of grading 
+    will be as follows:
+
+        * README provided that describes where each requirement satisfied: 10pts
+
+        * projects cleanly builds with Maven: 15pts
+
+        * Project 1 and 2 functionality: 5pts
+
+        * EJB Security: 10pts
+
+        * Client Security Login: 10pts
+
+        * WAR Security: 10pts
+
+        * EJB JMS Publisher: 10pts
+
+        * EJB MDB Subscriber: 10pts
+
+        * Java SE JMS Listener: 10pts
+
+        * EJB Timers: 10pts
+
+    Each area will be judged according to the following breakdown. For
+    areas where testing does not apply (e.g., README and build), those 
+    points will be assigned to quality:
+
+        * complete: 60%
+
+        * quality of implementation supplied: 30%
+
+        * testing: 10%
+
+* Submission Guidelines
+
+    Please follow the 
+    {{{../../../coursedocs/projects.html#Submission_Guidelines}
+    project submission guidelines}}
+    posted in the course overview.
