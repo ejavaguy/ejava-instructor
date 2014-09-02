@@ -33,6 +33,7 @@
         <maven-jar-plugin.version>2.4</maven-jar-plugin.version>
         <maven-war-plugin.version>2.4</maven-war-plugin.version>
         <build-helper-maven-plugin.version>1.8</build-helper-maven-plugin.version>
+        <wagon-ssh-external.version>2.4</wagon-ssh-external.version>
     </properties>
 
     <scm>
@@ -43,6 +44,13 @@
     </scm>
 
     <build>
+        <extensions> <!-- needed for site deploy over scp -->
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh-external</artifactId>
+                <version>${wagon-ssh-external.version}</version>
+            </extension>
+        </extensions>
         <pluginManagement>
             <plugins>
                 <plugin>
