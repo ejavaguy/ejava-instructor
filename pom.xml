@@ -440,5 +440,22 @@
                 </plugins>
             </build>
         </profile>
+
+        <profile>
+            <id>webdev</id>
+            <distributionManagement>
+                <repository>
+                    <id>webdev.repository</id>
+                    <name>ejava JHU repository</name>
+                    <url>scpexe://webdev.jhuep.com/home/jcs/public_html/maven2</url>
+                </repository>
+                <snapshotRepository>
+                    <id>webdev.snapshot.repo</id>
+                    <name>ejava JHU snapshot repository</name>
+                    <url>scpexe://webdev.jhuep.com/home/jcs/public_html/maven2-snapshot</url>
+                    <uniqueVersion>false</uniqueVersion>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
     </profiles>
 </project>
