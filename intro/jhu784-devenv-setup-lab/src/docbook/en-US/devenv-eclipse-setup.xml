@@ -5,12 +5,13 @@
 <chapter id="devenv-eclipse-setup">
     <title>Eclipse Setup</title>
     <para>
-        The most current version of Eclipse is Kepler. I have only been using
-        it for class, but so far it is fantastic.
+        The most current version of Eclipse is Luna. I have only been using
+        it for a few days for class. The prior version (Kepler) was fine for
+        use as well.
     </para>
 
     <section id="devenv-eclipse-install">
-        <title>Download and Install Eclipse Kepler</title>
+        <title>Download and Install Eclipse</title>
         <orderedlist spacing="compact">
             <listitem>
                 <para>
@@ -20,7 +21,7 @@
             </listitem>
             <listitem><para>Unzip the downloaded archive.</para>
 <programlisting><![CDATA[
-$ tar xzf ~/Downloads/eclipse-jee-kepler-R-linux-gtk-x86_64.tar.gz
+$ tar xzf ~/Downloads/eclipse-jee-xxxx-R-linux-gtk-x86_64.tar.gz
 
 $ ls eclipse
 about_files  about.html  artifacts.xml  configuration  dropins  eclipse  eclipse.ini  
@@ -54,7 +55,7 @@ epl-v10.html  features  icon.xpm  notice.html  p2  plugins  readme
         
         <note>
             <title>M2E is now part of Eclipse JavaEE</title>
-            <para>m2e was pre-installed in my download of kepler. Nothing more 
+            <para>m2e was pre-installed in my download of Kepler and Luna. Nothing more 
                 needs to be done to install it. The rest of these instructions
                 are concerned with using it and demonstrating it.</para>
         </note>
@@ -76,7 +77,7 @@ epl-v10.html  features  icon.xpm  notice.html  p2  plugins  readme
                     <listitem><para>Right click on "class-examples" in the Package 
                         Explorer and select Import...-&gt;Maven-&gt;Existing Maven Projects</para></listitem>
                     <listitem><para>Browse to the project area where you performed 
-                        the Git checkout earlier and select the javase5Enhancements folder.</para></listitem>
+                        the Git checkout earlier and select the javase/javase5Enhancements folder.</para></listitem>
                     <listitem><para>Select Next to have the current project(s)
                         added to the selected working set.</para>
                     <note>
@@ -142,7 +143,7 @@ openFile
         
         <note>
             <title>Git and EGit is now part of Eclipse JavaEE</title>
-            <para>Git and EGit was pre-installed in my download of kepler. Nothing more 
+            <para>Git and EGit was pre-installed in my download of Kepler and Luna. Nothing more 
                 needs to be done to install it. The rest of these instructions
                 are concerned with using it and demonstrating it.</para>
         </note>
@@ -165,7 +166,7 @@ openFile
                 <code>Help-&gt;Eclipse Marketplace</code></para>
             </listitem>
             <listitem><para>Type JBoss into the seach field and press Go</para></listitem>
-            <listitem><para>Click Install for the <code>JBoss Tools (Kepler)</code></para></listitem>
+            <listitem><para>Click Install for the <code>JBoss Tools (Luna)</code></para></listitem>
             <listitem><para>Complete the installation steps for JBoss Tools. There
                 are many tools in the repository. Not all of them are
                 needed for class or obvious how to use them without more investigation. 
@@ -192,9 +193,9 @@ openFile
                 <orderedlist spacing="compact">
                     <listitem><para>Open the JavaEE Perspective</para></listitem>
                     <listitem><para>Select "new server wizard..." in the Servers panel</para></listitem>
-                    <listitem><para>Select Enterprise Application Platform 6.x under the 
-                        JBoss Enterprise Middleware folder</para></listitem>
-                    <listitem><para>Set HOME to your jboss-eap-6.2.0.Final directory
+                    <listitem><para>Select Wildfly 8.x under the 
+                        JBoss Community folder</para></listitem>
+                    <listitem><para>Set HOME to your wildfly-8.1.0.Final directory
                        using the Browse button on the next panel</para></listitem>
                     <listitem><para>Name the server "standalone" and leave the 
                        to match the default "standalone.xml" configuration file.</para></listitem>
