@@ -37,7 +37,7 @@
         <para>Obtain a copy of the H2 database jar from one of the following sources</para>
         <itemizedlist spacing="compact">
             <listitem><para>Within the JBoss installation</para>
-                <programlisting><![CDATA[jboss-xxx-x.x.x.Final/modules/.../com/h2database/h2/main/]]></programlisting>
+                <programlisting><![CDATA[wildfly-x.x.x.Final/modules/.../com/h2database/h2/main/]]></programlisting>
             </listitem>
 
             <listitem><para>Internet Maven Repository (<ulink url="http://repo2.maven.org/maven2/com/h2database/h2/">

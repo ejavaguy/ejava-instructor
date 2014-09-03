@@ -8,10 +8,10 @@
         We will be using the JBoss/Wildfly Application Server this semester. This is a fully-compliant
         JavaEE 7 application server.
     </para>
-    <!--
     <note>
-        <title>JBoss Application Server (AS) and JBoss Enterprise Application Platform (EAP)</title>
-        <para>JBoss has a community version (JBoss AS) and commercial version (JBoss EAP) of 
+        <title>JBoss Application Server/Wildfly (AS) and JBoss Enterprise Application Platform (EAP)</title>
+        <para>JBoss has a community version (formerly call JBoss AS - recently renamed Wildfly) and 
+            commercial version (JBoss EAP) of 
             their JavaEE application server. Both are open source and built off the same code base. 
             In theory, changes propagate through the community version first in daily changes and 
             short iterations. In theory, commercial version is a roll-up of a stable version of the 
@@ -20,32 +20,25 @@
             upgrading to the latest release. With the community version - you pretty much need to 
             keep up with the latest release to get any patches. Of course, with either version you
             are free to perform your own support and code changes, but you can only get this 
-            commercially with the EAP release.</para>        
-        <para>JBoss has recently changed its distribution policy. It now makes the EAP version 
-            available for *development* use. You will be asked to download EAP and accept licensing
-            terms that forbids you from using the software in production and using whatever support
-            you receive from them on that product from setting up your own re-selling business.</para>
-        <para>JBoss AS version numbers are ahead of JBoss EAP because not every community version
-            becomes a commercial version. JBoss AS 6 was skipped entirely by EAP. There is a
-            <ulink url="https://access.redhat.com/site/articles/112673">good article</ulink> on the 
-            pairings between the two product lines on the RedHat Customer Portal</para>
-    </note>
-    <note>
-        <title>JBoss AS 7.2.0.Final &lt;= JBoss EAP 6.1.0.Final</title>
-        <para>We will be downloading JBoss EAP server for class use since that is the most stable release 
-            available. Build dependencies will use the community version since those versions are 
-            available from an Internet-accessible Nexus repository. If that becomes an issue, we can 
-            switch versions without much issue. 
+            commercially with the EAP release. There is a
+            <ulink url="https://planet.jboss.org/post/jboss_eap_and_wildfly_a_symbiotic_relationship">newsgoup post</ulink>
+            and <ulink url="http://www.slideshare.net/dandreadis/jboss-as7-reloaded">slide show</ulink>
+            that provides a decent, short description of the two.
+        </para>        
+        <para>JBoss makes the EAP version available for *development* use from jboss.org but you will notice
+            it has not yet caught up with Wildfly 8.x (at wildfly.org) just yet. We will be using the
+            open source/Wildfly version of the server - which is fully JavaEE 7-compliant.
             </para>
+        <para>JBoss AS/Wildfly version numbers are ahead of JBoss EAP because not every community version
+            becomes a commercial version. JBoss AS 6 was skipped entirely by EAP. 
+        </para>
     </note>
-    -->
 
-<!--
     <section id="devenv-jboss-install">
-        <title>Download and Install JBoss EAP 6.1.0.Final</title>
+        <title>Download and Install Wildfly 8.1.0.Final</title>
         <orderedlist spacing="compact">
-            <listitem><para>Download JBoss 6.1.0 EAP
-                <ulink url="http://www.jboss.org/jbossas/downloads">http://www.jboss.org/jbossas/downloads</ulink>.
+            <listitem><para>Download Wildfly 8.1.0.Final
+                <ulink url="http://www.wildfly.org/downloads/">http://www.wildfly.org/downloads/</ulink>.
                 The 'Quickstarts' examples are also helpful but class notes, exercises, and guidance
                 may have simplified, generalized, or alternative approaches to what is contained in the guides.</para>
             </listitem>
@@ -54,9 +47,10 @@
                     Install JBoss into a directory that does not have any spaces in its path.
                 </para>
                 <programlisting><![CDATA[
-$ unzip ~/Downloads/jboss-eap-6.1.0.Final.zip                
+$ unzip ~/Downloads/wildfly-8.1.0.Final.zip                
                 
-$ ls jboss-eap-6.1.0.Final/
+$ ls wildfly-8.1.0.Final/                                                                                                                                        
+appclient  bin  copyright.txt  docs  domain  jboss-modules.jar  LICENSE.txt  modules  README.txt  standalone  welcome-content
 ]]></programlisting>                        
             </listitem>
             <listitem>
@@ -65,28 +59,31 @@ $ ls jboss-eap-6.1.0.Final/
                     configuration installation.
                 </para>
                 <programlisting><![CDATA[
-$ ./jboss-eap-6.1.0.Final/bin/standalone.sh 
-=========================================================================                                                                                                                     
-                                                                                                                                                                                              
-  JBoss Bootstrap Environment                                                                                                                                                                 
-                                                                                                                                                                                              
-  JBOSS_HOME: /opt/jboss-eap-6.1                                                                                                                                                              
-                                                                                                                                                                                              
-  JAVA: /usr/bin/java                                                                                                                                                                         
-                                                                                                                                                                                              
-  JAVA_OPTS:  -server -XX:+UseCompressedOops -Xms1303m -Xmx1303m -XX:MaxPermSize=256m -Djava.net.preferIPv4Stack=true 
-      -Djboss.modules.system.pkgs=org.jboss.byteman -Djava.awt.headless=true 
+$ ./wildfly-8.1.0.Final/bin/standalone.sh 
+=========================================================================
+
+  JBoss Bootstrap Environment
+
+  JBOSS_HOME: /opt/wildfly-8.1.0.Final
+
+  JAVA: /usr/bin/java
+
+  JAVA_OPTS:  -server -Xms64m -Xmx512m -XX:MaxPermSize=256m -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.byteman -Djava.awt.headless=true
 
 =========================================================================
 
-13:26:53,149 INFO  [org.jboss.modules] (main) JBoss Modules version 1.2.0.Final-redhat-1
-13:26:53,423 INFO  [org.jboss.msc] (main) JBoss MSC version 1.0.4.GA-redhat-1
-13:26:53,554 INFO  [org.jboss.as] (MSC service thread 1-3) JBAS015899: JBoss EAP 6.1.0.GA (AS 7.2.0.Final-redhat-8) starting
+21:35:00,228 INFO  [org.jboss.modules] (main) JBoss Modules version 1.3.3.Final
+21:35:00,790 INFO  [org.jboss.msc] (main) JBoss MSC version 1.2.2.Final
+21:35:00,947 INFO  [org.jboss.as] (MSC service thread 1-2) JBAS015899: WildFly 8.1.0.Final "Kenny" starting
+
 ...
-13:26:59,008 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015961: Http management interface listening on http://127.0.0.1:9990/management
-13:26:59,009 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015951: Admin console listening on http://127.0.0.1:9990
-13:26:59,010 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015874: JBoss EAP 6.1.0.GA (AS 7.2.0.Final-redhat-8) started in 6349ms - 
-    Started 146 of 217 services (70 services are passive or on-demand)
+
+21:35:08,852 INFO  [org.jboss.as.server.deployment.scanner] (MSC service thread 1-1) JBAS015012: Started FileSystemDeploymentService for directory /opt/wildfly-8.1.0.Final/standalone/deployments
+21:35:09,317 INFO  [org.jboss.ws.common.management] (MSC service thread 1-3) JBWS022052: Starting JBoss Web Services - Stack CXF Server 4.2.4.Final
+21:35:28,904 INFO  [org.jboss.as.connector.subsystems.datasources] (MSC service thread 1-1) JBAS010400: Bound data source [java:jboss/datasources/ExampleDS]
+21:35:28,991 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015961: Http management interface listening on http://127.0.0.1:9990/management
+21:35:28,992 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015951: Admin console listening on http://127.0.0.1:9990
+21:35:28,993 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015874: WildFly 8.1.0.Final "Kenny" started in 29699ms - Started 184 of 233 services (81 services are lazy, passive or on-demand)
 ]]></programlisting>                        
                 <note>
                     <para>There are .sh version of scripts for *nix platforms
@@ -112,12 +109,30 @@ $ ./jboss-eap-6.1.0.Final/bin/standalone.sh
             <listitem><para>Copy over the class example server files from what 
                 you cloned and built from github earlier.</para>
 <programlisting language=""><![CDATA[
-#using the built .zip file from the module target directory
-$ cd .../jboss-eap-6.1.0.Final/
-$ ls 
-standalone  domain  ...
-
-$ unzip .../ejava-javaee/servers/ejava-jboss61eap/target/ejava-jboss61eap-xxx-server.zip
+$ cd wildfly-8.1.0.Final
+wildfly-8.1.0.Final]$ unzip -l .../ejava-student/servers/ejava-wildfly810/target/ejava-wildfly810-4.0.0-SNAPSHOT-server.zip 
+Archive:  .../ejava-student/servers/ejava-wildfly810/target/ejava-wildfly810-4.0.0-SNAPSHOT-server.zip
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+        0  09-02-2014 21:48   standalone/
+        0  09-02-2014 21:48   standalone/configuration/
+        0  09-02-2014 21:48   domain/
+        0  09-02-2014 21:48   domain/configuration/
+      575  09-02-2014 21:48   standalone/configuration/server.cer
+     1747  09-02-2014 21:48   standalone/configuration/application-roles.properties
+     1190  09-02-2014 21:48   standalone/configuration/server.keystore
+    31118  09-02-2014 21:48   standalone/configuration/standalone.xml
+     2490  09-02-2014 21:48   standalone/configuration/application-users.properties
+     1747  09-02-2014 21:48   domain/configuration/application-roles.properties
+     2402  09-02-2014 21:48   domain/configuration/application-users.properties
+---------                     -------
+    41269                     11 files
+$ unzip /home/jcstaff/workspaces/ejava-class/ejava-student/servers/ejava-wildfly810/target/ejava-wildfly810-4.0.0-SNAPSHOT-server.zip 
+Archive:  /home/jcstaff/workspaces/ejava-class/ejava-student/servers/ejava-wildfly810/target/ejava-wildfly810-4.0.0-SNAPSHOT-server.zip
+  inflating: standalone/configuration/server.cer  
+replace standalone/configuration/application-roles.properties? [y]es, [n]o, [A]ll, [N]one, [r]ename: y
+  inflating: standalone/configuration/application-roles.properties  
+...
 ]]></programlisting>
             </listitem>
             <listitem><para>Restart the server</para></listitem>
@@ -129,26 +144,47 @@ $ unzip .../ejava-javaee/servers/ejava-jboss61eap/target/ejava-jboss61eap-xxx-se
         <orderedlist spacing="compact">
             <listitem><para>Use the batch script to add an admin user to 
                 the system. Note the password must have at least one 
-                digit and one non-alphanumeric character.</para>
+                digit and one non-alphanumeric character. If you
+                run the application server on a remote machine or under
+                a different account, please
+                use the jboss.user and jboss.password supplied in 
+                build/dependencies/pom.xml. JBoss/Wildfly will bypass
+                user credentials when the client executes on the same 
+                machine by the same user that started the server.
+                </para>
+<programlisting>xml<![CDATA[$ grep jboss.user build/dependencies/pom.xml 
+        <jboss.user>admin</jboss.user>
+$ grep jboss.password build/dependencies/pom.xml 
+        <jboss.password>password1!</jboss.password>]]></programlisting>
                 <programlisting><![CDATA[
-/opt$ ./jboss-eap-6.1.0.Final/bin/add-user.sh 
+$ ./bin/add-user.sh 
 
 What type of user do you wish to add? 
  a) Management User (mgmt-users.properties) 
  b) Application User (application-users.properties)
-(a): a
+(a): 
 
 Enter the details of the new user to add.
-Realm (ManagementRealm) : 
+Using realm 'ManagementRealm' as discovered from the existing property files.
 Username : admin
-Password : 
-Re-enter Password : 
 The username 'admin' is easy to guess
 Are you sure you want to add user 'admin' yes/no? yes
+Password recommendations are listed below. To modify these restrictions edit the add-user.properties configuration file.
+ - The password should not be one of the following restricted values {root, admin, administrator}
+ - The password should contain at least 8 characters, 1 alphabetic character(s), 1 digit(s), 1 non-alphanumeric symbol(s)
+ - The password should be different from the username
+Password : 
+Re-enter Password : 
+What groups do you want this user to belong to? (Please enter a comma separated list, or leave blank for none)[  ]: 
 About to add user 'admin' for realm 'ManagementRealm'
 Is this correct yes/no? yes
-Added user 'admin' to file '/opt/jboss-eap-6.1.0.Final/standalone/configuration/mgmt-users.properties'
-Added user 'admin' to file '/opt/jboss-eap-6.1.0.Final/domain/configuration/mgmt-users.properties'
+Added user 'admin' to file '/opt/wildfly-8.1.0.Final/standalone/configuration/mgmt-users.properties'
+Added user 'admin' to file '/opt/wildfly-8.1.0.Final/domain/configuration/mgmt-users.properties'
+Added user 'admin' with groups  to file '/opt/wildfly-8.1.0.Final/standalone/configuration/mgmt-groups.properties'
+Added user 'admin' with groups  to file '/opt/wildfly-8.1.0.Final/domain/configuration/mgmt-groups.properties'
+Is this new user going to be used for one AS process to connect to another AS process? 
+e.g. for a slave host controller connecting to the master or for a Remoting connection for server to server EJB calls.
+yes/no? no
 ]]></programlisting>                        
             </listitem>
             <listitem>
@@ -173,13 +209,13 @@ JAVA_OPTS="$JAVA_OPTS -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspen
             <listitem><para>Restart the server and notice the additional listen
                 output. Use control-C to stop the server.</para>
                 <programlisting><![CDATA[
-$ ./jboss-eap-6.1.0.Final/bin/standalone.sh 
+$ ./bin/standalone.sh 
 =========================================================================
 ...
 
+=========================================================================
+
 Listening for transport dt_socket at address: 8787
-13:26:53,149 INFO  [org.jboss.modules] (main) JBoss Modules version 1.2.0.Final-redhat-1
-13:26:53,423 INFO  [org.jboss.msc] (main) JBoss MSC version 1.0.4.GA-redhat-1
 ]]></programlisting>                        
             </listitem>
             
@@ -230,16 +266,16 @@ Listening for transport dt_socket at address: 8787
                 </para>
                 <programlisting language="xml"><![CDATA[
         <profile>
-            <id>jboss7</id>
+            <id>jboss8</id>
             <properties>
                 <jboss.host>127.0.0.1</jboss.host>
-                <jboss.home>/opt/jboss-eap-6.1.0.Final</jboss.home>
+                <jboss.home>/opt/wildfly-8.1.0.Final</jboss.home>
             </properties>
         </profile>
     </profiles>
         ...
     <activeProfiles>
-        <activeProfile>jboss7</activeProfile>
+        <activeProfile>jboss8</activeProfile>
         <activeProfile>h2db</activeProfile>
     </activeProfiles>
 </settings>
@@ -247,5 +283,4 @@ Listening for transport dt_socket at address: 8787
             </listitem>
         </orderedlist>
     </section>
--->
 </chapter>
