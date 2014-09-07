@@ -2,7 +2,7 @@
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
 <chapter id="edatashare-project1-tech">
-    <title>Technical Details</title>
+    <title>Project 1 Technical Details</title>
     <note>
         There are a lot of technical details presented with this 
         specification. This is done to provide clarity and a starting point for
@@ -595,7 +595,7 @@
                 </variablelist>
             </section>
 
-            <section id="edatashare-project1-tech-maybo-">
+            <section id="edatashare-project1-tech-maybo-activity">
                 <title>Activity</title>
                 <para>
                     Design a class that encapsulates 
@@ -618,6 +618,29 @@
             </section>
 
         </section>
+    </section>
+
+    <section id="edatashare-project1-tech-validation">
+        <title>Validation API</title>
+        <para>
+            Add validation API declarations to your business objects as appropriate. 
+            This need not be extensive or exhaustive. Just do enough to show use of
+            declarative validation as a part of your application. 
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Determine the validation groups you wish to use in 
+                your application (suggest business logic interface and persistence tier).
+                </para> </listitem>
+            <listitem><para>
+                Add validation annotations to your business objects and assign them
+                to your designed groups as appropriate.
+                </para> </listitem>
+            <listitem><para>
+                Manually invoke validation from the business tier and integrate
+                the validation into your persistence unit.
+                </para> </listitem>
+        </orderedlist>
     </section>
 
     <section id="edatashare-project1-tech-ingest">

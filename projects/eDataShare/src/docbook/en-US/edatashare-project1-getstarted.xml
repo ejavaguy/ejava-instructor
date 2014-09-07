@@ -2,7 +2,7 @@
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
 <chapter id="edatashare-project1-getstarted">
-    <title>Getting Started</title>
+    <title>Project 1 Getting Started</title>
     <para>
         The following sketch of two directory structures can be used as a
         starting point for your overall application. The first is a simplified

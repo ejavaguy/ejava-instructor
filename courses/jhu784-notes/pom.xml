@@ -17,7 +17,7 @@
     
     <properties>
        <doc.base>jhu784-notes-book</doc.base>
-       <content.version>v2014-08-29</content.version>
+       <content.version>v2014-09-06</content.version>
     </properties>
 
     <dependencies>
@@ -96,6 +96,13 @@
         <dependency>
             <groupId>info.ejava.docs.ejb</groupId>
             <artifactId>webejb-notes</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>info.ejava.docs.projects</groupId>
+            <artifactId>edatashare-project</artifactId>
             <version>${project.version}</version>
             <classifier>docsrc</classifier>
         </dependency>

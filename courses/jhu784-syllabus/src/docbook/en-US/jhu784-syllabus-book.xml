@@ -15,4 +15,5 @@
     
     <xi:include href="jhu784-description.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="jhu784-syllabus.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jhu784-projects.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </book>

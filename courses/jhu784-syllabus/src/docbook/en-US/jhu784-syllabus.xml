@@ -99,10 +99,10 @@
               <entry namest="comment"><para><ulink url="../html/jpa-queryex.html">Exercise: JPA Query Exercise</ulink></para></entry>
             </row>
             <row rowsep="1">
-              <entry namest="comment">Project 1 - due by Sun, 8am Oct19</entry>
                 <!-- 
-              <entry namest="comment"><ulink url="../../../../../projects/eDataShare/projects/edatashare-project1.html">Project 1</ulink> due by Sun, 8am Oct19</entry>
+              <entry namest="comment">Project 1 - due by Sun, 8am Oct19</entry>
                  -->
+              <entry namest="comment"><link linkend="edatashare-project1-part">Project 1</link> due by Sun, 8am Oct19</entry>
             </row>
             <row rowsep="1">
               <entry namest="topic"><para><link linkend="jpa-tuning">JPA/SQL Tuning</link></para></entry>

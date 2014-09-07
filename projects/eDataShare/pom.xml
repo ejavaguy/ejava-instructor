@@ -16,7 +16,7 @@
     
     <properties>
        <doc.base>edatashare-project-book</doc.base>
-       <content.version>v2014-08-31</content.version>
+       <content.version>v2014-09-06</content.version>
     </properties>
 
     <build>

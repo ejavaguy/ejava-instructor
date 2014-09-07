@@ -5,7 +5,7 @@
 <chapter id="jhu784-course-projects">
     <title>Course Projects</title>
 
-    <section id="jhu784-course-projects-project0"->
+    <section id="jhu784-course-projects-project0">
         <title>Project 0: Sanity Check</title>
         <para>
             Project 0 will require construction of your development tree and
@@ -42,7 +42,7 @@
         </itemizedlist>
     </section>
 
-    <section id="jhu784-course-projects-project1"->
+    <section id="jhu784-course-projects-project1">
         <title>Project 1: Data Access Tier and Business Logic</title>
         <para>
             Project 1 will require the development of the business objects,
@@ -78,7 +78,7 @@
         </itemizedlist>
     </section>
 
-    <section id="jhu784-course-projects-project2"->
+    <section id="jhu784-course-projects-project2">
         <title>Project 2: N-Tier Application</title>
         <para>
             Project 2 deploys the business logic and data tier to the server-side.
@@ -236,13 +236,11 @@
         <itemizedlist spacing="compact">
             <!--
             <listitem><para>
-                * Mark - mdsholund@gmail.com
+                Mark - mdsholund@gmail.com
                 </para></listitem>
                 -->
             <listitem><para>
-                * Jim - jim.stafford@jhu.edu
-                </para></listitem>
-            <listitem><para>
+                Jim - jim.stafford@jhu.edu
                 </para></listitem>
         </itemizedlist>
     </section>

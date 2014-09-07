@@ -4,7 +4,7 @@
 <chapter id="edatashare-project1-desc">
     <title>eDataShare Project 1 Description</title>
     <subtitle>Data Access Tier and Initial Business Logic</subtitle>
-    <para>Updated: ${content.version}</para>
+    <para>Updated: 2014-09-06</para>
 
     <section id="edatashare-project1-purpose">
         <title>Purpose</title>
@@ -157,7 +157,7 @@
             You will be required to encapsulate
             all object to relational (O/R) mapping within the DAOs, descriptor
             files, and/or class metadata annotations.  You will be given a set of
-            <ulink url=">https://raw.github.com/ejavaguy/ejava-student/master/projects/eDataShare/eDmvData/eDmvTestUtil/src/main/resources/xml/dmv-all.xml">
+            <ulink url="https://raw.github.com/ejavaguy/ejava-student/master/projects/eDataShare/eDmvData/eDmvTestUtil/src/main/resources/xml/dmv-all.xml">
             test data</ulink>
             to initially populate your applications and be the source
             of data for the ingest requirement. To use the data, you will ingest 
@@ -166,6 +166,11 @@
             parser as well as other aspects technology within the project.  
         </para>
   
+        <para>
+            The database will have a functional schema and indexes to provide 
+            query performance. Business objects will be validated in the database
+            using schema constraints and within the JVM using the Validation API.
+        </para>
   
         <para>
             The business logic will provide a set of classes with concise methods
@@ -182,7 +187,7 @@
             that it takes to implement the end-to-end scenarios specified later
             within this specification.
         </para>
-  
+
         <para>
             The test acceptance for the first project will be the unit tests and
             an integration test that takes the business logic, data access
