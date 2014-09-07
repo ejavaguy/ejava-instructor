@@ -1,0 +1,205 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="edatashare-project1-getstarted">
+    <title>Getting Started</title>
+    <para>
+        The following sketch of two directory structures can be used as a
+        starting point for your overall application. The first is a simplified
+        project layout that collapses the number of sub-projects into a single
+        "Impl" project. It is suggested that you use this layout if you
+        are new to maven and want the simplest configuration possible. The
+        second is a more robust layout and is closer to a multi-developer
+        environment.  Use the later structure if you want to better simulate a
+        work environment where the work of multiple developers needs clearer
+        separation. 
+    </para>
+
+    <note>
+        <para>
+            All "e"DataShare, "e"Dmv, and "e"Mayberry names
+            should be changed to your specific name mangler. The same type of
+            modification needs to occur for the java package names.
+        </para>
+    </note>
+    <note>
+        <para>
+            Other than a README, it is not anticipated that you
+            will have any artifacts at the root layer. It should be
+            used only as a convenience wrapper to perform goals across both
+            projects. The root project can also be used for common property, 
+            dependencyManagement, and pluginManagement defintions. All 
+            concrete dependency and plugins should be defined in the leaf-level
+            poms to avoid unwanted dependencies from the root or mid-level
+            parents.
+        </para>
+    </note>
+        <figure>
+            <title>Single Module Approach Candidate Module Structure</title>
+<programlisting language=""><![CDATA[
+eDataShare
+|-- eDmv
+|   +--eDmvImpl
+|   |   |-- pom.xml
+|   |   `-- src
+|   |       |-- main
+|   |       |   |-- java
+|   |       |   |   `-- edmv
+|   |       |   |       |-- bo
+|   |       |   |       |-- dao
+|   |       |   |       |-- jpa
+|   |       |   |       |-- bl
+|   |       |   |       |-- blimpl
+|   |       |   `-- resources
+|   |       |       `-- ddl
+|   |       |           |-- eDmv-create.ddl
+|   |       |           `-- eDmv-drop.ddl
+|   |       `-- test
+|   |           |-- java
+|   |           |   `-- edmv
+|   |           |       |-- bo
+|   |           |       |-- dao
+|   |           |       `-- bl
+|   |           `-- resources
+|   |               |-- log4j.xml
+|   |               `-- META-INF
+|   |                  `-- persistence.xml
+|   `-- pom.xml
+|-- eMayberry
+|   +--eMayberryImpl
+|   |   |-- pom.xml
+|   |   `-- src
+|   |       |-- main
+|   |       |   |-- java
+|   |       |   |   `-- emayberry
+|   |       |   |       |-- bo
+|   |       |   |       |-- dao
+|   |       |   |       |-- jpa
+|   |       |   |       |-- bl
+|   |       |   |       |-- blimpl
+|   |       |   `-- resources
+|   |       |       `-- ddl
+|   |       |           |-- eMayberry-create.ddl
+|   |       |           `-- eMayberry-drop.ddl
+|   |       `-- test
+|   |           |-- java
+|   |           |   `-- emayberry
+|   |           |       |-- bo
+|   |           |       |-- dao
+|   |           |       |-- bl
+|   |           `-- resources
+|   |               |-- log4j.xml
+|   |               `-- META-INF
+|   |                  `-- persistence.xml
+|   `-- pom.xml
+`-- pom.xml
+]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>Multi-Module Approach Candidate Module Structure</title>
+<programlisting language=""><![CDATA[
+eDataShare
+|-- eDmv
+|   +--eDmvBO
+|   |   |-- pom.xml
+|   |   `-- src
+|   |       |-- main
+|   |       |   `-- java
+|   |       |       `-- edmv
+|   |       |           |-- bo
+|   |       |           `-- bl
+|   |       `-- test
+|   |           |-- java
+|   |           |   `-- edmv
+|   |           |       `-- bo
+|   |           `-- resources
+|   |               `log4j.xml
+|   +--eDmvDAO
+|   |   |-- pom.xml
+|   |   `-- src
+|   |       |-- main
+|   |       |   |-- java
+|   |       |   |   `-- edmv
+|   |       |   |       |-- dao
+|   |       |   |       `-- jpa
+|   |       |   `-- resources
+|   |       |       `-- ddl
+|   |       |           |-- eDmv-create.ddl
+|   |       |           `-- eDmv-drop.ddl
+|   |       `-- test
+|   |           |-- java
+|   |           |   `-- edmv
+|   |           |       `-- dao
+|   |           `-- resources
+|   |               |-- log4j.xml
+|   |               `-- META-INF
+|   |                  `-- persistence.xml
+|   +--eDmvBLImpl
+|   |   |-- pom.xml
+|   |   `-- src
+|   |       |-- main
+|   |       |   `-- java
+|   |       |       `-- edmv
+|   |       |           `-- blimpl
+|   |       `-- test
+|   |           |-- java
+|   |           |   `-- edmv
+|   |           |       `-- bl
+|   |           `-- resources
+|   |               `-- log4j.xml
+|   `-- pom.xml
+|-- eMayberry
+|   +--eMayberryBO
+|   |   |-- pom.xml
+|   |   `-- src
+|   |       |-- main
+|   |       |   `-- java
+|   |       |       `-- emayberry
+|   |       |           |-- bo
+|   |       |           `-- bl
+|   |       `-- test
+|   |           |-- java
+|   |           |   `-- emayberry
+|   |           |       `-- bo
+|   |           `-- resources
+|   |               `-- log4j.xml
+|   +--eMayberryDAO
+|   |   |-- pom.xml
+|   |   `-- src
+|   |       |-- main
+|   |       |   |-- java
+|   |       |   |   `-- emayberry
+|   |       |   |       |-- dao
+|   |       |   |       |-- jpa
+|   |       |   `-- resources
+|   |       |       `-- ddl
+|   |       |           |-- eMayberry-create.ddl
+|   |       |           `-- eMayberry-drop.ddl
+|   |       `-- test
+|   |           |-- java
+|   |           |   `-- emayberry
+|   |           |       `-- dao
+|   |           `-- resources
+|   |               |-- log4j.xml
+|   |               `-- META-INF
+|   |                  `-- persistence.xml
+|   +--eMayberryBLImpl
+|   |   |-- pom.xml
+|   |   `-- src
+|   |       |-- main
+|   |       |   `-- java
+|   |       |       `-- emayberry
+|   |       |           `-- blimpl
+|   |       `-- test
+|   |           |-- java
+|   |           |   `-- emayberry
+|   |           |       `-- bl
+|   |           `-- resources
+|   |               `-- log4j.xml
+|   `-- pom.xml
+`-- pom.xml
+]]></programlisting>                        
+        </figure>
+</chapter>
+  

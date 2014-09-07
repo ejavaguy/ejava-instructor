@@ -3,7 +3,7 @@
     "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <book id="edatashare-project">
     <bookinfo>
-        <title>EDataShare Project</title>
+        <title>EDataShare Semester Projects</title>
         <issuenum>${content.version}</issuenum>
         <pubdate>${docbook.pubdate}</pubdate>
         <copyright>
@@ -16,6 +16,12 @@
                 server-side deployment, and security plus asynchronous actions. Each will be part
                 of the follow-on project.
             </para>
+            <para>
+                Please follow the 
+                <ulink url="../html/jhu784-course-projects.html#jhu784-course-projects-submission">
+                project submission guidelines</ulink>
+                posted in the course overview.
+            </para>
         </abstract>
     </bookinfo>
 
@@ -23,7 +29,11 @@
 
     <part id="edatashare-project1-part">
         <title>Project 1</title>
-        <xi:include href="edatashare-project1.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+        <xi:include href="edatashare-project1-desc.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+        <xi:include href="edatashare-project1-tech.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+        <xi:include href="edatashare-project1-getstarted.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+        <xi:include href="edatashare-project1-testing.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+        <xi:include href="edatashare-project1-grading.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     </part>
     <part id="edatashare-project2-part">
         <title>Project 2</title>

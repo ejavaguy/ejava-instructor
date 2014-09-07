@@ -287,596 +287,605 @@
             re-use tables or to make primary key assumptions between the two.
         </para>
 
-        <section id="edatashare-project1-tech-dmvdb">
-            <title>eDmv Candidate Database Schema</title>
+        <section id="edatashare-project1-tech-dbschema">
+            <title>Database Schema</title>
 
-            <figure>
+            <section id="edatashare-project1-tech-dmvdb">
                 <title>eDmv Candidate Database Schema</title>
-                <graphic scalefit="1" fileref="images/eDmv_dbschema.jpg"/>
-            </figure>
-      
-            <section id="edatashare-project1-tech-dmvdb-person">
-                <title>EDMV_PERSON</title>
-                <para>
-                    This table is used to hold core information about drivers and vehicle owners.
-                </para>
-                <variablelist spacing="compact">
-                    <varlistentry>
-                        <term><filename>ID</filename></term>
-                        <listitem><para>synthetic field to identify a specific person</para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>FIRST_NAME</filename></term>
-                        <listitem><para>required text field to hold a person's first name</para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>MIDDLE_NAME</filename></term>
-                        <listitem><para>text field to hold a person's middle name</para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>LAST_NAME</filename></term>
-                        <listitem><para>required text field to hold a person's last name</para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>NAME_SUFFIX</filename></term>
-                        <listitem><para>optional text field to hold any name suffix information, such as III, Jr., Sr, etc.</para></listitem>
-                    </varlistentry>
-                </variablelist>
+
+                <figure>
+                    <title>eDmv Candidate Database Schema</title>
+                    <graphic scalefit="1" fileref="images/eDmv_dbschema.jpg"/>
+                </figure>
+          
+                <section id="edatashare-project1-tech-dmvdb-person">
+                    <title>EDMV_PERSON</title>
+                    <para>
+                        This table is used to hold core information about drivers and vehicle owners.
+                    </para>
+                    <variablelist spacing="compact">
+                        <varlistentry>
+                            <term><filename>ID</filename></term>
+                            <listitem><para>synthetic field to identify a specific person</para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>FIRST_NAME</filename></term>
+                            <listitem><para>required text field to hold a person's first name</para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>MIDDLE_NAME</filename></term>
+                            <listitem><para>text field to hold a person's middle name</para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>LAST_NAME</filename></term>
+                            <listitem><para>required text field to hold a person's last name</para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>NAME_SUFFIX</filename></term>
+                            <listitem><para>optional text field to hold any name suffix information, such as III, Jr., Sr, etc.</para></listitem>
+                        </varlistentry>
+                    </variablelist>
+                </section>
+
+                <section id="edatashare-project1-tech-dmvdb-physicaldetails">
+                    <title>EDMV_PHYSICAL_DETAILS</title>
+                    <para>
+                        This table holds the physical
+                        description of an individual. This information is required 
+                        for a driver's license, but not for a vehicle owner.
+                    </para>
+                    <variablelist spacing="compact">
+                        <varlistentry>
+                            <term><filename>PERSON_ID</filename></term>
+                            <listitem><para>(0..1:1 relationship with EDMV_PERSON) - 
+                                used to form a primary key join with the EDMV_PERSON.
+                                </para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>SEX
+                            </filename></term>
+                            <listitem><para>indicates male or female. This 
+                                can be an ordinal code (0,1,2), symbolic character (U,M,F), or 
+                                textual word (Unknown, Male, Female).
+                                </para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>DOB
+                            </filename></term>
+                            <listitem><para>This is holds the person's date of birth</para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>HEIGHT</filename></term>
+                            <listitem><para>(inches) - numeric field holds the height measurement for a person</para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>WEIGHT</filename></term>
+                            <listitem><para>(lbs) - numeric field holds the weight measurement for a person</para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>EYE_COLOR</filename></term>
+                            <listitem><para>holds either the ordinal code or textual name for a person's eye color</para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>HAIR_COLOR</filename></term>
+                            <listitem><para>holds either the ordinal code or textual name for the person's hair color</para></listitem>
+                        </varlistentry>
+                    </variablelist>
+                </section>
+
+                <section id="edatashare-project1-tech-dmvdb-photo">
+                    <title>EDMV_PHOTO</title>
+                    <para>
+                        This table holds photos for the drivers.
+                    </para>
+                    <variablelist spacing="compact">
+                        <varlistentry>
+                            <term><filename>PERSON_ID</filename></term>
+                            <listitem><para>
+                                (0..1:1 relationship with PHYSICAL_DETAILS) - 
+                                forms a primary key join with either the 
+                                physical details or person.
+                                </para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>IMAGE</filename></term>
+                            <listitem><para>
+                                blob field holds the digital image for the
+                                photo. It might also be useful to have a field to indicate
+                                the image type.
+                                </para></listitem>
+                        </varlistentry>
+                    </variablelist>
+                </section>
+
+                <section id="edatashare-project1-tech-dmvdb-location">
+                    <title>EDMV_LOCATION</title>
+                    <para>
+                        This table holds a location that 
+                        refers to a place without regard to time. One can have this
+                        table encapsulate the address information for a specific person
+                        or be used to also hold the common address record for multiple
+                        people with the same address. The former will result in
+                        multiple rows for the same physical address. The later will 
+                        require some de-duping when new information is inserted.
+                    </para>
+                    <variablelist spacing="compact">
+                        <varlistentry>
+                            <term><filename>ID</filename></term>
+                            <listitem><para>a synthetic value to identify a specific address</para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>STREET_NO</filename></term>
+                            <listitem><para>text field to hold the street number for an address</para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>STREET_NAME</filename></term>
+                            <listitem><para>text field to hold the street name for an address</para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>CITY</filename></term>
+                            <listitem><para>text field to hold the city name for an address</para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>STATE_CODE</filename></term>
+                            <listitem><para>text field to hold the state code name for an address</para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>ZIP</filename></term>
+                            <listitem><para>text field to hold the postal zip code for an address</para></listitem>
+                        </varlistentry>
+                    </variablelist>
+                </section>
+
+                <section id="edatashare-project1-tech-dmvdb-residence">
+                    <title>EDMV_RESIDENCE</title>
+                    <para>
+                        This table provides a start/end address for a location to form a residence.
+                    </para>
+                    <variablelist spacing="compact">
+                        <varlistentry>
+                            <term><filename>PERSON_ID
+                            </filename></term>
+                            <listitem><para>
+                                (N:1 relationship with EDMV_PERSON) - forms a primary key 
+                                join with the EDMV_PERSON table.
+                                </para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>LOCATION_ID</filename></term>
+                            <listitem><para>
+                                (N:1 relationship with EDMV_LOCATION) - 
+                                used to form a foreign key join with the EDMV_LOCATION table.
+                                </para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>START_DATE</filename></term>
+                            <listitem><para>
+                                required date field indicates when the residency started.
+                                </para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>END_DATE</filename></term>
+                            <listitem><para>
+                                optional date field indicates if/when the residency ended
+                                </para></listitem>
+                        </varlistentry>
+                    </variablelist>
+                </section>
+
+                <section id="edatashare-project1-tech-dmvdb-reg">
+                    <title>EDMV_VEHICLE_REGISTRATION</title>
+                    <para>
+                        This table is used to hold
+                        the core information for a vehicle registration. This table
+                        will also have a many-to-many relationship with EDMV_PERSON
+                        to hold current ownership information.
+                    </para>
+                    <variablelist spacing="compact">
+                        <varlistentry>
+                            <term><filename>ID</filename></term>
+                            <listitem><para>
+                                a synthetic value to identify a specific vehicle registration
+                                </para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>TAG_NO</filename></term>
+                            <listitem><para>
+                                textual field to hold the current tag number for the vehicle.
+                                </para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>VIN</filename></term>
+                            <listitem><para>
+                                textual field to hold the DMV identity
+                                for the vehicle. This could also be used as a primary key
+                                but would require one to solve seller/buyer overlap for 
+                                the same physical vehicle.
+                                </para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>MAKE</filename></term>
+                            <listitem><para>
+                                a textual field to hold the make name for the registered vehicle.
+                                </para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>MODEL</filename></term>
+                            <listitem><para>
+                                a textual field to hold the model name for the registered vehicle.
+                                </para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>YEAR</filename></term>
+                            <listitem><para>
+                                numeric field to hold the model year for the registered vehicle
+                                </para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>EXPIRATION</filename></term>
+                            <listitem><para>
+                                date field holds the registration expiration date
+                                </para></listitem>
+                        </varlistentry>
+                    </variablelist>
+                </section>
+
+                <section id="edatashare-project1-tech-dmvdb-vehowner">
+                    <title>EDMV_VEHICLE_OWNER_LINK</title>
+                    <para>
+                        This table is used to hold
+                        the many-to-many relationship between EDMV_PERSON and
+                        EDMV_VEHICLE_REGISTRATION to represent vehicle owners in a 
+                        registration.
+                    </para>
+                    <variablelist spacing="compact">
+                        <varlistentry>
+                            <term><filename>OWNER_ID
+                            </filename></term>
+                            <listitem><para>foreign key reference to EMDV_PERSON</para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>VEHICLE_ID</filename></term>
+                            <listitem><para>(0..N:0..M) - foreign key reference to EDMV_VEHICLE_REGISTRATION</para></listitem>
+                        </varlistentry>
+                    </variablelist>
+                </section>
             </section>
 
-            <section id="edatashare-project1-tech-dmvdb-physicaldetails">
-                <title>EDMV_PHYSICAL_DETAILS</title>
-                <para>
-                    This table holds the physical
-                    description of an individual. This information is required 
-                    for a driver's license, but not for a vehicle owner.
-                </para>
-                <variablelist spacing="compact">
-                    <varlistentry>
-                        <term><filename>PERSON_ID</filename></term>
-                        <listitem><para>(0..1:1 relationship with EDMV_PERSON) - 
-                            used to form a primary key join with the EDMV_PERSON.
-                            </para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>SEX
-                        </filename></term>
-                        <listitem><para>indicates male or female. This 
-                            can be an ordinal code (0,1,2), symbolic character (U,M,F), or 
-                            textual word (Unknown, Male, Female).
-                            </para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>DOB
-                        </filename></term>
-                        <listitem><para>This is holds the person's date of birth</para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>HEIGHT</filename></term>
-                        <listitem><para>(inches) - numeric field holds the height measurement for a person</para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>WEIGHT</filename></term>
-                        <listitem><para>(lbs) - numeric field holds the weight measurement for a person</para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>EYE_COLOR</filename></term>
-                        <listitem><para>holds either the ordinal code or textual name for a person's eye color</para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>HAIR_COLOR</filename></term>
-                        <listitem><para>holds either the ordinal code or textual name for the person's hair color</para></listitem>
-                    </varlistentry>
-                </variablelist>
-            </section>
-
-            <section id="edatashare-project1-tech-dmvdb-photo">
-                <title>EDMV_PHOTO</title>
-                <para>
-                    This table holds photos for the drivers.
-                </para>
-                <variablelist spacing="compact">
-                    <varlistentry>
-                        <term><filename>PERSON_ID</filename></term>
-                        <listitem><para>
-                            (0..1:1 relationship with PHYSICAL_DETAILS) - 
-                            forms a primary key join with either the 
-                            physical details or person.
-                            </para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>IMAGE</filename></term>
-                        <listitem><para>
-                            blob field holds the digital image for the
-                            photo. It might also be useful to have a field to indicate
-                            the image type.
-                            </para></listitem>
-                    </varlistentry>
-                </variablelist>
-            </section>
-
-            <section id="edatashare-project1-tech-dmvdb-location">
-                <title>EDMV_LOCATION</title>
-                <para>
-                    This table holds a location that 
-                    refers to a place without regard to time. One can have this
-                    table encapsulate the address information for a specific person
-                    or be used to also hold the common address record for multiple
-                    people with the same address. The former will result in
-                    multiple rows for the same physical address. The later will 
-                    require some de-duping when new information is inserted.
-                </para>
-                <variablelist spacing="compact">
-                    <varlistentry>
-                        <term><filename>ID</filename></term>
-                        <listitem><para>a synthetic value to identify a specific address</para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>STREET_NO</filename></term>
-                        <listitem><para>text field to hold the street number for an address</para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>STREET_NAME</filename></term>
-                        <listitem><para>text field to hold the street name for an address</para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>CITY</filename></term>
-                        <listitem><para>text field to hold the city name for an address</para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>STATE_CODE</filename></term>
-                        <listitem><para>text field to hold the state code name for an address</para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>ZIP</filename></term>
-                        <listitem><para>text field to hold the postal zip code for an address</para></listitem>
-                    </varlistentry>
-                </variablelist>
-            </section>
-
-            <section id="edatashare-project1-tech-dmvdb-residence">
-                <title>EDMV_RESIDENCE</title>
-                <para>
-                    This table provides a start/end address for a location to form a residence.
-                </para>
-                <variablelist spacing="compact">
-                    <varlistentry>
-                        <term><filename>PERSON_ID
-                        </filename></term>
-                        <listitem><para>
-                            (N:1 relationship with EDMV_PERSON) - forms a primary key 
-                            join with the EDMV_PERSON table.
-                            </para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>LOCATION_ID</filename></term>
-                        <listitem><para>
-                            (N:1 relationship with EDMV_LOCATION) - 
-                            used to form a foreign key join with the EDMV_LOCATION table.
-                            </para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>START_DATE</filename></term>
-                        <listitem><para>
-                            required date field indicates when the residency started.
-                            </para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>END_DATE</filename></term>
-                        <listitem><para>
-                            optional date field indicates if/when the residency ended
-                            </para></listitem>
-                    </varlistentry>
-                </variablelist>
-            </section>
-
-            <section id="edatashare-project1-tech-dmvdb-reg">
-                <title>EDMV_VEHICLE_REGISTRATION</title>
-                <para>
-                    This table is used to hold
-                    the core information for a vehicle registration. This table
-                    will also have a many-to-many relationship with EDMV_PERSON
-                    to hold current ownership information.
-                </para>
-                <variablelist spacing="compact">
-                    <varlistentry>
-                        <term><filename>ID</filename></term>
-                        <listitem><para>
-                            a synthetic value to identify a specific vehicle registration
-                            </para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>TAG_NO</filename></term>
-                        <listitem><para>
-                            textual field to hold the current tag number for the vehicle.
-                            </para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>VIN</filename></term>
-                        <listitem><para>
-                            textual field to hold the DMV identity
-                            for the vehicle. This could also be used as a primary key
-                            but would require one to solve seller/buyer overlap for 
-                            the same physical vehicle.
-                            </para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>MAKE</filename></term>
-                        <listitem><para>
-                            a textual field to hold the make name for the registered vehicle.
-                            </para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>MODEL</filename></term>
-                        <listitem><para>
-                            a textual field to hold the model name for the registered vehicle.
-                            </para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>YEAR</filename></term>
-                        <listitem><para>
-                            numeric field to hold the model year for the registered vehicle
-                            </para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>EXPIRATION</filename></term>
-                        <listitem><para>
-                            date field holds the registration expiration date
-                            </para></listitem>
-                    </varlistentry>
-                </variablelist>
-            </section>
-
-            <section id="edatashare-project1-tech-dmvdb-vehowner">
-                <title>EDMV_VEHICLE_OWNER_LINK</title>
-                <para>
-                    This table is used to hold
-                    the many-to-many relationship between EDMV_PERSON and
-                    EDMV_VEHICLE_REGISTRATION to represent vehicle owners in a 
-                    registration.
-                </para>
-                <variablelist spacing="compact">
-                    <varlistentry>
-                        <term><filename>OWNER_ID
-                        </filename></term>
-                        <listitem><para>foreign key reference to EMDV_PERSON</para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>VEHICLE_ID</filename></term>
-                        <listitem><para>(0..N:0..M) - foreign key reference to EDMV_VEHICLE_REGISTRATION</para></listitem>
-                    </varlistentry>
-                </variablelist>
-            </section>
-        </section>
-
-        <section id="edatashare-project1-tech-maydb">
-            <title>eMayberry Candidate Database Schema</title>
-
-            <figure>
+            <section id="edatashare-project1-tech-maydb">
                 <title>eMayberry Candidate Database Schema</title>
-                <graphic scalefit="1" fileref="images/eMayberry_dbschema.jpg"/>
-            </figure>
-      
-            <section id="edatashare-project1-tech-maydb-poi">
-                <title>EMAY_POI</title>
-                <para>
-                    This table is used to hold the core information for a person of interest.
-                </para>
-                <variablelist spacing="compact">
-                    <varlistentry>
-                        <term><filename>ID</filename></term>
-                        <listitem><para>
-                            a synthetic value used to identify the
-                            record within eMayberry. This will not be the same ID
-                            value from eDmv due to the fact that they are separate
-                            systems.
-                            </para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>FIRST_NAME</filename></term>
-                        <listitem><para>
-                            textual field holds the first name for a person of interest
-                            </para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>MIDDLE_NAME</filename></term>
-                        <listitem><para>
-                            textual field holds the middle name for a person of interest
-                            </para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>LAST_NAME</filename></term>
-                        <listitem><para>
-                            textual field holds the middle name for a person of interest
-                            </para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>ALIAS_FOR</filename></term>
-                        <listitem><para>
-                            (0..N:1 to EMAY_POI) holds the foreign key from an alias name 
-                            to the primary name for a person of interest.
-                            </para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>DMV_ID</filename></term>
-                        <listitem><para>
-                            could be used to
-                            hold PK information for the person of interest's identity
-                            within DMV. If used, this should not be declared as a
-                            foreign key reference since DMV and Mayberry are meant to 
-                            be deployed to separate physical databases. If it is not
-                            used, then a search by first, middle, and last name would
-                            be required each time; knowing that this does not uniquely 
-                            identify a person in all cases.
-                            </para></listitem>
-                    </varlistentry>
-                </variablelist>
-            </section>
 
-            <section id="edatashare-project1-tech-maydb-activity">
-                <title>ACTIVITY</title>
-                <para>
-                    This table holds activity (traffic ticket, crime, etc.) for a person of interest
-                </para>
-                <variablelist spacing="compact">
-                    <varlistentry>
-                        <term><filename>ID</filename></term>
-                        <listitem><para>
-                            a synthetic value used to identify a specific activity record
-                            </para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>POI_ID</filename></term>
-                        <listitem><para>
-                            (0..N:1) foreign key reference to EMAY_POI to form a many-to-one relationship
-                            </para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>DATE</filename></term>
-                        <listitem><para>
-                            holds the date of occurrence for the
-                            activity. At this point we are not worrying about a
-                            start/end date that spans more than a day.
-                            </para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>CODE</filename></term>
-                        <listitem><para>
-                            holds a value that indicates the type of activity record for the person of interest
-                            </para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>DESCRIPTION</filename></term>
-                        <listitem><para>
-                            narrative description specific to the actual event
-                            </para></listitem>
-                    </varlistentry>
-                </variablelist>
+                <figure>
+                    <title>eMayberry Candidate Database Schema</title>
+                    <graphic scalefit="1" fileref="images/eMayberry_dbschema.jpg"/>
+                </figure>
+          
+                <section id="edatashare-project1-tech-maydb-poi">
+                    <title>EMAY_POI</title>
+                    <para>
+                        This table is used to hold the core information for a person of interest.
+                    </para>
+                    <variablelist spacing="compact">
+                        <varlistentry>
+                            <term><filename>ID</filename></term>
+                            <listitem><para>
+                                a synthetic value used to identify the
+                                record within eMayberry. This will not be the same ID
+                                value from eDmv due to the fact that they are separate
+                                systems.
+                                </para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>FIRST_NAME</filename></term>
+                            <listitem><para>
+                                textual field holds the first name for a person of interest
+                                </para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>MIDDLE_NAME</filename></term>
+                            <listitem><para>
+                                textual field holds the middle name for a person of interest
+                                </para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>LAST_NAME</filename></term>
+                            <listitem><para>
+                                textual field holds the middle name for a person of interest
+                                </para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>ALIAS_FOR</filename></term>
+                            <listitem><para>
+                                (0..N:1 to EMAY_POI) holds the foreign key from an alias name 
+                                to the primary name for a person of interest.
+                                </para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>DMV_ID</filename></term>
+                            <listitem><para>
+                                could be used to
+                                hold PK information for the person of interest's identity
+                                within DMV. If used, this should not be declared as a
+                                foreign key reference since DMV and Mayberry are meant to 
+                                be deployed to separate physical databases. If it is not
+                                used, then a search by first, middle, and last name would
+                                be required each time; knowing that this does not uniquely 
+                                identify a person in all cases.
+                                </para></listitem>
+                        </varlistentry>
+                    </variablelist>
+                </section>
+
+                <section id="edatashare-project1-tech-maydb-activity">
+                    <title>ACTIVITY</title>
+                    <para>
+                        This table holds activity (traffic ticket, crime, etc.) for a person of interest
+                    </para>
+                    <variablelist spacing="compact">
+                        <varlistentry>
+                            <term><filename>ID</filename></term>
+                            <listitem><para>
+                                a synthetic value used to identify a specific activity record
+                                </para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>POI_ID</filename></term>
+                            <listitem><para>
+                                (0..N:1) foreign key reference to EMAY_POI to form a many-to-one relationship
+                                </para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>DATE</filename></term>
+                            <listitem><para>
+                                holds the date of occurrence for the
+                                activity. At this point we are not worrying about a
+                                start/end date that spans more than a day.
+                                </para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>CODE</filename></term>
+                            <listitem><para>
+                                holds a value that indicates the type of activity record for the person of interest
+                                </para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>DESCRIPTION</filename></term>
+                            <listitem><para>
+                                narrative description specific to the actual event
+                                </para></listitem>
+                        </varlistentry>
+                    </variablelist>
+                </section>
+
             </section>
 
         </section>
 
 
-        <section id="edatashare-project1-tech-dmvbo">
-            <title>eDmv Candidate Business Objects</title>
-            <figure>
+        <section id="edatashare-project1-tech-bo">
+            <title>Business Objects</title>
+
+            <section id="edatashare-project1-tech-dmvbo">
                 <title>eDmv Candidate Business Objects</title>
-                <graphic scalefit="1" fileref="images/eDmv_classes.jpg"/>
-            </figure>
+                <figure>
+                    <title>eDmv Candidate Business Objects</title>
+                    <graphic scalefit="1" fileref="images/eDmv_classes.jpg"/>
+                </figure>
 
-            <section id="edatashare-project1-tech-dmvbo-person">
-                <title>Person</title>
-                <para>
-                    Design a class that encapsulates information
-                    for a Driver and/or Vehicle Owner.
-                </para>
-                <variablelist spacing="compact">
-                    <varlistentry>
-                        <term><filename>id:long</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>firstName:String</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>middleName:String</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>lastName:String</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>nameSuffix:String</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>currentResidence:Residence</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>residences:Collection&lt;Residence&gt;</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>physicalDetails:PhysicalDetails</filename></term>
-                    </varlistentry>
-                </variablelist>
+                <section id="edatashare-project1-tech-dmvbo-person">
+                    <title>Person</title>
+                    <para>
+                        Design a class that encapsulates information
+                        for a Driver and/or Vehicle Owner.
+                    </para>
+                    <variablelist spacing="compact">
+                        <varlistentry>
+                            <term><filename>id:long</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>firstName:String</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>middleName:String</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>lastName:String</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>nameSuffix:String</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>currentResidence:Residence</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>residences:Collection&lt;Residence&gt;</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>physicalDetails:PhysicalDetails</filename></term>
+                        </varlistentry>
+                    </variablelist>
+                </section>
+
+                <section id="edatashare-project1-tech-dmvbo-phydetails">
+                    <title>PhysicalDetails</title>
+                    <para>
+                        Design a class that encapsulates
+                        the physical details used to describe the person. This
+                        information is primarily used for driver's licenses and not
+                        needed for vehicle registrations.
+                    </para>
+                    <variablelist spacing="compact">
+                        <varlistentry>
+                            <term><filename>id:long</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>sex: SEX (enum)</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>dob: Date</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>height:int</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>weight:int</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>eyeColor: COLOR (enum)</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>hairColor: COLOR (enum)</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>photo:byte[]</filename></term>
+                        </varlistentry>
+                    </variablelist>
+                </section>
+
+                <section id="edatashare-project1-tech-dmvbo-photo">
+                    <title>Photo</title>
+                    <para>
+                        Design a class to hold the photo for a physical
+                        details. By separating this from the physical details, we can
+                        more easily limit the size/amount of information returned for
+                        basic queries.
+                    </para>
+                    <variablelist spacing="compact">
+                        <varlistentry>
+                            <term><filename>id:long</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>image:byte[]</filename></term>
+                        </varlistentry>
+                    </variablelist>
+                </section>
+
+                <section id="edatashare-project1-tech-dmvbo-residence">
+                    <title>Residence</title>
+                    <para>
+                        Design a class (or set of classes) to 
+                        represent the residence for people. The address information
+                        can be either a unique instance for each residence/Person
+                        or a shared instance across residences/People.
+                    </para>
+                    <variablelist spacing="compact">
+                        <varlistentry>
+                            <term><filename>locationId:long</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>streetNo:int</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>streetName:String</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>city:String</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>state:STATE (enum)</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>zip:String</filename></term>
+                        </varlistentry>
+                    </variablelist>
+                </section>
+
+                <section id="edatashare-project1-tech-dmvbo-vehreg">
+                    <title>VehicleRegistration</title>
+                    <para>
+                        Design a class to represent a vehicle registration.
+                    </para>
+                    <variablelist spacing="compact">
+                        <varlistentry>
+                            <term><filename>id:long</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>tagNo:String</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>vin:String</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>make:String</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>model:String</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>color:COLOR (enum)</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>year:Date</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>expiration:Date</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>owners:Collection&lt;Person&gt;</filename></term>
+                        </varlistentry>
+                    </variablelist>
+                </section>
             </section>
 
-            <section id="edatashare-project1-tech-dmvbo-phydetails">
-                <title>PhysicalDetails</title>
-                <para>
-                    Design a class that encapsulates
-                    the physical details used to describe the person. This
-                    information is primarily used for driver's licenses and not
-                    needed for vehicle registrations.
-                </para>
-                <variablelist spacing="compact">
-                    <varlistentry>
-                        <term><filename>id:long</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>sex: SEX (enum)</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>dob: Date</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>height:int</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>weight:int</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>eyeColor: COLOR (enum)</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>hairColor: COLOR (enum)</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>photo:byte[]</filename></term>
-                    </varlistentry>
-                </variablelist>
-            </section>
-
-            <section id="edatashare-project1-tech-dmvbo-photo">
-                <title>Photo</title>
-                <para>
-                    Design a class to hold the photo for a physical
-                    details. By separating this from the physical details, we can
-                    more easily limit the size/amount of information returned for
-                    basic queries.
-                </para>
-                <variablelist spacing="compact">
-                    <varlistentry>
-                        <term><filename>id:long</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>image:byte[]</filename></term>
-                    </varlistentry>
-                </variablelist>
-            </section>
-
-            <section id="edatashare-project1-tech-dmvbo-residence">
-                <title>Residence</title>
-                <para>
-                    Design a class (or set of classes) to 
-                    represent the residence for people. The address information
-                    can be either a unique instance for each residence/Person
-                    or a shared instance across residences/People.
-                </para>
-                <variablelist spacing="compact">
-                    <varlistentry>
-                        <term><filename>locationId:long</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>streetNo:int</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>streetName:String</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>city:String</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>state:STATE (enum)</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>zip:String</filename></term>
-                    </varlistentry>
-                </variablelist>
-            </section>
-
-            <section id="edatashare-project1-tech-dmvbo-vehreg">
-                <title>VehicleRegistration</title>
-                <para>
-                    Design a class to represent a vehicle registration.
-                </para>
-                <variablelist spacing="compact">
-                    <varlistentry>
-                        <term><filename>id:long</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>tagNo:String</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>vin:String</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>make:String</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>model:String</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>color:COLOR (enum)</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>year:Date</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>expiration:Date</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>owners:Collection&lt;Person&gt;</filename></term>
-                    </varlistentry>
-                </variablelist>
-            </section>
-        </section>
-
-        <section id="edatashare-project1-tech-maybo">
-            <title>eMayberry Candidate Business Objects</title>
-            <figure>
+            <section id="edatashare-project1-tech-maybo">
                 <title>eMayberry Candidate Business Objects</title>
-                <graphic scalefit="1" fileref="images/eMayberry_classes.jpg"/>
-            </figure>
+                <figure>
+                    <title>eMayberry Candidate Business Objects</title>
+                    <graphic scalefit="1" fileref="images/eMayberry_classes.jpg"/>
+                </figure>
 
-            <section id="edatashare-project1-tech-maybo-poi">
-                <title>POI</title>
-                <para>
-                    Design a class that encapsulates 
-                    the identity of for a person of interest. A person may have 
-                    zero-to-many aliases.
-                </para>
-                <variablelist spacing="compact">
-                    <varlistentry>
-                        <term><filename>id:long</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>firstName:String</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>middleName:String</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>lastName:String</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>aliases:Collection&lt;POI&gt;</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>activities:Collection&lt;Activity&gt;</filename></term>
-                    </varlistentry>
-                </variablelist>
+                <section id="edatashare-project1-tech-maybo-poi">
+                    <title>POI</title>
+                    <para>
+                        Design a class that encapsulates 
+                        the identity of for a person of interest. A person may have 
+                        zero-to-many aliases.
+                    </para>
+                    <variablelist spacing="compact">
+                        <varlistentry>
+                            <term><filename>id:long</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>firstName:String</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>middleName:String</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>lastName:String</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>aliases:Collection&lt;POI&gt;</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>activities:Collection&lt;Activity&gt;</filename></term>
+                        </varlistentry>
+                    </variablelist>
+                </section>
+
+                <section id="edatashare-project1-tech-maybo-">
+                    <title>Activity</title>
+                    <para>
+                        Design a class that encapsulates 
+                        a specific event/activity for a person of interest.
+                    </para>
+                    <variablelist spacing="compact">
+                        <varlistentry>
+                            <term><filename>id:long</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>date:Date</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>type:enum</filename></term>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>description:String</filename></term>
+                        </varlistentry>
+                    </variablelist>
+                </section>
+
             </section>
-
-            <section id="edatashare-project1-tech-maybo-">
-                <title>Activity</title>
-                <para>
-                    Design a class that encapsulates 
-                    a specific event/activity for a person of interest.
-                </para>
-                <variablelist spacing="compact">
-                    <varlistentry>
-                        <term><filename>id:long</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>date:Date</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>type:enum</filename></term>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>description:String</filename></term>
-                    </varlistentry>
-                </variablelist>
-            </section>
-
         </section>
 
         <section id="edatashare-project1-tech-ingest">
@@ -926,7 +935,7 @@
                 interface should encapsulate the fact that an EntityManager is being
                 used and the same EntityManager should be shared among other DAOs in
                 the same Thread. Your DAOs should not attempt to control the transaction 
-                or they will &lt;NOT&gt; be portable to the EJB tier.
+                or they will <emphasis>NOT</emphasis> be portable to the EJB tier.
             </para>
 
             <section id="edatashare-project1-tech-dmvdao">
@@ -981,78 +990,562 @@
             </section>
         </section>
 
-<!--
-                <orderedlist spacing="compact">
-                    <listitem><para>
-                        </para> </listitem>
-                    <listitem><para>
-                        </para> </listitem>
-                </orderedlist>
-            <section id="edatashare-project1-tech-maybo-">
-                <title>
-                </title>
-                <para>
-                </para>
+        <section id="edatashare-project1-tech-bl">
+            <title>Business Logic</title>
+            <para>
+                Design an initial business interface and business logic for
+                the applications. The core O/R mapping work will be done
+                by the DAOs.  However, it is the ultimate responsibility of these
+                business logic implementations that either it or the business objects
+                enforce the business rules of the application. The DAOs only perform
+                O/R mapping and do not enforce such things as a physical details
+                required for a driver's license. The
+                business logic is assumed to work within the context of a single,
+                externally controlled transaction. Do not attempt to control the
+                transaction of the EntityManager within these objects or you will
+                <emphasis>NOT</emphasis> be portable to the EJB tier. You need only implement the behavior
+                required to implement the end-to-end use case listed in the testing
+                section. Some of the anticipated methods are listed below.
+            </para>
+
+            <section id="edatashare-project1-tech-dmvbl">
+                <title>eDMV Business Logic</title>
+
+                <figure>
+                    <title>eDMV Business Logic</title>
+                    <graphic scalefit="1" fileref="images/eDmv_business_logic.jpg"/>
+                </figure>
                 <variablelist spacing="compact">
                     <varlistentry>
-                        <term><filename>
-                        </filename></term>
+                        <term><filename>DriverMgmt/DriverMgmtImpl</filename></term>
                         <listitem><para>
-                        </para></listitem>
+                            Encapsulate the actions required to manage Drivers and their 
+                            associated information.  The project is primarily interested 
+                            in query methods after ingest. 
+                            </para>
+                            <orderedlist spacing="compact">
+                                <listitem><para>
+                                    addDriver - design the ability to add a driver
+                                    with their physical details and residence.
+                                    </para> </listitem>
+                                <listitem><para>
+                                    moveResidence - design the ability to change the
+                                    residence for a driver.
+                                    </para> </listitem>
+                                <listitem><para>
+                                    getDriver - you will need to be able to return a 
+                                    driver by id.
+                                    </para> </listitem>
+                                <listitem><para>
+                                    getDrivers - you will need to be able to return a 
+                                    collection of drivers by such things as ByName.
+                                    </para> </listitem>
+                            </orderedlist>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>VehicleMgmt/VehicleMgmtImpl</filename></term>
+                        <listitem><para>
+                            Encapsulate the actions
+                            required to manage Vehicle Registrations and ownership. The
+                            project is primarily interested in query methods after ingest.
+                            </para>
+                            <orderedlist spacing="compact">
+                                <listitem><para>
+                                    addRegistration - design the ability to add a new 
+                                    registration with references to owners.
+                                    </para> </listitem>
+                                <listitem><para>
+                                    getRegistrationsByMakeModel - design the ability to
+                                    return a collection of registrations by such things as
+                                    make/model or owner name.
+                                    </para> </listitem>
+                                <listitem><para>
+                                    getRegistrationsByOwner - design the ability to return
+                                    registrations for a specific owner.
+                                    </para> </listitem>
+                            </orderedlist>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>PersonMgmt/PersonMgmtImpl</filename></term>
+                        <listitem><para>
+                            Encapsulate the actions
+                            to query for individuals within eDmv. This will include
+                            drivers and owners.
+                            </para>
+                            <orderedlist spacing="compact">
+                                <listitem><para>
+                                    getPeopleByName - design the ability to return a 
+                                    collection of people (drivers and owners) by their
+                                    name.
+                                    </para> </listitem>
+                                <listitem><para>
+                                    getPerson - design the ability to return a specific
+                                    person (driver or owner).
+                                    </para> </listitem>
+                            </orderedlist>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>DmvTestUtil/DmvTestUtilImpl</filename></term>
+                        <listitem><para>
+                            A useful tool during
+                            testing that encapsulates how to get the application back into
+                            a known state prior to running a test or to inspect values not
+                            normally exposed through the normal business interfaces.
+                            </para>
+                            <orderedlist spacing="compact">
+                                <listitem><para>
+                                    resetAll - sanely take the state of the system down to a coldstart.
+                                    </para> </listitem>
+                                <listitem><para>
+                                    populate - you might want the database populated with 
+                                    a known state prior to running a test. This may delegate
+                                    to the DmvIngestor.
+                                    </para> </listitem>
+                            </orderedlist>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>DmvIngestor</filename></term>
+                        <listitem><para>
+                            The Ingestor written as a part of a separate
+                            requirement is also logically considered part of this tier.
+                            </para>
+                            <orderedlist spacing="compact">
+                                <listitem><para>
+                                    populate - point an externally provided parser at a
+                                    set of test data and use the DAOs to populate the system
+                                    to a known state.
+                                    </para> </listitem>
+                            </orderedlist>
+                        </listitem>
                     </varlistentry>
                 </variablelist>
             </section>
 
+            <section id="edatashare-project1-tech-maybl">
+                <title>eMayberry Business Logic</title>
+
+                <figure>
+                    <title>eMayberry Business Logic</title>
+                    <graphic scalefit="1" fileref="images/eMayberry_business_logic.jpg"/>
+                </figure>
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>PoiMgmt/PoiMgmtImpl</filename></term>
+                        <listitem><para>
+                            Encapsulates the actions
+                            required to manage persons of interest.
+                            </para>
+                            <orderedlist spacing="compact">
+                                <listitem><para>
+                                    addPOI - add a person of interest to the system.
+                                    </para> </listitem>
+                                <listitem><para>
+                                    addActivity - add a specific activity for a person of
+                                    interest.
+                                    </para> </listitem>
+                                <listitem><para>
+                                    getPOI - get a specific person of interest. This will
+                                    initially return just the POI information and Actvities.
+                                    In the follow-on projects, we'll add contact information
+                                    from eDmv.
+                                    </para> </listitem>
+                                <listitem><para>
+                                    isDangerous - determine if a person of interest is 
+                                    considered dangerous. The implementation of this method
+                                    could be as simple as the presence of the word "dangerous"
+                                    being present in any activity description associated with
+                                    the person of interest.
+                                    </para> </listitem>
+                            </orderedlist>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>MayberryTestUtil/MayberryTestUtilImpl</filename></term>
+                        <listitem><para>
+                            A useful tool during
+                            testing that encapsulates how to get the application back into
+                            a known state prior to running a test or to inspect values not
+                            normally exposed through the normal business interfaces.
+                            </para>
+                            <orderedlist spacing="compact">
+                                <listitem><para>
+                                    resetAll - sanely take the state of the system down to a
+                                    coldstart.
+                                    </para> </listitem>
+                                <listitem><para>
+                                    populate - it may be helpful to return the database to
+                                    a known populated state between tests. Note: there will
+                                    be no data provided or required for ingest to bootstrap
+                                    Mayberry. The end-to-end scenario will start with this
+                                    application in the coldstart state.
+                                    </para> </listitem>
+                            </orderedlist>
+                        </listitem>
+                    </varlistentry>
+                </variablelist>
+            </section>
+        </section>
+
+        <section id="edatashare-project1-testing">
+            <title>Testing</title>
+
+            <note>
+                <para>
+                    The end-to-end scenario will test you business logic, DAO, and BOs in a 
+                    "happy path" scenario. Any white-box or black-box testing of alternate
+                    and error paths would be appropriate to put in the unit tests.
+                </para>
+            </note>
+            <orderedlist spacing="compact">
+                <listitem><para>
+                    Provide a JUnit test for your business objects (BOs) that test
+                    the manipulation of the data. An example test might be to try
+                    adding a residence to a Person without a start date.  These tests
+                    should be packaged with the BOs. It is anticipated that these 
+                    tests will be a minimal demonstration of understanding.
+                    </para> </listitem>
+                <listitem><para>
+                    Provide a JUnit test for your eDmv and eMayberry JPA DAOs. This
+                    should test the implementation for the required CRUD operations
+                    for each type of object. It is understood that some of the objects
+                    will be handled by cascades, so you might not have a set of methods
+                    handling each type of business object.  This test should be packaged
+                    with the DAOs.
+                    </para> </listitem>
+                <listitem><para>
+                    Provide a JUnit test for your business logic to test the
+                    basic functionality of your business logic design, including ingest.
+                    The ingestor test should be able to reference a known data file and
+                    ingest records into the database using the DAOs. These tests
+                    should be packaged with the business logic implementation.
+                    </para> </listitem>
+                <listitem><para>
+                    Provide a set of JUnit test programs to verify the following
+                    end-to-end scenario in eDmv.  This test should be implemented as
+                    a JUnit test and packaged with the business logic implementation.
+                    </para>
+                    <orderedlist spacing="compact">
+                        <listitem><para>
+                            reset (using DmvTestUtilImpl)
+                            </para> </listitem>
+                        <listitem><para>
+                            populate (using DmvIngestor)
+                            </para> </listitem>
+                        <listitem><para>
+                            addDriver (using DriverMgmtImpl)
+                            </para> </listitem>
+                        <listitem><para>
+                            moveResidence (using DriverMgmtImpl)
+                            </para> </listitem>
+                        <listitem><para>
+                            addRegistration (using VehicleMgmtImpl)
+                            </para> </listitem>
+                        <listitem><para>
+                            getRegistrationByMakeModel (using VehicleMgmtImpl)
+                            </para> </listitem>
+                        <listitem><para>
+                            getPeopleByName (using PeopleMgmtImpl)
+                            </para> </listitem>
+                        <listitem><para>
+                            getPerson (using PeopleMgmtImpl)
+                            </para> </listitem>
+                        <listitem><para>
+                            getRegistrationByOwner (using VehicleMgmtImpl)
+                            </para> </listitem>
+                    </orderedlist>
+                </listitem>
+                <listitem><para>
+                    Provide a set of JUnit test programs to verify the following
+                    end-to-end scenario in eMayberry.  This test should be implemented as
+                    a JUnit test and packaged with the business logic implementation.
+                    </para> 
+                    <orderedlist spacing="compact">
+                        <listitem><para>
+                            reset (using MayberryTestUtilImpl)
+                            </para> </listitem>
+                        <listitem><para>
+                            addPoi (PoiMgmtImpl)
+                            </para> </listitem>
+                        <listitem><para>
+                            addActivity (PoiMgmtImpl)
+                            </para> </listitem>
+                        <listitem><para>
+                            getPoi (PoiMgmtImpl)
+                            </para> </listitem>
+                        <listitem><para>
+                            isDangerous (PoiMgmtImpl)
+                            </para> </listitem>
+                    </orderedlist>
+                    </listitem>
+            </orderedlist>
+        </section>
+
+        <section id="edatashare-project1-getstarted">
+            <title>Getting Started</title>
+            <para>
+                The following sketch of two directory structures can be used as a
+                starting point for your overall application. The first is a simplified
+                project layout that collapses the number of sub-projects into a single
+                "Impl" project. It is suggested that you use this layout if you
+                are new to maven and want the simplest configuration possible. The
+                second is a more robust layout and is closer to a multi-developer
+                environment.  Use the later structure if you want to better simulate a
+                work environment where the work of multiple developers needs clearer
+                separation. 
+            </para>
+
+            <note>
+                <para>
+                    All "e"DataShare, "e"Dmv, and "e"Mayberry names
+                    should be changed to your specific name mangler. The same type of
+                    modification needs to occur for the java package names.
+                </para>
+            </note>
+            <note>
+                <para>
+                    Other than a README, it is not anticipated that you
+                    will have any artifacts at the root layer. It should be
+                    used only as a convenience wrapper to perform goals across both
+                    projects. The root project can also be used for common property, 
+                    dependencyManagement, and pluginManagement defintions. All 
+                    concrete dependency and plugins should be defined in the leaf-level
+                    poms to avoid unwanted dependencies from the root or mid-level
+                    parents.
+                </para>
+            </note>
+                <figure>
+                    <title>Single Module Approach Candidate Module Structure</title>
+<programlisting language=""><![CDATA[
+eDataShare
+|-- eDmv
+|   +--eDmvImpl
+|   |   |-- pom.xml
+|   |   `-- src
+|   |       |-- main
+|   |       |   |-- java
+|   |       |   |   `-- edmv
+|   |       |   |       |-- bo
+|   |       |   |       |-- dao
+|   |       |   |       |-- jpa
+|   |       |   |       |-- bl
+|   |       |   |       |-- blimpl
+|   |       |   `-- resources
+|   |       |       `-- ddl
+|   |       |           |-- eDmv-create.ddl
+|   |       |           `-- eDmv-drop.ddl
+|   |       `-- test
+|   |           |-- java
+|   |           |   `-- edmv
+|   |           |       |-- bo
+|   |           |       |-- dao
+|   |           |       `-- bl
+|   |           `-- resources
+|   |               |-- log4j.xml
+|   |               `-- META-INF
+|   |                  `-- persistence.xml
+|   `-- pom.xml
+|-- eMayberry
+|   +--eMayberryImpl
+|   |   |-- pom.xml
+|   |   `-- src
+|   |       |-- main
+|   |       |   |-- java
+|   |       |   |   `-- emayberry
+|   |       |   |       |-- bo
+|   |       |   |       |-- dao
+|   |       |   |       |-- jpa
+|   |       |   |       |-- bl
+|   |       |   |       |-- blimpl
+|   |       |   `-- resources
+|   |       |       `-- ddl
+|   |       |           |-- eMayberry-create.ddl
+|   |       |           `-- eMayberry-drop.ddl
+|   |       `-- test
+|   |           |-- java
+|   |           |   `-- emayberry
+|   |           |       |-- bo
+|   |           |       |-- dao
+|   |           |       |-- bl
+|   |           `-- resources
+|   |               |-- log4j.xml
+|   |               `-- META-INF
+|   |                  `-- persistence.xml
+|   `-- pom.xml
+`-- pom.xml
+]]></programlisting>                        
+                </figure>
+
+                <figure>
+                    <title>Multi-Module Approach Candidate Module Structure</title>
+<programlisting language=""><![CDATA[
+eDataShare
+|-- eDmv
+|   +--eDmvBO
+|   |   |-- pom.xml
+|   |   `-- src
+|   |       |-- main
+|   |       |   `-- java
+|   |       |       `-- edmv
+|   |       |           |-- bo
+|   |       |           `-- bl
+|   |       `-- test
+|   |           |-- java
+|   |           |   `-- edmv
+|   |           |       `-- bo
+|   |           `-- resources
+|   |               `log4j.xml
+|   +--eDmvDAO
+|   |   |-- pom.xml
+|   |   `-- src
+|   |       |-- main
+|   |       |   |-- java
+|   |       |   |   `-- edmv
+|   |       |   |       |-- dao
+|   |       |   |       `-- jpa
+|   |       |   `-- resources
+|   |       |       `-- ddl
+|   |       |           |-- eDmv-create.ddl
+|   |       |           `-- eDmv-drop.ddl
+|   |       `-- test
+|   |           |-- java
+|   |           |   `-- edmv
+|   |           |       `-- dao
+|   |           `-- resources
+|   |               |-- log4j.xml
+|   |               `-- META-INF
+|   |                  `-- persistence.xml
+|   +--eDmvBLImpl
+|   |   |-- pom.xml
+|   |   `-- src
+|   |       |-- main
+|   |       |   `-- java
+|   |       |       `-- edmv
+|   |       |           `-- blimpl
+|   |       `-- test
+|   |           |-- java
+|   |           |   `-- edmv
+|   |           |       `-- bl
+|   |           `-- resources
+|   |               `-- log4j.xml
+|   `-- pom.xml
+|-- eMayberry
+|   +--eMayberryBO
+|   |   |-- pom.xml
+|   |   `-- src
+|   |       |-- main
+|   |       |   `-- java
+|   |       |       `-- emayberry
+|   |       |           |-- bo
+|   |       |           `-- bl
+|   |       `-- test
+|   |           |-- java
+|   |           |   `-- emayberry
+|   |           |       `-- bo
+|   |           `-- resources
+|   |               `-- log4j.xml
+|   +--eMayberryDAO
+|   |   |-- pom.xml
+|   |   `-- src
+|   |       |-- main
+|   |       |   |-- java
+|   |       |   |   `-- emayberry
+|   |       |   |       |-- dao
+|   |       |   |       |-- jpa
+|   |       |   `-- resources
+|   |       |       `-- ddl
+|   |       |           |-- eMayberry-create.ddl
+|   |       |           `-- eMayberry-drop.ddl
+|   |       `-- test
+|   |           |-- java
+|   |           |   `-- emayberry
+|   |           |       `-- dao
+|   |           `-- resources
+|   |               |-- log4j.xml
+|   |               `-- META-INF
+|   |                  `-- persistence.xml
+|   +--eMayberryBLImpl
+|   |   |-- pom.xml
+|   |   `-- src
+|   |       |-- main
+|   |       |   `-- java
+|   |       |       `-- emayberry
+|   |       |           `-- blimpl
+|   |       `-- test
+|   |           |-- java
+|   |           |   `-- emayberry
+|   |           |       `-- bl
+|   |           `-- resources
+|   |               `-- log4j.xml
+|   `-- pom.xml
+`-- pom.xml
+]]></programlisting>                        
+                </figure>
+        </section>
 
 
--->
-    </section>
+        <section id="edatashare-project1-grading">
+            <title>Grading</title>
+            <para>
+                Your project will be graded on completeness and quality of product. In
+                order for you to receive full credit in each area, it must be a)
+                complete, b) done well, and c) tested.  The breakdown of grading 
+                will be as follows:
+            </para>
+            <itemizedlist spacing="compact">
+                <listitem><para>
+                    README provided that describes where each requirement satisfied: 10pts
+                    </para> </listitem>
+                <listitem><para>
+                    projects cleanly builds with Maven: 15pts
+                    </para> </listitem>
+                <listitem><para>
+                    managed schema (i.e., defined in a set of files and explicitly 
+                    used to coldstart and initialize the database at defined times): 5pts
+                    </para> </listitem>
+                <listitem><para>
+                    business objects: 15pts
+                    </para> </listitem>
+                <listitem><para>
+                    JPA DAO and JPA O/R Mapping: 25pts
+                    </para> </listitem>
+                <listitem><para>
+                    Ingest: 10pts
+                    </para> </listitem>
+                <listitem><para>
+                    Business Logic: 10pts
+                    </para> </listitem>
+                <listitem><para>
+                    End-to-end Integration Test: 10pts
+                    </para> </listitem>
+            </itemizedlist>
 
+            <para>
+                Each area will be judged according to the following breakdown. For
+                areas where testing does not apply (e.g., README and build), those 
+                points will be assigned to quality:
+            </para>
+            <itemizedlist spacing="compact">
+                <listitem><para>
+                    complete: 60%
+                    </para> </listitem>
+                <listitem><para>
+                    quality of implementation supplied: 30%
+                    </para> </listitem>
+                <listitem><para>
+                    testing: 10%
+                    </para> </listitem>
+            </itemizedlist>
+        </section>
 
-<!--
-    <section id="edatashare-project1-">
-        <title></title>
-        <para></para>
-  
-        <itemizedlist spacing="compact">
-            <listitem><para></para> </listitem>
-            <listitem><para></para> </listitem>
-            <listitem><para></para> </listitem>
-        </itemizedlist>
-        <para></para>
-    </section>
-    
-
-
-    <section id="edatashare-project1-">
-        <title></title>
-        <para></para>
-  
-        <itemizedlist spacing="compact">
-            <listitem><para></para> </listitem>
-            <listitem><para></para> </listitem>
-            <listitem><para></para> </listitem>
-        </itemizedlist>
-        <para></para>
-    </section>
-
-    <section id="edatashare-project1-">
-        <title></title>
-        <para></para>
-  
-        <itemizedlist spacing="compact">
-            <listitem><para></para> </listitem>
-            <listitem><para></para> </listitem>
-            <listitem><para></para> </listitem>
-        </itemizedlist>
-        <para></para>
-    </section>
--->
-
-    <section id="edatashare-project1-summary">
-       <title>Summary</title>
-       <para>In this chapter we
-       </para>
-    </section>    
+        <section id="edatashare-project1-submission">
+            <title>Project Submission</title>
+            Please follow the 
+            <ulink url="">project submission guidelines</ulink>
+            posted in the course overview.
+        </section>
 </chapter>
   

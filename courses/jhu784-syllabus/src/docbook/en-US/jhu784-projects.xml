@@ -1,0 +1,250 @@
+<?xml version='1.0' encoding="utf-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jhu784-course-projects">
+    <title>Course Projects</title>
+
+    <section id="jhu784-course-projects-project0"->
+        <title>Project 0: Sanity Check</title>
+        <para>
+            Project 0 will require construction of your development tree and
+            early implemementation of technical requirements for class projects.
+            The intent of this short/skeletal project is to get the student
+            to a concrete starting point for course topics, eliminate wrong
+            assumptions, and to generate early discussions about the development
+            and development options/trade-offs. Grading will be primarily a 
+            done/not-done grade with unsatisfactory starts given feedback and
+            a request to re-submit.
+        </para>
+        <para>
+            Specific Goals:
+        </para>
+        <itemizedlist spacing="compact">
+            <listitem><para>
+                Instantiate a Maven development tree for projects 1 thru 3.
+                </para></listitem>
+            <listitem><para>
+                Setup JUnit test case(s).
+                </para></listitem>
+            <listitem><para>
+                Develop business logic interfaces and method signatures
+                for end-to-end scenario.
+                </para></listitem>
+            <listitem><para>
+                Develop skeletal business objects used in the business 
+                logic interfaces.
+                </para></listitem>
+            <listitem><para>
+                Develop an early JUnit test that demonstrates understanding
+                of the end-to-end requirements for project 1. 
+                </para></listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="jhu784-course-projects-project1"->
+        <title>Project 1: Data Access Tier and Business Logic</title>
+        <para>
+            Project 1 will require the development of the business objects,
+            O/R mapping of the business objects to a relational database, and
+            business logic to integrate the end-to-end application.
+            The artifacts from project 1 will also be used as a foundation for
+            all follow-on projects as well.  There is no application server used
+            in project 1. All code is executes within a single JVM and database.
+        </para>
+        <para>
+            Specific Goals:
+        </para>
+        <itemizedlist spacing="compact">
+            <listitem><para>
+                Develop and test a Java application
+                </para></listitem>
+            <listitem><para>
+                Develop and test a set of POJOs
+                </para></listitem>
+            <listitem><para>
+                Design a relational database schema
+                </para></listitem>
+            <listitem><para>
+                Develop and test a DAO using JPA Entities
+                </para></listitem>
+            <listitem><para>
+                Develop and test a business logic to manipulate
+                    data using DAOs.
+                </para></listitem>
+            <listitem><para>
+                Ingest test data into database
+                </para></listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="jhu784-course-projects-project2"->
+        <title>Project 2: N-Tier Application</title>
+        <para>
+            Project 2 deploys the business logic and data tier to the server-side.
+            to be hosted in an EJB tier; providing resource management (e.g., threads), 
+            transactions, security (added in project 3), and remote access. The user 
+            interface will be supplied through the use of Servlets and JSPs integrated
+            with the EJBs. A remote client will also be developed for the unit tests.
+        </para>
+        <para>
+            Specific Goals:
+        </para>
+        <itemizedlist spacing="compact">
+            <listitem><para>
+                Deploy business logic within an EJB application using Session Beans
+                </para></listitem>
+            <listitem><para>
+                Configure applications using JNDI and CDI.
+                </para></listitem>
+            <listitem><para>
+                Integrate application with JTA
+                </para></listitem>
+            <listitem><para>
+                Access EJB business logic using remote interfaces
+                </para></listitem>
+            <listitem><para>
+                Integrate business logic with a Web tier
+                </para></listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="jhu784-course-projects-project3">
+        <title>Project 3: Secure and Asynchronous Application</title>
+        <para>
+            Project 3 enacts security for Project 2 and adds publish/subscribe
+            topics and timers.  An application server is
+            used to host the application logic and JMS components. A stand-alone
+            client is also developed to interface with the appication through
+            JMS messages.
+        </para>
+        <para>
+            Specific Goals:
+        </para>
+        <itemizedlist spacing="compact">
+            <listitem><para>
+                Protect access to applications using Java EE security
+                </para></listitem>
+            <listitem><para>
+                Authenticate users using Java EE security means
+                </para></listitem>
+            <listitem><para>
+                Design asynchronous interactions
+                </para></listitem>
+            <listitem><para>
+                Design JMS messages 
+                </para></listitem>
+            <listitem><para>
+                Develop and test MDB and stand-alone JMS clients
+                </para></listitem>
+            <listitem><para>
+                Develop and test EJB Timers
+                </para></listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="jhu784-course-projects-genreqs">
+        <title>General Requirements</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>
+                Projects must build using 
+                <ulink url="http://maven.apache.org/">Maven 3</ulink>. 
+                <ulink url="http://ant.apache.org/">Ant</ulink> will be used late in the semester 
+                to wrap any interactive commands (e.g., launch JavaSE JMS subscriber)
+                </para></listitem>
+            <listitem><para>
+                All projects must be portable to build and deploy within grader and
+                intructor environments. You may submit partial projects early to get portability
+                feedback (not early content grading feedback).
+                </para></listitem>
+            <listitem><para>
+                Test Cases must be written using JUnit or another unit test frameworks that
+                will run within a Maven surefire and failsafe environment.
+                </para></listitem>
+            <listitem><para>
+                Projects must be supplied with a README that points out how project
+                meets requirements.
+                </para></listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="jhu784-course-projects-submission">
+        <title>Submission Guidelines</title>
+        <para>
+            You should test your application prior to submission by 
+        </para>
+        <itemizedlist spacing="compact">
+            <listitem><para>
+                Run maven clean, zip your project from the root, and unzip
+                in a new location. Move your localRepository (or set your
+                settings.xml#localRepository value to a new location -- don't
+                delete your primary localRepository) and run mvn clean install
+                from the root of your project. This will make sure you do not
+                have dependencies on older versions of your modules or manually
+                installed artifacts. This will also make sure you are not 
+                depending on any old .class files. This, of course, will 
+                download all project
+                dependencies and help verify that the project will build in
+                other environments.  This will also simulate what the grader
+                will see when they unzip your project.
+                </para></listitem>
+            <listitem><para>
+                Coldstart your database instance(s) and run mvn clean
+                install from the root of your project. This will make sure
+                you are not depending on any residue schema or data
+                in your database.
+                </para></listitem>
+            <listitem><para>
+                Make sure the README documents all information required to 
+                navigate your application (primarily a project 2 and 3 requirement)
+                and point out issues that would be important for the grader/instructor
+                to know (e.g., "the instructor said...")
+                </para></listitem>
+        </itemizedlist>
+
+        <para>
+            You will e-mail the projects to the grader and me with the following
+            subject line
+        </para>
+        <itemizedlist spacing="compact">
+            <listitem><para>
+                (your name) project #; revision 0; part # of #
+                </para></listitem>
+        </itemizedlist>
+
+        <para>
+            Your submission will include source zip, README (could be in source
+            zip), and built project artifact(s) (e.g., jar, war, ear, etc.). The
+            easiest way to do this is to zip up the project from the root after
+            completing a build.
+        </para>
+
+        <para>
+            If you need to make a correction, the correction should have the
+            following e-mail subject. The body should describe what you wish to 
+            revise.
+        </para>
+        <itemizedlist spacing="compact">
+            <listitem><para>
+                * (your name) project #; revision N; part # of #
+                </para></listitem>
+        </itemizedlist>
+
+        <para>
+            Submission e-mails (<ulink url="mailto:jim.stafford@jhu.edu">mail to all</ulink>):
+        </para>
+        <itemizedlist spacing="compact">
+            <!--
+            <listitem><para>
+                * Mark - mdsholund@gmail.com
+                </para></listitem>
+                -->
+            <listitem><para>
+                * Jim - jim.stafford@jhu.edu
+                </para></listitem>
+            <listitem><para>
+                </para></listitem>
+        </itemizedlist>
+    </section>
+</chapter>
+  

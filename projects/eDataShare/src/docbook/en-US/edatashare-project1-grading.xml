@@ -1,0 +1,57 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="edatashare-project1-grading">
+    <title>Grading</title>
+    <para>
+        Your project will be graded on completeness and quality of product. In
+        order for you to receive full credit in each area, it must be a)
+        complete, b) done well, and c) tested.  The breakdown of grading 
+        will be as follows:
+    </para>
+    <itemizedlist spacing="compact">
+        <listitem><para>
+            README provided that describes where each requirement satisfied: 10pts
+            </para> </listitem>
+        <listitem><para>
+            projects cleanly builds with Maven: 15pts
+            </para> </listitem>
+        <listitem><para>
+            managed schema (i.e., defined in a set of files and explicitly 
+            used to coldstart and initialize the database at defined times): 5pts
+            </para> </listitem>
+        <listitem><para>
+            business objects: 15pts
+            </para> </listitem>
+        <listitem><para>
+            JPA DAO and JPA O/R Mapping: 25pts
+            </para> </listitem>
+        <listitem><para>
+            Ingest: 10pts
+            </para> </listitem>
+        <listitem><para>
+            Business Logic: 10pts
+            </para> </listitem>
+        <listitem><para>
+            End-to-end Integration Test: 10pts
+            </para> </listitem>
+    </itemizedlist>
+
+    <para>
+        Each area will be judged according to the following breakdown. For
+        areas where testing does not apply (e.g., README and build), those 
+        points will be assigned to quality:
+    </para>
+    <itemizedlist spacing="compact">
+        <listitem><para>
+            complete: 60%
+            </para> </listitem>
+        <listitem><para>
+            quality of implementation supplied: 30%
+            </para> </listitem>
+        <listitem><para>
+            testing: 10%
+            </para> </listitem>
+    </itemizedlist>
+</chapter>
+  

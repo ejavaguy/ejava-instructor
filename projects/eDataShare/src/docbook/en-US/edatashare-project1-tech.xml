@@ -1,291 +1,26 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="edatashare-project1">
-    <title>eDataShare Project 1</title>
-    <subtitle>Data Access Tier and Initial Business Logic</subtitle>
-    <para>Updated: ${content.version}</para>
+<chapter id="edatashare-project1-tech">
+    <title>Technical Details</title>
+    <note>
+        There are a lot of technical details presented with this 
+        specification. This is done to provide clarity and a starting point for
+        design discussion. However, it is not done so to specify specific class
+        or method naming, project layout, or order of work. You are free to
+        make many technical adjustments to the ideas presented.
+    </note>
+    <para>
+        Design 2 sets of database schema that account for the following
+        information. Although we will deploy the 2 database schemas to
+        the same database for the project, they should be designed to be
+        independently deployed to separate databases. eDmv and eMayberry are
+        two independent applications. This will primarily affect your attempt
+        re-use tables or to make primary key assumptions between the two.
+    </para>
 
-    <section id="edatashare-project1-purpose">
-        <title>Purpose</title>
-
-        <section id="edatashare-project1-goals">
-            <title>Goals</title>
-            <para></para>
-      
-            <itemizedlist spacing="compact">
-                <listitem><para>
-                    Gain experience designing and testing project implementations around
-                    layered boundaries.
-                    </para> </listitem>
-                <listitem><para>
-                    Build the data access tier and initial business logic for an application.
-                    </para> </listitem>
-                <listitem><para>
-                    Gain experience with database schema and Java Persistence API technologies.
-                    </para> </listitem>
-            </itemizedlist>
-            <para></para>
-        </section>
-        <section id="edatashare-project1-objectives">
-            <title>Objectives</title>
-            <para></para>
-            <itemizedlist spacing="compact">
-                <listitem><para>
-                    Design and implement a set of business logic interfaces that address 
-                    the functional requirements of the external users.
-                    </para> </listitem>
-                <listitem><para>
-                    Design and implement a set of business objects to represent the 
-                    data requirements in the system.
-                    </para> </listitem>
-                <listitem><para>
-                    Design and implement a relational database schema that will store the 
-                    state of the business objects.
-                    </para> </listitem>
-                <listitem><para>
-                    Design and implement a data access tier that will handle mapping the 
-                    business objects to the database using the Java Persistence API.
-                    </para> </listitem>
-                <listitem><para>
-                    Design and implement the business logic classes that realize the 
-                    business logic interfaces and leverage the data access objects to 
-                    implement the scenario logic. 
-                    </para> </listitem>
-                <listitem><para>
-                    Unit test the different levels of the architecture.
-                    </para> </listitem>
-                <listitem><para>
-                    Integration test the end-to-end solution according to a defined
-                    scenario.
-                    </para> </listitem>
-            </itemizedlist>
-            <para></para>
-        </section>
-    </section>
-
-
-    <section id="edatashare-project1-businessdesc">
-        <title>Business Description</title>
-        <para>
-            The  Mayberry Sheriff's Department has a very small budget and will want
-            to team up with the Department of Motor Vehicles (DMV) in Raleigh to
-            obtain most of their information. Often, deputies are sent to stakeout
-            a suspected criminal where all they may know is their name.  They will
-            interface with the DMV to get a residence, physical description,
-            and drivers license photo.  Once at the residence, they may see
-            vehicles on the premises. The tag information is checked against
-            the DMV database to help determine people associated with the
-            premises. The owners of the vehicle are searched against their own
-            database of "persons of interest" to help officers be aware of
-            any immediate danger or actions to take.
-        </para>
-  
-        <para>
-            Both the DMV and Mayberry Sheriff's Department have come to you to
-            develop the initial phase of their applications.  You are tasked
-            with implementing a low-cost prototype, based on current standards,
-            to automate much of this activity. At this point in the project we
-            are primarily looking to build the data access tiers for both the DMV
-            (eDmv) and Mayberry Sheriff's (eMayberry) department (two separate
-            systems). We will also add a minor amount of business logic to
-            coordinate the data access between the individual data access objects.
-        </para>
-
-        <para>
-            For eDmv, the system is initialized with a starting set of information
-            pertaining to drivers, vehicle registrations, and the vehicle owners.
-            New information can be added and updated, but the primary focus within
-            this project is for eDmv to respond to queries from clients.
-        </para>
-
-        <para>
-            For eMayberry, the system is initialized with an empty database that
-            is designed to hold people of interest and their activities.
-            The people of interest will be supplied by eMayberry users. Contact
-            information for the people of interest will be supplied through a later
-            integration with eDmv.
-        </para>
-
-        <para>
-            eDmv will track name, date of birth, physical description, and
-            residency information for people. These people can be either drivers,
-            vehicle owners, or both. eDmv will track vehicle description,
-            VIN, tag, and owner information for vehicle registrations.
-        </para>
-
-        <para>
-            eMayberry will track name, alias, and activity information for people
-            of interest. 
-        </para>
-    </section>
-
-
-    <section id="edatashare-project1-techoverview">
-        <title>Technical Overview</title>
-        <para>
-            The work done during this project focuses on the business objects
-            (BOs), the data access objects (DAOs) of the data access tier,
-            and some initial business logic interfaces (BL) and business
-            logic implementations (BLImpl). The DAOs will be based on the 
-            Java Persistence API (JPA). How you partition the implementations
-            of your projects is up to you. A suggested starting point is provided
-            at the end of this project description.
-        </para>
-        <note>
-            <para>
-                There will be many choices while creating your solution to the two 
-                applications. It is intended that you always approach the DMV application
-                as "it is hard" and requires extra formal layers. To provide contrast,
-                it is intended that you always approach the Mayberry application as 
-                "it is simple" and target as many simplification and shortcuts in the 
-                architectural layers as you can find. The point of this is for you to gain
-                experience with the different approaches and to not make Mayberry a 
-                tedious clone of approaches as DMV. The spec will describe both in a 
-                similar manner, but you should apply more of a "right approach" based 
-                on what was just stated.
-            </para>
-        </note>
-
-        <para>
-            The business objects encapsulate the core business data and rules
-            of the application. You will design the business objects and then
-            map them to the database.  You are required to implement required 
-            CRUD (Create, Read, Update, and Delete) capability with JPA but 
-            you only need to implement the CRUD methods that are necessary to 
-            complete the provided end-to-end scenario. 
-            You will be required to encapsulate
-            all object to relational (O/R) mapping within the DAOs, descriptor
-            files, and/or class metadata annotations.  You will be given a set of
-            <ulink url=">https://raw.github.com/ejavaguy/ejava-student/master/projects/eDataShare/eDmvData/eDmvTestUtil/src/main/resources/xml/dmv-all.xml">
-            test data</ulink>
-            to initially populate your applications and be the source
-            of data for the ingest requirement. To use the data, you will ingest 
-            using a parser supplied by the instructor. There is a sample thread
-            in the projects/eDataShare/eDmv directory that shows how to use the 
-            parser as well as other aspects technology within the project.  
-        </para>
-  
-  
-        <para>
-            The business logic will provide a set of classes with concise methods
-            that map easily to the provided end-to-end scenario. The business logic will ensure proper
-            use of the overall application, delegating some business logic
-            functionality to the business objects and full O/R responsibility
-            to the DAOs. eDmv will have an ingest requirement as well as the
-            requirement to manipulate and add to what was ingested. eMayberry will
-            start fresh and obtain all data from users and coordinate with eDmv. 
-            However, for project 1, eMayberry will be unable to fully implement 
-            data sharing with eDmv because remote interfaces will not be
-            implemented until project2.  Some of that must be stubbed at this point. 
-            You are only required to implement enough business logic methods
-            that it takes to implement the end-to-end scenarios specified later
-            within this specification.
-        </para>
-  
-        <para>
-            The test acceptance for the first project will be the unit tests and
-            an integration test that takes the business logic, data access
-            tier, and business objects through a provided end-to-end scenario
-            that will never change during the semester. You are required to 
-            supply the following tests:
-        </para>
-        <itemizedlist spacing="compact">
-            <listitem><para>A unit test that implements the steps of the provided DMV end-to-end scenario</para> </listitem>
-            <listitem><para>A unit test that implements the steps of the provided Mayberry end-to-end scenario</para> </listitem>
-            <listitem><para>At least one unit test per architectural layer (BO, DAO, BL) that demonstrates 
-                your ability to test at that level.</para> </listitem>
-        </itemizedlist>
-
-        <tip>
-            <para>
-                The amount of work that you can implement within the
-                bounds of this project spec could be endless if you
-                attempted to account for everything/anything. It is
-                very important that you limit your work to only what
-                is necessary to implement (and test) the functionality
-                required for the end-to-end scenario. That means you may
-                have entities that are designed to be created but never
-                modified while having other entities that go through
-                a full lifecycle. When deciding to add or skip certain
-                capabilities -- always ask yourself "does the business
-                logic need this behavior to implement the end-to-end
-                scenario".
-            </para>
-        </tip>
-    </section>
-
-
-    <section id="edatashare-project1-assembly">
-        <title>Assembly Overview</title>
-        <para>
-            Since the work is for separate applications, we will need to establish
-            two separate application projects for this work; eDmv and eMayberry.
-            The development can physically share resources (e.g., same database
-            and application server), but should be easily separated. It is
-            suggested that you form a root for the overall eDataShare work to
-            coordinate integration testing, and then group the lower-level
-            work under two child projects; eDmv and eMayberry.  See some
-            suggested project layouts at the bottom of this specification.  A
-            <ulink url="https://github.com/ejavaguy/ejava-student/tree/master/projects/eDataShare">
-            sample set of projects</ulink> that implement a thin eDmv thread has
-            been made available. Please ignore the TestData sub-project when
-            using the example to craft your source tree. You will depend on
-            projects within that tree -- not re-implement them and not copy
-            them.  See the Getting Started section towards the end of this 
-            specification for a more detailed sample project layout.
-        </para>
-
-        <note>
-            <para>
-                You will likely copy significant portions of the thin thread
-                example and other class examples into your project. Be aware that
-                the thin thread and other example pom.xml files inherit from 
-                the class root project that provides dependencyManagement and 
-                pluginManagement duties. You will either need to also inherit from
-                the dependencies/pom.xml or compensate by re-defining the management
-                sections in the root pom.xml of your project.
-            </para>
-        </note>
-  
-        <para>
-            Since students in the class will be producing parallel implementations for
-            the applications and submitting them for evaluation, it is asked
-            that you come up with unique names for your artifacts. This could
-            be done by replacing the "e" in eDataShare, eDmv, and eMayberry with a
-            unique name that corresponds to your newsgroup or college login
-            (ex.  jcsDataShare, jcsDmv, jcsMayberry). You should also use this same pattern for
-            java packages (ex. jcs.dmv, jcs.mayberry), DB tables (e.g., JCS_), etc.
-        </para>
-  
-        <para>
-            There should be no use of System.out.println() in the code and all
-            implementations must use a logging API with log4j as the logging provider.  
-            You may leave debug in your code, but this 
-            should be able to be turned on/off with the proper logging priority
-            changes in the log4j.xml configuration.
-        </para>
-    </section>
-
-
-
-    <section id="edatashare-project1-tech">
-        <title>Technical Details</title>
-        <note>
-            There are a lot of technical details presented with this 
-            specification. This is done to provide clarity and a starting point for
-            design discussion. However, it is not done so to specify specific class
-            or method naming, project layout, or order of work. You are free to
-            make many technical adjustments to the ideas presented.
-        </note>
-        <para>
-            Design 2 sets of database schema that account for the following
-            information. Although we will deploy the 2 database schemas to
-            the same database for the project, they should be designed to be
-            independently deployed to separate databases. eDmv and eMayberry are
-            two independent applications. This will primarily affect your attempt
-            re-use tables or to make primary key assumptions between the two.
-        </para>
+    <section id="edatashare-project1-tech-dbschema">
+        <title>Database Schema</title>
 
         <section id="edatashare-project1-tech-dmvdb">
             <title>eDmv Candidate Database Schema</title>
@@ -656,6 +391,11 @@
 
         </section>
 
+    </section>
+
+
+    <section id="edatashare-project1-tech-bo">
+        <title>Business Objects</title>
 
         <section id="edatashare-project1-tech-dmvbo">
             <title>eDmv Candidate Business Objects</title>
@@ -878,181 +618,308 @@
             </section>
 
         </section>
+    </section>
 
-        <section id="edatashare-project1-tech-ingest">
-            <title>DMV Ingest</title>
+    <section id="edatashare-project1-tech-ingest">
+        <title>DMV Ingest</title>
+        <para>
+            Design and implement a mechanism to ingest a starting state for
+            eDmv based on a provided data file and parser.  You will implement
+            two primary sets of classes to support this requirement; the
+            DAO(s) and an Ingestor. 
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Design and implement a set of DAOs that can be used
+                to ingest eDmv business data into the database using 
+                the database schema you designed as a part of a
+                separate requirement. These DAOs can optionally be tuned for 
+                ingest or simply reused from your CRUD-style requirements.
+                </para> </listitem>
+            <listitem><para>
+                Design and implement an Ingestor that will use an externally
+                provided parser to obtain business data for eDmv and use the 
+                Ingest DAO to populate the database. 
+                </para> </listitem>
+        </orderedlist>
+
+        <figure>
+            <title>eDmv Ingest and DAO</title>
+            <graphic scalefit="1" fileref="images/eDmv_ingest_dao.jpg"/>
+        </figure>
+        <note>
             <para>
-                Design and implement a mechanism to ingest a starting state for
-                eDmv based on a provided data file and parser.  You will implement
-                two primary sets of classes to support this requirement; the
-                DAO(s) and an Ingestor. 
+                Please ignore references in the diagrams that call out use of 
+                JDBC. All DAOs can be implemented exclusively with JPA for this assignment.
             </para>
-            <orderedlist spacing="compact">
-                <listitem><para>
-                    Design and implement a set of DAOs that can be used
-                    to ingest eDmv business data into the database using 
-                    the database schema you designed as a part of a
-                    separate requirement. These DAOs can optionally be tuned for 
-                    ingest or simply reused from your CRUD-style requirements.
-                    </para> </listitem>
-                <listitem><para>
-                    Design and implement an Ingestor that will use an externally
-                    provided parser to obtain business data for eDmv and use the 
-                    Ingest DAO to populate the database. 
-                    </para> </listitem>
-            </orderedlist>
+        </note>
+    </section>
 
+    <section id="edatashare-project1-tech-dao">
+        <title>DAOs</title>
+        <para>
+            Design and implement a DAO layer that will map the business
+            objects between the object model and the database using the Java
+            Persistence API (JPA). These DAOs will support all standard CRUD
+            operations and can optionally implement the same interface as other
+            potential DAO implementations. The implementation can make liberal use
+            of JPA @Annotations, descriptor files, or a combination of both. Your 
+            interface should encapsulate the fact that an EntityManager is being
+            used and the same EntityManager should be shared among other DAOs in
+            the same Thread. Your DAOs should not attempt to control the transaction 
+            or they will <emphasis>NOT</emphasis> be portable to the EJB tier.
+        </para>
+
+        <section id="edatashare-project1-tech-dmvdao">
+            <title>eDmv DAOs</title>
             <figure>
-                <title>eDmv Ingest and DAO</title>
-                <graphic scalefit="1" fileref="images/eDmv_ingest_dao.jpg"/>
+                <title>eDmv Candidate JPA DAOs</title>
+                <graphic scalefit="1" fileref="images/eDmv_daos.jpg"/>
             </figure>
+            <variablelist spacing="compact">
+                <varlistentry>
+                    <term><filename>PersonDAO/JPAPersonDAO</filename></term>
+                    <listitem><para>
+                        encapsulates the use of JPA when
+                        mapping Person and closely associated business objects (Person,
+                        PhysicalDetails, Photo, and Residence) to/from the database.
+                        </para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>VehicleDAO/JPAVehicleDAO</filename></term>
+                    <listitem><para>
+                        encapsulates the use of JPA when
+                        mapping Vehicle and closely associated business objects
+                        (VehicleRegistration and Owner) to/from the database.
+                        </para></listitem>
+                </varlistentry>
+            </variablelist>
+        </section>
+
+        <section id="edatashare-project1-tech-maydao">
+            <title>Mayberry DAOs</title>
             <note>
                 <para>
-                    Please ignore references in the diagrams that call out use of 
-                    JDBC. All DAOs can be implemented exclusively with JPA for this assignment.
+                    Please remember the option to keep it simple for Mayberry.
+                    You have the option of implementing the DAO as part of 
+                    the business logic in this application if you wish.
                 </para>
             </note>
-        </section>
-
-        <section id="edatashare-project1-tech-dao">
-            <title>DAOs</title>
-            <para>
-                Design and implement a DAO layer that will map the business
-                objects between the object model and the database using the Java
-                Persistence API (JPA). These DAOs will support all standard CRUD
-                operations and can optionally implement the same interface as other
-                potential DAO implementations. The implementation can make liberal use
-                of JPA @Annotations, descriptor files, or a combination of both. Your 
-                interface should encapsulate the fact that an EntityManager is being
-                used and the same EntityManager should be shared among other DAOs in
-                the same Thread. Your DAOs should not attempt to control the transaction 
-                or they will &lt;NOT&gt; be portable to the EJB tier.
-            </para>
-
-            <section id="edatashare-project1-tech-dmvdao">
-                <title>eDmv DAOs</title>
-                <figure>
-                    <title>eDmv Candidate JPA DAOs</title>
-                    <graphic scalefit="1" fileref="images/eDmv_daos.jpg"/>
-                </figure>
-                <variablelist spacing="compact">
-                    <varlistentry>
-                        <term><filename>PersonDAO/JPAPersonDAO</filename></term>
-                        <listitem><para>
-                            encapsulates the use of JPA when
-                            mapping Person and closely associated business objects (Person,
-                            PhysicalDetails, Photo, and Residence) to/from the database.
-                            </para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>VehicleDAO/JPAVehicleDAO</filename></term>
-                        <listitem><para>
-                            encapsulates the use of JPA when
-                            mapping Vehicle and closely associated business objects
-                            (VehicleRegistration and Owner) to/from the database.
-                            </para></listitem>
-                    </varlistentry>
-                </variablelist>
-            </section>
-
-            <section id="edatashare-project1-tech-maydao">
-                <title>Mayberry DAOs</title>
-                <note>
-                    <para>
-                        Please remember the option to keep it simple for Mayberry.
-                        You have the option of implementing the DAO as part of 
-                        the business logic in this application if you wish.
-                    </para>
-                </note>
-                <figure>
-                    <title>eMayberry JPA DAOs</title>
-                    <graphic scalefit="1" fileref="images/eMayberry_daos.jpg"/>
-                </figure>
-                <variablelist spacing="compact">
-                    <varlistentry>
-                        <term><filename>PoiDAO/JPAPoiDAO</filename></term>
-                        <listitem><para>
-                            encapsulates the use of JPA when
-                            mapping POI and closely associated business objects
-                            (POI and Activity) to/from the database.
-                            </para></listitem>
-                    </varlistentry>
-                </variablelist>
-            </section>
-        </section>
-
-<!--
-                <orderedlist spacing="compact">
+            <figure>
+                <title>eMayberry JPA DAOs</title>
+                <graphic scalefit="1" fileref="images/eMayberry_daos.jpg"/>
+            </figure>
+            <variablelist spacing="compact">
+                <varlistentry>
+                    <term><filename>PoiDAO/JPAPoiDAO</filename></term>
                     <listitem><para>
-                        </para> </listitem>
-                    <listitem><para>
-                        </para> </listitem>
-                </orderedlist>
-            <section id="edatashare-project1-tech-maybo-">
-                <title>
-                </title>
-                <para>
-                </para>
-                <variablelist spacing="compact">
-                    <varlistentry>
-                        <term><filename>
-                        </filename></term>
-                        <listitem><para>
+                        encapsulates the use of JPA when
+                        mapping POI and closely associated business objects
+                        (POI and Activity) to/from the database.
                         </para></listitem>
-                    </varlistentry>
-                </variablelist>
-            </section>
-
-
-
--->
+                </varlistentry>
+            </variablelist>
+        </section>
     </section>
 
+    <section id="edatashare-project1-tech-bl">
+        <title>Business Logic</title>
+        <para>
+            Design an initial business interface and business logic for
+            the applications. The core O/R mapping work will be done
+            by the DAOs.  However, it is the ultimate responsibility of these
+            business logic implementations that either it or the business objects
+            enforce the business rules of the application. The DAOs only perform
+            O/R mapping and do not enforce such things as a physical details
+            required for a driver's license. The
+            business logic is assumed to work within the context of a single,
+            externally controlled transaction. Do not attempt to control the
+            transaction of the EntityManager within these objects or you will
+            <emphasis>NOT</emphasis> be portable to the EJB tier. You need only implement the behavior
+            required to implement the end-to-end use case listed in the testing
+            section. Some of the anticipated methods are listed below.
+        </para>
 
-<!--
-    <section id="edatashare-project1-">
-        <title></title>
-        <para></para>
-  
-        <itemizedlist spacing="compact">
-            <listitem><para></para> </listitem>
-            <listitem><para></para> </listitem>
-            <listitem><para></para> </listitem>
-        </itemizedlist>
-        <para></para>
+        <section id="edatashare-project1-tech-dmvbl">
+            <title>eDMV Business Logic</title>
+
+            <figure>
+                <title>eDMV Business Logic</title>
+                <graphic scalefit="1" fileref="images/eDmv_business_logic.jpg"/>
+            </figure>
+            <variablelist spacing="compact">
+                <varlistentry>
+                    <term><filename>DriverMgmt/DriverMgmtImpl</filename></term>
+                    <listitem><para>
+                        Encapsulate the actions required to manage Drivers and their 
+                        associated information.  The project is primarily interested 
+                        in query methods after ingest. 
+                        </para>
+                        <orderedlist spacing="compact">
+                            <listitem><para>
+                                addDriver - design the ability to add a driver
+                                with their physical details and residence.
+                                </para> </listitem>
+                            <listitem><para>
+                                moveResidence - design the ability to change the
+                                residence for a driver.
+                                </para> </listitem>
+                            <listitem><para>
+                                getDriver - you will need to be able to return a 
+                                driver by id.
+                                </para> </listitem>
+                            <listitem><para>
+                                getDrivers - you will need to be able to return a 
+                                collection of drivers by such things as ByName.
+                                </para> </listitem>
+                        </orderedlist>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>VehicleMgmt/VehicleMgmtImpl</filename></term>
+                    <listitem><para>
+                        Encapsulate the actions
+                        required to manage Vehicle Registrations and ownership. The
+                        project is primarily interested in query methods after ingest.
+                        </para>
+                        <orderedlist spacing="compact">
+                            <listitem><para>
+                                addRegistration - design the ability to add a new 
+                                registration with references to owners.
+                                </para> </listitem>
+                            <listitem><para>
+                                getRegistrationsByMakeModel - design the ability to
+                                return a collection of registrations by such things as
+                                make/model or owner name.
+                                </para> </listitem>
+                            <listitem><para>
+                                getRegistrationsByOwner - design the ability to return
+                                registrations for a specific owner.
+                                </para> </listitem>
+                        </orderedlist>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>PersonMgmt/PersonMgmtImpl</filename></term>
+                    <listitem><para>
+                        Encapsulate the actions
+                        to query for individuals within eDmv. This will include
+                        drivers and owners.
+                        </para>
+                        <orderedlist spacing="compact">
+                            <listitem><para>
+                                getPeopleByName - design the ability to return a 
+                                collection of people (drivers and owners) by their
+                                name.
+                                </para> </listitem>
+                            <listitem><para>
+                                getPerson - design the ability to return a specific
+                                person (driver or owner).
+                                </para> </listitem>
+                        </orderedlist>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>DmvTestUtil/DmvTestUtilImpl</filename></term>
+                    <listitem><para>
+                        A useful tool during
+                        testing that encapsulates how to get the application back into
+                        a known state prior to running a test or to inspect values not
+                        normally exposed through the normal business interfaces.
+                        </para>
+                        <orderedlist spacing="compact">
+                            <listitem><para>
+                                resetAll - sanely take the state of the system down to a coldstart.
+                                </para> </listitem>
+                            <listitem><para>
+                                populate - you might want the database populated with 
+                                a known state prior to running a test. This may delegate
+                                to the DmvIngestor.
+                                </para> </listitem>
+                        </orderedlist>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>DmvIngestor</filename></term>
+                    <listitem><para>
+                        The Ingestor written as a part of a separate
+                        requirement is also logically considered part of this tier.
+                        </para>
+                        <orderedlist spacing="compact">
+                            <listitem><para>
+                                populate - point an externally provided parser at a
+                                set of test data and use the DAOs to populate the system
+                                to a known state.
+                                </para> </listitem>
+                        </orderedlist>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </section>
+
+        <section id="edatashare-project1-tech-maybl">
+            <title>eMayberry Business Logic</title>
+
+            <figure>
+                <title>eMayberry Business Logic</title>
+                <graphic scalefit="1" fileref="images/eMayberry_business_logic.jpg"/>
+            </figure>
+            <variablelist spacing="compact">
+                <varlistentry>
+                    <term><filename>PoiMgmt/PoiMgmtImpl</filename></term>
+                    <listitem><para>
+                        Encapsulates the actions
+                        required to manage persons of interest.
+                        </para>
+                        <orderedlist spacing="compact">
+                            <listitem><para>
+                                addPOI - add a person of interest to the system.
+                                </para> </listitem>
+                            <listitem><para>
+                                addActivity - add a specific activity for a person of
+                                interest.
+                                </para> </listitem>
+                            <listitem><para>
+                                getPOI - get a specific person of interest. This will
+                                initially return just the POI information and Actvities.
+                                In the follow-on projects, we'll add contact information
+                                from eDmv.
+                                </para> </listitem>
+                            <listitem><para>
+                                isDangerous - determine if a person of interest is 
+                                considered dangerous. The implementation of this method
+                                could be as simple as the presence of the word "dangerous"
+                                being present in any activity description associated with
+                                the person of interest.
+                                </para> </listitem>
+                        </orderedlist>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>MayberryTestUtil/MayberryTestUtilImpl</filename></term>
+                    <listitem><para>
+                        A useful tool during
+                        testing that encapsulates how to get the application back into
+                        a known state prior to running a test or to inspect values not
+                        normally exposed through the normal business interfaces.
+                        </para>
+                        <orderedlist spacing="compact">
+                            <listitem><para>
+                                resetAll - sanely take the state of the system down to a
+                                coldstart.
+                                </para> </listitem>
+                            <listitem><para>
+                                populate - it may be helpful to return the database to
+                                a known populated state between tests. Note: there will
+                                be no data provided or required for ingest to bootstrap
+                                Mayberry. The end-to-end scenario will start with this
+                                application in the coldstart state.
+                                </para> </listitem>
+                        </orderedlist>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </section>
     </section>
-    
-
-
-    <section id="edatashare-project1-">
-        <title></title>
-        <para></para>
-  
-        <itemizedlist spacing="compact">
-            <listitem><para></para> </listitem>
-            <listitem><para></para> </listitem>
-            <listitem><para></para> </listitem>
-        </itemizedlist>
-        <para></para>
-    </section>
-
-    <section id="edatashare-project1-">
-        <title></title>
-        <para></para>
-  
-        <itemizedlist spacing="compact">
-            <listitem><para></para> </listitem>
-            <listitem><para></para> </listitem>
-            <listitem><para></para> </listitem>
-        </itemizedlist>
-        <para></para>
-    </section>
--->
-
-    <section id="edatashare-project1-summary">
-       <title>Summary</title>
-       <para>In this chapter we
-       </para>
-    </section>    
 </chapter>
   
