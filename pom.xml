@@ -18,6 +18,7 @@
         <module>build</module>
         <module>intro</module>
         <module>javase</module>
+        <module>projects</module>
         <module>jpa</module>
         <module>ejb</module>
         <module>async</module>
