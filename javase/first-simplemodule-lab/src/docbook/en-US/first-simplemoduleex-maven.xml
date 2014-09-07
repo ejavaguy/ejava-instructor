@@ -59,7 +59,7 @@
         
     <orderedlist>
         <listitem><para>
-            Create a pom.xml file in project ${basedir}. This will be used to 
+            Create a pom.xml file in project basedir. This will be used to 
             define your entire project. Refer to the
             <ulink url="http://maven.apache.org/ref/current/maven-model/maven.html">Maven POM Reference</ulink> 
             for details about each element. 
@@ -339,7 +339,16 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
             </itemizedlist>
         </listitem>
 
+
         <listitem><para>
+            For *fun*, lets add a README that could be used to describe
+            something about your project and have it be processed as part of the
+            documentation for the module. You do not need to do this for class
+            projects, but walking through this may be helpful in understanding how
+            the class website is created from the source you have on your disk.
+            Maven supports a couple of documentation generation languages, but
+            lets just use HTML to keep this simple. Place the following content
+            to src/site/resources/README.html
             </para>
 <programlisting language="xml"><![CDATA[mkdir -p src/site/resources
 $ cat src/site/resources/README.html 
@@ -423,6 +432,28 @@ target/site/integration.html
 target/site/distribution-management.html
 target/site/project-summary.html
 target/site/plugins.html]]></programlisting>
+
+            <note>
+                <para>
+                    If you use the posted firstSimpleModuleEx as a starting point 
+                    for your work you will need to re-enable site generation
+                    under the maven-site-plugin. This was turned off since the 
+                    posted examples do not contain enough information to be posted
+                    with the rest of the class examples.
+                </para>
+<programlisting language="xml"><![CDATA[
+            <!-- exclude this modules from site generation -->
+            <plugin> 
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.4</version>
+                <configuration>
+                    <skip>true</skip>
+                    <skipDeploy>true</skipDeploy>
+                </configuration>
+            </plugin>
+]]></programlisting>
+            </note>
         </listitem>
 
         <listitem><para>

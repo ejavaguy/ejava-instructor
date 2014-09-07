@@ -42,6 +42,19 @@
 
     <section id="first-simple-moduleex-eclipse-import">
         <title>Import a project into Eclipse</title>
+
+        <note>
+            <title>ex1 ~= firstSimpleModuleEx</title>
+            <para>
+                The exercize asked you to name your module "ex1". This portion of the 
+                exercise demonstrates actions within Eclipse in a posted solution 
+                in your examples tree call "firstSimpleModuleEx". You may/should continue
+                to use your "ex1" solution from the previous chapters but know that
+                firstSimpleModuleEx (as posted) has a few minor tweeks to its pom.xml
+                to allow it to be distributed with the rest of the class examples as 
+                part of the class site. 
+            </para>
+        </note>
         <orderedlist>
             <listitem><para>
                     Select File-&gt;Import-&gt;Maven-&gt;Existing Maven Projects,
