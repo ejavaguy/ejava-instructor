@@ -16,10 +16,28 @@
 
         <orderedlist>
         
-            <listitem><para>Add the following class to your src/main tree. In this case the entity
+            <listitem><para>Add the following classes to your src/main tree. In this case the entity
                 class contains an instance of a Name class which contains two properties mapped to 
                 the database. The Name class is annotated as @Embeddable and the name property in the 
                 entity is annotated as @Embedded.</para>
+<programlisting language="java"><![CDATA[
+package myorg.entityex.annotated;
+
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
+@Embeddable
+public class Name {
+    private String firstName;
+    private String lastName;
+
+    public String getFirstName() { return firstName; }
+    public Name setFirstName(String firstName) { this.firstName = firstName; return this; }
+    
+    public String getLastName() { return lastName; }
+    public Name setLastName(String lastName) { this.lastName = lastName; return this; }
+}]]></programlisting>
+
 <programlisting language="java"><![CDATA[
 package myorg.entityex.annotated;
 
@@ -28,18 +46,6 @@ import javax.persistence.*;
 @Entity
 @Table(name="ENTITYEX_BEAR")
 public class Bear {
-    @Embeddable
-    public static class Name {
-        private String firstName;
-        private String lastName;
-
-        public String getFirstName() { return firstName; }
-        public Name setFirstName(String firstName) { this.firstName = firstName; return this; }
-        
-        public String getLastName() { return lastName; }
-        public Name setLastName(String lastName) { this.lastName = lastName; return this; }
-    }
-
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private int id;
@@ -82,9 +88,12 @@ public class Bear {
                 Define the mapping for firstName from within the embedded class. Define the 
                 mapping for lastName from within the entity class.</para>
 <programlisting language="java"><![CDATA[
-    public static class Name {
-        @Column(name="FIRST_NAME", length=16)
-        private String firstName;
+public class Name {
+    @Column(name="FIRST_NAME", length=16)
+    private String firstName;
+]]></programlisting>                        
+<programlisting language="java"><![CDATA[
+public class Bear {
 ...
     @AttributeOverrides({
         @AttributeOverride(name="lastName", column=@Column(name="LAST_NAME", length=16))
@@ -122,38 +131,52 @@ public class Bear {
 
         <orderedlist>
         
-            <listitem><para>Add the following nested classes to the Bear entity class.</para>
+            <listitem><para>Add the following classes.</para>
 <programlisting language="java"><![CDATA[
-    @Embeddable
-    public static class Street {
-        private int number;
-        private String name;
-        
-        public int getNumber() { return number; }
-        public Street setNumber(int number) { this.number = number; return this; }
-        
-        public String getName() { return name; }
-        public Street setName(String name) { this.name = name; return this; }
-    }
+package myorg.entityex.annotated;
+
+import javax.persistence.Embeddable;
+
+@Embeddable
+public class Street {
+    private int number;
+    private String name;
     
-    @Embeddable
-    public static class Address {
-        private Street street; //a second level of embedded
-        //@Column(name="CITY", length=16)
-        private String city;
-        //@Column(name="STATE", length=16)
-        private String state;
+    public int getNumber() { return number; }
+    public Street setNumber(int number) { this.number = number; return this; }
+    
+    public String getName() { return name; }
+    public Street setName(String name) { this.name = name; return this; }
+}]]></programlisting>                        
+<programlisting language="java"><![CDATA[
+package myorg.entityex.annotated;
 
-        public Street getStreet() { return street; }
-        public Address setStreet(Street street) { this.street = street; return this; }
-        
-        public String getCity() { return city; }
-        public Address setCity(String city) { this.city = city; return this; }
-        
-        public String getState() { return state; }
-        public Address setState(String state) { this.state = state; return this; }
-    }
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
 
+@Embeddable
+public class Address {
+    private Street street; //a second level of embedded
+    //@Column(name="CITY", length=16)
+    private String city;
+    //@Column(name="STATE", length=16)
+    private String state;
+
+    public Street getStreet() { return street; }
+    public Address setStreet(Street street) { this.street = street; return this; }
+    
+    public String getCity() { return city; }
+    public Address setCity(String city) { this.city = city; return this; }
+    
+    public String getState() { return state; }
+    public Address setState(String state) { this.state = state; return this; }
+}]]></programlisting>                        
+
+<programlisting language=""><![CDATA[
+public class Bear {
+...
     @Embedded
     private Address address;
     
@@ -236,11 +259,11 @@ public class Bear {
     public void testEmbeddedObject() {
         log.info("testEmbeddedObject");
         Bear bear = new Bear();
-        bear.setName(new Bear.Name().setFirstName("Yogi").setLastName("Bear"));
-        bear.setAddress(new Bear.Address()
+        bear.setName(new Name().setFirstName("Yogi").setLastName("Bear"));
+        bear.setAddress(new Address()
             .setCity("Jellystone Park")
             .setState("???")
-            .setStreet(new Bear.Street().setNumber(1).setName("Picnic")));
+            .setStreet(new Street().setNumber(1).setName("Picnic")));
         em.persist(bear);
         
         //flush to DB and get a new instance
