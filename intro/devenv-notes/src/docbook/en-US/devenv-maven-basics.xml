@@ -447,7 +447,7 @@ java.lang.AssertionError: app didn't return 0
             <programlisting language="xml"><![CDATA[<properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
-    <java.source.version>1.6</java.source.version>
+    <java.source.version>1.7</java.source.version>
     <java.target.version>1.7</java.target.version>
 </properties>]]></programlisting>
             <itemizedlist spacing="compact">
