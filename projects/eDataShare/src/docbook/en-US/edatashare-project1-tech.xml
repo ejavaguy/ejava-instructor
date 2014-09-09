@@ -745,8 +745,8 @@
         </section>
     </section>
 
-    <section id="edatashare-project1-tech-bl">
-        <title>Business Logic</title>
+    <section id="edatashare-project1-tech-sqltuning">
+        <title>SQL Tuning (Indexes)</title>
         <para>
             Add tuning to your database schema by augmenting the DDL files with 
             indexes for foreign keys, joins, and where clauses. This need not be extensive 
