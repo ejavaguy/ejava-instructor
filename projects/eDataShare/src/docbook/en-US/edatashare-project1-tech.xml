@@ -748,6 +748,16 @@
     <section id="edatashare-project1-tech-bl">
         <title>Business Logic</title>
         <para>
+            Add tuning to your database schema by augmenting the DDL files with 
+            indexes for foreign keys, joins, and where clauses. This need not be extensive 
+            or exhaustive. Just do enough to show that proper data model and database tuniung 
+            is part of the overall enterprise development process.
+        </para>
+    </section>
+
+    <section id="edatashare-project1-tech-bl">
+        <title>Business Logic</title>
+        <para>
             Design an initial business interface and business logic for
             the applications. The core O/R mapping work will be done
             by the DAOs.  However, it is the ultimate responsibility of these

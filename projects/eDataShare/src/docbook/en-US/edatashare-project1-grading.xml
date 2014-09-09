@@ -17,8 +17,9 @@
             Projects cleanly builds with Maven: 15pts
             </para> </listitem>
         <listitem><para>
-            Managed schema (i.e., defined in a set of files and explicitly 
-            used to coldstart and initialize the database at defined times): 5pts
+            Managed schema to include declaration of key indexes (i.e., defined 
+            in a set of files and explicitly used to coldstart and initialize the 
+            database at defined times): 5pts
             </para> </listitem>
         <listitem><para>
             Business Objects: 10pts
@@ -92,6 +93,14 @@
                 <row rowsep="1">
                   <entry namest="area">Managing multiple copies of the same source file.</entry>
                   <entry namest="points">1</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Large commented out blocks of code.</entry>
+                  <entry namest="points">2-5</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Non-portable references to external resources (e.g., ingested file)</entry>
+                  <entry namest="points">2</entry>
                 </row>                        
             </tbody>
         </tgroup>
