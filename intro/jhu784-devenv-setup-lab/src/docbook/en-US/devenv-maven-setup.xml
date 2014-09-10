@@ -40,8 +40,7 @@ set PATH=%MAVEN_HOME%\bin;%PATH%
 ]]></programlisting>
             </listitem>
             <listitem>
-                <para>Verify maven is installed and in the path (TODO:Update Windows Example)</para>
-                <!-- TODO: update windows to Maven 3.2.1 -->
+                <para>Verify maven is installed and in the path</para>
                 <programlisting><![CDATA[
 //my fedora system
 $ mvn --version
@@ -178,6 +177,33 @@ $ mvn clean install
 ]]></programlisting>                        
              </listitem>
          </orderedlist>
+
+        <note>
+            <title>OutOfMemoryError</title>
+            <para>
+                If you receive an "OutOfMemoryError: PermGen space" error, you can update 
+                the amount of memory allocated to the build by setting MAVEN_OPTS.
+            </para>
+            <para>
+                You can set this in the current shell using one of the following commands
+            </para>
+<programlisting><![CDATA[
+bash> export MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=256m"
+
+windows> set MAVEN_OPTS=-Xmx512m -XX:MaxPermSize=256m
+]]></programlisting>                        
+            <para>
+                You can optionally set these properties in one of the shell-specific environment scripts.
+            </para>
+<programlisting><![CDATA[
+bash> $HOME/.mavenrc
+
+windows> %HOME%\mavenrc_pre.bat
+]]></programlisting>                        
+            <para>
+                You can also set them using shell-specific techniques.
+            </para>
+        </note>
     </section>
     
     <section id="devenv-maven-missing-dependencies">
@@ -198,6 +224,13 @@ was cached in the local repository, resolution will not be reattempted until the
             If you want to eliminate the warning or it is coming up as an error, you can download
             the artifact directly from the vendor and manually install it in your local repository.
         </para>
+        <note>
+            <para>
+                This is only an example. You are not required to download if the Oracle database driver for
+                class if you do not wish. You can create a dummy file (touch dummy.jar) and register it using
+                a dummy groupId, artifactId, and version if you wish.
+            </para>
+        </note>
        <orderedlist spacing="compact">
             <listitem><para>Download the driver jar from 
                 <ulink url="http://www.oracle.com/technetwork/database/features/jdbc/index-091264.html">Oracle</ulink> 

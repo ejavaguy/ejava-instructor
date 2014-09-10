@@ -19,7 +19,7 @@
     
     <properties>
        <doc.base>jhu784-devenv-setup-book</doc.base>
-       <content.version>v2014-08-29</content.version>
+       <content.version>v2014-09-09</content.version>
     </properties>
 
     <build>
