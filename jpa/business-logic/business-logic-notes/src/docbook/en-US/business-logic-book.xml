@@ -45,7 +45,7 @@
                         <listitem><para>Define business logic interface</para></listitem>
                         <listitem><para>Define business logic class</para></listitem>
                         <listitem><para>Distinguish business logic from data access concerns</para></listitem>
-                        <listitem><para>Write a white-box test to act as an acceptance test</para></listitem>
+                        <listitem><para>Write a black-box test to act as an acceptance test</para></listitem>
                     </itemizedlist>
                 </listitem>
             </itemizedlist>
