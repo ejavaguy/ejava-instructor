@@ -384,6 +384,7 @@ Version: 1.72.0
 		<base href="{$html.base}"/>
 	</xsl:if>
 
+        <meta content="text/html;  charset=UTF-8"  http-equiv="Content-Type"/>
 	<meta xmlns="http://www.w3.org/1999/xhtml" name="generator" content="DocBook {$DistroTitle} V{$VERSION}"/>
 
 	<xsl:if test="$generate.meta.abstract != 0">
