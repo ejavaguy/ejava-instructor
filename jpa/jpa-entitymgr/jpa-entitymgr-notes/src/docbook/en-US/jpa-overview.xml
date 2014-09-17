@@ -373,6 +373,29 @@ version="2.0">
     </entity>
 </entity-mappings>
 ]]></programlisting>
+
+            <note>
+                <para>
+                    The JPA 2.1 schema references are shown below. They have been left out of all class examples 
+                    because they are not yet compatible with the schema generation plugin (hibernate3) used in 
+                    class. It is unlikely that you will need features unique to JPA 2.1 declared in your XML files
+                    but know if you include references to JPA 2.1 you must use an alternate means of generating
+                    schema -- possibly manually.
+                </para>
+            <programlisting language="xml"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd" version="2.1">
+]]></programlisting>
+
+            <programlisting language="xml"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd" version="2.1">
+]]></programlisting>
+            </note>
         </section>
 
         
