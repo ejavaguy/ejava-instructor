@@ -1,0 +1,25 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="edatashare-project2-getstarted">
+    <title>Project 2 Getting Started</title>
+    <para>
+    </para>
+
+    <note>
+        <para>
+        </para>
+    </note>
+        <figure>
+            <title>Single Module Approach Candidate Module Structure</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>Multi-Module Approach Candidate Module Structure</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+        </figure>
+</chapter>
+  

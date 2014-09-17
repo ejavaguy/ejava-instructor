@@ -10,17 +10,17 @@
         or method naming, project layout, or order of work. You are free to
         make many technical adjustments to the ideas presented.
     </note>
-    <para>
-        Design 2 sets of database schema that account for the following
-        information. Although we will deploy the 2 database schemas to
-        the same database for the project, they should be designed to be
-        independently deployed to separate databases. eDmv and eMayberry are
-        two independent applications. This will primarily affect your attempt
-        re-use tables or to make primary key assumptions between the two.
-    </para>
 
     <section id="edatashare-project1-tech-dbschema">
         <title>Database Schema</title>
+        <para>
+            Design 2 sets of database schema that account for the following
+            information. Although we will deploy the 2 database schemas to
+            the same database for the project, they should be designed to be
+            independently deployed to separate databases. eDmv and eMayberry are
+            two independent applications. This will primarily affect your attempt
+            re-use tables or to make primary key assumptions between the two.
+        </para>
 
         <section id="edatashare-project1-tech-dmvdb">
             <title>eDmv Candidate Database Schema</title>

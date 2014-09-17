@@ -1,0 +1,180 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="edatashare-project2-desc">
+    <title>eDataShare Project 2 Description</title>
+    <subtitle>N-Tier Application</subtitle>
+    <para>Updated: 2014-09-14</para>
+
+    <section id="edatashare-project2-purpose">
+        <title>Purpose</title>
+
+        <section id="edatashare-project2-goals">
+            <title>Goals</title>
+            <para></para>
+      
+            <itemizedlist spacing="compact">
+                <listitem><para>
+                    Continue to re-use and update the implementations from the previously
+                    implemented data access tier and initial business logic
+                    </para> </listitem>
+                <listitem><para>
+                    Deploy data access tier and business logic as an EJB component to server
+                    </para> </listitem>
+                <listitem><para>
+                    Deploy EJBs using different deployment approaches (EAR and WAR)
+                    </para> </listitem>
+                <listitem><para>
+                    Provide a remote interface to business logic
+                    </para> </listitem>
+                <listitem><para>
+                    Provide integration prototype for Web Tier
+                    </para> </listitem>
+            </itemizedlist>
+            <para></para>
+        </section>
+        <section id="edatashare-project2-objectives">
+            <title>Objectives</title>
+            <para></para>
+            <itemizedlist spacing="compact">
+                <listitem><para>
+                    Expand the current project development architecture to include EJB,
+                    WAR, EAR, and remote Test sub-projects for eDmv. For eDmv you will have 
+                    separate EJB, WAR, EAR, and RMI Test modules. This is being done to 
+                    simulate a complex project option.
+                    </para></listitem>
+                <listitem><para>
+                    Expand the current project development architecture to include EJB,
+                    WAR, and remote Tests for eMayberry. For eMayberry you will have a
+                    single WAR for deployment. You may merge all architectural levels
+                    into a single WAR module. This is being done to simulate a simple
+                    project option.
+                    </para></listitem>
+                <listitem><para>
+                    Re-host the data access tiers and initial business logic from 
+                    Project 1 within the new EJB and WEB tiers at component/runtime.
+                    </para></listitem>
+                <listitem><para>
+                    Design the data transfer objects (DTOs) to be used to communicate
+                    with clients using the remote interface.
+                    </para></listitem>
+                <listitem><para>
+                    Create the EAR and WAR sub-projects to host/deploy the Java EE components.
+                    </para></listitem>
+                <listitem><para>
+                    Create the remote Test sub-project(s) to deploy and run tests using the
+                    remote EJB interface.
+                    </para></listitem>
+                <listitem><para>
+                    Create and test the WAR sub-project to host the user interface.
+                    This component will ultimately be deployed the application server 
+                    and may use local interfaces of the EJB to access business logic. 
+                    </para></listitem>
+            </itemizedlist>
+            <para></para>
+        </section>
+    </section>
+
+    <section id="edatashare-project2-techoverview">
+        <title>Technical Overview</title>
+        <note>
+            <para>
+                This project and the final project rely heavily on the
+                components from Project 1. You are encouraged to make sure your
+                implementation of Project 1 is sound and well tested prior to doing too
+                much work on Project 2. You should continue to maintain your JUnit
+                tests for the earlier components while working on these higher level
+                tiers.
+            </para>
+        </note>
+        <note>
+            <para>
+                We are continuing a theme that DMV is complex and requires all 
+                levels of architecture and that Mayberry is simple and can leverage
+                various shortcuts. The intent it to show how JavaEE can be used 
+                for projects of different sizes and demands. To inially meet satisfy
+                this requirement, you must deploy DMV as an EAR and Mayberry as a WAR.
+                DMV
+            </para>
+            <orderedlist>
+                <listitem><para>
+                    Deploy DMV as an EAR and Mayberry as a WAR
+                    </para></listitem>
+                <listitem><para>
+                    Implement separate DTOs for DMV and re-use BOs as DTOs for Mayberry
+                    </para></listitem>
+                <listitem><para>
+                    Implement separate Impl and EJB modules for DMV and combine
+                    Impl and EJB into a single module for Mayberry. The combined 
+                    module may be also combined with the Mayberry WAR.
+                    </para></listitem>
+            </orderedlist>
+        </note>
+
+        <para>
+            The project will continue along two parallel paths; eDmv and eMayberry.
+            However, this time we will add several new project types; EJB, EAR,
+            WAR, and Test. We will add all new project types to eDmv. We will add
+            (or migrate to) the WAR type to eMayberry. 
+            These new sub-projects will become siblings to your
+            existing Dmv Impl -or- BO, DAO, and BLImpl sub-projects. 
+            For eMayberry, you have the option of making the WAR a sibling project
+            or migrating the existing Impl project to be a WAR project (and remain with
+            a single module for eMayberry).    
+            The new projects will depend on your legacy work. The remote interface of the EJB
+            will also require specific design of what gets externalized to the
+            client. The remote clients do not share the same address space we had
+            in Project 1 and we cannot afford to serialize the entire contents
+            of a database full of related information. Data Transfer Objects
+            (DTOs) will be part of the EJB remote interface design.
+        </para>
+
+        <para>
+            You have finished a significant amount of eDmv during Project 1; the
+            O/R mapping and core business logic of a non-trivial business model.
+            You will now host the data access tier and business logic within an
+            EJB component.  This EJB component will supply the EntityManager,
+            control transaction boundaries, provide local interaction for the
+            Web Tier, and a RMI interface for remote clients. Security will be
+            addressed in the next project. To limit the scope of the project, the
+            Web UI requirements will be constrained to a limited number of
+            use cases. You are to deploy eDmv using an EAR and eMayberry using
+            only a WAR. 
+        </para>
+
+        <para>
+            eMayberry will require additional work as well. With a remote interface
+            for eDmv in hand and the ability to either simulate or operate with a
+            live instance, we can now complete the rest of the the business logic
+            that will also be hosted within an EJB tier. We'll try to keep the Web-UI
+            minimal. 
+        </para>
+
+        <para>
+            You may develop your Web tier in an alternate environment, such as
+            Jetty. However, it must be submitted as part of the application that
+            runs within JBoss.
+        </para>
+            
+        <note>
+            <para>
+                As with the previous project, the use of the name eDataShare,
+                eDmv, and eMayberry within the project specification are to be taken as
+                placeholders. Please make an effort to uniquely name your directories,
+                components, Java packages, JNDI names, etc. to help logically separate
+                the parallel project implementations.
+            </para>
+        </note>
+
+        <note>
+            <para>
+                There should be no use of System.out.println() in the code
+                and all implementations must use a logging API
+                with the log4j logging provider.  You may leave debug in your code,
+                but this should be able to be turned on/off with the proper logging
+                priority changes in the log4j.xml configuration.
+            </para>
+        </note>
+    </section>
+</chapter>
+  
