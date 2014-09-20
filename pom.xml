@@ -369,6 +369,18 @@
                                         <resource>
                                             <directory>${basedir}/src/docbook</directory>
                                             <filtering>true</filtering>
+                                            <includes>
+                                                <include>**/*book.xml</include>
+                                                <include>**/*section.xml</include>
+                                            </includes>
+                                        </resource>
+                                        <resource>
+                                            <directory>${basedir}/src/docbook</directory>
+                                            <filtering>false</filtering>
+                                            <excludes>
+                                                <exclude>**/*book.xml</exclude>
+                                                <exclude>**/*section.xml</exclude>
+                                            </excludes>
                                         </resource>
                                     </resources>              
                                 </configuration>            

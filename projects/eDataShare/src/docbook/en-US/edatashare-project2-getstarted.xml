@@ -4,22 +4,96 @@
 <chapter id="edatashare-project2-getstarted">
     <title>Project 2 Getting Started</title>
     <para>
+        The following sketch of directory structure can be used as a starting
+        point for your overall application. It assumes you already have either
+        a consolidated Impl -or- a BO, DAO, and BLImpl set of projects in
+        place from Project 1. You will not have the option of consolidating
+        the EJB, WAR, EAR, and RMI Test into a single project. They must be
+        implemented as separate projects with proper dependencies between
+        them declared.  Note that all "e"DataShare, "e"Dmv, and "e"Mayberry names
+        should be changed to your specific name mangler. The same type of
+        modification needs to occur for the java package names.
     </para>
 
-    <note>
-        <para>
-        </para>
-    </note>
-        <figure>
-            <title>Single Module Approach Candidate Module Structure</title>
+    <figure>
+        <title>Candidate Source Module Structure</title>
 <programlisting language=""><![CDATA[
+`-- eDataShare
+    |-- eDmv
+    |   |-- eDmvBO
+    |   |-- eDmvDAO
+    |   |-- eDmvBLImpl
+    |   |-- eDmvEJB
+    |   |   |-- pom.xml
+    |   |   `-- src
+    |   |       `-- main
+    |   |           |-- java
+    |   |           |   `-- emdv
+    |   |           |       `-- ejb
+    |   |           `-- resources
+    |   |               `-- META-INF
+    |   |                   |-- beans.xml
+    |   |                   |-- persistence.xml
+    |   |                   |-- (ejb-jar.xml)
+    |   |                   `-- (jboss-ejb3.xml)
+    |   |-- eDmvWAR
+    |   |   |-- pom.xml
+    |   |   `-- src
+    |   |       `-- main
+    |   |           |-- java
+    |   |           |   `-- emdv
+    |   |           |       `-- web
+    |   |           |-- resources
+    |   |           `-- webapp
+    |   |               |-- WEB-INF
+    |   |               |   |-- beans.xml
+    |   |               |   |-- web.xml
+    |   |               |   |-- (jboss-web.xml)
+    |   |               |   `-- content
+    |   |               `-- index.jsp
+    |   |-- eDmvEAR
+    |   |   `-- pom.xml
+    |   |-- eDmvTest
+    |   |   |-- pom.xml
+    |   |   `-- src
+    |   |       `-- test
+    |   |           |-- java
+    |   |           |   `-- emdv
+    |   |           |       `-- ejbclient
+    |   |           `-- resources
+    |   |               `-- jndi.properties
+    |   `-- pom.xml
+    |-- eMayberry
+    |   |-- (eMayberryImpl -- could be merged with WAR)
+    |   |-- eMayberryWAR
+    |   |   |-- pom.xml
+    |   |   `-- src
+    |   |       +-- main
+    |   |       |   |-- java
+    |   |       |   |   `-- emayberry
+    |   |       |   |       +-- ejb
+    |   |       |   |       `-- web
+    |   |       |   |-- resources
+    |   |       |   |   `-- META-INF
+    |   |       |   |       |-- persistence.xml
+    |   |       |   |       `-- (ejb-jar.xml)
+    |   |       |   `-- webapp
+    |   |       |       |-- WEB-INF
+    |   |       |       |   |-- beans.xml
+    |   |       |       |   |-- web.xml
+    |   |       |       |   |-- (jboss-web.xml)
+    |   |       |       |   |-- (jboss-ejb3.xml)
+    |   |       |       |   `-- content
+    |   |       |       `-- index.jsp
+    |   |       `-- test
+    |   |           |-- java
+    |   |           |   `-- emayberry
+    |   |           |       `-- ejbclient (*IT.java)
+    |   |           `-- resources
+    |   |               `-- jndi.properties
+    |   `-- pom.xml
+    `-- pom.xml
 ]]></programlisting>                        
-        </figure>
-
-        <figure>
-            <title>Multi-Module Approach Candidate Module Structure</title>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-        </figure>
+    </figure>
 </chapter>
   
