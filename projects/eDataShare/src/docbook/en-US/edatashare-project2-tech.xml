@@ -3,8 +3,6 @@
 
 <chapter id="edatashare-project2-tech">
     <title>Project 2 Technical Details</title>
-    <note>
-    </note>
 
     <section id="edatashare-project2-tech-impl">
         <title>Data Tier and Business Logic Support</title>
@@ -89,7 +87,7 @@
             </para>
             <figure>
                 <title>eDmv Candidate DTOs</title>
-                <graphic scalefit="1" fileref="images/eDmv_dtos.jpg] eDmv Candidate DTOs"/>
+                <graphic scalefit="1" fileref="images/eDmv_dtos.jpg"/>
             </figure>
 
             <para>

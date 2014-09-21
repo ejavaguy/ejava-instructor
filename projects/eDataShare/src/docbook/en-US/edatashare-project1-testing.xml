@@ -6,9 +6,9 @@
 
     <note>
         <para>
-            The end-to-end scenario will test you business logic, DAO, and BOs in a 
+            The end-to-end scenario will test your business logic, DAO, and BOs in a 
             "happy path" scenario. Any white-box or black-box testing of alternate
-            and error paths would be appropriate to put in the unit tests.
+            and error paths would be appropriate to put in the separate unit tests.
         </para>
     </note>
     <orderedlist spacing="compact">

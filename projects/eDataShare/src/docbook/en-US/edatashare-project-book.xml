@@ -35,11 +35,15 @@
         <xi:include href="edatashare-project1-testing.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
         <xi:include href="edatashare-project1-grading.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     </part>
-    <!--
     <part id="edatashare-project2-part">
         <title>Project 2</title>
-        <xi:include href="edatashare-project2.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+        <xi:include href="edatashare-project2-desc.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+        <xi:include href="edatashare-project2-tech.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+        <xi:include href="edatashare-project2-getstarted.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+        <xi:include href="edatashare-project2-testing.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+        <xi:include href="edatashare-project2-grading.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     </part>
+    <!--
     <part id="edatashare-project3-part">
         <title>Project 3</title>
         <xi:include href="edatashare-project3.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />

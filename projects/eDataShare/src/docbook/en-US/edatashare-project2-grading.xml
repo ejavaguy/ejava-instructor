@@ -12,25 +12,28 @@
     <itemizedlist spacing="compact">
         <listitem><para>
             README provided that describes where each requirement satisfied: 10pts
-            </para> </listitem>
+            </para></listitem>
         <listitem><para>
             Projects cleanly builds with Maven: 15pts
+            </para></listitem>
+        <listitem><para>
+            Project 1 functionality: 10pts
+            </para></listitem>
+        <listitem><para>
+            EJB Tier, remote interface, and EAR deployment: 25pts
+            </para></listitem>
+        <listitem><para>
+            WAR/EJB deployment: 10pts
             </para> </listitem>
         <listitem><para>
-            </para> </listitem>
+            Web UI integration: 10pts
+            </para></listitem>
         <listitem><para>
-            </para> </listitem>
-        <listitem><para>
-            </para> </listitem>
-        <listitem><para>
-            </para> </listitem>
-        <listitem><para>
-            </para> </listitem>
-        <listitem><para>
-            </para> </listitem>
+            Transactions: 10pts
+            </para></listitem>
         <listitem><para>
             End-to-end Integration Test: 10pts
-            </para> </listitem>
+            </para></listitem>
     </itemizedlist>
 
     <para>
@@ -54,6 +57,14 @@
                   <entry namest="area">Not provided</entry>
                   <entry namest="points">10</entry>
                 </row>                        
+                <row rowsep="1">
+                  <entry namest="area">README did not indicate where X was located and it was not obvious even after ...</entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">The WebUI is hard to navigate (fine) but README offered no assistance</entry>
+                  <entry namest="points">5</entry>
+                </row>                        
             </tbody>
         </tgroup>
 
@@ -68,8 +79,22 @@
             <tbody>
                 <row rowsep="1">
                   <entry namest="area">
-                  </entry>
-                  <entry namest="points"></entry>
+                     One of your IT tests assume the DB is setup correctly prior to running and that would only be true of 
+                     we were running a common server database instance across our unit and IT tests.
+                    </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                     Testing does not produce consistent results - out of four runs of mvn install the process failed twice and succeeded twice.
+                    </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    Build was not portable. I had to make changes. Sending me a copy of this beforehand would have caught this.
+                    </entry>
+                  <entry namest="points">2</entry>
                 </row>                        
             </tbody>
         </tgroup>
@@ -79,19 +104,152 @@
             <colspec colname="points"/>
             <thead>
                 <row>
-                  <entry>
-                  </entry>
+                  <entry>Project 1 functionality</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">DB schema is under-constrained</entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Project 1 end-to-end scenarios no longer exist/run</entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>EJB Tier, remote interface, and EAR deployment</entry>
                 </row>
             </thead>
             <tbody>
                 <row rowsep="1">
                   <entry namest="area">
+                    With auto-create DDL turned on (hibernate.hbm2ddl.auto" value="create") your application deletes all data when redeployed.
+                    Deleting all data should be restricted to only an explicit call to resetAll().
                     </entry>
-                  <entry namest="points">1</entry>
+                  <entry namest="points">5</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    Not separating a single call into separate transactions to drop and then create schema. First action may fail when not exist.
+                    </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    You have methods that will only work in a @Local interface a part of your @Remote interface
+                    </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    Reusing business logic classes instead if EJB components - repeating the same work of the reusable EJB component in each EJB that needs to reuse the
+                    functionality. Inject @Local interfaces. Do not repeat instantiation and setup of identical business logic/DAO classes.
+                    </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    Injest was not implemented within a deployed EJB. It was mistakely implemented the same as project 1 in a JUnit client.
+                    </entry>
+                  <entry namest="points">5</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    You have not integrated the two applications at the EJB remote interface level. The second application does not make a single remote call to the first
+                    application. All interaction is occcuring outside of the server-side and results passed in.
+                    </entry>
+                  <entry namest="points">5</entry>
                 </row>                        
             </tbody>
         </tgroup>
 
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>WAR/EJB deployment</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                    You are deploying EJBs from the first application within your second application's WAR. Look at your built/deployed artifact and correct dependencies.
+                    </entry>
+                  <entry namest="points">5</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>Web UI integration</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                    UI does not provide a path to satisfy a step in the end-to-end scenario (that the IT test shows works).
+                    </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    EJB/Impl functionality called by UI fails and is not exercised by end-to-end IT test
+                    </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    This is a real bust when tested on the deployment platform. This should have been easily noticed. Pressing resetAll() results in the following error
+                    displayed.
+                    </entry>
+                  <entry namest="points">5</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>Transactions</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                    Transaction scope not explicitly defined for EJB. You are accepting container defaults.
+                    </entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    No attempt to demonstrate transaction rollback
+                    </entry>
+                  <entry namest="points">10</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    Scenario shows business logic check but not a rollback of actions (store) to a transactional resource (DB).  
+                    The requirement called for you to persist something all the way to the database - such that if you stopped 
+                    in a breakpoint you would see the data - and then have the data thrown away due to a rollback.
+                    </entry>
+                  <entry namest="points">7</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
 
         <tgroup cols='4' align='left' colsep='1' rowsep='0'>
             <colspec colname="area"/>
@@ -112,6 +270,10 @@
                 </row>                        
                 <row rowsep="1">
                   <entry namest="area">Missing step X</entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">No. I want different functionality in this step</entry>
                   <entry namest="points">1</entry>
                 </row>                        
             </tbody>

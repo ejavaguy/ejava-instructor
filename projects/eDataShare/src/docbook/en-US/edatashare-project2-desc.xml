@@ -4,7 +4,7 @@
 <chapter id="edatashare-project2-desc">
     <title>eDataShare Project 2 Description</title>
     <subtitle>N-Tier Application</subtitle>
-    <para>Updated: 2014-09-14</para>
+    <para>Updated: 2014-09-20</para>
 
     <section id="edatashare-project2-purpose">
         <title>Purpose</title>
@@ -47,8 +47,8 @@
                     Expand the current project development architecture to include EJB,
                     WAR, and remote Tests for eMayberry. For eMayberry you will have a
                     single WAR for deployment. You may merge all architectural levels
-                    into a single WAR module. This is being done to simulate a simple
-                    project option.
+                    into a single WAR module (or a few other options). This is being 
+                    done to simulate a simple project option.
                     </para></listitem>
                 <listitem><para>
                     Re-host the data access tiers and initial business logic from 
@@ -56,7 +56,9 @@
                     </para></listitem>
                 <listitem><para>
                     Design the data transfer objects (DTOs) to be used to communicate
-                    with clients using the remote interface.
+                    with clients using the remote interface. For DMV you will design 
+                    a set of DTO classes separate from your BO classes. For Mayberry
+                    you will reuse your BO classes as DTOs.
                     </para></listitem>
                 <listitem><para>
                     Create the EAR and WAR sub-projects to host/deploy the Java EE components.
@@ -93,8 +95,7 @@
                 levels of architecture and that Mayberry is simple and can leverage
                 various shortcuts. The intent it to show how JavaEE can be used 
                 for projects of different sizes and demands. To inially meet satisfy
-                this requirement, you must deploy DMV as an EAR and Mayberry as a WAR.
-                DMV
+                this requirement, you must ... 
             </para>
             <orderedlist>
                 <listitem><para>

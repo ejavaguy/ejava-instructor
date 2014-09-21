@@ -1,97 +1,83 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="edatashare-project1-testing">
-    <title>Project 1 Testing</title>
+<chapter id="edatashare-project2-testing">
+    <title>Project 2 Testing</title>
 
     <note>
         <para>
-            The end-to-end scenario will test you business logic, DAO, and BOs in a 
+            The end-to-end scenario will test your end-to-end application in a 
             "happy path" scenario. Any white-box or black-box testing of alternate
-            and error paths would be appropriate to put in the unit tests.
+            and error paths would be appropriate to put in the separate unit and IT tests.
         </para>
     </note>
+
     <orderedlist spacing="compact">
         <listitem><para>
-            Provide a JUnit test for your business objects (BOs) that test
-            the manipulation of the data. An example test might be to try
-            adding a residence to a Person without a start date.  These tests
-            should be packaged with the BOs. It is anticipated that these 
-            tests will be a minimal demonstration of understanding.
+            Provide JUnit tests that verify the EJB functionality of
+            eDmv accessed through its remote interface. This will also test the
+            DTOs. These tests should be packaged in the eDmv RMI Test project.
             </para> </listitem>
         <listitem><para>
-            Provide a JUnit test for your eDmv and eMayberry JPA DAOs. This
-            should test the implementation for the required CRUD operations
-            for each type of object. It is understood that some of the objects
-            will be handled by cascades, so you might not have a set of methods
-            handling each type of business object.  This test should be packaged
-            with the DAOs.
+            Provide JUnit tests that verify the extra business logic
+            functionality of eMayberry interfacing with eDmv. These tests may
+            be placed either with the business logic project or where you 
+            test the remote interfaces.
             </para> </listitem>
         <listitem><para>
-            Provide a JUnit test for your business logic to test the
-            basic functionality of your business logic design, including ingest.
-            The ingestor test should be able to reference a known data file and
-            ingest records into the database using the DAOs. These tests
-            should be packaged with the business logic implementation.
+            Provide JUnit tests that verify the EJB functionality of
+            eMayberry accessed through its remote interface. This will also test
+            its use of DTOs. Theses tests should be packaged in the eMayberry
+            WAR (or optional RMI Test) project.
             </para> </listitem>
         <listitem><para>
-            Provide a set of JUnit test programs to verify the following
-            end-to-end scenario in eDmv.  This test should be implemented as
-            a JUnit test and packaged with the business logic implementation.
+            Perform an end-to-end use case to do the following. This must be 
+            demonstrated in an automated JUnit test and then be manually
+            implementable using the Web UI.
             </para>
             <orderedlist spacing="compact">
                 <listitem><para>
-                    reset (using DmvTestUtilImpl)
+                    Reset all eDmv and eMayberry tables (using the DmvTestUtilEJB and MayberryTestUtilEJB)
                     </para> </listitem>
                 <listitem><para>
-                    populate (using DmvIngestor)
+                    Populate the eDmv tables (using the DmvIngestor)
                     </para> </listitem>
                 <listitem><para>
-                    addDriver (using DriverMgmtImpl)
+                    Create a new Driver in eDmv (using the DriverMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    moveResidence (using DriverMgmtImpl)
+                    List Drivers, including the newly added Driver in eDmv (using
+                    the DriverMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    addRegistration (using VehicleMgmtImpl)
+                    Move Residence for a Driver in eDmv (using DriverMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    getRegistrationByMakeModel (using VehicleMgmtImpl)
+                    Add a Vehicle Registration in eDmv (using VehcileMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    getPeopleByName (using PeopleMgmtImpl)
+                    List Vehicle Registrations, including the newly created
+                    Vehicle Registration, in eDmv (using DriverMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    getPerson (using PeopleMgmtImpl)
+                    Create a Person of Interest in eMayberry that matches
+                    someone in eDmv (using PoiMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    getRegistrationByOwner (using VehicleMgmtImpl)
+                    Add an Activity for the Person of Interest in eMayberry
+                    (using PoiMgmtEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    Search for the Person of Interest in eDmv (using
+                    PersonMgmtEJB). Optionally associate the identity of the
+                    correct information in eMayberry (using PoiMgmtEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    Add a dangerous Activity for the Person of Interest in
+                    eMayberry (using PoiMgmtEJB)
                     </para> </listitem>
             </orderedlist>
         </listitem>
-        <listitem><para>
-            Provide a set of JUnit test programs to verify the following
-            end-to-end scenario in eMayberry.  This test should be implemented as
-            a JUnit test and packaged with the business logic implementation.
-            </para> 
-            <orderedlist spacing="compact">
-                <listitem><para>
-                    reset (using MayberryTestUtilImpl)
-                    </para> </listitem>
-                <listitem><para>
-                    addPoi (PoiMgmtImpl)
-                    </para> </listitem>
-                <listitem><para>
-                    addActivity (PoiMgmtImpl)
-                    </para> </listitem>
-                <listitem><para>
-                    getPoi (PoiMgmtImpl)
-                    </para> </listitem>
-                <listitem><para>
-                    isDangerous (PoiMgmtImpl)
-                    </para> </listitem>
-            </orderedlist>
-            </listitem>
     </orderedlist>
 </chapter>
   
