@@ -17,27 +17,30 @@
             <id>webdev-repositories</id>
             <repositories>
                 <repository>
-                    <id>webdev-baseline</id>
-                    <name>webdev.apl.jhu.edu baseline</name>
-                    <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
+                    <id>webdev</id>
+                    <name>ejava webdev repository</name>
+                    <url>http://webdev.jhuep.com/~jcs/maven2</url>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
                 </repository>
                 <repository>
                     <id>webdev-snapshot</id>
-                    <name>webdev.apl.jhu.edu SNAPSHOT</name>
-                    <url>http://webdev.apl.jhu.edu/~jcs/maven2-snapshot</url>
+                    <name>ejava webdev snapshot repository</name>
+                    <url>http://webdev.jhuep.com/~jcs/maven2-snapshot</url>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
                     <snapshots>
                         <enabled>true</enabled>
                         <updatePolicy>daily</updatePolicy>
                     </snapshots>
                 </repository>
             </repositories>
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>webdev-plugins</id>
-                    <name>ejava webdev repository</name>
-                    <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
-                </pluginRepository>
-            </pluginRepositories>
         </profile>
     </profiles>
     <activeProfiles>
@@ -51,22 +54,17 @@
         
             <listitem><para>Use the ejava.jpa:jpa-queryex-archetype to setup a new Maven project for this exercise.
                 Activate the webdev-repositories profile (-Pwebdev-repositories) so that you can resolve
-                the archetype off the Internet.</para>
+                the archetype off the Internet. The following should be run outside of the class example
+                tree.</para>
                 <note>
                     <para>This archetype is specific to this exercise and is a different profile than what was 
                         used by the previous exercises.</para>
                 </note>
  <programlisting language=""><![CDATA[
-$ mvn archetype:generate -B \
--DarchetypeGroupId=ejava.jpa -DarchetypeArtifactId=jpa-queryex-archetype \
--DgroupId=myorg.queryex -DartifactId=queryEx \
--Pwebdev-repositories
+ >mvn archetype:generate -B -DarchetypeGroupId=info.ejava.examples.jpa -DarchetypeArtifactId=jpa-queryex-archetype -DgroupId=myorg.queryex -DartifactId=queryEx -Pwebdev-repositories
 
-...
-[INFO] Generating project in Batch mode
-[INFO] Archetype [ejava.jpa:jpa-queryex-archetype:3.0.2013.1-SNAPSHOT] found in catalog local
 [INFO] ----------------------------------------------------------------------------
-[INFO] Using following parameters for creating project from Archetype: jpa-queryex-archetype:3.0.2013.1-SNAPSHOT
+[INFO] Using following parameters for creating project from Archetype: jpa-queryex-archetype:4.0.0-SNAPSHOT
 [INFO] ----------------------------------------------------------------------------
 [INFO] Parameter: groupId, Value: myorg.queryex
 [INFO] Parameter: artifactId, Value: queryEx
@@ -77,9 +75,14 @@ $ mvn archetype:generate -B \
 [INFO] Parameter: package, Value: myorg.queryex
 [INFO] Parameter: groupId, Value: myorg.queryex
 [INFO] Parameter: artifactId, Value: queryEx
-[INFO] project created from Archetype in dir: /tmp/queryEx
+[INFO] project created from Archetype in dir: C:\proj\784\queryEx
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 3.562 s
+[INFO] Finished at: 2014-09-20T22:43:17-04:00
+[INFO] Final Memory: 11M/28M
+[INFO] ------------------------------------------------------------------------
 ]]></programlisting>
             </listitem>
             <listitem><para>You should now have an instantiated template for a JPA project</para>
@@ -119,11 +122,12 @@ queryEx/
             <listitem><para>Verify the instantiated template builds in your environment</para>
                 <itemizedlist spacing="compact">
                     <listitem><para>Activate the h2db profile (and deactivate the h2srv profile) to use an embedded file as your database.
-                        This option does not require a server but is harder to inspect database state in between tests.</para>
+                        This option does not require a server but is harder to inspect database state in between tests. Remember
+                        that the "!" character must be escaped ("\!") for bash shells.</para>
 <programlisting language=""><![CDATA[
-relationEx]$ mvn clean test -Ph2db -P\!h2srv
+queryEx> mvn clean test -Ph2db -P!h2srv
 ...
- -HHH000401: using driver [org.h2.Driver] at URL [jdbc:h2:/home/jcstaff/workspaces/ejava-javaee/git/jpa/jpa-relation/relationEx/target/h2db/ejava]
+ -HHH000401: using driver [org.h2.Driver] at URL [jdbc:h2:C:\proj\784\relationEx/target/h2db/ejava]
 ...
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
@@ -140,7 +144,7 @@ $ java -jar M2_REPO/com/h2database/h2/1.3.168/h2-1.3.168.jar
                     <listitem><para>Activate the h2srv profile (and deactivate the h2db profile) to use a running H2 database server.
                         This option provides more interaction with your database but does require the server to be running.</para>
 <programlisting language=""><![CDATA[
-relationEx]$ mvn clean test -P\!h2db -Ph2srv
+queryEx]$ mvn clean test -P\!h2db -Ph2srv
 ...
  -HHH000401: using driver [org.h2.Driver] at URL [jdbc:h2:tcp://127.0.0.1:9092/h2db/ejava]
 ...
