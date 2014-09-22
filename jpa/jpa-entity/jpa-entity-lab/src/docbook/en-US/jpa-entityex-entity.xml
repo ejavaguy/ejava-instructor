@@ -10,7 +10,7 @@
     <para>JPA Classes are required to ...</para>
    <itemizedlist spacing="compact">
         <listitem><para>Be identified as being a JPA entity class</para></listitem>
-        <listitem><para>Have a default constructor</para></listitem>
+        <listitem><para>Have a non-private default constructor</para></listitem>
         <listitem><para>At least have one property defined as the primary key</para></listitem>
     </itemizedlist>
         

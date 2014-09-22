@@ -289,6 +289,8 @@ public class Cat2 {]]></programlisting>
                 and expose it to the provider as a BigDecimal.</para>
 <programlisting language="java"><![CDATA[    private double weight;
 ...
+    @javax.persistence.Column(precision=3, scale=1)  //10.2lbs
+    @javax.persistence.Access(javax.persistence.AccessType.PROPERTY)
     public BigDecimal getWeight() {
         return new BigDecimal(weight); 
     }
