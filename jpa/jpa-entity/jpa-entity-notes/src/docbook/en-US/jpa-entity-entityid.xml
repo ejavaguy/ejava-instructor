@@ -25,7 +25,7 @@ em.remove(bike);]]></programlisting>
             
             <listitem><para>Must</para>
                 <itemizedlist spacing="compact">
-                    <listitem><para>Have a no-arg constructor (spec says non-private; but hibernate can work with private)</para></listitem>
+                    <listitem><para>Have a non-private no-arg constructor</para></listitem>
                     <listitem><para>Be identified as an Entity (either using class annotations or ORM descriptors)</para></listitem>
                     <listitem><para>Have at least one (1) @Id property to be used as a primary key</para></listitem>
                 </itemizedlist>

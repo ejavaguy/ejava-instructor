@@ -232,7 +232,7 @@ Hibernate:
                 <title>IDENTITY Requires Provider to Get All PK Values from Database</title>
                 <para>The provider must obtain the next primary key value from the database 
                    each time. Notice in the first case above -- the provider has already flushed the
-                   INSERT to the database during the persist and before out manual call to flush()</para>
+                   INSERT to the database during the persist and before our manual call to flush()</para>
             </note>
         </section>
        

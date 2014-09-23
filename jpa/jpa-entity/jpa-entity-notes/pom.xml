@@ -16,7 +16,7 @@
     
     <properties>
        <doc.base>jpa-entity-book</doc.base>
-       <content.version>v2013-09-23</content.version>
+       <content.version>v2014-09-22</content.version>
     </properties>
 
     <build>
