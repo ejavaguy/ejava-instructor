@@ -1,0 +1,264 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="edatashare-project3-grading">
+    <title>Project 3 Grading</title>
+    <para>
+        Your project will be graded on completeness and quality of product. In
+        order for you to receive full credit in each area, it must be a)
+        complete, b) done well, and c) tested.  The breakdown of grading 
+        will be as follows:
+    </para>
+
+    <itemizedlist spacing="compact">
+        <listitem><para>
+            README provided that describes where each requirement satisfied: 10pts
+            </para></listitem>
+        <listitem><para>
+            Projects cleanly builds with Maven: 15pts
+            </para></listitem>
+        <listitem><para>
+            Project 1 and 2 functionality: 5pts
+            </para></listitem>
+        <listitem><para>
+            Client Security Login: 10pts
+            </para></listitem>
+        <listitem><para>
+            EJB Security: 10pts
+            </para> </listitem>
+        <listitem><para>
+            WAR Security: 10pts
+            </para></listitem>
+        <listitem><para>
+            EJB JMS Publisher: 5pts
+            </para></listitem>
+        <listitem><para>
+            EJB MDB Subscriber: 5pts
+            </para></listitem>
+        <listitem><para>
+            Java SE JMS Listener: 10pts
+            </para></listitem>
+        <listitem><para>
+            EJB Timers: 10pts
+            </para></listitem>
+        <listitem><para>
+            End-to-End Integration Test: 10pts
+            </para></listitem>
+    </itemizedlist>
+
+
+    <para>
+        The following table contains examples of where projects have lost 
+        points in the past. Of course, each project submitted can introduce
+        new issues or different severity levels of the same issues. Do not
+        treat this as a complete list.
+    </para>
+    <table>
+        <title>Sample Lost Points</title>
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>README</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                        </entry>
+                  <entry namest="points">
+                        </entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">The WebUI is hard to navigate (fine) but README offered no assistance</entry>
+                  <entry namest="points">5</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>Projects cleanly builds with Maven</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                    </entry>
+                  <entry namest="points"></entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>Project 1 and 2 functionality</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                        </entry>
+                  <entry namest="points"></entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>Client Security Login</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                    </entry>
+                  <entry namest="points"></entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>EJB Security</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                    </entry>
+                  <entry namest="points"></entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>WAR Security</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                    </entry>
+                  <entry namest="points"></entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>EJB JMS Publisher</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                    </entry>
+                  <entry namest="points"></entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>EJB MDB Subscriber</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                    </entry>
+                  <entry namest="points"></entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>Java SE JMS Listener</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                    </entry>
+                  <entry namest="points"></entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>EJB Timers</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                    </entry>
+                  <entry namest="points"></entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>End-to-end Integration Test</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">Poluted, hard to follow, too much extra stuff</entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Missing resetAll and populate at start of scenarios</entry>
+                  <entry namest="points">5</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Missing step X</entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">No. I want different functionality in this step</entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+    </table>
+
+</chapter>
+  

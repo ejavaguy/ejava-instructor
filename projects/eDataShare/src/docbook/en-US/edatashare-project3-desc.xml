@@ -1,0 +1,242 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="edatashare-project3-desc">
+    <title>eDataShare Project 3 Description</title>
+    <subtitle>Secure and Asynchronous N-Tier Application</subtitle>
+    <para>Updated: 2014-09-23</para>
+
+    <section id="edatashare-project3-purpose">
+        <title>Purpose</title>
+
+        <section id="edatashare-project3-goals">
+            <title>Goals</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>
+                    Secure access to EJB and Web applications
+                    </para> </listitem>
+                <listitem><para>
+                    Provide for asynchronous processing.
+                    </para> </listitem>
+            </itemizedlist>
+            <para></para>
+        </section>
+
+        <section id="edatashare-project3-objectives">
+            <title>Objectives</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>
+                    Re-use the eDmv and eMayberry implementations from projects 1 and 2.
+                    </para></listitem>
+                <listitem><para>
+                    Define access controls and implement authentication mechanisms for 
+                    applications.
+                    </para></listitem>
+                <listitem><para>
+                    Implement a publish/subscribe capability between the eMayberry
+                    and stand-alone client applications.
+                    </para></listitem>
+                <listitem><para>
+                    Trigger certain behaviors based on timers.
+                    </para></listitem>
+            </itemizedlist>
+            <para></para>
+        </section>
+    </section>
+
+    <section id="edatashare-project3-techoverview">
+        <title>Technical Overview</title>
+
+        <para>
+            The project will build on the core implementation from Projects 1 and
+            2. We will mostly extend existing projects with security and
+            asynchronous logic. 
+        </para>
+
+        <para>
+            Java EE defines authentication and authorization to be independent
+            of the overall API and capability. JBoss and other application
+            servers provide simple, default mechanisms that are easy to
+            demonstrate and more sophisticated mechanisms that are realistic for
+            deployments that require no change to the JavaEE-compliant application code.  
+            We will use the simple, default/"other" security-domain defined
+            within the standard JBoss installation. This uses the RealmUsersRoles
+            login-module -- which is powered by two property files supplied and
+            pre-populated by the class server files from ejava-wildfly810.
+        </para>
+
+
+        <table>
+            <title>User Credential Files</title>
+            <tgroup cols='2' align='left' colsep='1' rowsep='0'>
+            <colspec colname="file"/>
+            <colspec colname="desc"/>
+            <thead>
+                <row>
+                  <entry>File</entry>
+                  <entry>Description</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                   <entry namest="file">
+                        ${jboss.server.config.dir}/application-users.properties
+                        </entry>
+                   <entry namest="desc">
+                        defines username=password lines that list the login username and hashed password
+                        </entry>
+                </row>
+                <row rowsep="1">
+                   <entry namest="file">
+                        ${jboss.server.config.dir}/application-roles.properties
+                        </entry>
+                   <entry namest="desc">
+                        defines username=role1,role2 lines that list the login username and assigned roles
+                        </entry>
+                </row>
+            </tbody>
+            </tgroup>
+        </table>    
+
+        <para>
+            We are going to have a couple types of users. Some of the users will
+            have zero, one, or more of these roles. Because of the static nature of
+            our authentication, all users will have a login configured before
+            the application is even deployed to the server.
+        </para>
+
+        <table>
+            <title>Application Roles</title>
+            <tgroup cols='2' align='left' colsep='1' rowsep='0'>
+            <colspec colname="role"/>
+            <colspec colname="desc"/>
+            <thead>
+                <row>
+                  <entry>Role</entry>
+                  <entry>Description</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                   <entry namest="role">dmv-admin</entry>
+                   <entry namest="desc">
+                        these users can reset and populate the eDmv database
+                        </entry>
+                </row>
+                <row rowsep="1">
+                   <entry namest="role">dmv-tactical</entry>
+                   <entry namest="desc">
+                        these users can read/write information in eDmv
+                        </entry>
+                </row>
+                <row rowsep="1">
+                   <entry namest="role">dmv-federated</entry>
+                   <entry namest="desc">
+                        these users can only read information from eDmv.
+                        </entry>
+                </row>
+                <row rowsep="1">
+                   <entry namest="role">mayberry-admin</entry>
+                   <entry namest="desc">
+                        these users can reset and populate the eMayberry database
+                        </entry>
+                </row>
+                <row rowsep="1">
+                   <entry namest="role">mayberry-tactical</entry>
+                   <entry namest="desc">
+                        these users can read/write information in eMayberry (and read information from eDmv through eMayberry).
+                        </entry>
+                </row>
+                <row rowsep="1">
+                   <entry namest="role">mayberry-analytical</entry>
+                   <entry namest="desc">
+                        these users can only read information from mayberry (and eDmv through eMayberry)
+                        </entry>
+                </row>
+            </tbody>
+            </tgroup>
+        </table>    
+
+        <para>
+            If a user has a login for one application, they will use the same
+            account to access the other application (e.g., user1 might have
+            both dmv-federated and mayberry-tactical roles).
+        </para>
+
+        <table>
+            <title>User Roles</title>
+            <tgroup cols='2' align='left' colsep='1' rowsep='0'>
+            <colspec colname="user"/>
+            <colspec colname="roles"/>
+            <thead>
+                <row>
+                  <entry>User</entry>
+                  <entry>Roles</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                   <entry namest="user">admin1</entry>
+                   <entry namest="roles">dmv-admin,mayberry-admin</entry>
+                </row>
+                <row rowsep="1">
+                   <entry namest="user">known</entry>
+                   <entry namest="roles">(no roles)</entry>
+                </row>
+                <row rowsep="1">
+                   <entry namest="user">kathy</entry>
+                   <entry namest="roles">dmv-tactical</entry>
+                </row>
+                <row rowsep="1">
+                   <entry namest="user">sherri</entry>
+                   <entry namest="roles">dmv-tactical</entry>
+                </row>
+                <row rowsep="1">
+                   <entry namest="user">sysRaleigh</entry>
+                   <entry namest="roles">dmv-tactical</entry>
+                </row>
+                <row rowsep="1">
+                   <entry namest="user">sysMayberry</entry>
+                   <entry namest="roles">dmv-federated,mayberry-tactical,mayberry-analytical</entry>
+                </row>
+                <row rowsep="1">
+                   <entry namest="user">andy</entry>
+                   <entry namest="roles">mayberry-tactical,mayberry-analytical</entry>
+                </row>
+                <row rowsep="1">
+                   <entry namest="user">barney</entry>
+                   <entry namest="roles">mayberry-tactical</entry>
+                </row>
+                <row rowsep="1">
+                   <entry namest="user">gomer</entry>
+                   <entry namest="roles">mayberry-analytical</entry>
+                </row>
+            </tbody>
+            </tgroup>
+        </table>    
+
+        <para>
+            Some actions are open to any users; authenticated or not.
+            Authentication will be performed using a JNDI login.  All users
+            will have a password of "password".
+        </para>
+
+        <para>
+            For some asynchronous activity, we will implement a Topic within
+            eDmv that will be used to provide updates to any of the driver or
+            owner information. eMayberry will listen to this topic with a 
+            Message Driven Bean to keep up to date on POIs. We will also
+            implement a separate Topic where eMayberry will publish messages
+            related to persons of interest when they change.  These topics
+            will be pre-defined in your application server along with the users
+            and roles.  However, you will have to design the type, structure,
+            and payload of the messages sent on the topics.
+        </para>
+
+        <para>
+            eMayberry will use EJB Timers to send out person of interest re-caps.
+        </para>
+            
+    </section>
+</chapter>
+  

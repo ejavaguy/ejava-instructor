@@ -1,0 +1,298 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="edatashare-project3-tech">
+    <title>Project 3 Technical Details</title>
+
+    <section id="edatashare-project3-tech-impl">
+        <title>Data Tier, Business Logic, and EJB/WAR Support</title>
+        <para>
+            Provide all functionality from Projects 1 and 2.
+        </para>
+    </section>
+
+    <section id="edatashare-project3-tech-dmvaccess">
+        <title>eDmv Access Restrictions</title>
+        <para>
+            Enhance eDmv with access restrictions.
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Assign the EJB to the "other" security domain
+                </para>
+                </listitem>
+            <listitem><para>
+                Restrict access to the EJB write methods to appropriate roles
+                using declarative security.
+                </para>
+                <orderedlist spacing="compact">
+                    <listitem><para>
+                        Only the dmv-admin role may run the test utility functions.
+                        </para>
+                        </listitem>
+                    <listitem><para>
+                        Only the dmv-tactical role may create objects
+                        </para>
+                        </listitem>
+                </orderedlist>
+                </listitem>
+            <listitem><para>
+                Restrict access to the EJB read methods to appropriate roles
+                using declarative security.
+                </para>
+                <orderedlist spacing="compact">
+                    <listitem><para>
+                        dmv-tactical and dmv-federated may read information
+                        within eDmv.
+                        </para>
+                        </listitem>
+                </orderedlist>
+                </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="edatashare-project3-tech-dmvclient">
+        <title>eDMV RMI client Authentication</title>
+        <para>
+            Extend your existing eDmv RMI Test project and any RMI client(s) to
+            address new authentication requirements.
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Add a valid login to your existing tests to re-enable them under
+                the newly secure environment.
+                </para>
+                </listitem>
+            <listitem><para>
+                Add a new unit test that verifies the access controls of the
+                protected and open methods. This means that -- after fixing access
+                issues in the previous bullet -- you purposely attempt to violate
+                access restrictions from a new JUnit test to show a test of 
+                access control.
+                </para>
+                </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="edatashare-project3-tech-mayaccess">
+        <title>eMayberry Access Restrictions</title>
+        <para>
+            Enhance eMayberry with access restrictions.
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Assign the EJB to the "other" security domain.
+                </para>
+                </listitem>
+            <listitem><para>
+                Restrict access to the EJB write methods to appropriate roles
+                using declarative security.
+                </para>
+                <orderedlist spacing="compact">
+                    <listitem><para>
+                        Only the mayberry-admin role may run the test utility
+                        functions.
+                        </para>
+                        </listitem>
+                    <listitem><para>
+                        Only the mayberry-tactical role may update information.
+                        </para>
+                        </listitem>
+                </orderedlist>
+                </listitem>
+            <listitem><para>
+                Restrict access to the EJB read methods to appropriate roles
+                using declarative security.
+                </para>
+                <orderedlist spacing="compact">
+                    <listitem><para>
+                        Only the mayberry-tactical and mayberry-analytical roles
+                        may execute read options
+                        </para>
+                        </listitem>
+                </orderedlist>
+                </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="edatashare-project3-tech-mayclient">
+        <title>eMayberry RMI client Authentication</title>
+        <para>
+            Extend your existing eMayberry RMI Test project and any RMI
+            client(s) to address new authentication requirements.
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Add a valid login to your existing tests to re-enable them under 
+                the new secure environment.
+                </para>
+                </listitem>
+            <listitem><para>
+                Add a new unit test that verifies the access controls of the
+                protected and open methods. Same comment as above -- after
+                fixing proper access to Mayberry you should have at least
+                one test that demonstrates how the application is preventing
+                unauthorized access.
+                </para>
+                </listitem>
+        </orderedlist>
+    </section>
+
+
+    <section id="edatashare-project3-tech-dmvwar">
+        <title>eDmvWAR Access Restrictions</title>
+        <para>
+            Enhance eDmvWAR with access restrictions.
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Assign the WAR to the "other" security-domain.
+                </para>
+                </listitem>
+            <listitem><para>
+                Restrict access beyond the main page to users with
+                the appropriate roles. You may use FORM or BASIC authentication.
+                (I suggest FORM for easy logout/login as new user).
+                </para>
+                </listitem>
+            <listitem><para>
+                Permit only users to only ask the EJB tier for
+                information that is associated with their login. For example,
+                a federated-user should not be given the option to create
+                a driver.
+                </para>
+                </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="edatashare-project3-tech-maywar">
+        <title>eMayberryWAR Access Restrictions</title>
+        <para>
+            Enhance eMayberryWAR with access restrictions.
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Assign the WAR to the "other" security domain.
+                </para>
+                </listitem>
+            <listitem><para>
+                Restrict access beyond the main page to users with
+                the appropriate roles. You may use FORM or BASIC authentication.
+                (I suggest FORM for easy logout).
+                </para>
+                </listitem>
+            <listitem><para>
+                Permit only users to only ask the EJB tier for information that
+                is associated with their login. For example, a eMayberry
+                analytical user should not see an option to add a person of
+                interest or add an activity.
+                </para>
+                </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="edatashare-project3-tech-maypublish">
+        <title>eMayberry JMS Publisher</title>
+        <figure>
+            <title>eDataShare Async</title>
+            <graphic scalefit="1" fileref="images/eDataShare_async.jpg"/>
+        </figure>
+        <para>
+            Extend your eMayberry implementations to publish a JMS message
+            to a topic whenever information for a person of interest changes.
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Use the datashare-mayberry-poi topic (JNDI name: topic/ejava/projects/datashare/mayberry-poi)
+                </para>
+                </listitem>
+            <listitem><para>
+                Design your JMS Message. You can use any JMS Type and JMS/custom
+                properties you wish.  However, know that some subscribers will
+                only want to receive messages for persons that are dangerous.
+                </para>
+                </listitem>
+            <listitem><para>
+                Have your eMayberry EJBs publish JMS Messages to the topic when 
+                a person of interest is added, an activity is added, or there is an
+                change for that person reported by eDmv.
+                </para>
+                </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="edatashare-project3-tech-mayjavase">
+        <title>eMayberry JavaSE Subscriber </title>
+        <para>
+            Add a Java SE JMS subscriber to eMayberry to consume events about
+            dangerous persons of interest.
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Implement a Java SE JMS subscriber that listens for changes to
+                persons of interest. Register a JMS selector such that only people
+                with that classification are received by this process. 
+                </para>
+                </listitem>
+            <listitem><para>
+                Simply print the fact that the process was called and the
+                contents reported in the message.
+                </para>
+                </listitem>
+            <listitem><para>
+                You must launch this subscriber using an Ant wrapper script.
+                </para>
+                </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="edatashare-project3-tech-dmvpublish">
+        <title>eDmv JMS Publisher</title>
+        <para>
+            Extend your eDmv EJB implementations to publish changes to 
+            People.
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Use the datashare-dmv topic (JNDI name: topic/ejava/projects/datashare/dmv)
+                </para>
+                </listitem>
+            <listitem><para>
+                Design your JMS Message. You can use any JMS Type and JMS/custom
+                properties you wish.  
+                </para>
+                </listitem>
+            <listitem><para>
+                Have your eDmv EJBs publish JMS Messages to the topic when 
+                a Person changes physical details or residency.
+                </para>
+                </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="edatashare-project3-tech-maymdb">
+        <title>eMayberry MDB Subscriber</title>
+        <para>
+            Implement a Message Driven Bean within eMayberry to subscribe to 
+            changes to eDmv people and trigger changes to persons of interest.
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Determine whether the identity of the person -or- the name
+                of the person matches one or more persons of interest. Publish a
+                person of interest change for that person if there is a match.
+                </para>
+                </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="edatashare-project3-tech-maytimer">
+        <title>eMayberry EJBTimer</title>
+        <para>
+            Implement an EJB Timer that will allow eMayberry to
+            automatically wake-up and send out a full list of persons of interest
+            to its JMS Topic.
+        </para>
+    </section>
+</chapter>
+  
