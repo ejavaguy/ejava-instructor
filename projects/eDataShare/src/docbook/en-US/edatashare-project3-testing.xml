@@ -30,7 +30,9 @@
             encapsulate the classpath details in a portable manner (see the
             class jmsNotifier project for an example of using an Ant runtime script).
             The full JSE subscriber need not be part of the automated end-to-end
-            JUnit test.
+            JUnit test. The JUnit test/module must be delivered in a state that can 
+            be executed in a debugger -- whether directly within Eclipse or using a 
+            remote debugging session.
             </para>
             <itemizedlist spacing="compact">
                 <listitem><para>admin1=dmv-admin,mayberry-admin</para> </listitem>

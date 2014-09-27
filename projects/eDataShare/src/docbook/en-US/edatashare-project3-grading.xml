@@ -65,12 +65,6 @@
             </thead>
             <tbody>
                 <row rowsep="1">
-                  <entry namest="area">
-                        </entry>
-                  <entry namest="points">
-                        </entry>
-                </row>                        
-                <row rowsep="1">
                   <entry namest="area">The WebUI is hard to navigate (fine) but README offered no assistance</entry>
                   <entry namest="points">5</entry>
                 </row>                        
@@ -88,8 +82,15 @@
             <tbody>
                 <row rowsep="1">
                   <entry namest="area">
+                    Using rogue users that are not part of the standard class setup in your end-to-end.
                     </entry>
-                  <entry namest="points"></entry>
+                  <entry namest="points">3</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    Initial build fails. Looks to depend on DB schema bleedover between unit and IT tests.
+                    </entry>
+                  <entry namest="points">2</entry>
                 </row>                        
             </tbody>
         </tgroup>
@@ -105,8 +106,35 @@
             <tbody>
                 <row rowsep="1">
                   <entry namest="area">
-                        </entry>
-                  <entry namest="points"></entry>
+                      Second application being deployed as EAR and not WAR
+                      </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                      Relying on persistence unit to create schema -- thus blowing away all DB data on deployment
+                      </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                      Missing scenario feature (e.g., wrong data) from project 2 end-to-end scenario.
+                      </entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                      Attempting to set the state of a @Stateless EJB. What do you think will happen to that state 
+                      when you get a different bean instance the next time you call?
+                      </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                      Not self managing schema. With the end-to-end having resetAll() in place, why did you rely on the JPA 
+                      provider to initialize your schema?
+                      </entry>
+                  <entry namest="points">1</entry>
                 </row>                        
             </tbody>
         </tgroup>
@@ -122,8 +150,9 @@
             <tbody>
                 <row rowsep="1">
                   <entry namest="area">
+                    Fine, but too many fine-grain logins.
                     </entry>
-                  <entry namest="points"></entry>
+                  <entry namest="points">0</entry>
                 </row>                        
             </tbody>
         </tgroup>
@@ -139,8 +168,36 @@
             <tbody>
                 <row rowsep="1">
                   <entry namest="area">
+                    Using credential logins for the JMS Connection from EJBs -- versus leveraging the @RunAs role 
                     </entry>
-                  <entry namest="points"></entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    Not relying on declaritive security to perform the role checks. You are also having the caller authorized for the role
+                    supply instance-specific information. For example, any division coordinator is allowed to report the score for any division.                        
+                    </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    Not constraining authorized caller to manage only their information. Caller is passing references to information using
+                    identifiers that could be associated with any user versus "manage my stuff". By relying on those identifiers you are allowing
+                    them to "manage that stuff which may or may not be my stuff".
+                    </entry>
+                  <entry namest="points">3</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                      EJB module not being associated with a specific security-domain. Relying on defaults.
+                    </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    @RunAs takes a role -- not a principal
+                    </entry>
+                  <entry namest="points">1</entry>
                 </row>                        
             </tbody>
         </tgroup>
@@ -156,6 +213,20 @@
             <tbody>
                 <row rowsep="1">
                   <entry namest="area">
+                    Requiring login to pages that should allow anonymous access.
+                    </entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    WAR is not properly locked down.
+                    </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                      Mixed use of BASIC and FORM. When signing in to perform action a Basic authentication popup appears and 
+                      logout no longer functions, need to close browser to log out.
                     </entry>
                   <entry namest="points"></entry>
                 </row>                        
@@ -173,8 +244,23 @@
             <tbody>
                 <row rowsep="1">
                   <entry namest="area">
+                    Copied provided example wholesale and did not adjust to be your solution (e.g., features specific to the 
+                    example are not required for project, comments specific to example are not appropriate for a project 
+                    solution).
                     </entry>
-                  <entry namest="points"></entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    Not closing resources (JMS 1.1) This eventually exhausts resources over time.
+                    </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    Could not find testing of this anywhere to makeup for the fact that the end-to-end was not implemented
+                    </entry>
+                  <entry namest="points">2</entry>
                 </row>                        
             </tbody>
         </tgroup>
@@ -190,8 +276,15 @@
             <tbody>
                 <row rowsep="1">
                   <entry namest="area">
+                    Not implemented
                     </entry>
-                  <entry namest="points"></entry>
+                  <entry namest="points">10</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    Using System.out versus logging framework or better error reporting
+                    </entry>
+                  <entry namest="points">1</entry>
                 </row>                        
             </tbody>
         </tgroup>
@@ -207,8 +300,15 @@
             <tbody>
                 <row rowsep="1">
                   <entry namest="area">
+                    Did not provide your subscriber any credentials to interact with the server.
                     </entry>
-                  <entry namest="points"></entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    Didn't work out of box. JMS topic mis-named
+                    </entry>
+                  <entry namest="points">1</entry>
                 </row>                        
             </tbody>
         </tgroup>
@@ -224,8 +324,10 @@
             <tbody>
                 <row rowsep="1">
                   <entry namest="area">
+                    It would be a better design to treat the timer() callback as an interface facade and not the triggering implementation mechanism. You have combined EJB
+                    Timer, JMS publishing, and business logic within a single method.
                     </entry>
-                  <entry namest="points"></entry>
+                  <entry namest="points">0</entry>
                 </row>                        
             </tbody>
         </tgroup>
@@ -240,6 +342,14 @@
                 </row>
             </thead>
             <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                    Your configuration made it hard to run the end-to-end scenario in a debugger. All JNDI names and properties 
+                    were solely expressed in the pom.xml rather than having suitable defaults in the IT test and overrides 
+                    from the pom.xml. With that type of setup you did not have your pom.xml and surefire setup to allow remote debugging.
+                    </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
                 <row rowsep="1">
                   <entry namest="area">Poluted, hard to follow, too much extra stuff</entry>
                   <entry namest="points">2</entry>

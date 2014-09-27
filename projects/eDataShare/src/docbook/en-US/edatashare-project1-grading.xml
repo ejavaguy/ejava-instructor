@@ -199,6 +199,12 @@
                   <entry namest="area">Not honoring dependencies. Attempt to delete entities with incoming relationships/FKs.</entry>
                   <entry namest="points">1</entry>
                 </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Walking the object tree functionally works but using a JPA-QL query would be much cleaner
+                      and more efficient.
+                      </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
             </tbody>
         </tgroup>
 

@@ -130,6 +130,13 @@
             <tbody>
                 <row rowsep="1">
                   <entry namest="area">
+                      Attempting to set the state of a @Stateless EJB. What do you think will happen to that state 
+                      when you get a different bean instance the next time you call?
+                      </entry>
+                  <entry namest="points">5</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
                     With auto-create DDL turned on (hibernate.hbm2ddl.auto" value="create") your application deletes all data when redeployed.
                     Deleting all data should be restricted to only an explicit call to resetAll().
                     </entry>
