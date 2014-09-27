@@ -47,8 +47,8 @@ import javax.persistence.Table;
 @Table(name="ENTITYEX_DOG")
 @Access(AccessType.FIELD)
 public class Dog {
-    public enum Color {
-        WHITE, BLACK, BROWN, MIX 
+    public enum Sex {
+            MALE, FEMALE
     }
     
     @Id @GeneratedValue

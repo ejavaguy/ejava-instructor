@@ -38,7 +38,6 @@ public class Horse {
     private String description;
     private char[] history;
     private byte[] photo;
-    private Jockey jockey;
     
     public int getId() { return id; }
     public void setId(int id) {
@@ -181,9 +180,10 @@ ID      DESCRIPTION     HISTORY     NAME
 ]]></programlisting>                        
             </listitem>
         
-            <listitem><para>Add a Java Serializable type to the host class. JPA can store this
+            <listitem><para>Add a Java Serializable type to the Horse class. JPA can store this
                 type of object in a blob as well.</para>
 <programlisting language="java"><![CDATA[
+public class Horse {
     public static class Jockey implements Serializable {
         private static final long serialVersionUID = 1L;
         private String name;
