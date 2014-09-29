@@ -1,0 +1,263 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="service-tier-syllabus-schedule">
+    <title>Syllabus</title>
+
+    <table>
+        <title>Data Tier</title>
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+        <colspec colname="session"/>
+        <colspec colname="date"/>
+        <colspec colname="topic"/>
+        <colspec colname="comment"/>
+        <thead>
+            <row>
+              <entry>Session</entry>
+              <entry>Date</entry>
+              <entry>Topic</entry>
+              <entry>Comment</entry>
+            </row>
+        </thead>
+        <tbody>
+        
+            <row rowsep="1">
+               <entry namest="session">1</entry>
+               <entry namest="date"></entry>
+               <entry namest="topic"><para>Course Introduction</para></entry>
+            </row>
+            <row rowsep="1">
+               <entry namest="topic"><para><link linkend="javaee-intro">Enterprise Java (JavaEE) Introduction</link></para></entry>
+               <entry namest="comment"><para>Rubinger &amp; Burke: Ch 1-4</para></entry>
+            </row>
+            <row rowsep="1">
+              <entry namest="comment"><para>Exercise: Development Environment Setup</para></entry>
+            </row>
+            <row rowsep="1">
+              <entry namest="comment"><para>Exercise: First Simple Application</para></entry>
+            </row>
+            
+            <row rowsep="1">
+              <entry namest="session">2</entry>
+              <entry namest="date"></entry>
+              <entry namest="topic"><para><link linkend="devenv">Development Environment Overview</link></para></entry>
+            </row>
+            <row rowsep="1">
+              <entry namest="topic"><para><link linkend="business-logic">Business Logic</link></para></entry>
+            </row>
+
+            <row rowsep="1">
+               <entry namest="session">3</entry>
+               <entry namest="date"></entry>
+               <entry namest="topic"><para><link linkend="jpa-dao">Data Access Objects (DAOs)</link></para></entry>
+            </row>
+            <row rowsep="1">
+              <entry namest="topic"><para><link linkend="jpa-entitymgr">JPA Entity Manager</link></para></entry>
+              <entry namest="comment"><para>Rubinger &amp; Burke: Ch 9</para></entry>
+            </row>
+            <row rowsep="1">
+              <entry namest="comment"><para>Exercise: Entity Manager Exercise</para></entry>
+            </row>
+            <!-- 
+            <row rowsep="1">
+              <entry namest="comment"><para>Project Startup/Sanity Check due by Sun, 8am Sep22</para></entry>
+            </row>
+             -->
+
+            <row rowsep="1">
+              <entry namest="session">4</entry>
+              <entry namest="date"></entry>
+              <entry namest="topic"><para><link linkend="jpa-entity">JPA Core Entity Mapping</link></para></entry>
+              <entry namest="comment"><para>Rubinger &amp; Burke: Ch 10</para></entry>
+            </row>
+            <row rowsep="1">
+              <entry namest="comment"><para>Exercise: Entity Mapping Exercise</para></entry>
+            </row>
+            <row rowsep="1">
+              <entry namest="topic"><para><link linkend="jpa-validation">Validation API</link></para></entry>
+            </row>
+
+            <row rowsep="1">
+              <entry namest="session">5</entry>
+              <entry namest="date"></entry>
+              <entry namest="topic"><para><link linkend="jpa-relation">JPA Relationships</link></para></entry>
+              <entry namest="comment"><para>Rubinger &amp; Burke: Ch 11</para></entry>
+            </row>
+            <row rowsep="1">
+              <entry namest="comment"><para>Exercise: Relationship Mapping Exercise</para></entry>
+            </row>
+            <row rowsep="1">
+              <entry namest="topic"><para><link linkend="jpa-inheritance">JPA Inheritance</link></para></entry>
+              <entry namest="comment"><para>Rubinger &amp; Burke: Ch 12</para></entry>
+            </row>
+
+            <row rowsep="1">
+              <entry namest="session">6</entry>
+              <entry namest="date"></entry>
+              <entry namest="topic"><para><link linkend="jpa-query">JPA Query (Queries, JPAQL, &amp; Criteria API)</link></para></entry>
+              <entry namest="comment"><para>Rubinger &amp; Burke: Ch 13</para></entry>
+            </row>
+            <row rowsep="1">
+              <entry namest="comment"><para>Exercise: JPA Query Exercise</para></entry>
+            </row>
+                <!-- 
+            <row rowsep="1">
+              <entry namest="comment"><ulink url="../../../../../projects/eDataShare/projects/edatashare-project1.html">Project 1</ulink> due by Sun, 8am Oct19</entry>
+            </row>
+                 -->
+            <row rowsep="1">
+              <entry namest="topic"><para><link linkend="jpa-tuning">JPA/SQL Tuning</link></para></entry>
+            </row>
+        </tbody>
+        </tgroup>
+    </table>    
+
+
+    <table>
+        <title>N-Tier Application/Enterprise JavaBeans</title>
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+        <colspec colname="session"/>
+        <colspec colname="date"/>
+        <colspec colname="topic"/>
+        <colspec colname="comment"/>
+        <thead>
+            <row>
+              <entry>Session</entry>
+              <entry>Date</entry>
+              <entry>Topic</entry>
+              <entry>Comment</entry>
+            </row>
+        </thead>
+        <tbody>
+            <row rowsep="1">
+                <!--
+                -->
+                <entry namest="session">0</entry>
+                <entry namest="date">Nov5</entry>
+                <entry namest="topic"><para>Sound Check</para></entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic"><para>Development Environment</para></entry>
+                <entry namest="comment"><para>Exercise: Development Environment Setup</para></entry>
+            </row>
+
+
+
+
+            <row rowsep="1">
+                <!--
+                    POJO
+                    Interfaces
+                    Business Methods
+                    Business Exceptions
+                    Unit Test
+                    POJO Archive
+
+                    EJB
+                    Remote interface
+                    Serializable DTO
+                    EJB Archive
+                    JNDI 
+                    RMI Client
+                    IT Test
+
+                    Local interface
+                    No interface
+                -->
+                <entry namest="session">1</entry>
+                <entry namest="date">Nov12</entry>
+                <entry namest="topic"><para>Enterprise Java Beans Introduction</para></entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic"><para>Basic Session EJB</para></entry>
+            </row>
+            <row rowsep="1">
+                <!--
+                    Server Start/Stop
+                    Embedded Server
+
+                    EJB Module
+                    IT test phases
+                    Deployer
+                    RMI Dependencies
+                    JNDI/RMI Client
+
+                    Remote Debugging
+                -->
+                <entry namest="topic"><para>EJB Development Scenarios</para></entry>
+                <entry namest="comment"><para>Exercise: Basic Session EJB Development and Deploy</para></entry>
+            </row>
+
+
+
+
+            <row rowsep="1">
+                <entry namest="session">2</entry>
+                <entry namest="date">Nov19</entry>
+                <entry namest="topic"><para>Configuring EJBs</para></entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic">Configuring EJBs with CDI</entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic">EJB Persistence</entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic">EJB Deployments</entry>
+            </row>
+            
+
+            <row rowsep="1">
+                <entry namest="session">3</entry>
+                <entry namest="date">Nov26</entry>
+                <entry namest="topic">EJB Transactions</entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="session"/>
+                <entry namest="topic">Session EJB Types</entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic">Web-enabled EJBs with JAX-RS</entry>
+            </row>
+
+
+            <row rowsep="1">
+                <entry namest="session">4</entry>
+                <entry namest="date">Dec03</entry>
+                <entry namest="topic">JavaEE Security</entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="session"/>
+                <entry namest="topic">JavaEE Interceptors</entry>
+            </row>
+
+            
+            <row rowsep="1">
+                <entry namest="session">5</entry>
+                <entry namest="date">Dec10</entry>
+                <entry namest="topic">Asynchronous Processing</entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic">Asynchronous Methods</entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic">EJB Timers</entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic">JMS and Message Driven Beans</entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic">Batch?</entry>
+            </row>
+
+            
+            <row rowsep="1">
+                <entry namest="session">6</entry>
+                <entry namest="date">Dec17</entry>
+                <entry namest="topic">Related Standards</entry>
+            </row>
+        </tbody>
+        </tgroup>
+    </table>    
+</chapter>
+  
