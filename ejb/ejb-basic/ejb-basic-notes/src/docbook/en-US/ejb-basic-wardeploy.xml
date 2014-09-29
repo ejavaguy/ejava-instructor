@@ -1,0 +1,182 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-basic-wardeploy">
+    <title>WAR Deployment</title>
+    <itemizedlist spacing="compact">
+        <listitem><para>Useful in WAR deployments</para></listitem>
+    </itemizedlist>
+    
+    <section id="ejb-basic-wardeploy-war">
+        <title>WAR Artifact</title>
+<programlisting language=""><![CDATA[`-- WEB-INF
+    |-- classes
+    |-- jboss-web.xml
+    `-- lib
+        `-- ejb-basic-ejb-4.0.0-SNAPSHOT.jar]]></programlisting>
+                        
+        <section id="ejb-basic-wardeploy-war">
+            <title>WEB-INF/jboss-web.xml</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Specifies WAR's context when deployed as naked WAR (outside of EAR)</para></listitem>
+                <listitem><para>Useful in eliminating JNDI names from containing version#</para></listitem>
+            </itemizedlist>
+
+<programlisting language="xml"><![CDATA[<jboss-web>
+    <!-- needed to always assure that version# does not get into JNDI name -->
+    <context-root>ejb-basic-war</context-root>
+</jboss-web>]]></programlisting>
+        </section>
+    </section>
+        
+    <section id="ejb-basic-wardeploy-deploy">
+        <title>WAR-based EJB Deployment</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>EJB module deployed within WAR</para></listitem>
+        </itemizedlist>
+<programlisting language=""><![CDATA[
+20:47:51,929 INFO  [org.jboss.as.ejb3.deployment.processors.EjbJndiBindingsDeploymentUnitProcessor] (MSC service thread 1-2) JNDI bindings for session bean named GreeterEJB in deployment unit deployment "ejb-basic-war.war" are as follows:
+
+        java:global/ejb-basic-war/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote
+        java:app/ejb-basic-war/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote
+        java:module/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote
+        java:jboss/exported/ejb-basic-war/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote
+        java:global/ejb-basic-war/GreeterEJB
+        java:app/ejb-basic-war/GreeterEJB
+        java:module/GreeterEJB
+
+20:47:51,970 INFO  [org.jboss.weld.deployer] (MSC service thread 1-2) JBAS016005: Starting Services for CDI deployment: ejb-basic-war.war
+20:47:51,988 INFO  [org.jboss.weld.deployer] (MSC service thread 1-1) JBAS016008: Starting weld service for deployment ejb-basic-war.war
+20:47:52,353 INFO  [org.wildfly.extension.undertow] (MSC service thread 1-1) JBAS017534: Registered web context: /ejb-basic-war
+]]></programlisting>                        
+        <itemizedlist spacing="compact">
+            <listitem><para>JBoss server prints out JNDI names to access EJB through...</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>@Remote</para></listitem>
+                    <listitem><para>No interface</para></listitem>
+                    <listitem><para>Globally within the server (java:global)</para></listitem>
+                    <listitem><para>Within the deployed application (java:app)</para></listitem>
+                    <listitem><para>Within the EJB module (java:module)</para></listitem>
+                    <listitem><para>External to server (java:global/exported)</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Derive remote client JNDI name from "exported" name</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>ejb-basic-war/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Local and No-interface interfaces are not exposed to remote clients</para></listitem>
+        </itemizedlist>
+    </section>
+    
+    
+    <section id="ejb-basic-wardeploy-maven">
+        <title>Maven Aspects: WAR</title>
+        
+        <section id="ejb-basic-wardeploy-mavendeploy-war">
+            <title>WAR Module Build</title>
+            <variablelist spacing="compact">
+                <varlistentry>
+                    <term><filename>packaging=war</filename></term>
+                    <listitem><para>Configures plugin to perform WAR-like packaging of dependencies</para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>scope=compile dependencies</filename></term>
+                    <listitem><para>Name upstream Maven modules that should be deployed in WEB-INF/classes</para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>build.finalName</filename></term>
+                    <listitem><para>Helps eliminate version# from being in JNDI name</para></listitem>
+                </varlistentry>
+            </variablelist>
+
+<programlisting language="xml"><![CDATA[
+<project>
+    <groupId>info.ejava.examples.ejb.basicejb</groupId>
+    <artifactId>ejb-basic-war</artifactId>
+    <packaging>war</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ejb-basic-ejb</artifactId>
+            <version>${project.version}</version>
+            <type>ejb</type>
+        </dependency>     
+    </dependencies>
+
+
+    <build>
+        <finalName>ejb-basic-war</finalName>
+    </build>
+</project>]]></programlisting>
+        </section>
+
+
+        <section id="ejb-basic-wardeploy-mavendeploy-test">
+            <title>IT Test Module</title>
+            <itemizedlist spacing="compact">            
+                <listitem><para>Add EAR artifact as a scope=compile dependency when deploying from separate (test) module</para>
+<programlisting language="xml"><![CDATA[
+    <dependencies>      
+...
+        <!-- packages being deployed must be a dependency -->
+        <dependency>        
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ejb-basic-war</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+            <scope>compile</scope>
+        </dependency>
+...
+    </dependencies>      
+]]></programlisting>
+                </listitem>
+                <listitem><para>Declare EAR artifact to be deployed</para>
+<programlisting language="xml"><![CDATA[
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+                <configuration>
+                    <!-- artifacts to deploy to server -->
+                    <deployables>
+                        <deployable>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>ejb-basic-war</artifactId>
+                            <type>war</type>
+                        </deployable>
+                    </deployables>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>]]></programlisting>
+                </listitem>
+                <listitem><para>Details of cargo-maven2-plugin are provided elsewhere</para></listitem>
+            </itemizedlist>
+        </section>    
+        
+    </section>    
+    
+
+
+    <section id="ejb-basic-wardeploy-summary">
+       <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Deployed EJB using a WAR</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Flexible JavaEE deployment</para></listitem>
+                    <listitem><para>Permits easy extension of web-based applications</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Obtained JNDI name of EAR-based @Remote</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>(war-name)/(ejb-name)!(remote-interface-name)</para></listitem>
+                    <listitem><para>ejb-basic-war/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  

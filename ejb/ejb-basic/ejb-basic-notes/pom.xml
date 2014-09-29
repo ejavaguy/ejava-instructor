@@ -1,0 +1,30 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>info.ejava.docs.ejb</groupId>
+        <artifactId>ejb-basic</artifactId>
+        <version>4.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>ejb-basic-notes</artifactId>
+    <packaging>pom</packaging>
+
+    <name>EJB::Basic EJB::Notes</name>
+    <description>
+        This project provides discussion notes for creating and initial EJB.
+    </description>
+    
+    <properties>
+       <doc.base>ejb-basic-book</doc.base>
+       <content.version>v2014-09-28</content.version>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jboss.maven.plugins</groupId>
+                <artifactId>maven-jdocbook-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

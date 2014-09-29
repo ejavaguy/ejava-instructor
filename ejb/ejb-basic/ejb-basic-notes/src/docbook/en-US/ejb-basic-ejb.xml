@@ -1,0 +1,251 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-basic-ejb">
+    <title>Basic Session EJB Component</title>
+    <itemizedlist spacing="compact">
+        <listitem><para>Add essential EJB aspects to POJO classes</para></listitem>
+        <listitem><para>Deploy to server and test</para></listitem>
+    </itemizedlist>
+        
+    <section id="ejb-basic-ejb-class">
+        <title>Making POJO an EJB</title>
+        
+        <section id="ejb-basic-ejb-class-stateless">
+            <title>Annotate Bean class with @javax.ejb.Stateless</title>
+<programlisting language="java"><![CDATA[import javax.ejb.Stateless;
+...
+@Stateless
+public class GreeterEJB implements Greeter {
+]]></programlisting>
+
+                        
+            <itemizedlist spacing="compact">
+                <listitem><para>Other types include @Stateful, @Singleton, and @MessageDriven</para></listitem>
+            </itemizedlist>
+        </section>
+
+
+
+        <section id="ejb-basic-ejb-class-remote">
+            <title>Annotate Interface with @javax.ejb.Remote</title>
+<programlisting language="java"><![CDATA[import javax.ejb.Remote;
+...
+@Remote
+public interface Greeter {
+]]></programlisting>                        
+           <itemizedlist spacing="compact">
+                <listitem><para>Defines business remote interface for EJB</para></listitem>
+                <listitem><para>Alternately can define @Remote(Interface.class) within EJB bean class</para>
+<programlisting language="java"><![CDATA[@Stateless
+@Remote(Greeter.class)
+public class GreeterEJB implements Greeter {
+]]></programlisting>                        
+                </listitem>
+            </itemizedlist>
+        </section>
+        
+        <section id="ejb-basic-ejb-class-remote-extends">
+            <title>Optionally Annotate Empty Interface Extending POJO Business Interface</title>
+<programlisting language="java"><![CDATA[public interface Greeter {
+    String sayHello(String name) throws BadRequestException;
+
+    Greeting sayHello(Name name) throws BadRequestException;
+}]]></programlisting>                    
+    
+<programlisting language="java"><![CDATA[import javax.ejb.Remote;
+
+@Remote
+public interface GreeterRemote extends Greeter {
+}]]></programlisting>                        
+            <itemizedlist spacing="compact">
+                <listitem><para>Useful when EJB implements legacy interface</para></listitem>
+                <listitem><para>EJB must then implement Remote or declare @Remote</para>
+                
+<programlisting language="java"><![CDATA[@Stateless
+public class GreeterEJB implements GreeterRemote {]]></programlisting>
+                        
+<programlisting language="java"><![CDATA[@Stateless
+@Remote(GreeterRemote.class)
+public class GreeterEJB implements Greeter {]]></programlisting>                        
+                </listitem>
+            </itemizedlist>
+        </section>
+    </section>
+    
+    
+    <section id="ejb-basic-ejb-module">
+        <title>EJB Module</title>
+            
+        <itemizedlist spacing="compact">
+            <listitem><para>
+                EJB artifact looks very much like a normal POJO archive
+                </para></listitem>
+            <listitem><para>
+                Since our EJB is 100% annotation-based, we have no need for META-INF/ejb-jar.xml descriptor
+                </para></listitem>
+        </itemizedlist>
+<programlisting language=""><![CDATA[
+$ jar tf target/ejb-basic-ejb-4.0.0-SNAPSHOT.jar 
+...
+info/ejava/examples/ejb/basic/ejb/BadRequestException.class
+info/ejava/examples/ejb/basic/ejb/Greeter.class
+info/ejava/examples/ejb/basic/ejb/GreeterEJB.class
+info/ejava/examples/ejb/basic/ejb/GreeterRemote.class
+info/ejava/examples/ejb/basic/dto/Name.class
+info/ejava/examples/ejb/basic/dto/Greeting.class
+...
+]]></programlisting>
+        
+        <section id="ejb-basic-ejb-source">
+            <title>Source EJB Module</title>
+<programlisting language=""><![CDATA[|-- pom.xml
+`-- src                                                                                                                                                                                       
+    |-- main                                                                                                                                                                                  
+    |   `-- java                                                                                                                                                                              
+    |       `-- info                                                                                                                                                                          
+    |           `-- ejava                                                                                                                                                                     
+    |               `-- examples
+    |                   `-- ejb
+    |                       `-- basic
+    |                           |-- dto
+    |                           |   |-- Greeting.java
+    |                           |   `-- Name.java
+    |                           `-- ejb
+    |                               |-- BadRequestException.java
+    |                               |-- GreeterEJB.java
+    |                               |-- Greeter.java
+    |                               `-- GreeterRemote.java
+    `-- test
+        |-- java
+        |   `-- info
+        |       `-- ejava
+        |           `-- examples
+        |               `-- ejb
+        |                   `-- basic
+        |                       `-- pojo
+        |                           `-- GreeterTest.java
+        `-- resources
+            `-- log4j.xml]]></programlisting>                               
+            <itemizedlist spacing="compact">
+                <listitem><para>Module contains separate source trees for production and unit test code</para></listitem>
+            </itemizedlist>
+        </section>
+    </section>
+    
+    
+    
+
+    <section id="ejb-basic-ejb-deploy">
+        <title>Naked EJB-based Deployment</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>EJB module deployed either as naked EJB</para></listitem>
+        </itemizedlist>
+<programlisting language=""><![CDATA[
+17:19:52,979 INFO  [org.jboss.as.ejb3.deployment.processors.EjbJndiBindingsDeploymentUnitProcessor] (MSC service thread 1-1) 
+JNDI bindings for session bean named GreeterEJB in deployment unit deployment "ejb-basic-ejb.jar" are as follows:
+
+        java:global/ejb-basic-ejb/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote
+        java:app/ejb-basic-ejb/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote
+        java:module/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote
+        java:jboss/exported/ejb-basic-ejb/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote
+        java:global/ejb-basic-ejb/GreeterEJB
+        java:app/ejb-basic-ejb/GreeterEJB
+        java:module/GreeterEJB
+
+17:19:53,012 INFO  [org.jboss.weld.deployer] (MSC service thread 1-1) JBAS016005: Starting Services for CDI deployment: ejb-basic-ejb.jar
+17:19:53,029 INFO  [org.jboss.weld.deployer] (MSC service thread 1-2) JBAS016008: Starting weld service for deployment ejb-basic-ejb.jar
+17:19:53,485 INFO  [org.jboss.as.server] (DeploymentScanner-threads - 1) JBAS018559: Deployed "ejb-basic-ejb.jar" (runtime-name : "ejb-basic-ejb.jar")
+]]></programlisting>                        
+        <itemizedlist spacing="compact">
+            <listitem><para>JBoss server prints out JNDI names to access EJB through...</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>@Remote</para></listitem>
+                    <listitem><para>No interface</para></listitem>
+                    <listitem><para>Globally within the server (java:global)</para></listitem>
+                    <listitem><para>Within the deployed application (java:app)</para></listitem>
+                    <listitem><para>Within the EJB module (java:module)</para></listitem>
+                    <listitem><para>External to server (java:global/exported)</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Derive remote client JNDI name from "exported" name</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>ejb-basic-ejb/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Local and No-interface interfaces are not exposed to remote clients</para></listitem>
+        </itemizedlist>
+    </section>
+    
+    <section id="ejb-basic-ejb-maven">
+        <title>Maven Aspects: EJB</title>
+
+        <variablelist spacing="compact">
+            <varlistentry>
+                <term><filename>packaging=ejb</filename></term>
+                <listitem><para>Required in order for downstream containers to recognize as EJB component</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>javax.ejb:javax.ejb-api</filename></term>
+                <listitem><para>Supplies EJB API definitions</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>maven-ejb-plugin</filename></term>
+                <listitem><para>Builds EJB and optional ejbclient artifact</para></listitem>
+            </varlistentry>
+        </variablelist>
+<programlisting language="xml"><![CDATA[
+<project>
+...
+    <packaging>ejb</packaging>
+
+    <dependencies>
+...
+        <dependency>
+            <groupId>javax.ejb</groupId>
+            <artifactId>javax.ejb-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+...        
+    </dependencies>
+    
+    <build>
+        <plugins>
+              <!-- tell EJB plugin to create a client-jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ejb-plugin</artifactId>
+                <configuration>
+                    <generateClient>true</generateClient>
+                    <clientExcludes>
+                        <clientExclude>**/ejb/*Local.class</clientExclude>
+                        <clientExclude>**/ejb/*EJB.class</clientExclude>
+                    </clientExcludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>    
+</project>]]></programlisting>
+    </section>
+
+
+    <section id="ejb-basic-ejb-summary">
+       <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Added necessary aspects to POJO to make it an EJB</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Annotated class as @Stateless</para></listitem>
+                    <listitem><para>Annotated remote interface as @Remote</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Deployed to server</para></listitem>
+            <listitem><para>Obtained JNDI name of naked EJB-based @Remote</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>(component-name)/(ejb-name)!(remote-interface-name)</para></listitem>
+                    <listitem><para>ejb-basic-ejb/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  

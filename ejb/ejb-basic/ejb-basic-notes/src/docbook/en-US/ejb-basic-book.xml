@@ -1,0 +1,60 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="jpa-entity">
+    <bookinfo>
+        <title>Basic EJB</title>
+        <subtitle>Developing and Deploying a Basic EJB</subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>This presentation provides information for developing a basic EJB 
+                (one without resource or dependency requirements) and deploying it
+                to the server using WAR and EAR-based deployments.
+            </para>
+        </abstract>
+    </bookinfo>
+    <preface id="ejb-basic-purpose">
+        <title>Purpose</title>
+        <section id="ejb-basic-goals">
+            <title>Goals</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Show how EJBs build on POJO concepts</para></listitem>
+                <listitem><para>Create and deploy a basic EJB (without resource requirements or other dependencies)</para></listitem>
+                <listitem><para>Show different deployment options</para></listitem>
+                <listitem><para>Show how to access the EJB</para></listitem>
+                <listitem><para>Create an integration test for the EJB</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejb-basic-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>be able to:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Create an EJB module</para></listitem>
+                        <listitem><para>Create a simple @Stateless EJB in the EJB module</para></listitem>
+                        <listitem><para>Add required and key aspects to the EJB</para></listitem>
+                        <listitem><para>Unit test the EJB as a POJO</para></listitem>
+                        <listitem><para>Deploy the EJB to the server using an EAR</para></listitem>
+                        <listitem><para>Deploy the EJB to the server using a WAR</para></listitem>
+                        <listitem><para>Integration test the EJB deployed to the server</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+    </preface>
+
+    <toc/>
+    
+    <xi:include href="ejb-basic-pojo.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-basic-ejb.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-basic-eardeploy.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-basic-wardeploy.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-basic-it.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>

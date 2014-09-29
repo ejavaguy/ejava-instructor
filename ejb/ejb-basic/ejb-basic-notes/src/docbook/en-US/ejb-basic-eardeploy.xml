@@ -1,0 +1,250 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-basic-eardeploy">
+    <title>EAR Deployment</title>
+    <itemizedlist spacing="compact">
+        <listitem><para>Useful when need to deploy EJB with dependent artifacts or without WAR</para></listitem>
+    </itemizedlist>
+    
+    <section id="ejb-basic-eardeploy-ear">
+        <title>EAR Artifact</title>
+<programlisting language=""><![CDATA[|-- ejb-basic-ejb.jar
+`-- META-INF
+    `-- application.xml
+]]></programlisting>                        
+
+        <section id="ejb-basic-eardeploy-applicationxml">
+            <title>EAR META-INF/application.xml</title>
+            
+               <itemizedlist spacing="compact">
+                    <listitem><para>
+                        Must supply a META-INF/application.xml with the EJB listed as an ejb module
+                        </para></listitem>
+                    <listitem><para>
+                        May supply utility jars in library-directory (e.g., /lib)
+                        </para></listitem>
+                </itemizedlist>
+<programlisting language="xml"><![CDATA[$ more META-INF/application.xml
+ 
+<?xml version="1.0" encoding="UTF-8"?>
+<application xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/
+javaee/application_6.xsd" version="6">
+  <application-name>ejb-basic-ear</application-name>
+  <description>This projects provides an example EAR for deploying
+      one or more EJB and other type modules.
+      This EAR is assembled here, but tested as a part of the
+      function/integration testing in a sibling project.</description>
+  <display-name>ejb-basic-ear</display-name>
+  <module>
+    <ejb>ejb-basic-ejb.jar</ejb>
+  </module>
+  <library-directory>lib</library-directory>
+</application>
+]]></programlisting>                        
+        </section>
+
+    </section>
+        
+        
+    <section id="ejb-basic-eardeploy-deploy">
+        <title>EAR-based EJB Deployment</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>EJB module deployed within EAR</para></listitem>
+        </itemizedlist>
+<programlisting language=""><![CDATA[
+19:50:07,583 INFO  [org.jboss.as.ejb3.deployment.processors.EjbJndiBindingsDeploymentUnitProcessor] (MSC service thread 1-1) JNDI bindings for session bean named GreeterEJB in deployment unit subdeployment "ejb-basic-ejb.jar" of deployment "ejb-basic-ear-4.0.0-SNAPSHOT.ear" are as follows:
+
+        java:global/ejb-basic-ear/ejb-basic-ejb/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote
+        java:app/ejb-basic-ejb/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote
+        java:module/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote
+        java:jboss/exported/ejb-basic-ear/ejb-basic-ejb/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote
+        java:global/ejb-basic-ear/ejb-basic-ejb/GreeterEJB
+        java:app/ejb-basic-ejb/GreeterEJB
+        java:module/GreeterEJB
+
+19:50:07,588 INFO  [org.jboss.weld.deployer] (MSC service thread 1-1) JBAS016005: Starting Services for CDI deployment: ejb-basic-ear-4.0.0-SNAPSHOT.ear
+19:50:07,596 INFO  [org.jboss.weld.deployer] (MSC service thread 1-2) JBAS016008: Starting weld service for deployment ejb-basic-ear-4.0.0-SNAPSHOT.ear
+]]></programlisting>                        
+        <itemizedlist spacing="compact">
+            <listitem><para>JBoss server prints out JNDI names to access EJB through...</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>@Remote</para></listitem>
+                    <listitem><para>No interface</para></listitem>
+                    <listitem><para>Globally within the server (java:global)</para></listitem>
+                    <listitem><para>Within the deployed application (java:app)</para></listitem>
+                    <listitem><para>Within the EJB module (java:module)</para></listitem>
+                    <listitem><para>External to server (java:global/exported)</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Derive remote client JNDI name from "exported" name</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>ejb-basic-ear/ejb-basic-ejb/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Local and No-interface interfaces are not exposed to remote clients</para></listitem>
+        </itemizedlist>
+    </section>
+    
+    
+    <section id="ejb-basic-eardeploy-maven">
+        <title>Maven Aspects: EAR</title>
+        
+        <section id="ejb-basic-eardeploy-maven-ear">
+            <title>EAR Module Build</title>
+            <variablelist spacing="compact">
+                <varlistentry>
+                    <term><filename>packaging=ear</filename></term>
+                    <listitem><para>Configures plugin to perform EAR-like packaging of dependencies</para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>ejb scope=compile dependencies</filename></term>
+                    <listitem><para>Name upstream Maven modules that should be deployed as EJBs</para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>maven-ear-plugin</filename></term>
+                    <listitem><para>Can perform most actions be default/convention. Example shows how to clean
+                        up JNDI names so that version# is not part of the JNDI name exposed</para></listitem>
+                </varlistentry>
+            </variablelist>
+
+<programlisting language="xml"><![CDATA[
+<project>
+    <groupId>info.ejava.examples.ejb.basicejb</groupId>
+    <artifactId>ejb-basic-ear</artifactId>
+    <packaging>ear</packaging>
+
+    <dependencies>
+        <!-- The EAR must have a scope=compile dependency on the EJB -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ejb-basic-ejb</artifactId>
+            <version>${project.version}</version>
+            <type>ejb</type>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- provide properties here to impact the EAR packaging -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ear-plugin</artifactId>
+                <configuration>
+                    <defaultLibBundleDir>lib</defaultLibBundleDir>
+                    <!-- eliminates use of version in EAR JNDI name portion -->
+                    <applicationName>${project.artifactId}</applicationName>
+                    <modules>
+                        <!-- eliminates use of the version in the EJB JNDI name -->
+                        <ejbModule>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>ejb-basic-ejb</artifactId>
+                            <bundleFileName>ejb-basic-ejb.jar</bundleFileName>
+                        </ejbModule>
+                    </modules>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>    
+]]></programlisting>
+        </section>
+    
+        <section id="ejb-basic-eardeploy-mavendeploy-ear">
+            <title>EAR Module Cleanup</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Add optional undeploy of EAR to clean lifecycle</para></listitem>
+                <listitem><para>Must be done in pre-clean phase before .ear artifact removed</para></listitem>
+                <listitem><para>Latch in profile (-Pundeploy) to prevent from running when .ear not exists</para></listitem>
+            </itemizedlist>
+            <programlisting language="xml"><![CDATA[
+    <profiles>
+        <profile>
+            <id>undeploy</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.cargo</groupId>
+                        <artifactId>cargo-maven2-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>undeploy-ear</id>
+                                <phase>pre-clean</phase>
+                                <goals>
+                                    <goal>undeploy</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>]]></programlisting>
+        </section>    
+
+        <section id="ejb-basic-eardeploy-mavendeploy-test">
+            <title>IT Test Module</title>
+            <itemizedlist spacing="compact">            
+                <listitem><para>Add EAR artifact as a scope=compile dependency when deploying from separate (test) module</para>
+<programlisting language="xml"><![CDATA[
+    <dependencies>      
+...
+        <!-- packages being deployed must be a dependency -->
+        <dependency>        
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ejb-basic-ear</artifactId>
+            <version>${project.version}</version>
+            <type>ear</type>
+            <scope>compile</scope>
+        </dependency>
+...
+    </dependencies>      
+]]></programlisting>
+                </listitem>
+                <listitem><para>Declare EAR artifact to be deployed</para>
+<programlisting language="xml"><![CDATA[
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+                <configuration>
+                    <!-- artifacts to deploy to server -->
+                    <deployables>
+                        <deployable>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>ejb-basic-ear</artifactId>
+                            <type>ear</type>
+                        </deployable>
+                    </deployables>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>]]></programlisting>
+                </listitem>
+                <listitem><para>Details of cargo-maven2-plugin are provided elsewhere</para></listitem>
+            </itemizedlist>
+        </section>    
+        
+    </section>    
+    
+
+
+    <section id="ejb-basic-eardeploy-summary">
+       <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Deployed EJB using an EAR</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Traditional JavaEE deployment</para></listitem>
+                    <listitem><para>Permits deployment of dependency artifacts</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Obtained JNDI name of EAR-based @Remote</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>(application-name)/(component-name)/(ejb-name)!(remote-interface-name)</para></listitem>
+                    <listitem><para>ejb-basic-ear/ejb-basic-ejb/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  

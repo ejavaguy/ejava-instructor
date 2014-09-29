@@ -1,0 +1,354 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-basic-it">
+    <title>IT Testing</title>
+    <itemizedlist spacing="compact">
+        <listitem><para>Unit tests test POJO classes in a single Maven phase</para></listitem>
+        <listitem><para>IT tests test components deployed to the server using multiple phases</para>
+            <variablelist spacing="compact">
+                <varlistentry>
+                    <term><filename>pre-integration-test</filename></term>
+                    <listitem><para>Deploy artifacts</para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>integration-test</filename></term>
+                    <listitem><para>Execute tests</para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>post-integration-test</filename></term>
+                    <listitem><para>Undeploy artifacts</para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>verify</filename></term>
+                    <listitem><para>Evaluate test results (possibly fail build after artifacts undeployed)</para></listitem>
+                </varlistentry>
+            </variablelist>
+        </listitem>
+        <listitem><para>IT tests require remote access</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Access Type</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>JBoss Remoting</para></listitem>
+                        <listitem><para>EJB Client</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>JNDI Properties</para></listitem>
+                <listitem><para>JNDI Name</para></listitem>
+            </itemizedlist>
+        </listitem>
+        <listitem><para>IT tests test EJB deployed to server</para></listitem>
+   </itemizedlist>
+
+    
+    <section id="ejb-basic-it-ejbaccess">
+        <title>EJB Access</title>
+        <section id="ejb-basic-it-ejbaccess-remoting">
+            <title>JNDI</title>
+            
+            <itemizedlist spacing="compact">
+                <listitem><para>Obtain JNDI properties through combination of 
+                    jndi.properties file and supplied Properties object.</para>
+<programlisting language="java"><![CDATA[java.util.Properties jndiProperties=...; // varies whether using Remoting or EJBClient]]></programlisting>
+<programlisting language=""><![CDATA[
+|-- jndi.properties
+
+java.naming.factory.initial=...
+java.naming.factory.url.pkgs=...
+java.naming.provider.url=...
+]]></programlisting>
+                </listitem>
+                <listitem><para>Obtain JNDI-name using deployment-specific name and access technique</para>
+<programlisting language="java"><![CDATA[String jndiName; // varies whether accessing EJB, WAR or EAR deployment and access]]></programlisting>
+                </listitem>
+                
+                <listitem><para>Get InitialContext to server JNDI tree</para>
+<programlisting language="java"><![CDATA[Context jndi = new InitialContext(jndiProperties);]]></programlisting>
+                </listitem>
+                <listitem><para>Lookup EJB's remote interface</para>
+<programlisting language="java"><![CDATA[GreeterRemote greeter = (GreeterRemote) jndi.lookup(jndiName);]]></programlisting>
+                </listitem>
+            </itemizedlist>
+        </section>
+
+        
+        <section id="ejb-basic-it-ejbaccess-remoting">
+            <title>JBoss Remoting</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Legacy approach</para></listitem>
+                <listitem><para>Follows published standards</para></listitem>
+                <listitem><para>Consistent with other resource types (e.g., JMS resource lookups)</para></listitem>
+                <listitem><para>Knows nothing of EJB</para></listitem>
+                <listitem><para>Stated to be less efficient than EJB Client</para></listitem>
+            </itemizedlist>
+            
+            <section id="ejb-basic-it-ejbaccess-remoting-jndi">
+                <title>JBoss Remoting jndi.properties</title>
+<programlisting language=""><![CDATA[
+java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
+java.naming.factory.url.pkgs=
+java.naming.provider.url=http-remoting://localhost:8080
+jboss.naming.client.ejb.context=true
+]]></programlisting>
+            </section>
+            
+            <section id="ejb-basic-it-ejbaccess-remoting-jndinames">
+                <title>JBoss Remoting JNDI Names</title>
+                <itemizedlist spacing="compact">
+                    <listitem><para>ejb-basic-ejb/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote</para></listitem>
+                    <listitem><para>ejb-basic-war/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote</para></listitem>
+                    <listitem><para>ejb-basic-ear/ejb-basic-ejb/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote</para></listitem>
+                </itemizedlist>
+            </section>
+            
+        </section>
+        
+        <section id="ejb-basic-it-ejbaccess-ejbclient">
+            <title>EJB Client</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Custom API for accessing EJBs</para></listitem>
+                <listitem><para>Can perform certain actions more efficiently with that knowledge and specialization</para></listitem>
+                <listitem><para>Uses separate naming context (ejb:)</para></listitem>
+                <listitem><para>Uses different and separate properties</para></listitem>
+                <listitem><para>Specifics can be shielded from client with minimal effort</para></listitem>
+            </itemizedlist>
+            
+            <section id="ejb-basic-it-ejbaccess-ejbclient-jndi">
+                <title>EJB Client jndi.properties</title>
+<programlisting language=""><![CDATA[java.naming.factory.initial=
+java.naming.factory.url.pkgs=org.jboss.ejb.client.naming
+java.naming.provider.url=]]></programlisting>
+            </section>
+            
+            <section id="ejb-basic-it-ejbaccess-ejbclient-ejbclient">
+                <title>EJB Client jndi.properties</title>
+<programlisting language=""><![CDATA[
+#top level property listing the names of the connections
+remote.connections=default
+
+#here we define the properties for the server we have called "default"
+remote.connection.default.host=localhost
+remote.connection.default.port=8080
+remote.connectionprovider.create.options.org.xnio.Options.SSL_ENABLED=false
+]]></programlisting>
+            </section>
+            
+            <section id="ejb-basic-it-ejbaccess-ejbclient-jndinames">
+                <title>EJB Client JNDI Names</title>
+                <itemizedlist spacing="compact">
+                    <listitem><para>ejb:/ejb-basic-ejb/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote</para></listitem>
+                    <listitem><para>ejb:/ejb-basic-war/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote</para></listitem>
+                    <listitem><para>ejb:ejb-basic-ear/ejb-basic-ejb/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote</para></listitem>
+                </itemizedlist>
+            </section>
+        </section>
+    </section>
+        
+    <section id="ejb-basic-it-tests">
+        <title>Integration Test Session EJB</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>IT tests require...</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Server running (possibly started)</para></listitem>
+                    <listitem><para>EJB deployed</para></listitem>
+                    <listitem><para>Tests run</para></listitem>
+                    <listitem><para>EJB undeployed (proper cleanup)</para></listitem>
+                    <listitem><para>Server stopped (if started as part of the test)</para></listitem>
+                    <listitem><para>Results evaluated</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>IT test can also be written with JUnit</para></listitem>
+        </itemizedlist>
+
+        <section id="ejb-basic-ejb-it-class">
+            <title>Integration Test (IT) JUnit Class</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>@BeforeClass runs at start of test case and before all test methods. This must be public and static</para></listitem>
+                <listitem><para>@Before runs before each test method. This must be public and non-static</para></listitem>
+                <listitem><para>@After runs after each test method. This must be public and non-static</para></listitem>
+                <listitem><para>@AfterClass runs after all test methods are complete and prior to test case shutdown.
+                    This must be public and static</para></listitem>
+            </itemizedlist>
+<programlisting language="java"><![CDATA[...
+import static org.junit.Assert.*;
+
+import java.util.Properties;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+
+import info.ejava.examples.ejb.basic.dto.Greeting;
+import info.ejava.examples.ejb.basic.dto.Name;
+import info.ejava.examples.ejb.basic.ejb.BadRequestException;
+import info.ejava.examples.ejb.basic.ejb.GreeterRemote;
+
+...
+public class GreeterIT {
+    private static final Logger logger = LoggerFactory.getLogger(GreeterBase.class);
+    protected Properties jndiProperties; // varies whether using Remoting or EJBClient
+    protected String jndiName; // varies whether accessing EJB, WAR or EAR deployment and access
+    protected Context jndi;
+    protected GreeterRemote greeter;
+
+    @Before
+    public void setUp() throws Exception {
+        jndi = new InitialContext(jndiProperties);
+        greeter = (GreeterRemote) jndi.lookup(jndiName);
+    }   
+
+    @After
+    public void tearDown() throws Exception {
+        if (jndi != null) {
+            jndi.close(); // produces errors with JBoss Remoting
+        }   
+    }   
+]]></programlisting>                        
+            <itemizedlist spacing="compact">
+                <listitem><para>@Before method sets up JNDI context and performs lookup for @Remote before each @Test</para></listitem>
+                <listitem><para>@After method closes out JNDI Context between @Tests</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejb-basic-ejb-it-tests">
+            <title>@Test Methods</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Same as before except they must use the EJB remote interface rather than instantiate bean</para></listitem>
+            </itemizedlist>
+<programlisting language="java"><![CDATA[    @Test
+    public void pojoGreeter() throws BadRequestException {
+        logger.info("*** pojoGreeter ***");
+        String name = "cat inhat";
+        String greeting = greeter.sayHello(name);
+        assertTrue("greeter did not say my name", greeting.contains(name));
+    }]]></programlisting>                        
+<programlisting language="java"><![CDATA[    @Test(expected = BadRequestException.class)
+    public void badName() throws BadRequestException {
+        logger.info("*** badName ***");
+        greeter.sayHello("");
+    }]]></programlisting>                        
+<programlisting language="java"><![CDATA[    @Test
+    public void dto() throws BadRequestException {
+        logger.info("*** dto ***");
+        Name name = new Name("thing", "one");
+        Greeting greeting = greeter.sayHello(name);
+        assertTrue("greeter did not say my name", greeting.getGreeting()
+                .contains(name.getFirstName()));
+    }]]></programlisting>                        
+        </section>
+    </section>
+
+    <section id="ejb-basic-it-source">
+        <title>IT Module</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>IT tests housed in separate modules (can be part of EJB and WAR modules)</para></listitem>
+            <listitem><para>jndi.properties part of IT test tree -- not the production code</para></listitem>
+        </itemizedlist>
+<programlisting language=""><![CDATA[.
+|-- pom.xml
+`-- src
+    `-- test
+        |-- java
+        |   `-- info
+        |       `-- ejava
+        |           `-- examples
+        |               `-- ejb
+        |                   `-- basicejb
+        |                       `-- ejbclient
+        |                           |-- GreeterIT.java
+        `-- resources
+            |-- jboss-ejb-client.properties
+            |-- jndi.properties
+            `-- log4j.xml
+]]></programlisting>                               
+    </section>
+
+    <section id="ejb-basic-it-test">
+        <title>IT Test Execution</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>surefire/Unit Tests run prior to deployment</para></listitem>
+            <listitem><para>failsafe/IT tests run after deployment</para></listitem>
+        </itemizedlist>
+<programlisting language=""><![CDATA[
+$ mvn clean verify
+...
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ ejb-basic-test ---
+[INFO] Deleting .../ejb-basic-example/ejb-basic-test/target
+...
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ ejb-basic-test ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ ejb-basic-test ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 4 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ ejb-basic-test ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 5 source files to .../ejb-basic-example/ejb-basic-test/target/test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.17:test (default-test) @ ejb-basic-test ---
+[INFO] 
+[INFO] --- maven-jar-plugin:2.5:jar (default-jar) @ ejb-basic-test ---
+[WARNING] JAR will be empty - no content was marked for inclusion!
+[INFO] Building jar: .../ejb-basic-example/ejb-basic-test/target/ejb-basic-test-4.0.0-SNAPSHOT.jar
+...
+
+[INFO] --- cargo-maven2-plugin:1.4.3:redeploy (cargo-prep) @ ejb-basic-test ---
+Sep 28, 2014 11:58:23 PM org.xnio.Xnio <clinit>
+INFO: XNIO version 3.2.2.Final
+Sep 28, 2014 11:58:23 PM org.xnio.nio.NioXnio <clinit>
+INFO: XNIO NIO Implementation Version 3.2.2.Final
+Sep 28, 2014 11:58:23 PM org.jboss.remoting3.EndpointImpl <clinit>
+INFO: JBoss Remoting version 4.0.3.Final
+
+...
+[INFO] --- maven-failsafe-plugin:2.17:integration-test (integration-tests) @ ejb-basic-test ---
+[INFO] Failsafe report directory: .../ejb-basic-example/ejb-basic-test/target/failsafe-reports
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+
+Running info.ejava.examples.ejb.basicejb.ejbclient.GreeterRemotingWARIT
+23:58:26,441 INFO  (GreeterIT.java:43) -using jndiName=ejb-basic-war/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote
+...
+23:58:27,811 INFO  (GreeterIT.java:43) -using jndiName=ejb:ejb-basic-ear/ejb-basic-ejb/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote
+...
+23:58:28,167 INFO  (GreeterIT.java:43) -using jndiName=ejb-basic-ear/ejb-basic-ejb/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote
+...
+23:58:28,289 INFO  (GreeterIT.java:43) -using jndiName=ejb:/ejb-basic-war/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote
+
+Results :
+
+Tests run: 12, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] 
+[INFO] --- cargo-maven2-plugin:1.4.3:undeploy (cargo-post) @ ejb-basic-test ---
+[INFO] 
+[INFO] --- maven-failsafe-plugin:2.17:verify (verify) @ ejb-basic-test ---
+[INFO] Failsafe report directory: .../ejb-basic-example/ejb-basic-test/target/failsafe-reports
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 11.036 s]]></programlisting>                        
+    </section>
+    
+    <section id="ejb-basic-it-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Created jndi.properties and jndiName for client</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>JBoss Remoting</para></listitem>
+                    <listitem><para>EJB Client</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Created IT test with</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>new InitialContext()</para></listitem>
+                    <listitem><para>JNDI lookup() of @Remote</para></listitem>
+                    <listitem><para>calls to EJB thru @Remote interface</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>
+</chapter>
+  

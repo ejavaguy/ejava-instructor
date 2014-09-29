@@ -1,0 +1,328 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-basic-pojo">
+    <title>Basic Session EJB POJO Aspects</title>
+    <itemizedlist spacing="compact">
+        <listitem><para>EJBs are based on Plain Old Java Objects (POJOs)</para></listitem>
+        <listitem><para>Standard POJO rules apply...</para></listitem>
+    </itemizedlist>
+        
+    <section id="ejb-basic-pojo-class">
+        <title>POJO Class</title>
+        <para></para>
+
+        <section id="ejb-basic-pojo-class-bean">
+            <title>Bean Class</title>
+<programlisting language="java"><![CDATA[...
+public class GreeterEJB implements Greeter {
+    private static final Logger logger = LoggerFactory.getLogger(GreeterEJB.class);
+...
+}]]></programlisting>                        
+            <itemizedlist spacing="compact">
+                <listitem><para>Must not write to static fields. Read-only static fields are allowed (suggests use of final)</para></listitem>
+                <listitem><para>Must not use thread synchronization primitives to synchronize execution</para></listitem>
+                <listitem><para>Must not manage/manipulate threads, class loaders, or security managers</para></listitem>
+                <listitem><para>Must not attempt to become a network server and form a network listen and similar actions</para></listitem>
+                <listitem><para>...</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejb-basic-pojo-class-method">
+            <title>Business Method</title>
+<programlisting language="java"><![CDATA[    @Override
+    public String sayHello(String name) throws BadRequestException {
+        logger.debug("sayHello({})", name);
+
+        if (name == null || name.isEmpty()) {
+            throw new BadRequestException("you must have a name for me to say hello");
+        }
+        return "hello " + name;
+    }]]></programlisting>                        
+            <itemizedlist spacing="compact">
+                <listitem><para>Normal stateless POJO method at this point</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejb-basic-pojo-class-remote">
+            <title>Interface</title>
+<programlisting language="java"><![CDATA[import info.ejava.examples.ejb.basic.dto.Greeting;
+import info.ejava.examples.ejb.basic.dto.Name;
+
+public interface Greeter {
+    String sayHello(String name) throws BadRequestException;
+
+    Greeting sayHello(Name name) throws BadRequestException;
+}]]></programlisting>                        
+            <itemizedlist spacing="compact">
+                <listitem><para>Provides an abstraction of the public class business methods</para></listitem>
+                <listitem><para>Some methods use simple/primitive types. Others use complex/custom classes.</para></listitem>
+                <listitem><para>All types conveniently defined using Serializable types at this point to permit use of remote interface in future</para></listitem>
+            </itemizedlist>
+        </section>
+        
+
+        <section id="ejb-basic-pojo-class-dto">
+            <title>Serializable DTO</title>
+<programlisting language="java"><![CDATA[public class Name implements Serializable {
+    private String firstName;
+    private String lastName;
+    ...]]></programlisting>                        
+<programlisting language="java"><![CDATA[public class Greeting implements Serializable {
+    private Date date;
+    private String message;
+    ...]]></programlisting>                        
+            <itemizedlist spacing="compact">
+                <listitem><para>Data abstraction necessary for local and remote interaction</para></listitem>
+                <listitem><para>Serializable not necessary until we use this in a remote interface</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejb-basic-pojo-class-exception">
+            <title>Business Exceptions</title>
+<programlisting language="java"><![CDATA[public class BadRequestException extends Exception {
+    public BadRequestException(String message) {
+        super(message);
+    }
+}]]></programlisting>                        
+            <itemizedlist spacing="compact">
+                <listitem><para>Checked exceptions used to report business rule failures</para></listitem>
+                <listitem><para>Unchecked exceptions used to report infrastructure issues</para></listitem>
+            </itemizedlist>
+        </section>
+    </section>
+
+
+    <section id="ejb-basic-pojo-unittest">
+        <title>POJO Unit Test</title>
+  
+        <section id="ejb-basic-pojo-unittest-class">
+            <title>JUnit Test Case</title>
+<programlisting language="java"><![CDATA[import static org.junit.Assert.*;
+
+import info.ejava.examples.ejb.basic.dto.Greeting;
+import info.ejava.examples.ejb.basic.dto.Name;
+import info.ejava.examples.ejb.basic.ejb.BadRequestException;
+import info.ejava.examples.ejb.basic.ejb.Greeter;
+import info.ejava.examples.ejb.basic.ejb.GreeterEJB;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class GreeterTest {
+    private static final Logger logger = LoggerFactory.getLogger(GreeterTest.class);
+    private Greeter greeter;
+
+    @Before
+    public void setUp() {
+        greeter = new GreeterEJB();
+    }
+    ...
+}]]></programlisting>                        
+            <itemizedlist spacing="compact">
+                <listitem><para>Test case used to verify the core functionality of the POJO -- prior to deployment as EJB</para></listitem>
+                <listitem><para>Each test case should be independent of another and not depend on a particular order</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejb-basic-pojo-unittest-method">
+            <title>JUnit Test Method(s)</title>
+<programlisting language="java"><![CDATA[    @Test
+    public void pojoGreeter() throws BadRequestException {
+        logger.info("*** pojoGreeter ***");
+        String name = "cat inhat";
+        String greeting = greeter.sayHello(name);
+        assertTrue("greeter did not say my name", greeting.contains(name));
+    }]]></programlisting>                        
+<programlisting language="java"><![CDATA[    @Test(expected = BadRequestException.class)
+    public void badName() throws BadRequestException {
+        logger.info("*** badName ***");
+        greeter.sayHello("");
+    }]]></programlisting>                        
+<programlisting language="java"><![CDATA[    @Test
+    public void dto() throws BadRequestException {
+        logger.info("*** dto ***");
+        Name name = new Name("thing", "one");
+        Greeting greeting = greeter.sayHello(name);
+        assertTrue("greeter did not say my name", greeting.getGreeting()
+                .contains(name.getFirstName()));
+    }]]></programlisting>                        
+            <itemizedlist spacing="compact">
+                <listitem><para>Each test method focused on testing a specific scenario or state</para></listitem>
+                <listitem><para>Contains assert statements to verify expected results</para></listitem>
+                <listitem><para>Each test method should be independent of another and not depend on a particular order</para></listitem>
+            </itemizedlist>
+        </section>
+    </section>
+    
+
+
+
+    <section id="ejb-basic-pojo-module">
+        <title>POJO Module</title>
+        <para/>
+            
+        <section id="ejb-basic-pojo-module-built">
+            <title>Built POJO Archive</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Production classes typically deployed in a Java archive (JAR)</para></listitem>
+            </itemizedlist>
+<programlisting language=""><![CDATA[$ jar tf target/ejb-basic-ejb-4.0.0-SNAPSHOT.jar 
+...
+info/ejava/examples/ejb/basic/ejb/BadRequestException.class
+info/ejava/examples/ejb/basic/ejb/Greeter.class
+info/ejava/examples/ejb/basic/ejb/GreeterEJB.class
+info/ejava/examples/ejb/basic/dto/Name.class
+info/ejava/examples/ejb/basic/dto/Greeting.class
+...]]></programlisting>                               
+        </section>
+        
+        
+        <section id="ejb-basic-pojo-module-source">
+            <title>Source POJO Module</title>
+<programlisting language=""><![CDATA[|-- pom.xml
+`-- src
+    |-- main
+    |   `-- java
+    |       `-- info
+    |           `-- ejava
+    |               `-- examples
+    |                   `-- ejb
+    |                       `-- basic
+    |                           |-- dto
+    |                           |   |-- Greeting.java
+    |                           |   `-- Name.java
+    |                           `-- ejb
+    |                               |-- BadRequestException.java
+    |                               |-- GreeterEJB.java
+    |                               `-- Greeter.java
+    `-- test
+        |-- java
+        |   `-- info
+        |       `-- ejava
+        |           `-- examples
+        |               `-- ejb
+        |                   `-- basic
+        |                       `-- pojo
+        |                           `-- GreeterTest.java
+        `-- resources
+            `-- log4j.xml]]></programlisting>                               
+            <itemizedlist spacing="compact">
+                <listitem><para>Module contains separate source trees for production and unit test code</para></listitem>
+            </itemizedlist>
+        </section>
+    </section>
+
+
+
+    <section id="ejb-basic-pojo-module-test">
+        <title>Unit Test Execution</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Unit tests should run with every module build</para></listitem>
+            <listitem><para>Unit tests should auto-evaluate themselves so that no human analysis is required</para></listitem>
+        </itemizedlist>
+<programlisting language=""><![CDATA[
+$ mvn clean test                        
+...
+[INFO] Deleting .../ejb-basic-ejb/target
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ ejb-basic-ejb ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory .../ejb-basic-ejb/src/main/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ ejb-basic-ejb ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 5 source files to .../ejb-basic-ejb/target/classes
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ ejb-basic-ejb ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 1 resource
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ ejb-basic-ejb ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 1 source file to .../ejb-basic-ejb/target/test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.17:test (default-test) @ ejb-basic-ejb ---
+[INFO] Surefire report directory: .../ejb-basic-ejb/target/surefire-reports
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running info.ejava.examples.ejb.basic.pojo.GreeterTest
+16:57:12,237 INFO  (GreeterTest.java:41) -*** dto ***
+16:57:12,243 DEBUG (GreeterEJB.java:41) -sayHello(Name [firstName=thing, lastName=one])
+16:57:12,249 INFO  (GreeterTest.java:27) -*** pojoGreeter ***
+16:57:12,250 DEBUG (GreeterEJB.java:27) -sayHello(cat inhat)
+16:57:12,252 INFO  (GreeterTest.java:35) -*** badName ***
+16:57:12,255 DEBUG (GreeterEJB.java:27) -sayHello()
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.239 sec - in info.ejava.examples.ejb.basic.pojo.GreeterTest
+
+Results :
+
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 3.815 s
+...]]></programlisting>                        
+    </section>
+    
+    
+    
+    <section id="ejb-basic-pojo-maven">
+        <title>Maven Aspects: POJO</title>
+        
+        <para>Basic POJO/JAR pom thus far</para>
+
+<programlisting language="xml"><![CDATA[<project>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>info.ejava.examples.ejb.basicejb</groupId>
+    <artifactId>ejb-basic-ejb</artifactId>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <!-- core implementation dependencies -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>]]></programlisting>
+        
+    </section>
+
+
+    <section id="ejb-basic-pojo-summary">
+       <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Created module to house POJO bean</para></listitem>
+            <listitem><para>Defined a standard POJO bean elements (bean class, interface, exception(s), data class(es))</para></listitem>
+            <listitem><para>Defined unit test for POJO bean</para></listitem>
+            <listitem><para>Built and tested POJO bean</para></listitem>
+        </itemizedlist>
+    </section>    
+    
+</chapter>
+  
