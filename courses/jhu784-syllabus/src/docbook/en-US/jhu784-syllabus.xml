@@ -134,11 +134,11 @@
                 <entry namest="topic"><para><ulink url="../ppt/ejbSession.ppt">Enterprise JavaBean (EJB) Overview</ulink></para></entry>
                 <entry namest="comment"><para>Rubinger &amp; Burke: Ch 5-7</para></entry>
             </row>
-            <!--
             <row rowsep="1">
                 <entry namest="session"/>
-                <entry namest="topic"><para>Basic Session EJB</para></entry>
+                <entry namest="topic"><para><link linkend="ejb-basic">Basic Session EJB</link></para></entry>
             </row>
+            <!--
             <row rowsep="1">
                 <entry namest="session"/>
                 <entry namest="topic"><para>EJB Development Scenarios</para></entry>

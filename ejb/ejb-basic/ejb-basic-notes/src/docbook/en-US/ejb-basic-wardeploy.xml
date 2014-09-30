@@ -15,7 +15,7 @@
     `-- lib
         `-- ejb-basic-ejb-4.0.0-SNAPSHOT.jar]]></programlisting>
                         
-        <section id="ejb-basic-wardeploy-war">
+        <section id="ejb-basic-wardeploy-jbossweb">
             <title>WEB-INF/jboss-web.xml</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Specifies WAR's context when deployed as naked WAR (outside of EAR)</para></listitem>

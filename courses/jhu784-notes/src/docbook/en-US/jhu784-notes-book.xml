@@ -61,5 +61,6 @@
     <xi:include href="jpa-inheritance-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="jpa-query-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="jpa-tuning-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-basic-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="webejb-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </book>

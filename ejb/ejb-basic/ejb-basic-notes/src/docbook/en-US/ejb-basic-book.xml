@@ -1,9 +1,9 @@
 <?xml version='1.0'?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
     "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
-<book id="jpa-entity">
+<book id="ejb-basic">
     <bookinfo>
-        <title>Basic EJB</title>
+        <title>Basic Session EJB</title>
         <subtitle>Developing and Deploying a Basic EJB</subtitle>
         <issuenum>${content.version}</issuenum>
         <pubdate>${docbook.pubdate}</pubdate>

@@ -5,7 +5,8 @@
     <title>IT Testing</title>
     <itemizedlist spacing="compact">
         <listitem><para>Unit tests test POJO classes in a single Maven phase</para></listitem>
-        <listitem><para>IT tests test components deployed to the server using multiple phases</para>
+        <listitem><para>IT tests test components deployed to the server using multiple phases
+            <ulink url="http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html#Lifecycle_Reference">Maven Lifecycle Reference</ulink></para>
             <variablelist spacing="compact">
                 <varlistentry>
                     <term><filename>pre-integration-test</filename></term>
@@ -43,7 +44,13 @@
     
     <section id="ejb-basic-it-ejbaccess">
         <title>EJB Access</title>
-        <section id="ejb-basic-it-ejbaccess-remoting">
+        <itemizedlist spacing="compact">
+            <listitem> <para>Java client may access @Remote interface of EJB by first going through Java Naming and Directory Interface (JNDI)</para></listitem>
+            <listitem><para>JBoss uses two different types of remote interface techniques -- both accessed thru JNDI; JBoss Remoting and EJB Client</para></listitem>
+        </itemizedlist>
+
+       
+        <section id="ejb-basic-it-ejbaccess-jndi">
             <title>JNDI</title>
             
             <itemizedlist spacing="compact">
@@ -58,12 +65,12 @@ java.naming.factory.url.pkgs=...
 java.naming.provider.url=...
 ]]></programlisting>
                 </listitem>
-                <listitem><para>Obtain JNDI-name using deployment-specific name and access technique</para>
-<programlisting language="java"><![CDATA[String jndiName; // varies whether accessing EJB, WAR or EAR deployment and access]]></programlisting>
-                </listitem>
                 
                 <listitem><para>Get InitialContext to server JNDI tree</para>
 <programlisting language="java"><![CDATA[Context jndi = new InitialContext(jndiProperties);]]></programlisting>
+                </listitem>
+                <listitem><para>Obtain JNDI-name using deployment-specific name and access technique</para>
+<programlisting language="java"><![CDATA[String jndiName; // varies whether accessing EJB, WAR or EAR deployment and access]]></programlisting>
                 </listitem>
                 <listitem><para>Lookup EJB's remote interface</para>
 <programlisting language="java"><![CDATA[GreeterRemote greeter = (GreeterRemote) jndi.lookup(jndiName);]]></programlisting>
@@ -71,7 +78,6 @@ java.naming.provider.url=...
             </itemizedlist>
         </section>
 
-        
         <section id="ejb-basic-it-ejbaccess-remoting">
             <title>JBoss Remoting</title>
             <itemizedlist spacing="compact">
@@ -140,6 +146,13 @@ remote.connectionprovider.create.options.org.xnio.Options.SSL_ENABLED=false
                     <listitem><para>ejb:/ejb-basic-war/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote</para></listitem>
                     <listitem><para>ejb:ejb-basic-ear/ejb-basic-ejb/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote</para></listitem>
                 </itemizedlist>
+                <note>
+                    <title>Add ?stateful to EJB Client Stateful Session EJB JNDI Names</title>
+                    <para>The EJB Client implementation understands JBoss/Wildfly EJBs and to 
+                        further help optimize the communication with Stateful Session EJBs 
+                        the following string ("?stateful")must be appended to the JNDI name</para>
+                    <para><ulink url="https://docs.jboss.org/author/display/WFLY8/EJB+invocations+from+a+remote+client+using+JNDI">Remote EJB JNDI Invocations Wiki Page</ulink></para>
+                </note>
             </section>
         </section>
     </section>
