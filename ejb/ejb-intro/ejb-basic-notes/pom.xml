@@ -1,23 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>info.ejava.docs.ejb</groupId>
-        <artifactId>ejb</artifactId>
+        <artifactId>ejb-intro</artifactId>
         <version>4.0.0-SNAPSHOT</version>
     </parent>
+    <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>ejb-intro-notes</artifactId>
+    <artifactId>ejb-basic-notes</artifactId>
     <packaging>pom</packaging>
 
-    <name>EJB::Intro::Notes</name>
+    <name>EJB::Intro::Basic EJB Notes</name>
     <description>
-        This module provides an intro to server-side EJBs
+        This project provides discussion notes for creating and initial EJB.
     </description>
     
     <properties>
-       <doc.base>ejb-intro-book</doc.base>
-       <content.version>v2013-09-23</content.version>
+       <doc.base>ejb-basic-book</doc.base>
+       <content.version>v2014-09-30</content.version>
     </properties>
 
     <build>

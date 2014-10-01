@@ -1,0 +1,215 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-intro-why">
+    <title>Why Enterprise?</title>
+    <para></para>
+
+    <figure>
+        <title>Needs and JavaEE/EJB Implementation Options</title>
+        <graphic scalefit="1" fileref="images/ejb-intro-impl-needs.png"/>
+    </figure>   
+
+    <section id="ejb-intro-why-pattern">
+        <title>Related Patterns</title>
+
+        <section id="ejb-intro-why-pattern-facade">
+            <title>Pattern: Session Facade</title>
+            <section id="ejb-intro-why-pattern-facade-context">
+                <title>Context</title>
+                <itemizedlist>
+                    <listitem><para>Multi-tiered application</para></listitem>
+                    <listitem><para>Non-trivial business logic and data</para></listitem>
+                </itemizedlist>                   
+            </section>
+        
+            <section id="ejb-intro-why-pattern-facade-problem">
+                <title>Problem</title>
+                <itemizedlist>
+                    <listitem><para>Potential tight coupling between clients and complex business objects</para></listitem>
+                    <listitem><para>Too many method invocations between clients and business objects</para></listitem>
+                    <listitem><para>Business methods exposed for misuse by clients</para></listitem>
+                </itemizedlist>                   
+                <figure>
+                    <title>Session Facade Problem</title>
+                    <graphic scalefit="0" fileref="images/ejb-intro-session-facade-problem.png"/>
+                </figure>
+            </section>
+        
+            <section id="ejb-intro-why-pattern-facade-forces">
+                <title>Forces</title>
+                <itemizedlist>
+                    <listitem><para>Hide complex interactions behind a simple client interface</para></listitem>
+                    <listitem><para>Reduce the number of business objects exposed to the client across the network</para></listitem>
+                    <listitem><para>Hide implementation, interactions, and dependencies of business components</para></listitem>
+                </itemizedlist>                   
+            </section>
+        
+            <section id="ejb-intro-why-pattern-facade-solution">
+                <title>Solution</title>
+                <itemizedlist>
+                    <listitem><para>Use a business logic class to encapsulate the interactions required with the business objects</para></listitem>
+                </itemizedlist>                   
+                <figure>
+                    <title>Session Facade Participants</title>
+                    <graphic scale="75" fileref="images/ejb-intro-session-facade-participants.png"/>
+                </figure>
+                <figure>
+                    <title>Session Facade Solution</title>
+                    <graphic scalefit="0" fileref="images/ejb-intro-session-facade-solution.png"/>
+                </figure>
+            </section>
+        
+            <section id="ejb-intro-why-pattern-facade-consequences">
+                <title>Consequences</title>
+                <itemizedlist>
+                    <listitem><para>Simplifies complex systems</para></listitem>
+                    <listitem><para>May appear to be a no value pass-thru in simple systems</para>
+                        <itemizedlist>
+                            <listitem><para>Should involve more than one business object per facade</para></listitem>
+                            <listitem><para>Should have more than one facade per system</para></listitem>
+                        </itemizedlist>                   
+                    </listitem>
+                    <listitem><para>Decouples the business objects from being aware of one another</para></listitem>
+                    <listitem><para>Improves perceived network performance for remote interfaces</para></listitem>
+                    <listitem><para>Centralizes security and transactions in some cases</para></listitem>
+                </itemizedlist>                   
+            </section>
+        </section>
+    </section>
+    
+        <section id="ejb-intro-why-pattern-remotefacade">
+            <title>Pattern: Remote Facade</title>
+            
+            <section id="ejb-intro-why-pattern-remote-facade-context">
+                <title>Context</title>
+                <itemizedlist>
+                    <listitem><para>Distributed environment with remote clients</para></listitem>
+                </itemizedlist>
+            </section>
+        
+            <section id="ejb-intro-why-pattern-remote-facade-problem">
+                <title>Problem</title>
+                <itemizedlist>
+                    <listitem><para>Remote clients require access to server-side resources.</para></listitem>
+                </itemizedlist>
+                
+                <figure>
+                    <title>Remote Facade Problem</title>
+                    <graphic scale="50" fileref="images/ejb-intro-remote-facade-problem.png"/>
+                </figure>
+            </section>
+        
+            <section id="ejb-intro-why-pattern-remote-facade-forces">
+                <title>Forces</title>
+                <itemizedlist>
+                    <listitem><para>Core service layer (business logic and its business objects) contains fine 
+                        grain objects and methods</para></listitem>
+                    <listitem><para>Significant number of fine-grain remote calls will not work</para></listitem>
+                </itemizedlist>
+            </section>
+        
+            <section id="ejb-intro-why-pattern-remote-facade-solution">
+                <title>Solution</title>
+                <itemizedlist>
+                    <listitem><para>Provide a Remote Facade</para>
+                        <itemizedlist>
+                            <listitem><para>Coarse-grain facade over service layer</para></listitem>
+                            <listitem><para>Contains no detailed business logic -- it calls it</para></listitem>
+                            <listitem><para>Translates course-grain methods and objects into fine-grain 
+                                method calls and objects to/from service layer</para></listitem>
+                            <listitem><para>Bulk accessors wrap fine-grain access methods</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                    <listitem><para>Service Layer does not have a remote interface</para>
+                        <itemizedlist>
+                            <listitem><para>Fine-grain business objects mapped to database might not be serializable</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </itemizedlist>
+                <figure>
+                    <title>Remote Facade Participants</title>
+                    <graphic scale="75" fileref="images/ejb-intro-remote-facade-roles.png"/>
+                </figure>
+                <figure>
+                    <title>Remote Facade Solution</title>
+                    <graphic scale="50" fileref="images/ejb-intro-remote-facade-solution.png"/>
+                </figure>
+            </section>
+        
+            <section id="ejb-intro-why-pattern-remote-facade-consequences">
+                <title>Consequences</title>
+                <itemizedlist>
+                    <listitem><para>Remote clients obtain access to desired resources (functional)</para></listitem>
+                    <listitem><para>Remote client interaction is efficient (appropriate)</para></listitem>
+                </itemizedlist>
+            </section>
+        </section>
+
+        <section id="ejb-intro-why-pattern-dto">
+            <title>Pattern: Data Transfer Object (DTO)</title>
+            <section id="ejb-intro-why-pattern-dto-context">
+                <title>Context</title>
+                <itemizedlist>
+                    <listitem><para>Business Objects represent too much information or behavior to transfer to remote client</para></listitem>
+                </itemizedlist>
+            </section>
+        
+            <section id="ejb-intro-why-pattern-dto-problem">
+                <title>Problem</title>
+                <figure>
+                    <title>DTO Problem</title>
+                    <graphic scale="75" fileref="images/ejb-intro-dto-problem.png"/>
+                </figure>
+                <itemizedlist>
+                    <listitem><para>Client may get information they don't need</para></listitem>
+                    <listitem><para>Client may get information they can't handle</para></listitem>
+                    <listitem><para>Client may get information they are not authorized to use</para></listitem>
+                    <listitem><para>Client may get too much information/behavior to be useful (e.g., entire database serialized to client)</para></listitem>
+                </itemizedlist>
+            </section>
+        
+            <section id="ejb-intro-why-pattern-dto-forces">
+                <title>Forces</title>
+                <itemizedlist>
+                    <listitem><para>Some clients are local and can share object references with business logic</para></listitem>
+                    <listitem><para>Handling specifics of remote clients outside of core scope of business logic</para></listitem>
+                </itemizedlist>
+            </section>
+        
+            <section id="ejb-intro-why-pattern-dto-solution">
+                <title>Solution</title>
+                <itemizedlist>
+                    <listitem><para>Layer a Remote Facade over Business Logic</para></listitem>
+                    <listitem><para>Remote Facade constructs Data Transfer Objects (DTOs) from Business Objects that are appropriate for remote client view</para></listitem>
+                    <listitem><para>Remote Facade uses DTOs to construct or locate Business Objects to communicate with Business Logic</para></listitem>
+                </itemizedlist>
+                <figure>
+                    <title>DTO Participants</title>
+                    <graphic scalefit="0" fileref="images/ejb-intro-dto-roles.png"/>
+                </figure>
+            </section>
+        
+            <section id="ejb-intro-why-pattern-dto-consequences">
+                <title>Consequences</title>
+                <itemizedlist>
+                    <listitem><para>Clients only get what they need</para></listitem>
+                    <listitem><para>Clients only get what they understand</para></listitem>
+                    <listitem><para>Clients only get what they are authorized to use</para></listitem>
+                    <listitem><para>Remote and Local interfaces to services are different</para>
+                        <itemizedlist>
+                            <listitem><para>Makes it harder to provide location transparency</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                    <listitem><para>Lightweight Business Objects can be used as DTOs</para>
+                        <itemizedlist>
+                            <listitem><para>Remote Facade must make sure they are “pruned” of excess related items before transferring to client</para></listitem>
+                            <listitem><para>Remote Facade must make sure they are “cleaned” of DAO persistence classes before transferring to client</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </itemizedlist>
+            </section>
+        </section>
+    
+</chapter>
+  

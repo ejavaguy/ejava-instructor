@@ -25,29 +25,9 @@
             <title>Goals</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Introduce the purpose of an EJB (why?)</para></listitem>
-                <listitem><para>Introduce the different EJB styles</para>
-                    <itemizedlist spacing="compact">
-                        <listitem><para>Stateless EJB</para></listitem>
-                        <listitem><para>Stateful EJB</para></listitem>
-                        <listitem><para>Singleton EJB</para></listitem>
-                        <listitem><para>Message Driven EJB</para></listitem>
-                    </itemizedlist>
-                </listitem>
-                <listitem><para>Introduce different EJB interface options</para>
-                    <itemizedlist spacing="compact">
-                        <listitem><para>Remote</para></listitem>
-                        <listitem><para>Local</para></listitem>
-                        <listitem><para>No Interface (Local)</para></listitem>
-                    </itemizedlist>
-                </listitem>
-                <listitem><para>Introduce different deployment options for EJBs</para>
-                    <itemizedlist spacing="compact">
-                        <listitem><para>Naked EJB Archive (JAR)</para></listitem>
-                        <listitem><para>Enterprise Archive (EAR)</para></listitem>
-                        <listitem><para>Web Archive (WAR)</para></listitem>
-                    </itemizedlist>
-                </listitem>
-                <listitem><para>Develop, deploy, and test a simple Stateless EJB</para></listitem>
+                <listitem><para>Introduce the different EJB types</para></listitem>
+                <listitem><para>Introduce different EJB interface options</para></listitem>
+                <listitem><para>Introduce different deployment options for EJBs</para></listitem>
             </itemizedlist>
         </section>
 
@@ -59,18 +39,9 @@
                 <listitem><para>State the four different types of EJBs and reasons for/against using each</para></listitem>
                 <listitem><para>State the three different built-in interface types and when to/not-to use each</para></listitem>
                 <listitem><para>State the three different deployment options and when to/not-to use each</para></listitem>
-                <listitem><para>Develop, deploy, and test a simple Stateless EJB</para>
-                    <itemizedlist spacing="compact">
-                        <listitem><para>EJB (without resource requirements)</para></listitem>
-                        <listitem><para>Remote interface</para></listitem>
-                        <listitem><para>Naked EJB deployment</para></listitem>
-                        <listitem><para>Integration test (IT)</para></listitem>
-                    </itemizedlist>
-                </listitem>
             </itemizedlist>
         </section>
     </preface>
-
 
     <xi:include href="ejb-intro-why.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-intro-ejb.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
