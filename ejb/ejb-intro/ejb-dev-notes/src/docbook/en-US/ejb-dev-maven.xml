@@ -4,8 +4,8 @@
 <chapter id="ejb-dev-maven">
     <title>Build Commands</title>
     <itemizedlist spacing="compact">
-        <listitem><para></para></listitem>
-        <listitem><para></para></listitem>
+        <listitem><para>Many/most build commands can be automated through Maven or other scripts</para></listitem>
+        <listitem><para>Used in interactive development and automated/headless builds</para></listitem>
     </itemizedlist>
 
     <section id="ejb-dev-maven-structure">
@@ -19,6 +19,61 @@
         <figure>
             <title>Example Source Tree</title>
 <programlisting language=""><![CDATA[
+.
+|-- ejb-basic-ear
+|   `-- pom.xml
+|-- ejb-basic-ejb
+|   |-- pom.xml
+|   `-- src
+|       |-- main
+|       |   `-- java
+|       |       `-- info
+|       |           `-- ejava
+|       |               `-- examples
+|       |                   `-- ejb
+|       |                       `-- basic
+|       |                           |-- dto
+|       |                           |   |-- Greeting.java
+|       |                           |   `-- Name.java
+|       |                           `-- ejb
+|       |                               |-- BadRequestException.java
+|       |                               |-- GreeterEJB.java
+|       |                               |-- Greeter.java
+|       |                               `-- GreeterRemote.java
+|       `-- test
+|           |-- java
+|           |   `-- info
+|           |       `-- ejava
+|           |           `-- examples
+|           |               `-- ejb
+|           |                   `-- basic
+|           |                       `-- pojo
+|           |                           `-- GreeterTest.java
+|           `-- resources
+|               `-- log4j.xml
+|-- ejb-basic-test
+|   |-- pom.xml
+|   `-- src
+|       `-- test
+|           |-- java
+|           |   `-- info
+|           |       `-- ejava
+|           |           `-- examples
+|           |               `-- ejb
+|           |                   `-- basicejb
+|           |                       `-- ejbclient
+|           |                           `-- GreeterIT.java
+|           `-- resources
+|               |-- jndi.properties
+|               `-- log4j.xml
+|-- ejb-basic-war
+|   |-- pom.xml
+|   `-- src
+|       `-- main
+|           `-- webapp
+|               `-- WEB-INF
+|                   `-- jboss-web.xml
+`-- pom.xml
 ]]></programlisting>
         </figure>
         
@@ -26,7 +81,10 @@
     
     <section id="ejb-dev-maven-test">
         <title>Unit Tests</title>
-        <para></para>
+        <itemizedlist spacing="compact">
+               <listitem><para>Tests functionality of code within the bounds of a single JVM</para></listitem>
+               <listitem><para>All external dependencies stubbed, simulated, or in-memory versions used (e.g., database, JMS server)</para></listitem>
+        </itemizedlist>
         
         <section id="ejb-dev-maven-test-resources">
             <title>Resources Plugin</title>
@@ -45,6 +103,15 @@
            <figure>
                <title>Example Source Resource File: src/test/resources/jndi.properties</title>
 <programlisting language=""><![CDATA[
+$ cat src/test/resources/jndi.properties 
+
+###jboss-remoting technique
+java.naming.factory.initial=${jboss.remoting.java.naming.factory.initial}
+java.naming.factory.url.pkgs=${jboss.remoting.java.naming.factory.url.pkgs}
+java.naming.provider.url=${jboss.remoting.java.naming.provider.url}
+java.naming.security.principal=${jboss.remoting.java.naming.security.principal}
+java.naming.security.credentials=${jboss.remoting.java.naming.security.credentials}
+jboss.naming.client.ejb.context=true
 ]]></programlisting>
            </figure>
            <itemizedlist spacing="compact">
@@ -54,6 +121,15 @@
            <figure>
                <title>Example Filtered Resource File: target/test-classes/jndi.properties</title>
 <programlisting language=""><![CDATA[
+$ cat target/test-classes/jndi.properties 
+
+###jboss-remoting technique
+java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
+java.naming.factory.url.pkgs=
+java.naming.provider.url=http-remoting://localhost:8080
+java.naming.security.principal=known
+java.naming.security.credentials=password1!
+jboss.naming.client.ejb.context=true
 ]]></programlisting>
            </figure>
            <itemizedlist spacing="compact">
@@ -62,10 +138,25 @@
            
            <figure>
                <title>Example Maven Configuration</title>
-<programlisting language="xml"><![CDATA[
-]]></programlisting>
-<programlisting language="xml"><![CDATA[
-]]></programlisting>
+<programlisting language="xml"><![CDATA[<properties>
+    <jboss.host>localhost</jboss.host>
+    <jboss.http.port>8080</jboss.http.port>
+    <jndi.user>known</jndi.user>
+    <jndi.password>password1!</jndi.password>
+    <jboss.remoting.java.naming.factory.initial>org.jboss.naming.remote.client.InitialContextFactory</jboss.remoting.java.naming.factory.initial>
+    <jboss.remoting.java.naming.provider.url>http-remoting://${jboss.host}:${jboss.http.port}</jboss.remoting.java.naming.provider.url>
+    <jboss.remoting.java.naming.factory.url.pkgs/>
+    <jboss.remoting.java.naming.security.principal>${jndi.user}</jboss.remoting.java.naming.security.principal>
+    <jboss.remoting.java.naming.security.credentials>${jndi.password}</jboss.remoting.java.naming.security.credentials>
+</properties> ]]></programlisting>
+<programlisting language="xml"><![CDATA[    <build>
+        <!-- filter test/resource files for profile-specific valies -->
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>]]></programlisting>
            </figure>
            <itemizedlist spacing="compact">
                <listitem><para>Properties defined either within pom.xml, settings.xml, or -Dsystem-properties</para></listitem>
@@ -87,18 +178,35 @@
            <figure>
                <title>Module Declaration</title>
 <programlisting language="xml"><![CDATA[
+            <properties>
+                <loop-count>3</loop-count>
+            </properties>
+...
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <loop.count>${loop-count}</loop.count>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
 ]]></programlisting>
            </figure>
            <itemizedlist spacing="compact">
                <listitem><para>Plugin always enabled by default. Declaration used only to customize</para></listitem>
                <listitem><para>Configuration defines environment for JVM</para></listitem>
                <listitem><para>Easy way to supply system properties (-Dsystem-property=value)</para></listitem>
+               <listitem><para>values can be hard-coded or use properties to allow easier overrides</para></listitem>
            </itemizedlist>
            
            <figure>
                <title>Optional Includes/Excludes</title>
-<programlisting language="xml"><![CDATA[
-]]></programlisting>
+<programlisting language="xml"><![CDATA[<configuration>
+    <includes>
+        <include>**/GreeterTest.java</include>
+    </includes>
+</configuration>]]></programlisting>
            </figure>
            <itemizedlist spacing="compact">
                <listitem><para>Useful when turning off all unit tests to concentrate on IT tests</para></listitem>
@@ -107,7 +215,16 @@
             
            <figure>
                <title>Parent Definition</title>
-<programlisting language="xml"><![CDATA[
+<programlisting language="xml"><![CDATA[        <maven-surefire-plugin.version>2.17</maven-surefire-plugin.version>
+...
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin.version}</version>
+                    <configuration>
+                        <argLine>${surefire.argLine}</argLine>
+                    </configuration>
+                </plugin>
 ]]></programlisting>
            </figure>
            <itemizedlist spacing="compact">
@@ -118,7 +235,40 @@
                <title>Run Unit Tests</title>
 <programlisting language=""><![CDATA[
 $ mvn clean test
-]]></programlisting>
+
+...
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ ejb-basic-ejb ---
+...
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ ejb-basic-ejb ---
+...
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ ejb-basic-ejb ---
+...
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ ejb-basic-ejb ---
+...
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ ejb-basic-ejb ---
+...
+[INFO] --- maven-surefire-plugin:2.17:test (default-test) @ ejb-basic-ejb ---
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running info.ejava.examples.ejb.basic.pojo.GreeterTest
+02:11:38,695 INFO  (GreeterTest.java:41) -*** dto ***
+02:11:38,701 DEBUG (GreeterEJB.java:45) -sayHello(Name [firstName=thing, lastName=one])
+02:11:38,707 INFO  (GreeterTest.java:27) -*** pojoGreeter ***
+02:11:38,708 DEBUG (GreeterEJB.java:31) -sayHello(cat inhat)
+02:11:38,711 INFO  (GreeterTest.java:35) -*** badName ***
+02:11:38,713 DEBUG (GreeterEJB.java:31) -sayHello()
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.238 sec - in info.ejava.examples.ejb.basic.pojo.GreeterTest
+
+Results :
+
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 3.871 s]]></programlisting>
            </figure>
            <itemizedlist spacing="compact">
                <listitem><para>Just definiing version here</para></listitem>
@@ -155,8 +305,20 @@ $ mvn clean test
             
            <figure>
                <title>IT Module Declaration</title>
-<programlisting language="xml"><![CDATA[
-]]></programlisting>
+<programlisting language="xml"><![CDATA[            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+                <configuration>
+                    <!-- artifacts to deploy to server -->
+                    <deployables>
+                        <deployable>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>ejb-basic-ear</artifactId>
+                            <type>ear</type>
+                        </deployable>
+                    </deployables>
+                </configuration>
+            </plugin>]]></programlisting>
            </figure>
             <itemizedlist spacing="compact">
                 <listitem><para>Plugin declaration enacts parent-defined behavior</para></listitem>
@@ -168,8 +330,26 @@ $ mvn clean test
            
            <figure>
                <title>WAR/EAR Module Cleanup Declarations</title>
-<programlisting language="xml"><![CDATA[
-]]></programlisting>
+<programlisting language="xml"><![CDATA[        <profile>
+            <id>undeploy</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.cargo</groupId>
+                        <artifactId>cargo-maven2-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>undeploy-ear</id>
+                                <phase>pre-clean</phase>
+                                <goals>
+                                    <goal>undeploy</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>                    
+                </plugins>
+            </build>
+        </profile>]]></programlisting>
            </figure>
             <itemizedlist spacing="compact">
                 <listitem><para>Used to simply undeploy module from server</para></listitem>
@@ -179,31 +359,115 @@ $ mvn clean test
            
            <figure>
                <title>Parent Definition</title>
-<programlisting language="xml"><![CDATA[
-]]></programlisting>
+<programlisting language="xml"><![CDATA[<pluginManagement>
+    <plugins>
+        <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <version>${cargo-maven2-plugin.version}</version>
+            <configuration>
+                <container>
+                    <containerId>${cargo.containerId}</containerId>
+                    <type>remote</type>
+                    <log>target/server.log</log>
+                    <output>target/output.log</output>
+                </container>
+                <configuration>
+                    <type>runtime</type>
+                    <properties>
+                        <cargo.hostname>${jboss.mgmt.host}</cargo.hostname>
+                        <cargo.jboss.management.port>${jboss.mgmt.port}</cargo.jboss.management.port>
+                    </properties>
+                </configuration>
+            </configuration>
+            <dependencies>
+                <dependency>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-controller-client</artifactId>
+                    <version>${wildfly.version}</version>
+                </dependency>
+            </dependencies>
+            <executions>
+               <execution>
+                   <id>cargo-prep</id> 
+                       <phase>pre-integration-test</phase>
+                   <goals>
+                        <goal>redeploy</goal>
+                   </goals>
+               </execution>
+                <execution>
+                    <id>cargo-post</id>
+                    <phase>post-integration-test</phase>
+                    <goals>
+                        <goal>undeploy</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</pluginManagement>]]></programlisting>
            </figure>
             <itemizedlist spacing="compact">
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Parent defines boiler-plate portion</para></listitem>
+                <listitem><para>Child will provide module-specific information</para></listitem>
             </itemizedlist>
 
            <figure>
                <title>Deploy Application</title>
 <programlisting language=""><![CDATA[
-$ mvn clean pre-integration-test -DskipTests
+$ mvn pre-integration-test -DskipTests
+...
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ ejb-basic-test ---
+...
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ ejb-basic-test ---
+...
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ ejb-basic-test ---
+...
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ ejb-basic-test ---
+...
+[INFO] --- maven-surefire-plugin:2.17:test (default-test) @ ejb-basic-test ---
+...
+[INFO] --- maven-jar-plugin:2.5:jar (default-jar) @ ejb-basic-test ---
+...
+[INFO] --- cargo-maven2-plugin:1.4.3:redeploy (cargo-prep) @ ejb-basic-test ---
+Oct 01, 2014 2:20:21 AM org.xnio.Xnio <clinit>
+INFO: XNIO version 3.2.2.Final
+Oct 01, 2014 2:20:21 AM org.xnio.nio.NioXnio <clinit>
+INFO: XNIO NIO Implementation Version 3.2.2.Final
+Oct 01, 2014 2:20:21 AM org.jboss.remoting3.EndpointImpl <clinit>
+INFO: JBoss Remoting version 4.0.3.Final
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
 ]]></programlisting>
            </figure>
             <itemizedlist spacing="compact">
                 <listitem><para>Builds a new packaged, deployable artifact</para></listitem>
                 <listitem><para>Deploys and leaves on server</para></listitem>
                 <listitem><para>(optional)<code>-DskipTests</code> bypasses any unit tests</para></listitem>
+                <listitem><para>Notice that build completes immediately after deploy with no IT tests or undeploy</para></listitem>
             </itemizedlist>
            
            <figure>
                <title>Undeploy Application</title>
 <programlisting language=""><![CDATA[
 $ mvn clean -Pundeploy
+
+...
+[INFO] ------------------------------------------------------------------------
+[INFO] Building EJB::Basic EJB::EAR 4.0.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- cargo-maven2-plugin:1.4.3:undeploy (undeploy-ear) @ ejb-basic-ear ---
+Oct 01, 2014 2:23:50 AM org.xnio.Xnio <clinit>
+INFO: XNIO version 3.2.2.Final
+Oct 01, 2014 2:23:50 AM org.xnio.nio.NioXnio <clinit>
+INFO: XNIO NIO Implementation Version 3.2.2.Final
+Oct 01, 2014 2:23:50 AM org.jboss.remoting3.EndpointImpl <clinit>
+INFO: JBoss Remoting version 4.0.3.Final
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ ejb-basic-ear ---
+[INFO] Deleting /home/jcstaff/workspaces/ejava-class/ejava-student/ejb/ejb-intro/ejb-basic-example/ejb-basic-ear/target
 ]]></programlisting>
            </figure>
             <itemizedlist spacing="compact">
@@ -227,7 +491,15 @@ $ mvn clean -Pundeploy
             
            <figure>
                <title>IT Module Declaration</title>
-<programlisting language="xml"><![CDATA[
+<programlisting language="xml"><![CDATA[            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <cargo.startstop>${cargo-startstop}</cargo.startstop>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
 ]]></programlisting>
            </figure>
             <itemizedlist spacing="compact">
@@ -237,8 +509,11 @@ $ mvn clean -Pundeploy
            
            <figure>
                <title>Optional Includes/Excludes</title>
-<programlisting language="xml"><![CDATA[
-]]></programlisting>
+<programlisting language="xml"><![CDATA[<configuration>
+    <includes>
+        <include>**/GreeterIT.java</include>
+    </includes>
+</configuration>]]></programlisting>
            </figure>
            <itemizedlist spacing="compact">
                <listitem><para>Can turn off problem or lengthy test(s)</para></listitem>
@@ -246,8 +521,34 @@ $ mvn clean -Pundeploy
             
            <figure>
                <title>Parent Definitition</title>
-<programlisting language="xml"><![CDATA[
-]]></programlisting>
+<programlisting language="xml"><![CDATA[<pluginManagement>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>${maven-failsafe-plugin.version}</version>
+            <configuration>
+                <argLine>${surefire.argLine}</argLine>
+            </configuration>
+            <executions>
+                <execution> <!-- run the tests here -->
+                   <id>integration-tests</id> 
+                       <phase>integration-test</phase>
+                   <goals>
+                       <goal>integration-test</goal>
+                   </goals>
+                </execution>
+                <execution> <!--  delay failures to after undeploy -->
+                    <id>verify</id>
+                    <phase>verify</phase>
+                    <goals>
+                        <goal>verify</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</pluginManagement>]]></programlisting>
            </figure>
             <itemizedlist spacing="compact">
                 <listitem><para>Defines version# and wires plugin into build phases when declared by child module</para></listitem>
@@ -257,6 +558,49 @@ $ mvn clean -Pundeploy
                <title>Run IT Tests</title>
 <programlisting language="xml"><![CDATA[
 $ mvn clean verify
+
+$ mvn clean verify
+...
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ ejb-basic-test ---
+...
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ ejb-basic-test ---
+...
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ ejb-basic-test ---
+...
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ ejb-basic-test ---
+...
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ ejb-basic-test ---
+...
+[INFO] --- maven-surefire-plugin:2.17:test (default-test) @ ejb-basic-test ---
+...
+[INFO] --- maven-jar-plugin:2.5:jar (default-jar) @ ejb-basic-test ---
+...
+[INFO] --- cargo-maven2-plugin:1.4.3:redeploy (cargo-prep) @ ejb-basic-test ---
+Oct 01, 2014 2:28:02 AM org.xnio.Xnio <clinit>
+INFO: XNIO version 3.2.2.Final
+Oct 01, 2014 2:28:02 AM org.xnio.nio.NioXnio <clinit>
+INFO: XNIO NIO Implementation Version 3.2.2.Final
+Oct 01, 2014 2:28:02 AM org.jboss.remoting3.EndpointImpl <clinit>
+INFO: JBoss Remoting version 4.0.3.Final
+...
+[INFO] --- maven-failsafe-plugin:2.17:integration-test (integration-tests) @ ejb-basic-test ---
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+...
+
+Results :
+
+Tests run: 12, Failures: 0, Errors: 0, Skipped: 0
+...
+[INFO] --- cargo-maven2-plugin:1.4.3:undeploy (cargo-post) @ ejb-basic-test ---
+...
+[INFO] --- maven-failsafe-plugin:2.17:verify (verify) @ ejb-basic-test ---
+...
+-------------------------------------------------------
+[INFO] BUILD SUCCESS
+
 ]]></programlisting>
            </figure>
             <itemizedlist spacing="compact">

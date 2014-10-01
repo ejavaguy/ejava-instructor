@@ -108,6 +108,12 @@
         </dependency>
         <dependency>
             <groupId>info.ejava.docs.ejb</groupId>
+            <artifactId>ejb-dev-notes</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+        <dependency>
+            <groupId>info.ejava.docs.ejb</groupId>
             <artifactId>webejb-notes</artifactId>
             <version>${project.version}</version>
             <classifier>docsrc</classifier>

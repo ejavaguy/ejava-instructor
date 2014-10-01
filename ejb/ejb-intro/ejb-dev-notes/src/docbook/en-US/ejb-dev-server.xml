@@ -7,76 +7,228 @@
 
     <section id="ejb-dev-server-config">
         <title>Server Configuration</title>
-        <para></para>
         
         <section id="ejb-dev-server-config-logger">
             <title>Logger</title>
-            <para></para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Deployed applications log to an API (e.g., commons-logging, slf4j)</para></listitem>
+                <listitem><para>API bound to server logger mechanism (e.g., log4j)</para></listitem>
+            </itemizedlist>
+            
+            <figure>
+                <title>Adjust Verbosity for Application</title>
+<programlisting language="xml"><![CDATA[# standalone/configuration/standalone.xml
+            <logger category="info.ejava">
+                <level name="DEBUG"/>
+            </logger>
+            <root-logger>
+                <level name="INFO"/>
+                <handlers>
+                    <handler name="CONSOLE"/>
+                    <handler name="FILE"/>
+                </handlers>
+            </root-logger>
+]]></programlisting>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>root-logger sets default versbosity to INFO</para></listitem>
+                <listitem><para>additional logger sets verbosity for info.ejava.* to DEBUG</para></listitem>
+            </itemizedlist>
+
+            <figure>
+                <title>Application Code</title>
+<programlisting language="java"><![CDATA[package info.ejava.examples.ejb.basic.ejb;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Stateless
+@Remote(GreeterRemote.class)
+public class GreeterEJB implements Greeter {
+    private static final Logger logger = LoggerFactory.getLogger(GreeterEJB.class);
+
+    @PostConstruct
+    public void init() {
+        logger.info("*** GreeterEJB ***");
+    }
+    
+    @Override
+    public String sayHello(String name) throws BadRequestException {
+        logger.debug("sayHello({})", name);
+        ...
+    }]]></programlisting>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>EJB class used to create logger named after the class' fully qualified name</para></listitem>
+                <listitem><para>@PostConstruct logging at INFO level</para></listitem>
+                <listitem><para>business method logging at DEBUG level</para></listitem>
+            </itemizedlist>
+
+            <figure>
+                <title>Server Console Output</title>
+<programlisting language=""><![CDATA[./bin/standalone.sh
+...
+01:17:01,990 INFO  [info.ejava.examples.ejb.basic.ejb.GreeterEJB] (EJB default - 1) *** GreeterEJB ***
+]]></programlisting>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Console configured (by default) to only output INFO and above</para></listitem>
+            </itemizedlist>
+
+            <figure>
+                <title>Server log/server.log Output</title>
+<programlisting language=""><![CDATA[$ tail -n 999 -f standalone/log/server.log
+
+2014-10-01 01:17:01,990 INFO  [info.ejava.examples.ejb.basic.ejb.GreeterEJB] (EJB default - 1) *** GreeterEJB ***
+2014-10-01 01:17:02,009 DEBUG [info.ejava.examples.ejb.basic.ejb.GreeterEJB] (EJB default - 1) sayHello(cat inhat)
+]]></programlisting>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>server.log will print all verbosity levels</para></listitem>
+            </itemizedlist>
         </section>
     </section>
     
     <section id="ejb-dev-server-standalone">
         <title>Standalone Server</title>
-        <para></para>
+        <itemizedlist spacing="compact">
+            <listitem><para>Runs as separate process</para></listitem>
+            <listitem><para>Started/stopped by shell commands</para></listitem>
+            <listitem><para>Decoupled from IDE</para></listitem>
+        </itemizedlist>
         
         <section id="ejb-dev-server-standalone-start">
             <title>Standalone Server Start</title>
-            <para></para>
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
             
             <figure>
                 <title>Start Standalone Server at Shell</title>
-<programlisting language=""><![CDATA[
+<programlisting language=""><![CDATA[wildfly-8.1.0.Final]$ ./bin/standalone.sh 
+=========================================================================
+
+  JBoss Bootstrap Environment
+
+  JBOSS_HOME: /opt/wildfly-8.1.0.Final
+
+  JAVA: /usr/lib/jvm/java-1.7.0/bin/java
+
+  JAVA_OPTS:  -server -Xms64m -Xmx512m -XX:MaxPermSize=256m -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.byteman -Djava.awt.headless=true -agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=n
+
+=========================================================================
+
+Listening for transport dt_socket at address: 8787
+01:33:57,008 INFO  [org.jboss.modules] (main) JBoss Modules version 1.3.3.Final
+01:33:57,508 INFO  [org.jboss.msc] (main) JBoss MSC version 1.2.2.Final
+01:33:57,970 INFO  [org.jboss.as] (MSC service thread 1-1) JBAS015899: WildFly 8.1.0.Final "Kenny" starting
+...
+01:34:56,423 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015874: WildFly 8.1.0.Final "Kenny" started in 60065ms - Started 309 of 362 services (113 services are lazy, passive or on-demand)
 ]]></programlisting>
             </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Server can be started at the command line</para></listitem>
+                <listitem><para>Add -c profile-name.xml to run alternate profile in standalone/configuration</para></listitem>
+            </itemizedlist>
         </section>
         
         <section id="ejb-dev-server-standalone-stop">
             <title>Standalone Server Stop</title>
-            <para></para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Server can be safely shutdown using the command line shell or Control-C</para></listitem>
+            </itemizedlist>
             
             <figure>
                 <title>Shutdown Standalone Server using Command</title>
 <programlisting language=""><![CDATA[
+$ /opt/wildfly-8.1.0.Final/bin/jboss-cli.sh --connect command=:shutdown 
+{"outcome" => "success"}
 ]]></programlisting>
             </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>All server actions can be scripted with command-line interface</para></listitem>
+            </itemizedlist>
             
             <figure>
                 <title>Kill Standalone Server using Control-C</title>
 <programlisting language=""><![CDATA[
+01:39:20,291 INFO  [org.jboss.as.messaging] (MSC service thread 1-4) JBAS011601: Bound messaging object to jndi name java:jboss/DefaultJMSConnectionFactory
+^C 01:39:32,666 INFO  [org.wildfly.extension.undertow] (MSC service thread 1-4) JBAS017532: Host default-host stopping
+01:39:32,666 INFO  [org.jboss.as.messaging] (ServerService Thread Pool -- 57) JBAS011605: Unbound messaging object to jndi name java:jboss/exported/jms/RemoteConnectionFactory
 ]]></programlisting>
             </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Server can also be safely shutdown with Control-C in console window</para></listitem>
+            </itemizedlist>
         </section>
     </section>
 
     <section id="ejb-dev-server-embedded">
         <title>Embedded Server</title>
-        <para></para>
+        <itemizedlist spacing="compact">
+            <listitem><para>Runs within IDE JVM</para></listitem>
+            <listitem><para>Controlled through UI clicks</para></listitem>
+            <listitem><para>Output appears in IDE panels</para></listitem>
+            <listitem><para>Provides easier access to server-side debugging and profiling</para></listitem>
+        </itemizedlist>
         
         <section id="ejb-dev-server-embedded-setup">
             <title>Embedded Server Setup</title>
-            <para></para>
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+
             <figure>
                 <title>Embedded Server Setup</title>
                 <graphic scalefit="1" fileref="images/ejb-dev-server-embedded-setup.png"/>
             </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
         </section>
         
         <section id="ejb-dev-server-embedded-start">
             <title>Embedded Server Start</title>
-            <para></para>
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+
             <figure>
                 <title>Embedded Server Start</title>
                 <graphic scalefit="1" fileref="images/ejb-dev-server-embedded-start.png"/>
             </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
         </section>
         
         <section id="ejb-dev-server-embedded-stop">
             <title>Embedded Server Stop</title>
-            <para></para>
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+
             <figure>
                 <title>Embedded Server Stop</title>
                 <graphic scalefit="1" fileref="images/ejb-dev-server-embedded-stop.png"/>
             </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
         </section>
     </section>
 
