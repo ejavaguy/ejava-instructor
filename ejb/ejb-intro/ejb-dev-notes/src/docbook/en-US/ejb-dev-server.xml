@@ -1,0 +1,92 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-dev-server">
+    <title>Application Server</title>
+    <para></para>
+
+    <section id="ejb-dev-server-config">
+        <title>Server Configuration</title>
+        <para></para>
+        
+        <section id="ejb-dev-server-config-logger">
+            <title>Logger</title>
+            <para></para>
+        </section>
+    </section>
+    
+    <section id="ejb-dev-server-standalone">
+        <title>Standalone Server</title>
+        <para></para>
+        
+        <section id="ejb-dev-server-standalone-start">
+            <title>Standalone Server Start</title>
+            <para></para>
+            
+            <figure>
+                <title>Start Standalone Server at Shell</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+            </figure>
+        </section>
+        
+        <section id="ejb-dev-server-standalone-stop">
+            <title>Standalone Server Stop</title>
+            <para></para>
+            
+            <figure>
+                <title>Shutdown Standalone Server using Command</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+            </figure>
+            
+            <figure>
+                <title>Kill Standalone Server using Control-C</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+            </figure>
+        </section>
+    </section>
+
+    <section id="ejb-dev-server-embedded">
+        <title>Embedded Server</title>
+        <para></para>
+        
+        <section id="ejb-dev-server-embedded-setup">
+            <title>Embedded Server Setup</title>
+            <para></para>
+            <figure>
+                <title>Embedded Server Setup</title>
+                <graphic scalefit="1" fileref="images/ejb-dev-server-embedded-setup.png"/>
+            </figure>
+        </section>
+        
+        <section id="ejb-dev-server-embedded-start">
+            <title>Embedded Server Start</title>
+            <para></para>
+            <figure>
+                <title>Embedded Server Start</title>
+                <graphic scalefit="1" fileref="images/ejb-dev-server-embedded-start.png"/>
+            </figure>
+        </section>
+        
+        <section id="ejb-dev-server-embedded-stop">
+            <title>Embedded Server Stop</title>
+            <para></para>
+            <figure>
+                <title>Embedded Server Stop</title>
+                <graphic scalefit="1" fileref="images/ejb-dev-server-embedded-stop.png"/>
+            </figure>
+        </section>
+    </section>
+
+    <section id="ejb-dev-server-summary">
+       <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Logging</para></listitem>
+            <listitem><para>Standalone/Embedded</para></listitem>
+            <listitem><para>Start/Stop</para></listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  

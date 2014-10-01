@@ -1,0 +1,281 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-dev-maven">
+    <title>Build Commands</title>
+    <itemizedlist spacing="compact">
+        <listitem><para></para></listitem>
+        <listitem><para></para></listitem>
+    </itemizedlist>
+
+    <section id="ejb-dev-maven-structure">
+        <title>Example Source Tree</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Uses EJB, EAR and Test Module</para></listitem>
+            <listitem><para>Also shows WAR option to EAR</para></listitem>
+            <listitem><para>IT tests could be placed inside WAR module</para></listitem>
+        </itemizedlist>
+        
+        <figure>
+            <title>Example Source Tree</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+        </figure>
+        
+    </section>
+    
+    <section id="ejb-dev-maven-test">
+        <title>Unit Tests</title>
+        <para></para>
+        
+        <section id="ejb-dev-maven-test-resources">
+            <title>Resources Plugin</title>
+            <para><ulink url="http://maven.apache.org/plugins/maven-resources-plugin/">Plugin Page</ulink></para>
+           <itemizedlist spacing="compact">
+               <listitem><para>Copies resource files from src tree to target tree</para></listitem>
+               <listitem><para>Can optionally "filter" variables and replace them with build time values (from environment's settings.xml)</para></listitem>
+               <listitem><para>Useful in customizing environment-specific properties</para>
+                   <itemizedlist spacing="compact">
+                       <listitem><para>server URLs</para></listitem>
+                       <listitem><para>server port#s</para></listitem>
+                   </itemizedlist>
+               </listitem>
+           </itemizedlist>
+           
+           <figure>
+               <title>Example Source Resource File: src/test/resources/jndi.properties</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+           </figure>
+           <itemizedlist spacing="compact">
+               <listitem><para>Source file uses variables to template source file</para></listitem>
+           </itemizedlist>
+           
+           <figure>
+               <title>Example Filtered Resource File: target/test-classes/jndi.properties</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+           </figure>
+           <itemizedlist spacing="compact">
+               <listitem><para>Concrete values are put in place for specific environment</para></listitem>
+           </itemizedlist>
+           
+           <figure>
+               <title>Example Maven Configuration</title>
+<programlisting language="xml"><![CDATA[
+]]></programlisting>
+<programlisting language="xml"><![CDATA[
+]]></programlisting>
+           </figure>
+           <itemizedlist spacing="compact">
+               <listitem><para>Properties defined either within pom.xml, settings.xml, or -Dsystem-properties</para></listitem>
+               <listitem><para>includes/exclused aids in filtering wrong files</para></listitem>
+               <listitem><para>avoid filtering binary files -- corrupts them (Ant has same issue)</para></listitem>
+           </itemizedlist>
+            
+        </section>
+        
+        
+        <section id="ejb-dev-maven-test-surefire">
+            <title>Surefire Plugin</title>
+            <para><ulink url="http://maven.apache.org/surefire/maven-surefire-plugin/">Plugin Page</ulink></para>
+           <itemizedlist spacing="compact">
+               <listitem><para>Runs unit tests</para></listitem>
+               <listitem><para>Runs after tests compiled and before IT tests</para></listitem>
+           </itemizedlist>
+            
+           <figure>
+               <title>Module Declaration</title>
+<programlisting language="xml"><![CDATA[
+]]></programlisting>
+           </figure>
+           <itemizedlist spacing="compact">
+               <listitem><para>Plugin always enabled by default. Declaration used only to customize</para></listitem>
+               <listitem><para>Configuration defines environment for JVM</para></listitem>
+               <listitem><para>Easy way to supply system properties (-Dsystem-property=value)</para></listitem>
+           </itemizedlist>
+           
+           <figure>
+               <title>Optional Includes/Excludes</title>
+<programlisting language="xml"><![CDATA[
+]]></programlisting>
+           </figure>
+           <itemizedlist spacing="compact">
+               <listitem><para>Useful when turning off all unit tests to concentrate on IT tests</para></listitem>
+               <listitem><para>Can turn off problem test(s)</para></listitem>
+           </itemizedlist>
+            
+           <figure>
+               <title>Parent Definition</title>
+<programlisting language="xml"><![CDATA[
+]]></programlisting>
+           </figure>
+           <itemizedlist spacing="compact">
+               <listitem><para>Just definiing version here</para></listitem>
+           </itemizedlist>
+
+           <figure>
+               <title>Run Unit Tests</title>
+<programlisting language=""><![CDATA[
+$ mvn clean test
+]]></programlisting>
+           </figure>
+           <itemizedlist spacing="compact">
+               <listitem><para>Just definiing version here</para></listitem>
+           </itemizedlist>
+        </section>
+    </section>
+
+    <section id="ejb-dev-maven-it">
+        <title>Integration (IT) Tests</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Runs after artifacts packaged and deployed</para></listitem>
+            <listitem><para>Required when tests require preparation/shutdown external to JVM</para></listitem>
+            <listitem><para>Four (4) <ulink url="http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html#Lifecycle_Reference">phases</ulink></para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>pre-integration-test</para></listitem>
+                    <listitem><para>integration-test</para></listitem>
+                    <listitem><para>post-integration-test</para></listitem>
+                    <listitem><para>verify</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Can be in same module as deployable artifact (i.e., within EJB or WAR modules)</para></listitem>
+        </itemizedlist>
+
+        <section id="ejb-dev-maven-it-cargo">
+            <title>Cargo Plugin</title>
+            <para><ulink url="http://cargo.codehaus.org/Maven2+plugin">Plugin Page</ulink></para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Manages deployment of components to containers</para></listitem>
+                <listitem><para>Not specific to JBoss/Wildfly</para></listitem>
+                <listitem><para>Specializations for Maven and JBoss/Wildfly</para></listitem>
+                <listitem><para>Can run embedded within each IT module build or use remote instance</para></listitem>
+                <listitem><para>Typically configured within module with IT tests</para></listitem>
+            </itemizedlist>
+            
+           <figure>
+               <title>IT Module Declaration</title>
+<programlisting language="xml"><![CDATA[
+]]></programlisting>
+           </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Plugin declaration enacts parent-defined behavior</para></listitem>
+                <listitem><para>Module specifies artifacts to deploy</para></listitem>
+                <listitem><para>Module specification is not required if deployment is self (i.e., the primary EJB/WAR/EAR produced by this module)</para></listitem>
+            </itemizedlist>
+           
+           
+           
+           <figure>
+               <title>WAR/EAR Module Cleanup Declarations</title>
+<programlisting language="xml"><![CDATA[
+]]></programlisting>
+           </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Used to simply undeploy module from server</para></listitem>
+                <listitem><para>Requires artifact to be present</para></listitem>
+                <listitem><para>Profile keeps behavior from running under conditions that would fail build</para></listitem>
+            </itemizedlist>
+           
+           <figure>
+               <title>Parent Definition</title>
+<programlisting language="xml"><![CDATA[
+]]></programlisting>
+           </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+
+           <figure>
+               <title>Deploy Application</title>
+<programlisting language=""><![CDATA[
+$ mvn clean pre-integration-test -DskipTests
+]]></programlisting>
+           </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Builds a new packaged, deployable artifact</para></listitem>
+                <listitem><para>Deploys and leaves on server</para></listitem>
+                <listitem><para>(optional)<code>-DskipTests</code> bypasses any unit tests</para></listitem>
+            </itemizedlist>
+           
+           <figure>
+               <title>Undeploy Application</title>
+<programlisting language=""><![CDATA[
+$ mvn clean -Pundeploy
+]]></programlisting>
+           </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Undeploys atifact from server</para></listitem>
+                <listitem><para>Useful in automating cleanup</para></listitem>
+                <listitem><para><code>-Pundeploy</code> activates latched profile</para></listitem>
+            </itemizedlist>
+        </section>
+
+
+
+        
+        <section id="ejb-dev-maven-it-failsafe">
+            <title>Failsafe Plugin</title>
+            <para><ulink url="http://maven.apache.org/surefire/maven-failsafe-plugin/">Plugin Page</ulink></para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Runs integration (IT) tests</para></listitem>
+                <listitem><para>Must be declared, not configured in by default</para></listitem>
+                <listitem><para>Runs after deployer completes and prior to undeployer</para></listitem>
+            </itemizedlist>
+            
+           <figure>
+               <title>IT Module Declaration</title>
+<programlisting language="xml"><![CDATA[
+]]></programlisting>
+           </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Plugin definition causes IT tests to run</para></listitem>
+                <listitem><para>Configuration defines environment for JVM</para></listitem>
+            </itemizedlist>
+           
+           <figure>
+               <title>Optional Includes/Excludes</title>
+<programlisting language="xml"><![CDATA[
+]]></programlisting>
+           </figure>
+           <itemizedlist spacing="compact">
+               <listitem><para>Can turn off problem or lengthy test(s)</para></listitem>
+           </itemizedlist>
+            
+           <figure>
+               <title>Parent Definitition</title>
+<programlisting language="xml"><![CDATA[
+]]></programlisting>
+           </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Defines version# and wires plugin into build phases when declared by child module</para></listitem>
+            </itemizedlist>
+            
+           <figure>
+               <title>Run IT Tests</title>
+<programlisting language="xml"><![CDATA[
+$ mvn clean verify
+]]></programlisting>
+           </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Runs all phases and stops just prior to installing into local repository</para></listitem>
+                <listitem><para>Cannot bypass unit tests (unless includes/excludes used)</para></listitem>
+            </itemizedlist>
+            
+        </section>
+        
+    </section>
+
+    <section id="ejb-dev-maven-summary">
+       <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Resource filtering</para></listitem>
+            <listitem><para>Surefire unit testing</para></listitem>
+            <listitem><para>Cargo deployment</para></listitem>
+            <listitem><para>Failsafe IT testing</para></listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  

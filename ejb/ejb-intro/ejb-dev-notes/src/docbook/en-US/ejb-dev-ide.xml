@@ -1,0 +1,51 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-dev-ide">
+    <title>IT Testing with IDE</title>
+    <para></para>
+    
+    <section id="ejb-dev-ide-test">
+        <title>Run IT Tests Against Server</title>
+
+        <figure>
+            <title>Deploy Artifacts</title>
+<programlisting language=""><![CDATA[
+$mvn clean pre-integration-test
+]]></programlisting>
+        </figure>
+        
+        <figure>
+            <title>Deploy Artifacts</title>
+            <graphic scalefit="1" fileref="images/.png"/>
+        </figure>
+    </section>
+    
+    <section id="ejb-dev-ide-debug">
+        <title>Debug Code Running on Server</title>
+        <figure>
+            <title>Enable Remote Debugging in Server</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Not required when using embedded server (just use debug-as)</para></listitem>
+            <listitem><para>Standalone server must be restarted after making this edit</para></listitem>
+        </itemizedlist>
+        
+        <figure>
+            <title>Connect Debugger</title>
+            <graphic scalefit="1" fileref="images/.png"/>
+        </figure>
+    </section>
+
+    <section id="ejb-dev-ide-summary">
+       <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Deploy Application</para></listitem>
+            <listitem><para>Run/Debug IT tests within IDE</para></listitem>
+            <listitem><para>Debug code on remote server</para></listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  

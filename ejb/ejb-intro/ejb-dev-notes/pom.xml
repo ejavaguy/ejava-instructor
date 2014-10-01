@@ -1,0 +1,31 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>info.ejava.docs.ejb</groupId>
+        <artifactId>ejb-intro</artifactId>
+        <version>4.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>ejb-dev-notes</artifactId>
+    <packaging>pom</packaging>
+
+    <name>EJB::Intro::EJB Development Notes</name>
+    <description>
+        This project provides discussion notes for development use cases
+        related to developing server-side EJBs and other JavaEE artifacts.
+    </description>
+    
+    <properties>
+       <doc.base>ejb-dev-book</doc.base>
+       <content.version>v2014-09-30</content.version>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jboss.maven.plugins</groupId>
+                <artifactId>maven-jdocbook-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

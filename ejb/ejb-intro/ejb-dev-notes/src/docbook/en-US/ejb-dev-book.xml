@@ -1,0 +1,56 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="ejb-dev">
+    <bookinfo>
+        <title>EJB Development Scenarios</title>
+        <subtitle>Developing and Deploying EJBs</subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>This presentation provides information for performing 
+                use cases that are specific to developing server-side EJBs.
+                Topics range from managing server execution, executing the 
+                build, and remote debugging. 
+            </para>
+        </abstract>
+    </bookinfo>
+    <preface id="ejb-dev-purpose">
+        <title>Purpose</title>
+        <section id="ejb-dev-goals">
+            <title>Goals</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Manage server execution</para></listitem>
+                <listitem><para>Manage EJB deployment</para></listitem>
+                <listitem><para>Running IT tests with server deployments</para></listitem>
+                <listitem><para>Perform remote debugging</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejb-dev-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>be able to:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Choose whether to run application server standalone or embedded</para></listitem>
+                        <listitem><para>Start/Stop application server</para></listitem>
+                        <listitem><para>Select specific Maven commands to execute for the development case</para></listitem>
+                        <listitem><para>Run an IT test within IDE with EJB deployed to application server</para></listitem>
+                        <listitem><para>Remote debug EJB deployed to application server</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+    </preface>
+
+    <toc/>
+    
+    <xi:include href="ejb-dev-server.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-dev-maven.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-dev-ide.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>
