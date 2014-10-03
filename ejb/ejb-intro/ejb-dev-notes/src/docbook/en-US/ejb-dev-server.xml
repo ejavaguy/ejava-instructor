@@ -3,7 +3,11 @@
 
 <chapter id="ejb-dev-server">
     <title>Application Server</title>
-    <para></para>
+    <para>Two primary ways to run the application server</para>
+    <itemizedlist spacing="compact">
+        <listitem><para>Standalone. Can be local or remote</para></listitem>
+        <listitem><para>Embedded within IDE. Shares same JVM.</para></listitem>
+    </itemizedlist>
 
     <section id="ejb-dev-server-config">
         <title>Server Configuration</title>
@@ -100,9 +104,7 @@ public class GreeterEJB implements Greeter {
         <section id="ejb-dev-server-standalone-start">
             <title>Standalone Server Start</title>
             <itemizedlist spacing="compact">
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Use start script (standalone.sh or standalone.bat)</para></listitem>
             </itemizedlist>
             
             <figure>
@@ -177,58 +179,53 @@ $ /opt/wildfly-8.1.0.Final/bin/jboss-cli.sh --connect command=:shutdown
         <section id="ejb-dev-server-embedded-setup">
             <title>Embedded Server Setup</title>
             <itemizedlist spacing="compact">
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Install JBoss Tools (JBoss AS Tools) -- shown earlier</para></listitem>
             </itemizedlist>
 
             <figure>
-                <title>Embedded Server Setup</title>
-                <graphic scalefit="1" fileref="images/ejb-dev-server-embedded-setup.png"/>
+                <title>Add New Server</title>
+                <graphic scale="60" fileref="images/ejb-dev-server-embedded-addserver.png"/>
             </figure>
             <itemizedlist spacing="compact">
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Locate Server tab in the JavaEE Profile</para></listitem>
+            </itemizedlist>
+
+            <figure>
+                <title>Configure New Server</title>
+                <graphic scale="60" fileref="images/ejb-dev-server-embedded-addserver2.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Defaults are usually good enough</para></listitem>
             </itemizedlist>
         </section>
         
         <section id="ejb-dev-server-embedded-start">
             <title>Embedded Server Start</title>
+
+            <figure>
+                <title>Embedded Server Start</title>
+                <graphic scale="60" fileref="images/ejb-dev-server-embedded-startserver.png"/>
+            </figure>
             <itemizedlist spacing="compact">
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Start (debug and profile) option associated with server</para></listitem>
             </itemizedlist>
 
             <figure>
                 <title>Embedded Server Start</title>
-                <graphic scalefit="1" fileref="images/ejb-dev-server-embedded-start.png"/>
+                <graphic scale="50" fileref="images/ejb-dev-server-embedded-startserver2.png"/>
             </figure>
             <itemizedlist spacing="compact">
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Console output appears in IDE console window</para></listitem>
             </itemizedlist>
         </section>
         
         <section id="ejb-dev-server-embedded-stop">
             <title>Embedded Server Stop</title>
-            <itemizedlist spacing="compact">
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>
 
             <figure>
                 <title>Embedded Server Stop</title>
-                <graphic scalefit="1" fileref="images/ejb-dev-server-embedded-stop.png"/>
+                <graphic scale="60" fileref="images/ejb-dev-server-embedded-stopserver.png"/>
             </figure>
-            <itemizedlist spacing="compact">
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>
         </section>
     </section>
 
