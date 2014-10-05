@@ -1,50 +1,34 @@
 <!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="ejb-basichotelex-chapter">
-    <title>Chapter</title>
+<chapter id="ejb-basicex-jndi">
+    <title>Controlling JNDI Names</title>
 
-    <section id="ejb-basichotelex-chapter-purpose">
+    <section id="ejb-basicex-jndi-purpose">
         <title>Purpose</title>
-        <section id="ejb-basichotelex-chapter-goals">
+        <section id="ejb-basicex-jndi-goals">
             <title>Goals</title>
             <itemizedlist spacing="compact">
-                <listitem><para></para></listitem>
-                <listitem><para></para>
-                    <itemizedlist spacing="compact">
-                        <listitem><para></para></listitem>
-                        <listitem><para></para> </listitem>
-                        <listitem><para></para></listitem>
-                    </itemizedlist>
-                </listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Create deterministic JNDI names</para></listitem>
             </itemizedlist>
         </section>
 
-        <section id="ejb-basichotelex-chapter-objectives">
+        <section id="ejb-basicex-jndi-objectives">
             <title>Objectives</title>
             <para>At the completion of this topic, the student shall</para>
             <itemizedlist spacing="compact">
-                <listitem><para></para></listitem>
-                <listitem><para></para>
-                    <itemizedlist spacing="compact">
-                        <listitem><para></para></listitem>
-                        <listitem><para></para> </listitem>
-                        <listitem><para></para></listitem>
-                    </itemizedlist>
-                </listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Eliminate Version# from ...</para></listitem>
             </itemizedlist>
         </section>
     </section>
 
-    <section id="ejb-basichotelex-chapter-">
+    <section id="ejb-basicex-jndi-">
         <title>Section</title>
         <para>
         </para>
     </section>
         
-    <section id="ejb-basichotelex-chapter-summary">
+    <section id="ejb-basicex-jndi-summary">
        <title>Summary</title>
         <itemizedlist spacing="compact">
             <listitem><para>

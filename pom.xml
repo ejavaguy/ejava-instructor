@@ -115,6 +115,7 @@
                 <copyright.holder>jim stafford (jim.stafford@jhu.edu)</copyright.holder>
                 <datePattern>yyyy-MM-dd HH:mm z</datePattern>
                 <timeZone>EST</timeZone>
+                <dependency.includes>en-US/**/*,images/**/*</dependency.includes>
 
                 <maven-jdocbook-plugin.version>2.3.4</maven-jdocbook-plugin.version>
             </properties>
@@ -274,7 +275,7 @@
                                 <configuration>
                                     <classifier>docsrc</classifier>
                                     <outputDirectory>${basedir}/target/resources/ejava/docs</outputDirectory>
-                                    <includes>en-US/**/*,images/**/*</includes>
+                                    <includes>${dependency.includes}</includes>
                                 </configuration>
                             </execution>
 

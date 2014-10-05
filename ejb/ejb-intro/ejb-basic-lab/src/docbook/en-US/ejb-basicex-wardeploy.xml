@@ -1,57 +1,64 @@
 <!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="ejb-basichotelex-eardeploy">
-    <title>EAR Deployment</title>
+<chapter id="ejb-basicex-wardeploy">
+    <title>WAR Deployment</title>
 
-    <section id="ejb-basichotelex-eardeploy-purpose">
+    <section id="ejb-basicex-wardeploy-purpose">
         <title>Purpose</title>
-        <section id="ejb-basichotelex-eardeploy-goals">
+        <section id="ejb-basicex-wardeploy-goals">
             <title>Goals</title>
             <itemizedlist spacing="compact">
-                <listitem><para>Create remaining Maven modules to support EAR deployment</para></listitem>
-                <listitem><para>Deploy an EJB</para></listitem>
-                <listitem><para>Create an IT test to communicate with and test the EAR-based EJB</para></listitem>
+                <listitem><para>Create remaining Maven modules to support WAR deployment</para></listitem>
+                <listitem><para>Deploy an EJB within WAR</para></listitem>
+                <listitem><para>Create and deploy an EJB within WAR</para></listitem>
+                <listitem><para>Create an IT test to communicate with and test the WAR-based EJB</para></listitem>
             </itemizedlist>
         </section>
 
-        <section id="ejb-basichotelex-eardeploy-objectives">
+        <section id="ejb-basicex-wardeploy-objectives">
             <title>Objectives</title>
             <para>At the completion of this topic, the student shall</para>
             <itemizedlist spacing="compact">
-                <listitem><para>Create child Maven EAR module</para></listitem>
-                <listitem><para>Create RMI Test module for EAR</para></listitem>
+                <listitem><para>Create child Maven WAR module</para></listitem>
+                <listitem><para>Create RMI Test within WAR module</para></listitem>
                 <listitem><para>Setup JNDI access to @Remote interface</para></listitem>
-                <listitem><para>Invoke EAR-based EJB method from IT test thru @Remote interface</para></listitem>
+                <listitem><para>Invoke WAR-based EJB method from IT test thru @Remote interface</para></listitem>
             </itemizedlist>
         </section>
     </section>
 
-    <section id="ejb-basichotelex-eardeploy-earmodule">
-        <title>Create EAR Module</title>
+    <section id="ejb-basicex-wardeploy-earmodule">
+        <title>Create WAR Module</title>
         <para>
         </para>
     </section>
 
-    <section id="ejb-basichotelex-eardeploy-testmodule">
-        <title>Create RMI Test Module</title>
+    <section id="ejb-basicex-wardeploy-testmodule">
+        <title>Add RMI Test</title>
         <para>
         </para>
     </section>
 
-    <section id="ejb-basichotelex-eardeploy-jndi">
+    <section id="ejb-basicex-wardeploy-jndi">
         <title>Locate JNDI Name of @Remote</title>
         <para>
         </para>
     </section>
 
-    <section id="ejb-basichotelex-eardeploy-invoke">
+    <section id="ejb-basicex-wardeploy-invoke">
         <title>Access/Test EJB Method</title>
         <para>
         </para>
     </section>
+
+    <section id="ejb-basicex-wardeploy-warejb">
+        <title>Add EJB to WAR Module</title>
+        <para>
+        </para>
+    </section>
         
-    <section id="ejb-basichotelex-eardeploy-summary">
+    <section id="ejb-basicex-wardeploy-summary">
        <title>Summary</title>
         <itemizedlist spacing="compact">
             <listitem><para>

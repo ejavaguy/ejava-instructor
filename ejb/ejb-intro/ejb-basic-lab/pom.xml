@@ -6,7 +6,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>ejb-basichotel-lab</artifactId>
+    <artifactId>ejb-basic-lab</artifactId>
     <packaging>pom</packaging>
 
     <name>EJB::Intro::Basic EJB Exercise</name>
@@ -16,9 +16,24 @@
     </description>
     
     <properties>
-       <doc.base>ejb-basichotel-lab-book</doc.base>
+       <doc.base>ejb-basic-lab-book</doc.base>
        <content.version>v2014-10-04</content.version>
+
+       <dependency.includes>
+            images/ejb-dev-server-embedded-addserver.png,
+            images/ejb-dev-server-embedded-startserver.png,
+            images/ejb-dev-server-embedded-stopserver.png
+       </dependency.includes>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ejb-dev-notes</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>

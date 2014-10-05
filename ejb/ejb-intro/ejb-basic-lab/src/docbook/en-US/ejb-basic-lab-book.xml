@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
     "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
-<book id="ejb-basichotel-lab">
+<book id="ejb-basic-lab">
     <bookinfo>
         <title>Basic Session EJB Exercise</title>
         <subtitle>Developing and Deploying a Basic EJB</subtitle>
@@ -17,9 +17,9 @@
             </para>
         </abstract>
     </bookinfo>
-    <preface id="ejb-basichotelex-purpose">
+    <preface id="ejb-basicex-purpose">
         <title>Purpose</title>
-        <section id="ejb-basichotelex-goals">
+        <section id="ejb-basicex-goals">
             <title>Goals</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Create and deploy a basic EJB (without resource requirements or other dependencies)</para></listitem>
@@ -30,7 +30,7 @@
             </itemizedlist>
         </section>
 
-        <section id="ejb-basichotelex-objectives">
+        <section id="ejb-basicex-objectives">
             <title>Objectives</title>
             <para>At the completion of this topic, the student shall</para>
             <itemizedlist spacing="compact">
@@ -52,12 +52,10 @@
 
     <toc/>
     
-    <xi:include href="ejb-basichotel-modules.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <!--
-    <xi:include href="ejb-basichotel-eardeploy.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="ejb-basichotel-wardeploy.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="ejb-basichotel-commands.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="ejb-basichotel-jndi.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="ejb-basichotel-debugging.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    -->
+    <xi:include href="ejb-basicex-modules.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-basicex-eardeploy.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-basicex-wardeploy.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-basicex-commands.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-basicex-jndi.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-basicex-debugging.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </book>

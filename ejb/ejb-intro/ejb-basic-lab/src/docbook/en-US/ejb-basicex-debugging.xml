@@ -1,19 +1,19 @@
 <!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="ejb-basichotelex-debug">
+<chapter id="ejb-basicex-debug">
     <title>Debug Remote EJB</title>
 
-    <section id="ejb-basichotelex-debug-purpose">
+    <section id="ejb-basicex-debug-purpose">
         <title>Purpose</title>
-        <section id="ejb-basichotelex-debug-goals">
+        <section id="ejb-basicex-debug-goals">
             <title>Goals</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Debug remote deployed application</para></listitem>
             </itemizedlist>
         </section>
 
-        <section id="ejb-basichotelex-debug-objectives">
+        <section id="ejb-basicex-debug-objectives">
             <title>Objectives</title>
             <para>At the completion of this topic, the student shall</para>
             <itemizedlist spacing="compact">
@@ -23,19 +23,19 @@
         </section>
     </section>
 
-    <section id="ejb-basichotelex-debug-standalone">
+    <section id="ejb-basicex-debug-standalone">
         <title>Debugging Deployment to Standalone Server</title>
         <para>
         </para>
     </section>
 
-    <section id="ejb-basichotelex-debug-embedded">
+    <section id="ejb-basicex-debug-embedded">
         <title>Debugging Deployment to Embedded Server</title>
         <para>
         </para>
     </section>
         
-    <section id="ejb-basichotelex-debug-summary">
+    <section id="ejb-basicex-debug-summary">
        <title>Summary</title>
         <itemizedlist spacing="compact">
             <listitem>Standalone server<para>

@@ -1,20 +1,21 @@
 <!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="ejb-basichotelex-modules">
-    <title>Multi-Module JavaEE Project Structure</title>
+<chapter id="ejb-basicex-modules">
+    <title>Multi-Module JavaEE Project</title>
 
-    <section id="ejb-basichotelex-modules-purpose">
+    <section id="ejb-basicex-modules-purpose">
         <title>Purpose</title>
-        <section id="ejb-basichotelex-modules-goals">
+        <section id="ejb-basicex-modules-goals">
             <title>Goals</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Create Maven modules to house different artifacts</para></listitem>
                 <listitem><para>Create an EJB</para></listitem>
+                <listitem><para>Ready application server</para></listitem>
             </itemizedlist>
         </section>
 
-        <section id="ejb-basichotelex-modules-objectives">
+        <section id="ejb-basicex-modules-objectives">
             <title>Objectives</title>
             <para>At the completion of this topic, the student shall</para>
             <itemizedlist spacing="compact">
@@ -44,7 +45,7 @@
 ]]></programlisting>                        
 -->
 
-    <section id="ejb-basichotelex-modules-rootmodule">
+    <section id="ejb-basicex-modules-rootmodule">
         <title>Create Root Module</title>
         <para>
             Each component of the Java EE application will be developed as 
@@ -195,7 +196,7 @@ $ mkdir ejb-basichotel
             </orderedlist>
     </section>
 
-    <section id="ejb-basichotelex-modules-ejbmodule">
+    <section id="ejb-basicex-modules-ejbmodule">
         <title>Create EJB Module</title>
         <para>
             The EJB module will be used to develop one of the EJB components. The
@@ -280,7 +281,6 @@ $ mkdir basicejb-ejb
                             pure Java construct that JavaEE takes advantage of in 
                             order to resolve dependencies on the server. 
                             </para></listitem>
-                        <listitem><para></para></listitem>
                     </itemizedlist>
 <programlisting language="xml"><![CDATA[
 # basicejbEx/pom.xml
@@ -481,6 +481,16 @@ $ mkdir basicejb-ejb
                             code in the following steps.
                         </para>
                     </note>
+                    <tip>
+                        <para>
+                            If you have not yet done so, you can now import your multi-module 
+                            project into the IDE as an existing set of Maven projects. Since 
+                            we have not yet linked the two -- you will need to import them 
+                            in separate steps. Although the instructions are written using file
+                            system commands it is assumed that you can translate them into IDE
+                            actions and work at the level you desire.
+                        </para>
+                    </tip>
                     </listitem>
 
 
@@ -488,7 +498,7 @@ $ mkdir basicejb-ejb
                         Create the src tree for the EJB.
                     </para>
 <programlisting language=""><![CDATA[
-$ mkdir mkdir -p basicejb-ejb/src/main/java/myorg/basicejb/ejb
+$ mkdir mkdir -p basicejb-ejb/src/main/java/org/myorg/basicejb/ejb
 ]]></programlisting>                        
                     </listitem>
 
@@ -497,8 +507,8 @@ $ mkdir mkdir -p basicejb-ejb/src/main/java/myorg/basicejb/ejb
                         a simple ping() method in the @Remote interface for use as an
                         end-to-end sanity check at the end of this exercise.
                     </para>
-<programlisting language="java"><![CDATA[$ cat basicejb-ejb/src/main/java/myorg/basicejb/ejb/ReservationRemote.java
-package myorg.basicejb.ejb;
+<programlisting language="java"><![CDATA[$ cat basicejb-ejb/src/main/java/org/myorg/basicejb/ejb/ReservationRemote.java
+package org.myorg.basicejb.ejb;
 
 import javax.ejb.Remote;
 
@@ -507,8 +517,8 @@ public interface ReservationRemote {
     void ping();
 }
 ]]></programlisting>                        
-<programlisting language="java"><![CDATA[$ cat basicejb-ejb/src/main/java/myorg/basicejb/ejb/ReservationLocal.java
-package myorg.basicejb.ejb;
+<programlisting language="java"><![CDATA[$ cat basicejb-ejb/src/main/java/org/myorg/basicejb/ejb/ReservationLocal.java
+package org.myorg.basicejb.ejb;
 
 import javax.ejb.Local;
 
@@ -525,8 +535,8 @@ public interface ReservationLocal {
                         logger and log statements to the methods so we can observe activity
                         within the EJB during the test at the end of this exercise.
                     </para>
-<programlisting language=""><![CDATA[$ cat basicejb-ejb/src/main/java/myorg/basicejb/ejb/ReservationEJB.java
-package myorg.basicejb.ejb;
+<programlisting language="java"><![CDATA[$ cat basicejb-ejb/src/main/java/org/myorg/basicejb/ejb/ReservationEJB.java
+package org.myorg.basicejb.ejb;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -605,12 +615,13 @@ public class ReservationEJB implements ReservationLocal, ReservationRemote {
 |   |-- src
 |   |   `-- main
 |   |       `-- java
-|   |           `-- myorg
-|   |               `-- basicejb
-|   |                   `-- ejb
-|   |                       |-- ReservationEJB.java
-|   |                       |-- ReservationLocal.java
-|   |                       `-- ReservationRemote.java
+|   |           `-- org
+|   |               `-- myorg
+|   |                   `-- basicejb
+|   |                       `-- ejb
+|   |                           |-- ReservationEJB.java
+|   |                           |-- ReservationLocal.java
+|   |                           `-- ReservationRemote.java
 |   `-- target
 |       |-- basicejb-ejb-1.0-SNAPSHOT-client.jar
 |       |-- basicejb-ejb-1.0-SNAPSHOT.jar
@@ -620,16 +631,16 @@ public class ReservationEJB implements ReservationLocal, ReservationRemote {
                     <para>The EJB.jar contains the full set of EJB classes/interfaces</para>
 <programlisting language=""><![CDATA[$ jar tf target/basicejb-ejb-1.0-SNAPSHOT.jar
 ...
-myorg/basicejb/ejb/ReservationLocal.class
-myorg/basicejb/ejb/ReservationRemote.class
-myorg/basicejb/ejb/ReservationEJB.class
+org/myorg/basicejb/ejb/ReservationLocal.class
+org/myorg/basicejb/ejb/ReservationRemote.class
+org/myorg/basicejb/ejb/ReservationEJB.class
 ...
 ]]></programlisting>
                     <para>The EJB-client.jar contains classes/interfaces required by remote clients</para>
 <programlisting language=""><![CDATA[$ jar tf target/basicejb-ejb-1.0-SNAPSHOT-client.jar
 ...
-myorg/basicejb/ejb/ReservationLocal.class
-myorg/basicejb/ejb/ReservationRemote.class
+org/myorg/basicejb/ejb/ReservationLocal.class
+org/myorg/basicejb/ejb/ReservationRemote.class
 ...
 ]]></programlisting>
                     <note>
@@ -674,10 +685,10 @@ myorg/basicejb/ejb/ReservationRemote.class
                     a part of the EJB.jar
                     </para>
 <programlisting language=""><![CDATA[
-$ mkdir -p basicejb-ejb/src/test/java/myorg/basicejb/ejb
+$ mkdir -p basicejb-ejb/src/test/java/org/myorg/basicejb/ejb
 ]]></programlisting>                        
-<programlisting language="java"><![CDATA[$ cat basicejb-ejb/src/test/java/myorg/basicejb/ejb/ReservationTest.java
-package myorg.basicejb.ejb;
+<programlisting language="java"><![CDATA[$ cat basicejb-ejb/src/test/java/org/myorg/basicejb/ejb/ReservationTest.java
+package org.myorg.basicejb.ejb;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -735,7 +746,7 @@ $ mkdir -p basicejb-ejb/src/test/resources
         </layout>
    </appender>
 
-   <logger name="myorg">
+   <logger name="org.myorg">
       <level value="debug"/>
       <appender-ref ref="logfile"/>  
    </logger>
@@ -758,7 +769,7 @@ $ mkdir -p basicejb-ejb/src/test/resources
 -------------------------------------------------------
  T E S T S
 -------------------------------------------------------
-Running myorg.basicejb.ejb.ReservationTest
+Running org.myorg.basicejb.ejb.ReservationTest
 21:50:10,382 INFO  (ReservationTest.java:20) -*** testPing ***
 21:50:10,390 DEBUG (ReservationEJB.java:26) -ping called
 Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.218 sec
@@ -781,18 +792,20 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 |   `-- src
 |       |-- main
 |       |   `-- java
-|       |       `-- myorg
-|       |           `-- basicejb
-|       |               `-- ejb
-|       |                   |-- ReservationEJB.java
-|       |                   |-- ReservationLocal.java
-|       |                   `-- ReservationRemote.java
+|       |       `-- org
+|       |           `-- myorg
+|       |               `-- basicejb
+|       |                   `-- ejb
+|       |                       |-- ReservationEJB.java
+|       |                       |-- ReservationLocal.java
+|       |                       `-- ReservationRemote.java
 |       `-- test
 |           |-- java
-|           |   `-- myorg
-|           |       `-- basicejb
-|           |           `-- ejb
-|           |               `-- ReservationTest.java
+|           |   `-- org
+|           |       `-- myorg
+|           |           `-- basicejb
+|           |               `-- ejb
+|           |                   `-- ReservationTest.java
 |           `-- resources
 |               `-- log4j.xml
 `-- pom.xml
@@ -801,15 +814,48 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
             </orderedlist>
     </section>
         
-    <section id="ejb-basichotelex-modules-server">
+    <section id="ejb-basicex-modules-server">
         <title>Manage Application Server</title>
         <para>
+            This set of steps is in preparation for the next chapter where
+            you will be asked to deploy the EJB built above to the server.
+            In this section you will be shown how to start/stop a standalone
+            server and how to setup, start/stop an embedded server.
         </para>
 
+        <section id="ejb-basicex-modules-server-setup">
+            <title>Application Server Setup</title>
+            <para>
+            </para>
+
+            <orderedlist>
                 <listitem><para>
+                        Depending on the origin of your server setup, either verify or
+                        put in place the following in the JBoss/Wildfly application server
+                        configuration file to address logging.
                     </para>
-<programlisting language=""><![CDATA[
+<programlisting language=""><![CDATA[# wildfly-8.1.0.Final/standalone/configuration/standalone.xml
+            <logger category="org.myorg">
+                <level name="DEBUG"/>
+            </logger>
+            ...
+            <root-logger>
+                <level name="INFO"/>
+                <handlers>
+                    <handler name="CONSOLE"/>
+                    <handler name="FILE"/>
+                </handlers>
+            </root-logger>
 ]]></programlisting>                        
+                    <para>
+                        The default configuration will permit all log entries INFO and above to
+                        be written to the CONSOLE and FILE appenders. The extra lines added for
+                        org.myorg defined a new logger that will have messages DEBUG and above
+                        logged.  The CONSOLE appender is normally throttled to only log INFO
+                        and above so you should not see any impact of the changes above in the 
+                        server's console output. The extra debug will be placed in the 
+                        standalone/log/server.log file.
+                    </para>
                     </listitem>
 
                 <listitem><para>
@@ -817,26 +863,166 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 <programlisting language=""><![CDATA[
 ]]></programlisting>                        
                     </listitem>
+            </orderedlist>
+        </section>
+
+        <section id="ejb-basicex-modules-server-standalone">
+            <title>Standalone Application Server</title>
+            <para>
+                The standalone application server runs as a separate process either in the 
+                same machine as or remote machine from the development machine. This approach
+                more closely resembles the target server setup and can help test certain 
+                production-like configurations. This is normally managed through scripts.
+            </para>
+
+            <orderedlist>
+                <listitem><para>
+                    Start the JBoss/Wildfly application server. In the command shown below
+                    </para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>
+                            -Djboss.server.base.dir - used to point to the root of the 
+                            profile. If you create other profiles (by copying the standalone
+                            directory) you can point the script to that directory using this
+                            java property flag. This flag is not needed if you use the 
+                            default standalone directory.
+                            </para></listitem>
+                        <listitem><para>
+                            -c standalone.xml - used to point to a specific profile 
+                            configuration file within the ${jboss.server.base.dir}/configuration
+                            directory. If you create alternate configurations (by copying 
+                            the standalone.xml file) you can point the script to that configuration
+                            using this argument. This is useful to switch between alternate 
+                            configurations but not required if you use the default standalone.xml
+                            configuration file.
+                            </para></listitem>
+                    </itemizedlist>
+<programlisting language=""><![CDATA[wildfly-8.1.0.Final]$ ./bin/standalone.sh 
+=========================================================================
+
+  JBoss Bootstrap Environment
+
+  JBOSS_HOME: /opt/wildfly-8.1.0.Final
+
+  JAVA: /usr/lib/jvm/java-1.7.0/bin/java
+
+  JAVA_OPTS:  -server -Xms64m -Xmx512m -XX:MaxPermSize=256m -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.byteman -Djava.awt.headless=true -agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=n
+
+=========================================================================
+
+Listening for transport dt_socket at address: 8787
+01:33:57,008 INFO  [org.jboss.modules] (main) JBoss Modules version 1.3.3.Final
+01:33:57,508 INFO  [org.jboss.msc] (main) JBoss MSC version 1.2.2.Final
+01:33:57,970 INFO  [org.jboss.as] (MSC service thread 1-1) JBAS015899: WildFly 8.1.0.Final "Kenny" starting
+...
+01:34:56,423 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015874: WildFly 8.1.0.Final "Kenny" started in 60065ms - Started 309 of 362 services (113 services are lazy, passive or on-demand)
+]]></programlisting>
+                    </listitem>
+
+                <listitem><para>
+                    Shutdown the server using the command line interface (CLI)
+                    </para>
+<programlisting language=""><![CDATA[
+$ /opt/wildfly-8.1.0.Final/bin/jboss-cli.sh --connect command=:shutdown 
+{"outcome" => "success"}
+]]></programlisting>
+                    </listitem>
+
+                <listitem><para>
+                    Restart the server.
+                    </para>
+<programlisting language=""><![CDATA[wildfly-8.1.0.Final]$ ./bin/standalone.sh 
+...
+]]></programlisting>
+                    </listitem>
+
+                <listitem><para>
+                    Shutdown the server by pressing Control-C keys
+                    </para>
+<programlisting language=""><![CDATA[
+01:39:20,291 INFO  [org.jboss.as.messaging] (MSC service thread 1-4) JBAS011601: Bound messaging object to jndi name java:jboss/DefaultJMSConnectionFactory
+^C 01:39:32,666 INFO  [org.wildfly.extension.undertow] (MSC service thread 1-4) JBAS017532: Host default-host stopping
+01:39:32,666 INFO  [org.jboss.as.messaging] (ServerService Thread Pool -- 57) JBAS011605: Unbound messaging object to jndi name java:jboss/exported/jms/RemoteConnectionFactory
+]]></programlisting>
+                    <note>
+                        <para>
+                            There is no negative impacts from stopping the application server
+                            using Control-C key sequence.
+                        </para>
+                    </note>
+                    </listitem>
+            </orderedlist>
+        </section>
+
+        <section id="ejb-basicex-modules-server-embedded">
+            <title>Embedded Application Server</title>
+            <para>
+                The embedded application server places the server in the same JVM as 
+                the IDE. This allows for easy start, stop, and debug options for 
+                managing the server. Since the server is running inside the IDE, it 
+                can differ greatly from what is used in production.
+            </para>
+            <note>
+                <para>
+                    The following steps assumes JBoss AS Tools have been installed. 
+                    If the server setup does not list a Wildfly 8.x server option
+                    please make install that option.
+                </para>
+            </note>
+
+            <orderedlist>
+
+                <listitem><para>
+                    Add a new Wildfly 8.x Server off the Servers tab of the JavaEE IDE profile.
+                    Accept all defaults.
+                    </para>
+                    <graphic scale="60" fileref="images/ejb-dev-server-embedded-addserver.png"/>
+                    </listitem>
+
+                <listitem><para>
+                    Start the server by right-clicking on the server and selecting Start.
+                    </para>
+                    <graphic scale="60" fileref="images/ejb-dev-server-embedded-startserver.png"/>
+                    </listitem>
+
+                <listitem><para>
+                    Stop the server by right-clicking on the server and selecting Stop.
+                    </para>
+                    <graphic scale="60" fileref="images/ejb-dev-server-embedded-stopserver.png"/>
+                    </listitem>
+            </orderedlist>
+        </section>
 
     </section>
 
-    <section id="ejb-basichotelex-modules-summary">
+    <section id="ejb-basicex-modules-summary">
        <title>Summary</title>
         <itemizedlist spacing="compact">
             <listitem><para>
+                Created parent module
                 </para>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>Houses re-usable property, dependency and plugin definitions</para></listitem>
+                    <listitem><para>Delegates build to implementation modules</para></listitem>
+                    <listitem><para>Has no technical artifacts of its own</para></listitem>
                 </itemizedlist>
             </listitem>
             <listitem><para>
+                Created EJB module
                 </para>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>EJB modules have one or more EJBs</para></listitem>
+                    <listitem><para>an "EJB" is made up of an EJB class and optional @Remote and @Local interfaces</para></listitem>
+                    <listitem><para>Functional unit tests can be included in the EJB module</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>
+                Server management
+                </para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Control logging verbosity</para></listitem>
+                    <listitem><para>Start/Stop standalone server</para></listitem>
+                    <listitem><para>Create and Start/Stop embedded server</para></listitem>
                 </itemizedlist>
             </listitem>
         </itemizedlist>

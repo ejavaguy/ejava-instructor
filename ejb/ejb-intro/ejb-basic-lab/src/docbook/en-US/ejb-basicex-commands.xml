@@ -1,19 +1,19 @@
 <!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="ejb-basichotelex-commands">
+<chapter id="ejb-basicex-commands">
     <title>Build Commands</title>
 
-    <section id="ejb-basichotelex-commands-purpose">
+    <section id="ejb-basicex-commands-purpose">
         <title>Purpose</title>
-        <section id="ejb-basichotelex-commands-goals">
+        <section id="ejb-basicex-commands-goals">
             <title>Goals</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Use a few key commands</para></listitem>
             </itemizedlist>
         </section>
 
-        <section id="ejb-basichotelex-commands-objectives">
+        <section id="ejb-basicex-commands-objectives">
             <title>Objectives</title>
             <para>At the completion of this topic, the student shall</para>
             <itemizedlist spacing="compact">
@@ -24,25 +24,25 @@
         </section>
     </section>
 
-    <section id="ejb-basichotelex-commands-restart">
+    <section id="ejb-basicex-commands-restart">
         <title>mvn (phase) -rf :module</title>
         <para>
         </para>
     </section>
 
-    <section id="ejb-basichotelex-commands-deploy">
+    <section id="ejb-basicex-commands-deploy">
         <title>mvn pre-integration-test</title>
         <para>
         </para>
     </section>
         
-    <section id="ejb-basichotelex-commands-undeploy">
+    <section id="ejb-basicex-commands-undeploy">
         <title>mvn clean -Pundeploy</title>
         <para>
         </para>
     </section>
         
-    <section id="ejb-basichotelex-commands-summary">
+    <section id="ejb-basicex-commands-summary">
        <title>Summary</title>
         <itemizedlist spacing="compact">
             <listitem><para>Re-start the build at a specific module</para>
