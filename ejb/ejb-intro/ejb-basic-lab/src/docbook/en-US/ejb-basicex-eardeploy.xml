@@ -3,6 +3,24 @@
 
 <chapter id="ejb-basicex-eardeploy">
     <title>EAR Deployment</title>
+    <para>
+        EARs are Java archives that are used to house the overall application,
+        with all of its components. The EAR can contain many EJB and WAR
+        components as well as their dependencies (and a little-used Java EE
+        Client type).  The EAR is used to deploy the contained modules to the 
+        server. It is the original JavaEE deployment type aside from a naked
+        EJB.
+    </para>
+    <para>
+        Naked EJB deployments are rare because they provide no construct to 
+        be deployed with dependencies. Everything required by the EJB must 
+        be a part of the EJB. The EAR, on the other hand, can deploy an EJB
+        and any dependencies such that they are loaded by the same class loader.
+        Since Naked EJB deployments are of limited use and present very few 
+        additional technical challenges -- we will not be addressing that 
+        type of deployment.
+    </para>
+
 
     <section id="ejb-basicex-eardeploy-purpose">
         <title>Purpose</title>
@@ -26,17 +44,674 @@
             </itemizedlist>
         </section>
     </section>
+<!--
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+
+            <orderedlist spacing="compact">
+                <listitem><para>
+                    </para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                    </listitem>
+                <listitem><para>
+                    </para></listitem>
+            </orderedlist>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+-->
 
     <section id="ejb-basicex-eardeploy-earmodule">
         <title>Create EAR Module</title>
         <para>
+            A single Maven module can house the development of a single EAR. 
+            The bulk of the project is solely within the pom.xml
+            as nearly all of its contents are brought in through dependencies.
         </para>
+
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Create the sub-project directory for the EAR.
+                </para>
+<programlisting language=""><![CDATA[
+$ mkdir basicejb-ear
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Add the initial entries for the EAR pom.xml.
+                </para>
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>myorg.basicejb</groupId>
+        <artifactId>basicejbEx</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>basicejb-ear</artifactId>
+    <packaging>ear</packaging>
+
+    <name>Basic EJB Exercise::EAR</name>
+    <description>
+        This project provides a sample EAR for the Java EE components
+        associated with the overall project.
+    </description>
+
+    <dependencies>
+    </dependencies>
+</project>]]></programlisting>                        
+                <note>
+                    <para>
+                        It is important to note that the packaging type is "ear"
+                        in this case. If you leave this out, Maven will default to a 
+                        standard "jar" packaging type and not build the EAR correctly.
+                    </para>
+                </note>
+                </listitem>
+
+            <listitem><para>
+                Add the EJB dependency to the EAR. Use exclusions to keep
+                any unwanted 3rd party .jars from being brought along.
+                </para>
+<programlisting language="xml"><![CDATA[
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>basicejb-ejb</artifactId>
+            <version>${project.version}</version>
+            <type>ejb</type>
+            <exclusions>
+                <!-- server doesn't want to see already provided jars -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+]]></programlisting>                        
+                <note>
+                    <para>
+                        Since our EJB pom declared the dependency on slf4j-api as 
+                        scope=provided the above exclusion is not necessary but 
+                        included as an example of how this can be done.
+                    </para>
+                </note>
+                </listitem>
+
+            <listitem><para>
+                Verify the EAR builds.
+                </para>
+<programlisting language=""><![CDATA[$ mvn clean verify
+...
+[INFO] Building Basic EJB Exercise::EAR 1.0-SNAPSHOT
+...
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ basicejb-ear ---
+...
+[INFO] --- maven-ear-plugin:2.8:generate-application-xml (default-generate-application-xml) @ basicejb-ear ---
+[INFO] Generating application.xml
+...
+[INFO] --- maven-resources-plugin:2.4.3:resources (default-resources) @ basicejb-ear ---
+...
+[INFO] --- maven-ear-plugin:2.8:ear (default-ear) @ basicejb-ear ---
+[INFO] Copying artifact [ejb:myorg.basicejb:basicejb-ejb:1.0-SNAPSHOT] to [basicejb-ejb-1.0-SNAPSHOT.jar]
+[INFO] Could not find manifest file: .../basicejbEx/basicejb-ear/target/basicejb-ear-1.0-SNAPSHOT/META-INF/MANIFEST.MF - Generating one
+[INFO] Building jar: .../basicejbEx/basicejb-ear/target/basicejb-ear-1.0-SNAPSHOT.ear
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Inspect the generated EAR archive. Notice how the EJB we developed in
+                the previous chapter and included as a dependency here was brought
+                into the archive.
+                </para>
+<programlisting language=""><![CDATA[$ jar tf target/basicejb-ear-1.0-SNAPSHOT.ear
+...
+basicejb-ejb-1.0-SNAPSHOT.jar
+META-INF/application.xml
+...
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Inspect the generated application.xml. There is a copy in target/application.xml
+                without having to unzip the archive. Notice how the archive was registered within 
+                this required descriptor as an EJB. Without this designation the EJB will be 
+                not be recognized as an EJB module by the container when deployed.
+                </para>
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE application PUBLIC
+	"-//Sun Microsystems, Inc.//DTD J2EE Application 1.3//EN"
+	"http://java.sun.com/dtd/application_1_3.dtd">
+<application>
+  <display-name>basicejb-ear</display-name>
+  <description>This project provides a sample EAR for the Java EE components
+        associated with the overall project.</description>
+  <module>
+    <ejb>basicejb-ejb-1.0-SNAPSHOT.jar</ejb>
+  </module>
+</application>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Add the EAR to the *root* level module and verify everything builds 
+                from the root.
+                </para>
+<programlisting language="xml"><![CDATA[    <modules>
+        <module>basicejb-ejb</module>
+        <module>basicejb-ear</module>
+    </modules>]]></programlisting>                        
+<programlisting language="xml"><![CDATA[$ mvn clean install
+...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Basic EJB Exercise ................................. SUCCESS [  0.435 s]
+[INFO] Basic EJB Exercise::EJB ............................ SUCCESS [  3.063 s]
+[INFO] Basic EJB Exercise::EAR ............................ SUCCESS [  0.557 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                This is what our project looks like so far.
+                </para>
+<programlisting language=""><![CDATA[.
+|-- basicejb-ear
+|   `-- pom.xml
+|-- basicejb-ejb
+|   |-- pom.xml
+|   `-- src
+|       |-- main
+|       |   `-- java
+|       |       `-- org
+|       |           `-- myorg
+|       |               `-- basicejb
+|       |                   `-- ejb
+|       |                       |-- ReservationEJB.java
+|       |                       |-- ReservationLocal.java
+|       |                       `-- ReservationRemote.java
+|       `-- test
+|           |-- java
+|           |   `-- org
+|           |       `-- myorg
+|           |           `-- basicejb
+|           |               `-- ejb
+|           |                   `-- ReservationTest.java
+|           `-- resources
+|               `-- log4j.xml
+`-- pom.xml]]></programlisting>                        
+                </listitem>
+
+        </orderedlist>
     </section>
 
     <section id="ejb-basicex-eardeploy-testmodule">
         <title>Create RMI Test Module</title>
         <para>
+            Any tests we implement within the EJB module itself would likely
+            be a POJO-level unit test. EJB 3.2 does provide a means to create
+            a lightweight EJB container to be used as a test harness, but 
+            does not substitue for honest end-to-end testing using a 
+            server deployment of the EJB/EAR and external test clients.
+            We will create an additional module to deploy the EAR, locate
+            the server and EJB remote interface, and test the EJB through
+            that interface. We can reuse tests from lower levels, but
+            that will not be shown as a part of this exercise.
+            This module will have no target artifact (i.e., artifactId.jar) that we care about. One 
+            could do some tweeking of the pom.xml to keep that from being 
+            generated, but I have found that to only confuse Eclipse so we'll
+            just live with and empty, unused RMI Test.jar.
         </para>
+
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Create the sub-project directory for the RMI Test.
+                </para>
+<programlisting language=""><![CDATA[
+$ mkdir basicejb-test
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Create the pom.xml for the RMI Test module.
+                </para>
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>basicejbEx</artifactId>
+        <groupId>myorg.basicejb</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>basicejb-test</artifactId>
+    <packaging>jar</packaging>
+
+    <name>Basic EJB Exercise::Remote Test</name>
+    <description>
+        This project provides an example RMI Test project.
+    </description>
+
+    <dependencies>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+
+        </plugins>
+    </build>
+</project>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Add the dependencies to the Test/pom.xml 
+                required to use logging and JUnit.
+                </para>
+<programlisting language="xml"><![CDATA[        <!-- core dependencies -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <scope>test</scope>
+        </dependency>]]></programlisting>                        
+                <note>
+                    <para>
+                         Like before, the maven pom.xml will not validate until
+                         we populate the parent pom with version information for the
+                         new dependencies added. Luckily we added these dependencyManagement
+                         declaration while adding the unit test within the EJB module.
+                    </para>
+                    <para>
+                        Notice we will silently also inherit the maven-compiler-plugin
+                        definition from the parent. We don't have to repeat any work to get a 
+                        properly configured compiler.
+                    </para>
+                    <para>
+                        This begins to show how work we do at the parent pom.xml can be used to 
+                        keep child modules consistent and allow child modules the flexibility to 
+                        determine whether they should or should not include a particular dependency.
+                    </para>
+                </note>
+                </listitem>
+
+            <listitem><para>
+                    Add the dependencies required to be an RMI client of JBoss/Wildfly. This
+                    is not as clean or simple as it sounds. There are many APIs in JavaEE
+                    and many layered jars that implement them. If we use something that 
+                    includes everything -- we get a dependency tree that is very bloated.
+                    I have attempted to cut the list down to a set we need for class and 
+                    have included it in the following project.
+                </para>
+<programlisting language="xml"><![CDATA[        <!-- dependencies used for remote interface -->
+        <dependency>
+            <groupId>info.ejava.examples.common</groupId>
+            <artifactId>jboss-rmi-client</artifactId>
+            <type>pom</type>
+            <scope>test</scope>
+        </dependency>    
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Add a definition of the above dependency to your parent pom
+                </para>
+<programlisting language="xml"><![CDATA[    <properties>
+        ...
+        <ejava.version>4.0.0-SNAPSHOT</ejava.version>
+...
+        <dependency>
+            <groupId>info.ejava.examples.common</groupId>
+            <artifactId>jboss-rmi-client</artifactId>
+            <version>${ejava.version}</version>
+            <type>pom</type>
+        </dependency>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Attempt to resolve all dependencies at this point. If you don't 
+                yet have a copy of the info.ejava.examples.common#jboss-rmi-client in your repository
+                this will fail. You can use the dependency:go-offline to make sure you
+                have everything your project needs.
+                </para>
+<programlisting language=""><![CDATA[(from basicejb-test directory)
+$ mvn dependency:go-offline
+...
+[WARNING] The POM for info.ejava.examples.common:jboss-rmi-client:pom:4.0.0-SNAPSHOT is missing, no dependency information available
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+...
+[ERROR] Failed to execute goal on project basicejb-test: Could not resolve dependencies for project myorg.basicejb:basicejb-test:jar:1.0-SNAPSHOT: 
+Could not find artifact info.ejava.examples.common:jboss-rmi-client:pom:4.0.0-SNAPSHOT -> [Help 1]
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Add the repository information required to resolve 
+                info.ejava.examples.common#jboss-rmi-client and its dependencies from the Internet.
+                We need one entry for the SNAPSHOT release. Place the following in the root module
+                pom.xml.
+                </para>
+<programlisting language="xml"><![CDATA[
+    <repositories>
+        <repository>
+            <id>webdev-snapshot</id>
+            <name>ejava webdev snapshot repository</name>
+            <url>http://webdev.jhuep.com/~jcs/maven2-snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+]]></programlisting>                        
+<programlisting language=""><![CDATA[(from basicejb-test directory)
+$ mvn dependency:go-offline
+
+...
+[INFO] <<< maven-dependency-plugin:2.8:go-offline (default-cli) < :resolve-plugins @ basicejb-test <<<
+Downloading: http://webdev.jhuep.com/~jcs/maven2-snapshot/info/ejava/examples/common/jboss-rmi-client/4.0.0-SNAPSHOT/maven-metadata.xml
+Downloaded: http://webdev.jhuep.com/~jcs/maven2-snapshot/info/ejava/examples/common/jboss-rmi-client/4.0.0-SNAPSHOT/maven-metadata.xml (621 B at 0.8 KB/sec)
+Downloading: http://webdev.jhuep.com/~jcs/maven2-snapshot/info/ejava/examples/common/jboss-rmi-client/4.0.0-SNAPSHOT/jboss-rmi-client-4.0.0-20141001.053140-16.pom
+Downloaded: http://webdev.jhuep.com/~jcs/maven2-snapshot/info/ejava/examples/common/jboss-rmi-client/4.0.0-SNAPSHOT/jboss-rmi-client-4.0.0-20141001.053140-16.pom (5 KB at 77.3 KB/sec)
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                <note>
+                    <para>
+                        Maven keeps track of which repositories it has checked for a resource and 
+                        when so that it can throttle attempts to resolve artifacts during a normal
+                        build. Note that in the repository definition we created -- we set the 
+                        updatePolicy to daily.  If you make an error and wish to coldstart Maven's 
+                        knowledge of that artifact simply delete its directory from the localRepository. 
+                        You can also try adding the -U (update snapshots) flag to the command line.
+                    </para>
+<programlisting language=""><![CDATA[
+$ rm -rf $HOME/.m2/repository/info/ejava/examples/common/jboss-rmi-client/4.0.0-SNAPSHOT
+]]></programlisting>                        
+                </note>
+                </listitem>
+
+            <listitem><para>
+                Create a JNDI configuration for JBoss Remoting. Use variable references to 
+                the server to better support different configurations. Place this file in
+                src/test/resources. We will describe the contents of the file later once 
+                we get tangible values inserted.
+                </para>
+<programlisting language=""><![CDATA[
+$ mkdir -p javaeeExTest/src/test/resources
+$ vi javaeeExTest/src/test/resources/jndi.properties
+]]></programlisting>                        
+<programlisting language=""><![CDATA[
+$ cat javaeeExTest/src/test/resources/jndi.properties
+
+#jndi.properties for JBoss Remoting
+java.naming.factory.initial=${jboss.remoting.java.naming.factory.initial}
+java.naming.factory.url.pkgs=${jboss.remoting.java.naming.factory.url.pkgs}
+java.naming.provider.url=${jboss.remoting.java.naming.provider.url}
+java.naming.security.principal=${jboss.remoting.java.naming.security.principal}
+java.naming.security.credentials=${jboss.remoting.java.naming.security.credentials}
+jboss.naming.client.ejb.context=true
+]]></programlisting>
+                <note>
+                    <para>
+                        JBoss/Wildfly provides two types of interfacing with EJBs thru JNDI;
+                        JBoss Remoting and EJB Client. JBoss Remoting is ignorant of the specifics
+                        of EJB and can be used with any resource type. EJB Client is specific to 
+                        EJB but tuned to work more efficiently than the general purpose JBoss Remoting.
+                        We are using the general purpose method here so that it can be re-usable
+                        for other resources -- like JMS -- without changing technologies.
+                    </para>
+                </note>
+                </listitem>
+
+            <listitem><para>
+                Build the RMI Test project after the jndi.properties file is in place.
+                </para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-resources
+...
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ basicejb-test ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 1 resource
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                <para>
+                Notice the properties file was copied from the src/test tree to target/test-classes
+                without modification. We need to make more changes so the properties within the 
+                file get assigned to actual values from out environment.
+                </para>
+<programlisting language=""><![CDATA[
+$ cat basicejb-test/target/test-classes/jndi.properties
+
+#jndi.properties for JBoss Remoting
+java.naming.factory.initial=${jboss.remoting.java.naming.factory.initial}
+java.naming.factory.url.pkgs=${jboss.remoting.java.naming.factory.url.pkgs}
+java.naming.provider.url=${jboss.remoting.java.naming.provider.url}
+java.naming.security.principal=${jboss.remoting.java.naming.security.principal}
+java.naming.security.credentials=${jboss.remoting.java.naming.security.credentials}
+jboss.naming.client.ejb.context=true
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Add resource filtering to test resources in the pom.xml. This
+                will cause the jndi.properties file to have variables replaces with 
+                physical values when copied to the target tree.
+                </para>
+<programlisting language="xml"><![CDATA[        <build>
+        <!-- filter test/resource files for profile-specific valies -->
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </testResource>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/*.properties</exclude>
+                </excludes>
+            </testResource>
+        </testResources>]]></programlisting>                        
+                <note>
+                    <title>Restrict Filtering to Targeted Files</title>
+                    <para>
+                        The above definition of filtering is restricting filtering to 
+                        a specific pattern of files and leaving all other files unfiltered.
+                        This is more verbose but suggested. Filtering some files that were
+                        not meant to be filtered causes issues. Binary files (e.g., PKI certs)
+                        and variables meant to be expanded in the deployment environment
+                        do not work well with filtering.
+                    </para>
+                </note>
+                </listitem>
+
+            <listitem><para>
+                Rebuild the RMI Test module and notice two copies take place; one for the
+                filtered set and a second for the unfiltered set.
+                </para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-resources
+...
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ basicejb-test ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 1 resource
+[INFO] Copying 0 resource
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                <para>
+                    However, our jndi.properties file in the target tree still looks the 
+                    same. That is because we have not defined the referenced variables in
+                    the environment.
+                </para>
+<programlisting language=""><![CDATA[
+$ cat basicejb-test/target/test-classes/jndi.properties
+
+#jndi.properties for JBoss Remoting
+java.naming.factory.initial=${jboss.remoting.java.naming.factory.initial}
+java.naming.factory.url.pkgs=${jboss.remoting.java.naming.factory.url.pkgs}
+java.naming.provider.url=${jboss.remoting.java.naming.provider.url}
+java.naming.security.principal=${jboss.remoting.java.naming.security.principal}
+java.naming.security.credentials=${jboss.remoting.java.naming.security.credentials}
+jboss.naming.client.ejb.context=true
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Add the properties referenced in jndi.properties to the *root* pom.xml.
+                </para>
+<programlisting language="xml"><![CDATA[$ cat pom.xml
+    <properties>
+...
+        <jboss.host>localhost</jboss.host>
+        <jboss.http.port>8080</jboss.http.port>
+        <jndi.user>known</jndi.user>
+        <jndi.password>password1!</jndi.password>
+
+        <jboss.remoting.java.naming.factory.initial>org.jboss.naming.remote.client.InitialContextFactory</jboss.remoting.java.naming.factory.initial>
+        <jboss.remoting.java.naming.provider.url>http-remoting://${jboss.host}:${jboss.http.port}</jboss.remoting.java.naming.provider.url>
+        <jboss.remoting.java.naming.factory.url.pkgs/>
+        <jboss.remoting.java.naming.security.principal>${jndi.user}</jboss.remoting.java.naming.security.principal>
+        <jboss.remoting.java.naming.security.credentials>${jndi.password}</jboss.remoting.java.naming.security.credentials>
+    </properties>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Rebuild the RMI Test module and note the contents of the jndi.properties file 
+                in the target/test-classes tree should be expanded with the properties defined
+                in the root pom.xml.
+                </para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-resources
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ basicejb-test ---
+...
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 1 resource
+[INFO] Copying 0 resource
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+<programlisting language=""><![CDATA[
+$ cat target/test-classes/jndi.properties
+
+#jndi.properties for JBoss Remoting
+java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
+java.naming.factory.url.pkgs=
+java.naming.provider.url=http-remoting://localhost:8080
+java.naming.security.principal=known
+java.naming.security.credentials=password1!
+jboss.naming.client.ejb.context=true
+]]></programlisting>                        
+                <itemizedlist spacing="compact">
+                    <listitem><para>
+                        java.naming.factory.initial - an implementation class for the 
+                        InitialContext() created by the Java code. A default javax.naming
+                        implementation will be used if this is not supplied or blank.
+                        </para></listitem>
+                    <listitem><para>
+                        java.naming.factory.url.pkgs= - a list of java packages to search
+                        in the classpath to resolve a well-known-named class handler 
+                        for custom name prefixes (e.g., http-remoting).
+                        However, since we are using a custom JBoss Remoting factory.initial
+                        there is no need to list anything here to resolve the http-remoting 
+                        naming prefix.
+                        </para></listitem>
+                    <listitem><para>
+                        java.naming.provider.url - URL to the JNDI provider. JBoss uses 
+                        the HTTP port and protocol for JNDI lookups. 
+                        </para></listitem>
+                    <listitem><para>
+                        java.naming.security.principal and java.naming.security.credentials -
+                        credentials to use when interacting with the server. In some cases
+                        we have the server locked down so that JNDI lookups require credentials
+                        prior to even getting to the application. If your Java code does not
+                        supply credentials -- this can be used to authenticate with the server.
+                        </para></listitem>
+                    <listitem><para>
+                        jboss.naming.client.ejb.context=true - required for JBoss Remoting to
+                        correctly work with EJBs.
+                        </para></listitem>
+                </itemizedlist>
+                </listitem>
+
+            <listitem><para>
+                Register the RMI Test module with the root pom and perform a root-level build.
+                </para>
+<programlisting language="xml"><![CDATA[    <modules>
+        <module>basicejb-ejb</module>
+        <module>basicejb-ear</module>
+        <module>basicejb-test</module>
+    </modules>]]></programlisting>                        
+<programlisting language=""><![CDATA[
+$ mvn clean install
+...
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Basic EJB Exercise ................................. SUCCESS [  0.564 s]
+[INFO] Basic EJB Exercise::EJB ............................ SUCCESS [  5.183 s]
+[INFO] Basic EJB Exercise::EAR ............................ SUCCESS [  0.951 s]
+[INFO] Basic EJB Exercise::Remote Test .................... SUCCESS [  0.731 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                </para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                </para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                </para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </listitem>
+        </orderedlist>
+
     </section>
 
     <section id="ejb-basicex-eardeploy-jndi">
