@@ -1,0 +1,845 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-basichotelex-modules">
+    <title>Multi-Module JavaEE Project Structure</title>
+
+    <section id="ejb-basichotelex-modules-purpose">
+        <title>Purpose</title>
+        <section id="ejb-basichotelex-modules-goals">
+            <title>Goals</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Create Maven modules to house different artifacts</para></listitem>
+                <listitem><para>Create an EJB</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejb-basichotelex-modules-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Create a root Maven project to house modules</para></listitem>
+                <listitem><para>Create child Maven EJB module</para></listitem>
+                <listitem><para>Manage start/stop of application server</para></listitem>
+            </itemizedlist>
+        </section>
+    </section>
+<!--
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+
+            <orderedlist spacing="compact">
+                <listitem><para>
+                    </para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                    </listitem>
+                <listitem><para>
+                    </para></listitem>
+            </orderedlist>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+-->
+
+    <section id="ejb-basichotelex-modules-rootmodule">
+        <title>Create Root Module</title>
+        <para>
+            Each component of the Java EE application will be developed as 
+            as a separate Maven module. Each module will be placed in a 
+            flat structure under a common parent project. This parent project
+            will be used to coordinate goals involved of the entire application.
+            The order in which it builds things can be influenced by the 
+            configuration you supply, however, maven will analyze dependencies
+            at build time and either honor the actual dependency ordering or fail
+            if you have expressed a circular dependency.
+        </para>
+
+            <orderedlist spacing="compact">
+                <listitem><para>
+                        Create a root directory for the exercise. This will host
+                        the root project and sub-projects for the Impl, EJB, WAR, EAR,
+                        and RMI Test modules.
+                    </para>
+<programlisting language=""><![CDATA[
+$ mkdir ejb-basichotel
+]]></programlisting>                        
+                    </listitem>
+                <listitem><para>
+                        Create a root project pom.xml file. This project will 
+                        will not have an associated artifact and is termed a 
+                        "parent" (simple term) or "reactor" (techy term)
+                        project. It uses a special packaging type called "pom".
+                    </para>
+                    <para>
+                        This project will also be used as a parent project
+                        of all implementation modules so we can define re-usable
+                        definitions. Note that the definitions within this project
+                        are passive. They will not actively add any dependencies
+                        or plugins to inheriting child modules unless the child
+                        specifically references the defined artifact. Details for
+                        the potentially used artifact can be placed here (and 
+                        consistently reused) and briefly referenced in the child
+                        poms or inherently referenced by the child modules 
+                        packaging type (i.e., packaging=jar projects automatically
+                        bring in the maven-compiler-plugin)
+                    </para>
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>myorg.basicejb</groupId>
+    <artifactId>basicejbEx</artifactId>
+    <packaging>pom</packaging>
+    <name>Basic EJB Exercise</name>
+    <version>1.0-SNAPSHOT</version>
+    <description>
+        This project is the root project for the example Java EE
+        Application.
+    </description>
+    <modules>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <repositories>
+    </repositories>
+    <pluginRepositories>
+    </pluginRepositories>
+
+    <dependencyManagement>
+        <dependencies>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+    	<pluginManagement>
+            <plugins>
+            </plugins>
+    	</pluginManagement>
+    </build>
+
+    <profiles>
+    </profiles>
+</project>]]></programlisting>                        
+                    <note>
+                        <para>
+                            It is very important that you make the packaging
+                            type is "pom" in this case. If you leave out this specification,
+                            Maven will default to packaging=jar type and attempt to build a
+                            Java-based artifact and ignore its responsibility in this 
+                            project to be the root project to delegate to the child 
+                            projects that build artifacts.
+                        </para>
+                    </note>
+                    </listitem>
+
+                <listitem><para>
+                    Add in the maven-compiler-plugin specification to the parent 
+                    pom to make sure JDK 1.7 or above is used and we use an up to date version
+                    of the plugin. 
+                    </para>
+<programlisting language="xml"><![CDATA[
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.source.version>1.7</java.source.version>
+        <java.target.version>1.7</java.target.version>
+
+        <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
+    </properties>
+...
+    	<pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                            <source>${java.source.version}</source>
+                            <target>${java.target.version}</target>
+                    </configuration>	                
+                </plugin>
+]]></programlisting>                        
+                    </listitem>
+
+                <listitem><para>
+                        Test your root project by building it at this time.
+                    </para>
+<programlisting language=""><![CDATA[$mvn clean install
+...
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Basic EJB Exercise 1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ basicejbEx ---
+[INFO] 
+[INFO] --- maven-install-plugin:2.4:install (default-install) @ basicejbEx ---
+[INFO] Installing /home/jcstaff/proj/basicejbEx/pom.xml to /home/jcstaff/.m2/repository2/myorg/basicejb/basicejbEx/1.0-SNAPSHOT/basicejbEx-1.0-SNAPSHOT.pom
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 0.682 s
+[INFO] Finished at: 2014-10-04T17:45:26-04:00
+[INFO] Final Memory: 7M/105M
+[INFO] ------------------------------------------------------------------------
+]]></programlisting>                        
+                    </listitem>
+            </orderedlist>
+    </section>
+
+    <section id="ejb-basichotelex-modules-ejbmodule">
+        <title>Create EJB Module</title>
+        <para>
+            The EJB module will be used to develop one of the EJB components. The
+            term "EJB" gets a little overloaded at times.  There are EJB
+            classes, EJB components, and an EJB tier.  EJB classes break out
+            into the business-remote (aka @Remote) and business-local (aka
+            @Local) interfaces, the EJB implementation class (either @Stateless,
+            @Stateful, @Singleton, or @MessageDriven), and support classes. It is common to
+            think of each cohesive pairing of @Remote, @Local, and implementation
+            class as "an EJB".  You can have many EJBs (the sets of classes)
+            within an EJB component. An EJB component is a materialized as a .jar
+            and there can be many EJB components within your EJB tier. For this
+            exercise we will have only one EJB component and start out with only
+            one EJB.  A second EJB will be added to the single EJB component in
+            a later excercise to help support testing.  A single Maven project
+            can build a single EJB component.
+        </para>
+            <orderedlist spacing="compact">
+                <listitem><para>
+                    Add an EJB module directory to your project tree.
+                    </para>
+<programlisting language=""><![CDATA[
+$ mkdir basicejb-ejb
+]]></programlisting>                        
+                    </listitem>
+
+                <listitem><para>
+                    Add the outer shell of the EJB module's pom.xml. 
+                    </para>
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <artifactId>basicejbEx</artifactId>
+        <groupId>myorg.basicejb</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>basicejb-ejb</artifactId>
+    <packaging>ejb</packaging>
+    <name>Basic EJB Exercise::EJB</name>
+    <description>
+        This project provides example usages of an EJB tier.
+    </description>
+
+    <dependencies>
+    </dependencies>
+
+    <build>
+        <plugins>
+        </plugins>
+    </build>
+</project>]]></programlisting>                        
+                    <note>
+                        <para>
+                            It is important to note that the packaging type is "ejb" in this
+                            case. If you leave out the packaging type, Maven will default to "jar"
+                            and not handle your module appropriately within the context of a Java EE
+                            application.
+                        </para>
+                    </note>
+                    </listitem>
+
+                <listitem><para>
+                            Add in the maven-ejb-plugin definition to the *parent* pom.xml
+                            with all properties and constructs that would be common across
+                            all EJB modules.
+                    </para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>
+                            Tell maven explicitly to use EJB 3.x. Anything 3.0
+                            and above should be fine. The plugin defaults to EJB 2.1 which 
+                            requires a descriptor in META-INF/ejb-jar.xml. We won't
+                            be using a descriptor until later.
+                        </para></listitem>
+                        <listitem><para>
+                            Tell maven to add all dependencies that have scope=compile 
+                            to the Class-Path in the META-INF/MANIFEST.MF. This is a 
+                            pure Java construct that JavaEE takes advantage of in 
+                            order to resolve dependencies on the server. 
+                            </para></listitem>
+                        <listitem><para></para></listitem>
+                    </itemizedlist>
+<programlisting language="xml"><![CDATA[
+# basicejbEx/pom.xml
+
+    <properties>
+...
+        <maven-ejb-plugin.version>2.3</maven-ejb-plugin.version>
+    </properties>
+
+
+    	<pluginManagement>
+...
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-ejb-plugin</artifactId>
+                    <version>${maven-ejb-plugin.version}</version>
+                    <configuration>
+                        <ejbVersion>3.2</ejbVersion>
+                        <archive>
+                            <manifest>
+                                <addClasspath>true</addClasspath>
+                            </manifest>
+                        </archive>
+                    </configuration>
+                </plugin>
+]]></programlisting>                        
+                    </listitem>
+
+                <listitem><para>
+                        Add in the maven-ejb-plugin declaration to the EJB/pom.xml.
+                        This will contain pertions of the plugin definition that 
+                        could be unique per EJB module. 
+                    </para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>
+                            Tell the plugin to create a ejb-client.jar file for remote clients.
+                            This will be populated using a set of include and exclude 
+                            paths. In this case, we are telling it not to include any
+                            of our deployment descriptors in the META-INF directory as
+                            well as leaving out our EJB implemenation class. This will
+                            produce an extra jar in the target directory called
+                            ${project.artifactId}-${project.version}-client.jar
+                            and can be brought in with a dependency on the EJB module
+                            using a type element set to "ejb-client". We will do this
+                            in the RMI Test module.
+                            </para></listitem>
+                    </itemizedlist>
+<programlisting language="xml"><![CDATA[        <!-- tell the EJB plugin to build a client-jar -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-ejb-plugin</artifactId>
+            <configuration>
+                <generateClient>true</generateClient>
+                <clientExcludes>
+                    <clientExclude>**/META-INF/*.xml</clientExclude>
+                    <clientExclude>**/ejb/*EJB.class</clientExclude>
+                </clientExcludes>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+]]></programlisting>                        
+                    <note>
+                        <para>
+                            Since the packaging type is "ejb" for this module, the
+                            maven-ejb-plugin is brought in (according to our pluginManagement
+                            definition) automatically. We are just extending the definition
+                            to include the ejb-client. If the plugin was not automatically
+                            brought in because of the packaging type -- the above specification
+                            in the build.plugins section of the EJB/pom.xml would have been 
+                            enough to activate the plugin.
+                        </para>
+                    </note>
+                    </listitem>
+
+                <listitem><para>
+                        Add several dependencies to the EJB/pom.xml account for use 
+                        of logging, annotations, and EJB constructs. Since we will be instantiating
+                        this code only on the server and not in a 2-tier approach,
+                        the pure JavaEE API from Sun/Oracle will do fine. Otherwise we
+                        should use the dependencies from Hibernate/JBoss.
+                    </para>
+<programlisting language="xml"><![CDATA[# basicejbEx/basicejb-ejb/pom.xml
+
+    <dependencies>
+        <!-- core implementation dependencies -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.ejb</groupId>
+            <artifactId>javax.ejb-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <scope>test</scope>
+        </dependency>    
+    </dependencies>]]></programlisting>                        
+                    <note>
+                        <para>
+                            You should always declare a scope=provided dependency on the 
+                            JavaEE API artifacts so that downstream clients of the module 
+                            are free to supply their own version/provider of the API.
+                        </para>
+                    </note>
+                    </listitem>
+
+                <listitem><para>
+                        Attempt to validate the EJB module at the child level 
+                        without futher specification. This will fail because
+                        we are missing version information for the two dependency
+                        artifacts we just added.
+                    </para>
+<programlisting language=""><![CDATA[$ mvn validate
+[ERROR]   The project myorg.basicejb:basicejb-ejb:1.0-SNAPSHOT (/home/jcstaff/proj/basicejbEx/basicejb-ejb/pom.xml) has 5 errors
+[ERROR]     'dependencies.dependency.version' for org.slf4j:slf4j-api:jar is missing. @ myorg.basicejb:basicejb-ejb:[unknown-version], .../basicejbEx/basicejb-ejb/pom.xml, line 22, column 21
+[ERROR]     'dependencies.dependency.version' for javax.ejb:javax.ejb-api:jar is missing. @ myorg.basicejb:basicejb-ejb:[unknown-version], .../basicejbEx/basicejb-ejb/pom.xml, line 27, column 21
+[ERROR]     'dependencies.dependency.version' for junit:junit:jar is missing. @ myorg.basicejb:basicejb-ejb:[unknown-version], .../basicejbEx/basicejb-ejb/pom.xml, line 34, column 21
+[ERROR]     'dependencies.dependency.version' for org.slf4j:slf4j-log4j12:jar is missing. @ myorg.basicejb:basicejb-ejb:[unknown-version], .../basicejbEx/basicejb-ejb/pom.xml, line 39, column 21
+[ERROR]     'dependencies.dependency.version' for log4j:log4j:jar is missing. @ myorg.basicejb:basicejb-ejb:[unknown-version], .../basicejbEx/basicejb-ejb/pom.xml, line 44, column 21
+]]></programlisting>                        
+                    </listitem>
+
+                <listitem><para>
+                        Update the parent pom.xml with the version specifications
+                        for these artifacts.
+                    </para>
+<programlisting language="xml"><![CDATA[# basicejbEx/pom.xml
+
+    <properties>
+        ...
+        <javax.ejb-api.version>3.2</javax.ejb-api.version>
+        <junit.version>4.11</junit.version>
+        <log4j.version>1.2.13</log4j.version>
+        <slf4j.version>1.6.1</slf4j.version>
+...
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.ejb</groupId>
+                <artifactId>javax.ejb-api</artifactId>
+                <version>${javax.ejb-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>    
+        </dependencies>
+    </dependencyManagement>
+]]></programlisting>                        
+                    </listitem>
+
+                <listitem><para>
+                    Validate that maven can now resolve the new dependencies.
+                    </para>
+<programlisting language=""><![CDATA[$ mvn validate
+
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                    <note>
+                        <para>
+                            We are using only the maven validate phase at this point
+                            because we only want to validate whether maven can resolve all
+                            artifacts and not fully build an EJB component.  The build will fail
+                            if you use a more advanced maven phase prior to adding the EJB source
+                            code in the following steps.
+                        </para>
+                    </note>
+                    </listitem>
+
+
+                <listitem><para>
+                        Create the src tree for the EJB.
+                    </para>
+<programlisting language=""><![CDATA[
+$ mkdir mkdir -p basicejb-ejb/src/main/java/myorg/basicejb/ejb
+]]></programlisting>                        
+                    </listitem>
+
+                <listitem><para>
+                        Add @Remote and @Local interfaces for the EJB. Place 
+                        a simple ping() method in the @Remote interface for use as an
+                        end-to-end sanity check at the end of this exercise.
+                    </para>
+<programlisting language="java"><![CDATA[$ cat basicejb-ejb/src/main/java/myorg/basicejb/ejb/ReservationRemote.java
+package myorg.basicejb.ejb;
+
+import javax.ejb.Remote;
+
+@Remote
+public interface ReservationRemote {
+    void ping();
+}
+]]></programlisting>                        
+<programlisting language="java"><![CDATA[$ cat basicejb-ejb/src/main/java/myorg/basicejb/ejb/ReservationLocal.java
+package myorg.basicejb.ejb;
+
+import javax.ejb.Local;
+
+@Local
+public interface ReservationLocal {
+}
+]]></programlisting>                        
+                    </listitem>
+
+                <listitem><para>
+                        Add a @Stateless EJB that will implement
+                        the provided @Remote and @Local interfaces. Implement @PostConstruct
+                        and @Destroy callbacks to intercept EJB lifecycle events. Add a 
+                        logger and log statements to the methods so we can observe activity
+                        within the EJB during the test at the end of this exercise.
+                    </para>
+<programlisting language=""><![CDATA[$ cat basicejb-ejb/src/main/java/myorg/basicejb/ejb/ReservationEJB.java
+package myorg.basicejb.ejb;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.ejb.Stateless;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Stateless
+public class ReservationEJB implements ReservationLocal, ReservationRemote {
+    private static Logger logger = LoggerFactory.getLogger(ReservationEJB.class);
+
+    @PostConstruct
+    public void init() {
+        logger.debug("*** ReservationEJB.init() ***");
+    }
+    
+    @PreDestroy
+    public void destroy() {
+        logger.debug("*** ReservationEJB.destroy() ***");
+    }
+    
+    @Override
+    public void ping() {
+        logger.debug("ping called");
+    }
+}]]></programlisting>                        
+                    </listitem>
+
+                <listitem><para>
+                    The EJB can be built at this time. You will notice the following
+                    in the output.
+                    </para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>
+                            Our 3 Java files (@Remote, @Local, and @Stateless) were compiled
+                            </para></listitem>
+                        <listitem><para>
+                            EJB 3 processing was performed on the target. This largely 
+                            consisted only of MANIFEST Class-Path processing and the construction
+                            of an ejb-client.jar file at this point.
+                            </para></listitem>
+                        <listitem><para>
+                            </para></listitem>
+                    </itemizedlist>
+<programlisting language=""><![CDATA[$ mvn package
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Basic EJB Exercise::EJB 1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+...
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ basicejb-ejb ---
+...
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ basicejb-ejb ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 3 source files to /home/jcstaff/proj/basicejbEx/basicejb-ejb/target/classes
+...
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ basicejb-ejb ---
+...
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ basicejb-ejb ---
+...
+[INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ basicejb-ejb ---
+...
+[INFO] --- maven-ejb-plugin:2.4:ejb (default-ejb) @ basicejb-ejb ---
+[INFO] Building EJB basicejb-ejb-1.0-SNAPSHOT with EJB version 3.2
+[INFO] Building jar: .../basicejbEx/basicejb-ejb/target/basicejb-ejb-1.0-SNAPSHOT.jar
+[INFO] Building EJB client basicejb-ejb-1.0-SNAPSHOT-client
+[INFO] Building jar: .../basicejbEx/basicejb-ejb/target/basicejb-ejb-1.0-SNAPSHOT-client.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+
+                    <para>Module structure looks very similar to a POJO/JAR module</para>
+<programlisting language=""><![CDATA[.
+|-- basicejb-ejb
+|   |-- pom.xml
+|   |-- src
+|   |   `-- main
+|   |       `-- java
+|   |           `-- myorg
+|   |               `-- basicejb
+|   |                   `-- ejb
+|   |                       |-- ReservationEJB.java
+|   |                       |-- ReservationLocal.java
+|   |                       `-- ReservationRemote.java
+|   `-- target
+|       |-- basicejb-ejb-1.0-SNAPSHOT-client.jar
+|       |-- basicejb-ejb-1.0-SNAPSHOT.jar
+...
+`-- pom.xml
+]]></programlisting>                        
+                    <para>The EJB.jar contains the full set of EJB classes/interfaces</para>
+<programlisting language=""><![CDATA[$ jar tf target/basicejb-ejb-1.0-SNAPSHOT.jar
+...
+myorg/basicejb/ejb/ReservationLocal.class
+myorg/basicejb/ejb/ReservationRemote.class
+myorg/basicejb/ejb/ReservationEJB.class
+...
+]]></programlisting>
+                    <para>The EJB-client.jar contains classes/interfaces required by remote clients</para>
+<programlisting language=""><![CDATA[$ jar tf target/basicejb-ejb-1.0-SNAPSHOT-client.jar
+...
+myorg/basicejb/ejb/ReservationLocal.class
+myorg/basicejb/ejb/ReservationRemote.class
+...
+]]></programlisting>
+                    <note>
+                        <para>
+                            Technically, Local interfaces should not be needed by remote
+                            clients. However, there was a time when remote clients of 
+                            JBoss Stateful Session EJBs required access to all interface 
+                            types and old assembly habits die hard when it does not hurt
+                            to include the extra interface if not needed.
+                        </para>
+                    </note>
+                    </listitem>
+
+                <listitem><para>
+                    Add the EJB module to the root pom.xml.
+                    </para>
+<programlisting language="xml"><![CDATA[    <modules>
+        <module>basicejb-ejb</module>
+    </modules>]]></programlisting>                        
+                    </listitem>
+
+                <listitem><para>
+                    Retest the build from the root.
+                    </para>
+<programlisting language=""><![CDATA[
+[INFO] Scanning for projects...
+...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Basic EJB Exercise ................................. SUCCESS [  0.503 s]
+[INFO] Basic EJB Exercise::EJB ............................ SUCCESS [  2.457 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                    </listitem>
+
+                <listitem><para>
+                    Add a unit test to the EJB module to show that you can 
+                    unit test functionality that does not require the container.
+                    This class will go into the src/test tree and will not be 
+                    a part of the EJB.jar
+                    </para>
+<programlisting language=""><![CDATA[
+$ mkdir -p basicejb-ejb/src/test/java/myorg/basicejb/ejb
+]]></programlisting>                        
+<programlisting language="java"><![CDATA[$ cat basicejb-ejb/src/test/java/myorg/basicejb/ejb/ReservationTest.java
+package myorg.basicejb.ejb;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class ReservationTest {
+    private static final Logger logger = LoggerFactory.getLogger(ReservationTest.class);
+    
+    ReservationRemote reservatist;
+    
+    @Before
+    public void setUp() {
+        reservatist=new ReservationEJB();
+    }
+    
+    @Test
+    public void testPing() {
+        logger.info("*** testPing ***");
+        reservatist.ping();
+    }
+}]]></programlisting>                        
+                    </listitem>
+
+                <listitem><para>
+                    Add a log4j.xml file to support logging  
+                    unit test functionality that does not require the container.
+                    </para>
+<programlisting language=""><![CDATA[
+$ mkdir -p basicejb-ejb/src/test/resources
+]]></programlisting>                        
+<programlisting language="xml"><![CDATA[$ cat basicejb-ejb/src/test/resources/log4j.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration PUBLIC
+  "-//APACHE//DTD LOG4J 1.2//EN" "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
+<log4j:configuration 
+    xmlns:log4j="http://jakarta.apache.org/log4j/" 
+    debug="false">
+   
+    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+        <param name="Target" value="System.out"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{HH:mm:ss,SSS} %-5p (%F:%L) -%m%n"/>
+        </layout>
+    </appender>
+
+    <appender name="logfile" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="target/log4j-out.txt"/>
+        <param name="Append" value="false"/>
+        <param name="MaxFileSize" value="100KB"/>
+        <param name="MaxBackupIndex" value="1"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" 
+                   value="%-5p %d{dd-MM HH:mm:ss,SSS} [%c] (%F:%M:%L)  -%m%n"/>
+        </layout>
+   </appender>
+
+   <logger name="myorg">
+      <level value="debug"/>
+      <appender-ref ref="logfile"/>  
+   </logger>
+   <root>
+      <priority value="info"/>    
+      <appender-ref ref="CONSOLE"/>  
+   </root>   
+</log4j:configuration>]]></programlisting>                        
+                    </listitem>
+
+                <listitem><para>
+                    Rebuild the EJB and/or entire application. You will notice the 
+                    unit tests executed during the build.
+                    </para>
+<programlisting language=""><![CDATA[$ mvn clean install
+...
+[INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ basicejb-ejb ---
+[INFO] Surefire report directory: /home/jcstaff/proj/basicejbEx/basicejb-ejb/target/surefire-reports
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running myorg.basicejb.ejb.ReservationTest
+21:50:10,382 INFO  (ReservationTest.java:20) -*** testPing ***
+21:50:10,390 DEBUG (ReservationEJB.java:26) -ping called
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.218 sec
+
+Results :
+
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                    </listitem>
+
+                <listitem><para>
+                    Verify this is what you have so far.
+                    </para>
+<programlisting language=""><![CDATA[.
+|-- basicejb-ejb
+|   |-- pom.xml
+|   `-- src
+|       |-- main
+|       |   `-- java
+|       |       `-- myorg
+|       |           `-- basicejb
+|       |               `-- ejb
+|       |                   |-- ReservationEJB.java
+|       |                   |-- ReservationLocal.java
+|       |                   `-- ReservationRemote.java
+|       `-- test
+|           |-- java
+|           |   `-- myorg
+|           |       `-- basicejb
+|           |           `-- ejb
+|           |               `-- ReservationTest.java
+|           `-- resources
+|               `-- log4j.xml
+`-- pom.xml
+]]></programlisting>                        
+                    </listitem>
+            </orderedlist>
+    </section>
+        
+    <section id="ejb-basichotelex-modules-server">
+        <title>Manage Application Server</title>
+        <para>
+        </para>
+
+                <listitem><para>
+                    </para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                    </listitem>
+
+                <listitem><para>
+                    </para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                    </listitem>
+
+    </section>
+
+    <section id="ejb-basichotelex-modules-summary">
+       <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>
+                </para>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>
+                </para>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  

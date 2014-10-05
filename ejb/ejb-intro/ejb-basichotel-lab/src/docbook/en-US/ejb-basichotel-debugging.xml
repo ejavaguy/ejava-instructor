@@ -1,0 +1,60 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-basichotelex-debug">
+    <title>Debug Remote EJB</title>
+
+    <section id="ejb-basichotelex-debug-purpose">
+        <title>Purpose</title>
+        <section id="ejb-basichotelex-debug-goals">
+            <title>Goals</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Debug remote deployed application</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejb-basichotelex-debug-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Debug remote deployment to standalone server</para></listitem>
+                <listitem><para>Debug remote deployment to embedded server</para></listitem>
+            </itemizedlist>
+        </section>
+    </section>
+
+    <section id="ejb-basichotelex-debug-standalone">
+        <title>Debugging Deployment to Standalone Server</title>
+        <para>
+        </para>
+    </section>
+
+    <section id="ejb-basichotelex-debug-embedded">
+        <title>Debugging Deployment to Embedded Server</title>
+        <para>
+        </para>
+    </section>
+        
+    <section id="ejb-basichotelex-debug-summary">
+       <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem>Standalone server<para>
+                </para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>More complex but not complicated</para></listitem>
+                    <listitem><para>Consistent with debugging true remote server</para></listitem>
+                    <listitem><para>Some independence between remote and local code</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>
+                </para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Easy to setup</para></listitem>
+                    <listitem><para>Requires server to be local</para></listitem>
+                    <listitem><para>Local and remote code accessed seemlessly</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  

@@ -1,0 +1,69 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-basichotelex-commands">
+    <title>Build Commands</title>
+
+    <section id="ejb-basichotelex-commands-purpose">
+        <title>Purpose</title>
+        <section id="ejb-basichotelex-commands-goals">
+            <title>Goals</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Use a few key commands</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejb-basichotelex-commands-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Re-start build at a certain module</para></listitem>
+                <listitem><para>Deploy and leave module artifact deployed</para></listitem>
+                <listitem><para>Undeploy deployed module artifact</para></listitem>
+            </itemizedlist>
+        </section>
+    </section>
+
+    <section id="ejb-basichotelex-commands-restart">
+        <title>mvn (phase) -rf :module</title>
+        <para>
+        </para>
+    </section>
+
+    <section id="ejb-basichotelex-commands-deploy">
+        <title>mvn pre-integration-test</title>
+        <para>
+        </para>
+    </section>
+        
+    <section id="ejb-basichotelex-commands-undeploy">
+        <title>mvn clean -Pundeploy</title>
+        <para>
+        </para>
+    </section>
+        
+    <section id="ejb-basichotelex-commands-summary">
+       <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Re-start the build at a specific module</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Saves time from building unchanged modules</para></listitem>
+                    <listitem><para>User must know that skipped modules are not needed</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Deploy and leave module artifact deployed</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Permits IT tests to be written and executed against deployed artifact</para></listitem>
+                    <listitem><para>Good for ad-hoc interface demonstration/development</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Undeploy module artifact</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Enables cleanup prior to a re-deploy</para></listitem>
+                    <listitem><para>Good for when having multiple application deployments with dependencies between them</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  

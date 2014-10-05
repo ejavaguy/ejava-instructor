@@ -1,0 +1,53 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-basichotelex-jndi">
+    <title>Controlling JNDI Names</title>
+
+    <section id="ejb-basichotelex-jndi-purpose">
+        <title>Purpose</title>
+        <section id="ejb-basichotelex-jndi-goals">
+            <title>Goals</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Create deterministic JNDI names</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejb-basichotelex-jndi-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Eliminate Version# from ...</para></listitem>
+            </itemizedlist>
+        </section>
+    </section>
+
+    <section id="ejb-basichotelex-jndi-">
+        <title>Section</title>
+        <para>
+        </para>
+    </section>
+        
+    <section id="ejb-basichotelex-jndi-summary">
+       <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>
+                </para>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>
+                </para>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  
