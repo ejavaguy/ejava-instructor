@@ -120,8 +120,7 @@ $ mkdir basicejb-ear
                 Add the EJB dependency to the EAR. Use exclusions to keep
                 any unwanted 3rd party .jars from being brought along.
                 </para>
-<programlisting language="xml"><![CDATA[
-    <dependencies>
+<programlisting language="xml"><![CDATA[    <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>basicejb-ejb</artifactId>
@@ -134,8 +133,7 @@ $ mkdir basicejb-ear
                     <artifactId>slf4j-api</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-]]></programlisting>                        
+        </dependency>]]></programlisting>                        
                 <note>
                     <para>
                         Since our EJB pom declared the dependency on slf4j-api as 
@@ -420,8 +418,7 @@ Could not find artifact info.ejava.examples.common:jboss-rmi-client:pom:4.0.0-SN
                 We need one entry for the SNAPSHOT release. Place the following in the root module
                 pom.xml.
                 </para>
-<programlisting language="xml"><![CDATA[
-    <repositories>
+<programlisting language="xml"><![CDATA[    <repositories>
         <repository>
             <id>webdev-snapshot</id>
             <name>ejava webdev snapshot repository</name>
@@ -434,8 +431,7 @@ Could not find artifact info.ejava.examples.common:jboss-rmi-client:pom:4.0.0-SN
                 <updatePolicy>daily</updatePolicy>
             </snapshots>
         </repository>
-    </repositories>
-]]></programlisting>                        
+    </repositories>]]></programlisting>                        
 <programlisting language=""><![CDATA[(from basicejb-test directory)
 $ mvn dependency:go-offline
 
@@ -672,6 +668,360 @@ jboss.naming.client.ejb.context=true
                 </listitem>
 
             <listitem><para>
+                    [[1]] Create a JUnit IT test that will lookup the EJB and invoke the
+                    ping method. 
+                </para>
+<programlisting language=""><![CDATA[
+$ mkdir -p basicejb-test/src/test/java/org/myorg/basicejb/earejb
+]]></programlisting>                        
+<programlisting language="java"><![CDATA[$ cat basicejb-test/src/test/java/org/myorg/basicejb/earejb/ReservationIT.java
+package org.myorg.basicejb.earejb;
+
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class ReservationIT {
+    private static final Logger logger = LoggerFactory.getLogger(ReservationIT.class);
+    private InitialContext jndi;
+    
+    
+    @Before
+    public void setUp() throws NamingException {
+        logger.debug("getting jndi initial context");
+        jndi=new InitialContext();
+        logger.debug("jndi={}", jndi.getEnvironment());
+    }
+
+    @After
+    public void tearDown() throws NamingException {
+        if (jndi!=null) {
+            jndi.close();
+        }
+    }
+    
+    @Test
+    public void testPing() {
+        logger.info("*** testPing ***");
+    }
+}]]></programlisting>                        
+                <note>
+                    <para>
+                        The above JUnit test has been purposely ended with the 
+                        capital letters "IT" to represent integration test. This 
+                        will be treated special from JUnit test cases ending with *Test.
+                        IT tests run during a later set of phases that account for
+                        deployment, testing, undeploy, and results verification
+                        in separate phases instead of the single test phase used by *Test
+                        test cases. *Test JUnit test cases are used for in-process unit tests.
+                        *IT test cases are used for integration tests that could span 
+                        multiple processes requiring extra work. Unit tests are handled
+                        by the maven-surefire-plugin. Integration tests are handled by 
+                        the maven-failsafe-plugin. More in a moment...
+                    </para>
+                </note>
+                </listitem>
+
+            <listitem><para>
+                Add a log4j.xml file to configure Log4j loggers. You may use the same 
+                file you put into your EJB.
+                </para>
+<programlisting language=""><![CDATA[
+$ cp basicejb-ejb/src/test/resources/log4j.xml basicejb-test/src/test/resources/
+]]></programlisting>                        
+<programlisting language="xml"><![CDATA[$ cat basicejb-test/src/test/resources/log4j.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration PUBLIC
+  "-//APACHE//DTD LOG4J 1.2//EN" "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
+<log4j:configuration 
+    xmlns:log4j="http://jakarta.apache.org/log4j/" 
+    debug="false">
+   
+    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+        <param name="Target" value="System.out"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{HH:mm:ss,SSS} %-5p (%F:%L) -%m%n"/>
+        </layout>
+    </appender>
+
+    <appender name="logfile" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="target/log4j-out.txt"/>
+        <param name="Append" value="false"/>
+        <param name="MaxFileSize" value="100KB"/>
+        <param name="MaxBackupIndex" value="1"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" 
+                   value="%-5p %d{dd-MM HH:mm:ss,SSS} [%c] (%F:%M:%L)  -%m%n"/>
+        </layout>
+   </appender>
+
+   <logger name="org.myorg">
+      <level value="debug"/>
+      <appender-ref ref="logfile"/>  
+   </logger>
+   <root>
+      <priority value="info"/>    
+      <appender-ref ref="CONSOLE"/>  
+   </root>   
+</log4j:configuration>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                    Try building the Test module at this point. Notice how no tests
+                    attempted to run. That is because the Tests run reported are surefire
+                    unit tests and we have no unit tests in this module. All our tests (1)
+                    are integration tests. Okay...why didn't our integration test run? 
+                    The failsafe plugin, unlike the surefire plugin does not run automatically.
+                    We must wire it into the build.
+                </para>
+                <para>
+                    You will also notice the extra resources copy for the log4j.xml we put 
+                    into src/test/resources. It was not filtered because it did not match the 
+                    include pattern.
+                </para>
+<programlisting language=""><![CDATA[$cd basicejb-test; mvn clean install
+...
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ basicejb-test ---
+[INFO] Deleting /home/jcstaff/proj/basicejbEx/basicejb-test/target
+...
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ basicejb-test ---
+...
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ basicejb-test ---
+...
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ basicejb-test ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 1 resource
+[INFO] Copying 1 resource
+...
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ basicejb-test ---
+[INFO] Compiling 1 source file to /home/jcstaff/proj/basicejbEx/basicejb-test/target/test-classes
+...
+[INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ basicejb-test ---
+...
+[INFO] --- maven-jar-plugin:2.4:jar (default-jar) @ basicejb-test ---
+...
+[INFO] --- maven-install-plugin:2.4:install (default-install) @ basicejb-test ---
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Declare the failsafe plugin to your RMI Test/pom.xml to cause our JUnit
+                IT test to be attempted.
+                </para>
+<programlisting language=""><![CDATA[
+        <plugins>
+            <!-- adds IT integration tests to the build -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+            </plugin>
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Define the failsafe plugin in the parent module. This definition
+                will have...
+                </para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>
+                        version for the plugin
+                        </para></listitem>
+                    <listitem><para>
+                        goals to execute for the plugin. Other than "help", these
+                        are the only two goals the plugin supports. 
+                        </para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>
+                                pre-integration-test - no plugin goals are bound to this 
+                                build phase yet. This is where we will want to deploy 
+                                the EAR.
+                                </para></listitem>
+                            <listitem><para>
+                                integration-test failsafe goal is automatically bound to the 
+                                integration-test build phase to run the IT tests.
+                                </para></listitem>
+                            <listitem><para>
+                                post-integration-test - no plugin goals are bound to this
+                                build phase yet. This is where we will want to undeploy
+                                the EAR.
+                                </para></listitem>
+                            <listitem><para>
+                                verify goal is automatically bound to the verify 
+                                goal to evaluate the IT test results and potentially
+                                fail the build.
+                                </para>
+                                </listitem>
+                        </itemizedlist>
+                        </listitem>
+                    <listitem><para>
+                        argLine definition that will permit remote debugging of the IT test
+                        if needed to be run within the full Maven lifecycle.
+                        </para></listitem>
+                </itemizedlist>
+<programlisting language="xml"><![CDATA[    <properties>
+    ...
+        <maven-failsafe-plugin.version>2.17</maven-failsafe-plugin.version>
+    ...
+    <build>
+    	<pluginManagement>
+            <plugins>
+                ...
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven-failsafe-plugin.version}</version>
+                    <configuration>
+                        <argLine>${surefire.argLine}</argLine>
+                    </configuration>
+                    <executions>
+                        <execution> 
+                           <goals>
+                               <goal>integration-test</goal>
+                               <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+    ...
+    <profiles>
+        <profile> <!-- tells surefire/failsafe to run JUnit tests with remote debug -->
+            <id>debugger</id>
+            <activation>
+                <property>
+                    <name>debugger</name>
+                </property>
+            </activation>
+            <properties>
+                <surefire.argLine>-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE</surefire.argLine>
+            </properties>                                  
+        </profile>        
+]]></programlisting>                        
+                <note>
+                    <para>
+                        The debugger profile is one we have added before for the surefire plugin.
+                        Activating this profile during the build will cause failsafe to suspend 
+                        until a debugger client connects and commands to continue. This is only 
+                        useful when you must run the IT test within the full Maven build. Ideally
+                        you would instead debug the IT test inside the IDE debugger.
+                    </para>
+                </note>
+                </listitem>
+
+            <listitem><para>
+                    Try building the Test module now that the failsafe plugin has been 
+                    correctly declared. Notice how our IT test runs within the integration-test
+                    phase. It is not doing much yet but we are purposely taking baby steps
+                    to explain every corner of the multi-module build.
+                </para>
+<programlisting language=""><![CDATA[$cd basicejb-test; mvn clean install
+...
+[INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ basicejb-test ---
+...
+[INFO] --- maven-jar-plugin:2.4:jar (default-jar) @ basicejb-test ---
+...
+[INFO] --- maven-failsafe-plugin:2.17:integration-test (default) @ basicejb-test ---
+...
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running org.myorg.basicejb.earejb.ReservationIT
+20:51:22,679 DEBUG (ReservationIT.java:18) -getting jndi initial context
+20:51:22,815 INFO  (Xnio.java:92) -XNIO version 3.2.2.Final
+20:51:22,925 INFO  (NioXnio.java:56) -XNIO NIO Implementation Version 3.2.2.Final
+20:51:23,028 INFO  (EndpointImpl.java:69) -JBoss Remoting version 4.0.3.Final
+20:51:23,180 DEBUG (ReservationIT.java:20) -jndi={java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory, java.naming.provider.url=http-remoting://localhost:8080, java.naming.factory.url.pkgs=, java.naming.security.principal=known, jboss.naming.client.ejb.context=true, java.naming.security.credentials=password1!}
+20:51:23,181 INFO  (ReservationIT.java:26) -*** testPing ***
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.767 sec - in org.myorg.basicejb.earejb.ReservationIT
+
+Results :
+
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] 
+[INFO] --- maven-failsafe-plugin:2.17:verify (default) @ basicejb-test ---
+[INFO] Failsafe report directory: /home/jcstaff/proj/basicejbEx/basicejb-test/target/failsafe-reports
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] 
+[INFO] --- maven-install-plugin:2.4:install (default-install) @ basicejb-test ---
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                <note>
+                    <para>
+                        The IT test is not yet doing enough to indicate whether the server
+                        is running or not.
+                    </para>
+                </note>
+                </listitem>
+
+
+            <listitem><para>
+                Add an additional line to the @Before method. This will perform a remote lookup
+                of the "jms" JNDI context. If the server is up and knows about this context, we
+                will continue to be successful. However, if the server is down or does not know
+                about the context -- it will fail.
+                </para>
+<programlisting language="java"><![CDATA[    @Before
+    public void setUp() throws NamingException {
+        logger.debug("getting jndi initial context");
+        jndi=new InitialContext();
+        logger.debug("jndi={}", jndi.getEnvironment());
+        jndi.lookup("jms");
+    }]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Re-run the IT test with the server stopped. Note the failure in the build does not
+                come until after the verify phase.
+                </para>
+<programlisting language=""><![CDATA[$ cd basicejb-test; mvn clean install
+ T E S T S
+-------------------------------------------------------
+Running org.myorg.basicejb.earejb.ReservationIT
+...
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 5.668 sec <<< FAILURE! - in org.myorg.basicejb.earejb.ReservationIT
+testPing(org.myorg.basicejb.earejb.ReservationIT)  Time elapsed: 5.471 sec  <<< ERROR!
+javax.naming.CommunicationException: Failed to connect to any server. Servers tried: [http-remoting://localhost:8080 (Operation failed with status WAITING after 5000 MILLISECONDS)]
+	at org.jboss.naming.remote.protocol.IoFutureHelper.get(IoFutureHelper.java:97)
+	at org.jboss.naming.remote.client.HaRemoteNamingStore.failOverSequence(HaRemoteNamingStore.java:198)
+	at org.jboss.naming.remote.client.HaRemoteNamingStore.namingStore(HaRemoteNamingStore.java:149)
+	at org.jboss.naming.remote.client.HaRemoteNamingStore.namingOperation(HaRemoteNamingStore.java:130)
+	at org.jboss.naming.remote.client.HaRemoteNamingStore.lookup(HaRemoteNamingStore.java:272)
+	at org.jboss.naming.remote.client.RemoteContext.lookup(RemoteContext.java:87)
+	at org.jboss.naming.remote.client.RemoteContext.lookup(RemoteContext.java:129)
+	at javax.naming.InitialContext.lookup(InitialContext.java:411)
+	at org.myorg.basicejb.earejb.ReservationIT.setUp(ReservationIT.java:22)
+
+Results :
+
+Tests in error: 
+  ReservationIT.setUp:22 » Communication Failed to connect to any server. Server...
+
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0
+...
+[INFO] --- maven-failsafe-plugin:2.17:verify (default) @ basicejb-test ---
+...
+[INFO] BUILD FAILURE
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Re-run the IT test with the server running.
+                </para>
+<programlisting language=""><![CDATA[$ cd basicejb-test; mvn clean install
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
                 Register the RMI Test module with the root pom and perform a root-level build.
                 </para>
 <programlisting language="xml"><![CDATA[    <modules>
@@ -692,57 +1042,462 @@ $ mvn clean install
 [INFO] BUILD SUCCESS
 ]]></programlisting>                        
                 </listitem>
-
-            <listitem><para>
-                </para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-                </listitem>
-
-            <listitem><para>
-                </para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-                </listitem>
-
-            <listitem><para>
-                </para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-                </listitem>
         </orderedlist>
 
     </section>
 
-    <section id="ejb-basicex-eardeploy-jndi">
-        <title>Locate JNDI Name of @Remote</title>
+    <section id="ejb-basicex-eardeploy-deploy">
+        <title>Deploy the EAR</title>
         <para>
+            In the previous section we ended with the IT test communicating with 
+            the server's JNDI tree. In this section we will *finally* deploy
+            the EAR, lookup the @Remote interface of our EJB, and invoke our first 
+            method.
         </para>
+        <para>
+            We want tests to run as automated as possible. This allows us to
+            simplify testing as well as leverage continous integration techniques
+            (e.g., CruiseControl, Hudson, Jenkins; i.e., nightly builds/tests). To
+            help automate this we are going to leverage the Maven cargo
+            plugin. Cargo, itself, is a Java library that is used to manage Java
+            EE containers. The maven cargo plugin just makes it callable from
+            within Maven. We will add the cargo plugin to the RMI Test project
+            (to deploy the application) since the application isn't ready to be
+            deployed until after the EAR is built.
+        </para>
+
+
+            <orderedlist spacing="compact">
+                <listitem><para>
+                        Declare the cargo plugin in the RMI Test pom.xml to deploy the EAR
+                        to JBoss. Like always, We will only put what is specific to this 
+                        module in the module's pom.xml.
+                    </para>
+<programlisting language="xml"><![CDATA[$ cat basicejb-test/pom.xml
+...
+    <build>
+        <plugins>
+            ...
+            <!-- artifacts to deploy to server -->
+            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+                <configuration>
+                    <deployables>
+                        <deployable>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>basicejb-ear</artifactId>
+                            <type>ear</type>
+                        </deployable>
+                    </deployables>
+                </configuration>
+            </plugin>]]></programlisting>                        
+                    </listitem>
+
+                <listitem><para>
+                        Cargo requires the module to be deployed to also be a scope=compile
+                        dependency of the local module. Since this is a Test module with no
+                        dependents -- we can add that without concern.
+                    </para>
+<programlisting language="xml"><![CDATA[<!-- cargo requires scope=compile dependencies on deployables -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>basicejb-ear</artifactId>
+            <type>ear</type>
+            <version>${project.version}</version>
+        </dependency>]]></programlisting>                        
+                    </listitem>
+
+                <listitem><para>
+                    Define the details of the cargo plugin in the parent pom. Since cargo is 
+                    not specific to any one container -- there is a good bit that requires configuring.
+                    The details are a mouthful but, in short, this
+                    tells cargo to deploy our artifacts to a running JBoss server (of a specific
+                    version), listening on a specific admin address:port, and where to place
+                    the runtime logs from this activity.
+                    </para>
+<programlisting language="xml"><![CDATA[    <properties>
+        ...
+        <wildfly.version>8.1.0.Final</wildfly.version>
+        <cargo-maven2-plugin.version>1.4.3</cargo-maven2-plugin.version>
+        <cargo.containerId>wildfly8x</cargo.containerId>
+        <jboss.mgmt.host>${jboss.host}</jboss.mgmt.host>
+        <jboss.mgmt.port>9990</jboss.mgmt.port>
+    ...
+    <build>
+    	<pluginManagement>
+            <plugins>
+                <plugin>
+                ...
+                    <groupId>org.codehaus.cargo</groupId>
+                    <artifactId>cargo-maven2-plugin</artifactId>
+                    <version>${cargo-maven2-plugin.version}</version>
+                    <configuration>
+                        <container>
+                            <containerId>${cargo.containerId}</containerId>
+                            <type>remote</type>
+                            <log>target/server.log</log>
+                            <output>target/output.log</output>
+                        </container>
+                        <configuration>
+                            <type>runtime</type>
+                            <properties>
+                                <cargo.hostname>${jboss.mgmt.host}</cargo.hostname>
+                                <cargo.jboss.management.port>${jboss.mgmt.port}</cargo.jboss.management.port>
+                            </properties>
+                        </configuration>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.wildfly</groupId>
+                            <artifactId>wildfly-controller-client</artifactId>
+                            <version>${wildfly.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <executions>
+                       <execution>
+                           <id>cargo-prep</id> 
+                               <phase>pre-integration-test</phase>
+                           <goals>
+                                <goal>redeploy</goal>
+                           </goals>
+                       </execution>
+                        <execution>
+                            <id>cargo-post</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>undeploy</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>]]></programlisting>                        
+                    </listitem>
+
+                <listitem><para>
+                    Rebuild the RMI Test and note the deployment of the EAR to the JBoss
+                    server prior to running the integration tests with failsafe and undeployed
+                    after finishing.
+                    </para>
+<programlisting language=""><![CDATA[
+...
+[INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ basicejb-test ---
+...
+[INFO] --- maven-jar-plugin:2.4:jar (default-jar) @ basicejb-test ---
+...
+[INFO] --- cargo-maven2-plugin:1.4.3:redeploy (cargo-prep) @ basicejb-test ---
+Oct 05, 2014 11:17:36 PM org.xnio.Xnio <clinit>
+INFO: XNIO version 3.2.2.Final
+Oct 05, 2014 11:17:36 PM org.xnio.nio.NioXnio <clinit>
+INFO: XNIO NIO Implementation Version 3.2.2.Final
+Oct 05, 2014 11:17:36 PM org.jboss.remoting3.EndpointImpl <clinit>
+INFO: JBoss Remoting version 4.0.3.Final
+...
+[INFO] --- maven-failsafe-plugin:2.17:integration-test (default) @ basicejb-test ---
+...
+Running org.myorg.basicejb.earejb.ReservationIT
+...
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+...
+[INFO] --- cargo-maven2-plugin:1.4.3:undeploy (cargo-post) @ basicejb-test ---
+...
+[INFO] --- maven-failsafe-plugin:2.17:verify (default) @ basicejb-test ---
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                <para>
+                    The following should have been output at the JBoss console and server.log. The "java:" names
+                    are JNDI names that can be used to locate the local and remote interfaces of our 
+                    ReservationEJB.
+                </para>
+<programlisting language=""><![CDATA[
+23:17:37,356 INFO  [org.jboss.as.ejb3.deployment.processors.EjbJndiBindingsDeploymentUnitProcessor] (MSC service thread 1-1) 
+JNDI bindings for session bean named ReservationEJB in deployment unit subdeployment "basicejb-ejb-1.0-SNAPSHOT.jar" of 
+deployment "basicejb-ear-1.0-SNAPSHOT.ear" are as follows:
+
+        java:global/basicejb-ear-1.0-SNAPSHOT/basicejb-ejb-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationLocal
+        java:app/basicejb-ejb-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationLocal
+        java:module/ReservationEJB!org.myorg.basicejb.ejb.ReservationLocal
+        java:global/basicejb-ear-1.0-SNAPSHOT/basicejb-ejb-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+        java:app/basicejb-ejb-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+        java:module/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+        java:jboss/exported/basicejb-ear-1.0-SNAPSHOT/basicejb-ejb-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+
+23:17:37,368 INFO  [org.jboss.weld.deployer] (MSC service thread 1-2) JBAS016005: Starting Services for CDI deployment: basicejb-ear-1.0-SNAPSHOT.ear
+23:17:37,376 INFO  [org.jboss.weld.deployer] (MSC service thread 1-3) JBAS016008: Starting weld service for deployment basicejb-ear-1.0-SNAPSHOT.ear
+23:17:38,335 INFO  [org.jboss.as.server] (management-handler-thread - 1) JBAS018559: Deployed "basicejb-ear-1.0-SNAPSHOT.ear" (runtime-name : "basicejb-ear-1.0-SNAPSHOT.ear")
+]]></programlisting>                        
+                <para>
+                    The only one that is available to our external RMI client starts with "java:jboss/exported/".
+                    That JNDI is available to external clients -- like our IT test.
+                </para>
+<programlisting language=""><![CDATA[
+    java:jboss/exported/basicejb-ear-1.0-SNAPSHOT/basicejb-ejb-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+]]></programlisting>                        
+                    <tip>
+                        <para>
+                            When you application does not correctly deploy, the most 
+                            valuable information is typically in the server.log and not in the 
+                            cargo client log. Applications usually fail to deploy because of
+                            a missing or mis-configured dependency/resource and the server.log
+                            will be necessary to determine what to correct.
+                        </para>
+                    </tip>
+                    </listitem>
+            </orderedlist>
     </section>
 
-    <section id="ejb-basicex-eardeploy-invoke">
-        <title>Access/Test EJB Method</title>
+    <section id="ejb-basicex-eardeploy-jndi">
+        <title>Lookup and Invoke @Remote Interface</title>
         <para>
+            Each EJB interface will have an entres in the JNDI tree. Clients will use
+            the JNDI tree to locate the interface object they need based on 
+            a hierarchical name. The names available locally within the server
+            were standardized in JavaEE 6. However that specification
+            did not cover external references -- so we have to peek at what 
+            JBoss is telling for the exported name.
         </para>
+<programlisting language=""><![CDATA[
+java:jboss/exported/basicejb-ear-1.0-SNAPSHOT/basicejb-ejb-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+]]></programlisting>                        
+            <itemizedlist spacing="compact">
+                <listitem><para>
+                    java: - JNDI naming prefix used to determine which implementation
+                    is used to lookup the name. This specific prefix is for local names.
+                    </para></listitem>
+                <listitem><para>
+                    jboss/exported/ - names below this context are available outside
+                    the server and exclude this portion of the name.
+                    </para></listitem>
+                <listitem><para>
+                    basicejb-ear-1.0-SNAPSHOT - name of the deployable artifact. In
+                    this case the EAR was deployed and the name included the maven
+                    full artifact and version name.
+                    </para></listitem>
+                <listitem><para>
+                    basicejb-ejb-1.0-SNAPSHOT - name of the EJB component. It too
+                    has its full artifact name and version number applied by maven.
+                    </para></listitem>
+                <listitem><para>
+                    ReservationEJB! - name of the EJB. If not changed by the @Stateless
+                    annotation or deployment descriptor -- this will be the same name
+                    as the POJO class name.
+                    </para></listitem>
+                <listitem><para>
+                    org.myorg.basicejb.ejb.ReservationRemote - fully qualified class name of 
+                    the remote interface.
+                    </para></listitem>
+            </itemizedlist>
+
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Add the above JNDI name for the @Remote interface in the 
+                RMI Test failsafe configuration so that our IT test does not have to know about 
+                version numbers. The following is equivalent to passing -Djndi.name.reservation
+                to the JVM.
+                </para>
+<programlisting language="xml"><![CDATA[    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+            <systemPropertyVariables>
+                <jndi.name.reservation>basicejb-ear-${project.version}/basicejb-ejb-${project.version}/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote</jndi.name.reservation>
+            </systemPropertyVariables>
+        </configuration>
+    </plugin>]]></programlisting>                        
+
+                </listitem>
+
+            <listitem><para>
+                Add the dependency on the ejb-client.jar to the RMI Test.
+                This will go in the root dependency area. This was built 
+                by the maven-ejb-plugin when we built the EJB module.
+                </para>
+<programlisting language="xml"><![CDATA[        <!-- brings in the EJB-client jar file w/o the EJB -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>basicejb-ejb</artifactId>
+            <version>${project.version}</version>
+            <type>ejb-client</type>
+            <scope>test</scope>
+        </dependency>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Add the handling of the provided JNDI name to the IT class by adding the 
+                following snippets of code. Note the JNDI name passed as a system property
+                by failsafe.
+                </para>
+<programlisting language="java"><![CDATA[import static org.junit.Assert.*;
+...
+public class ReservationIT {
+    ...
+    private static final String reservationJNDI = System.getProperty("jndi.name.reservation"); 
+    
+    @Before
+    public void setUp() throws NamingException {
+        assertNotNull("jndi.name.reservation not supplied", reservationJNDI);
+        ...
+        logger.debug("jndi name:{}", reservationJNDI);
+    }]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Add a lookup of the JNDI name and some debug of the remote interface
+                that came back. We should now have something we can communcate with.
+                </para>
+<programlisting language="java"><![CDATA[import org.myorg.basicejb.ejb.ReservationRemote;
+...
+public class ReservationIT {
+    ...
+    private ReservationRemote reservationist; 
+    
+    @Before
+    public void setUp() throws NamingException {
+        ...
+        reservationist = (ReservationRemote) jndi.lookup(reservationJNDI);
+        logger.debug("reservationist={}", reservationist);
+    }]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Add a call to the ReservationRemote.ping() method in the 
+                testPing() @Test method. This should complete our initial 
+                end-to-end IT test.
+                </para>
+<programlisting language="java"><![CDATA[public class ReservationIT {
+    ...
+    @Test
+    public void testPing() throws NamingException {
+        ...
+        reservationist.ping();
+    }
+}]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Build the application from the root. Note the JNDI lookup of the @Remote
+                interface and call to ping() that took place.
+                </para>
+<programlisting language=""><![CDATA[
+...
+[INFO] --- cargo-maven2-plugin:1.4.3:redeploy (cargo-prep) @ basicejb-test ---
+Oct 06, 2014 12:16:23 AM org.xnio.Xnio <clinit>
+INFO: XNIO version 3.2.2.Final
+Oct 06, 2014 12:16:23 AM org.xnio.nio.NioXnio <clinit>
+INFO: XNIO NIO Implementation Version 3.2.2.Final
+Oct 06, 2014 12:16:23 AM org.jboss.remoting3.EndpointImpl <clinit>
+INFO: JBoss Remoting version 4.0.3.Final
+...
+[INFO] --- maven-failsafe-plugin:2.17:integration-test (default) @ basicejb-test ---
+...
+Running org.myorg.basicejb.earejb.ReservationIT
+00:16:25,660 DEBUG (ReservationIT.java:23) -getting jndi initial context
+...
+00:16:26,033 DEBUG (ReservationIT.java:25) -jndi={java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory, java.naming.provider.url=http-remoting://localhost:8080, java.naming.factory.url.pkgs=, java.naming.security.principal=known, jboss.naming.client.ejb.context=true, java.naming.security.credentials=password1!}
+...
+00:16:26,545 DEBUG (ReservationIT.java:28) -jndi name:basicejb-ear-1.0-SNAPSHOT/basicejb-ejb-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+00:16:26,745 DEBUG (ReservationIT.java:30) -reservationist=Proxy for remote EJB StatelessEJBLocator{appName='basicejb-ear-1.0-SNAPSHOT', moduleName='basicejb-ejb-1.0-SNAPSHOT', distinctName='', beanName='ReservationEJB', view='interface org.myorg.basicejb.ejb.ReservationRemote'}
+00:16:26,746 INFO  (ReservationIT.java:35) -*** testPing ***
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.46 sec - in org.myorg.basicejb.earejb.ReservationIT
+...
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+...
+[INFO] --- cargo-maven2-plugin:1.4.3:undeploy (cargo-post) @ basicejb-test ---
+...
+[INFO] --- maven-failsafe-plugin:2.17:verify (default) @ basicejb-test ---
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Look in the server.log for the following output showing the server-side EJB logging INFO and DEBUG
+                messages.
+                </para>
+<programlisting language=""><![CDATA[
+2014-10-06 00:16:26,566 INFO  [org.jboss.ejb.client] (pool-1-thread-4) JBoss EJB Client version 2.0.1.Final
+2014-10-06 00:16:26,894 DEBUG [org.myorg.basicejb.ejb.ReservationEJB] (EJB default - 1) *** ReservationEJB.init() ***
+2014-10-06 00:16:26,898 DEBUG [org.myorg.basicejb.ejb.ReservationEJB] (EJB default - 1) ping called
+2014-10-06 00:16:26,899 DEBUG [org.myorg.basicejb.ejb.ReservationEJB] (EJB default - 1) *** ReservationEJB.destroy() ***
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                As a final sanity check, this is what your multi-module application
+                should look like at this time.
+                </para>
+<programlisting language=""><![CDATA[.
+|-- basicejb-ear
+|   `-- pom.xml
+|-- basicejb-ejb
+|   |-- pom.xml
+|   `-- src
+|       |-- main
+|       |   `-- java
+|       |       `-- org
+|       |           `-- myorg
+|       |               `-- basicejb
+|       |                   `-- ejb
+|       |                       |-- ReservationEJB.java
+|       |                       |-- ReservationLocal.java
+|       |                       `-- ReservationRemote.java
+|       `-- test
+|           |-- java
+|           |   `-- org
+|           |       `-- myorg
+|           |           `-- basicejb
+|           |               `-- ejb
+|           |                   `-- ReservationTest.java
+|           `-- resources
+|               `-- log4j.xml
+|-- basicejb-test
+|   |-- pom.xml
+|   `-- src
+|       `-- test
+|           |-- java
+|           |   `-- org
+|           |       `-- myorg
+|           |           `-- basicejb
+|           |               `-- earejb
+|           |                   `-- ReservationIT.java
+|           `-- resources
+|               |-- jndi.properties
+|               `-- log4j.xml
+`-- pom.xml
+]]></programlisting>                        
+                </listitem>
+        </orderedlist>
     </section>
         
     <section id="ejb-basicex-eardeploy-summary">
        <title>Summary</title>
         <itemizedlist spacing="compact">
             <listitem><para>
+                Created an EAR to deploy the EJB
                 </para>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>EAR is a packaging construct with no executable code</para></listitem>
+                    <listitem><para>EARs can deploy EJBs, WARs, and library JARs</para></listitem>
+                    <listitem><para>Everything within the same EAR share a common classloader and can pass data by reference using local interfaces</para></listitem>
                 </itemizedlist>
             </listitem>
             <listitem><para>
+                Deployed an EAR
                 </para>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>Cargo plugin used to automate deploy/undeploy of EAR during build of RMI Test module</para></listitem>
+                    <listitem><para>deploy/undeploy of EAR occured during pre-integration-test and post-integration-test phases</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>
+                Looked up @Remote interface in JNDI
+                </para>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para>JNDI names are standardized</listitem>
+                    <listitem><para></para>Only remote interface exposed outside of server</listitem>
+                    <listitem><para></para>Exercise used older JBoss Remoting to access remote thru JNDI lookup</listitem>
+                    <listitem><para></para>JBoss Remoting will work for any remote interface (e.g., JMS)</listitem>
+                    <listitem><para></para>JBoss recommends using newer EJBClient for access to EJBs (will tackle this in next chapter)</listitem>
                 </itemizedlist>
             </listitem>
         </itemizedlist>
