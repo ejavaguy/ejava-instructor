@@ -26,7 +26,7 @@ javax.persistence.metamodel.Metamodel getMetamodel();
             
             <listitem><para>Create query from Named Query</para>
 <programlisting language="java"><![CDATA[javax.persistence.Query createNamedQuery(String queryName);
-<T extends java/lang/Object> javax.persistence.TypedQuery<T> createNamedQuery(String queryName, Class<T>);]]></programlisting>                        
+<T extends java.lang.Object> javax.persistence.TypedQuery<T> createNamedQuery(String queryName, Class<T>);]]></programlisting>                        
             </listitem>
         </itemizedlist>
     </section>
