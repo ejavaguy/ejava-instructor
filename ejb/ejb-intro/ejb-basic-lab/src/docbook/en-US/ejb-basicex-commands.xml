@@ -3,6 +3,11 @@
 
 <chapter id="ejb-basicex-commands">
     <title>Build Commands</title>
+    <para>
+        In the previous sections we used several commands as a part of the build.
+        We will now take a moment to describe a few of them so it is more evident
+        they exist and how they can be useful.
+    </para>
 
     <section id="ejb-basicex-commands-purpose">
         <title>Purpose</title>
@@ -23,38 +28,252 @@
             </itemizedlist>
         </section>
     </section>
+<!--
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+
+            <orderedlist spacing="compact">
+                <listitem><para>
+                    </para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                    </listitem>
+                <listitem><para>
+                    </para></listitem>
+            </orderedlist>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+        <variablelist spacing="compact">
+            <varlistentry>
+                <term><filename>
+                    </filename></term>
+                <listitem><para>
+                    </para></listitem>
+            </varlistentry>
+        </variablelist>
+-->
+
+    <section id="ejb-basicex-commands-phases">
+        <title>mvn (phase)</title>
+        <para>
+            Maven builds modules in phases and in a specific phase 
+            <ulink url="http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html#Lifecycle_Reference">ordering</ulink>.
+            We won't discuss all of them here, but we will hit the ones of importance to server-side development. Try each of the following
+            commands from the root/parent directory and also watch the output in the server.log.
+        </para>
+
+<programlisting language=""><![CDATA[
+$ tail -n 999 -f standalone/log/server.log 
+]]></programlisting>                        
+<programlisting language=""><![CDATA[
+$mvn (phase)
+]]></programlisting>                        
+
+        <variablelist spacing="compact">
+            <varlistentry>
+                <term><filename>mvn clean
+                    </filename></term>
+                <listitem><para>
+                    Delete previously built artifacts below the target tree(s).
+                    </para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>mvn process-test-classes
+                    </filename></term>
+                    The last build phase prior to running unit tests. It is common that 
+                    any auto-generated schema has been created by this point.
+                <listitem><para>
+                    </para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>mvn test
+                    </filename></term>
+                <listitem><para>
+                    Run unit tests (i.e., classes matching 
+                    <ulink url="http://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclusion.html"> surefire file name pattern</ulink>)
+                    </para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>package
+                    </filename></term>
+                <listitem><para>
+                    Build Java, EJB, WAR, and EAR archives
+                    </para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>mvn pre-integration-test
+                    </filename></term>
+                <listitem><para>
+                    Deploy deployable archives for the module. Note this is a per-module basis. If you have separate IT modules, each module is 
+                    responsible for deploying its required artifacts. This is a very useful target when running the IT test within the IDE and 
+                    outside of the Maven framework once deployed to the server.
+                    </para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>mvn integration-test
+                    </filename></term>
+                <listitem><para>
+                    Run integration tests (IT tests) (i.e., classes matching 
+                    <ulink url="http://maven.apache.org/surefire/maven-failsafe-plugin/examples/inclusion-exclusion.html"> failsafe file name pattern</ulink>)
+                    </para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>mvn post-integration-test
+                    </filename></term>
+                <listitem><para>
+                    Undeploy deployed archives for the module. Note this is a per-module basis. If you have separate IT modules, each module is 
+                    responsible for undeploying its required artifacts. If these artifacts are needed by a downstream module build they will need
+                    to be re-deployed by that downstream module.
+                    </para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>mvn verify
+                    </filename></term>
+                <listitem><para>
+                    Evaludate the IT test results and wait to fail until this point so that the deployed artifacts can be undeployed.
+                    </para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>mvn install
+                    </filename></term>
+                <listitem><para>
+                    Install the built artifacts into the local repository to make them available to downstream modules when building
+                    outside the context of a common parent. i.e., If you build from the parent of an EJB and EAR, the EAR will be 
+                    given knowledge of the EJB through the parent. If you build only the EAR, the latest installed version of the EJB
+                    in the local repository will be used.
+                    </para></listitem>
+            </varlistentry>
+        </variablelist>
+    </section>
 
     <section id="ejb-basicex-commands-restart">
         <title>mvn (phase) -rf :module</title>
         <para>
+            It is common, when building a multi-module application when the first 
+            set of modules build fine but an error is encountered when building one
+            of the later modules.
         </para>
+
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Re-build just the WAR and RMI Test modules by naming the module to 
+                start with. Based on the order specified in the parent pom, we will start
+                with the RMI Test module.
+                </para>
+<programlisting language=""><![CDATA[    <modules>
+        <module>basicejb-ejb</module>
+        <module>basicejb-ear</module>
+        <module>basicejb-test</module>
+        <module>basicejb-war</module>
+    </modules>]]></programlisting>                        
+<programlisting language=""><![CDATA[
+$ mvn clean install -rf :basicejb-test
+...
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Basic EJB Exercise::Remote Test .................... SUCCESS [  8.018 s]
+[INFO] Basic EJB Exercise::WAR ............................ SUCCESS [  3.030 s]
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+        </orderedlist>
     </section>
 
-    <section id="ejb-basicex-commands-deploy">
-        <title>mvn pre-integration-test</title>
-        <para>
-        </para>
-    </section>
-        
     <section id="ejb-basicex-commands-undeploy">
         <title>mvn clean -Pundeploy</title>
         <para>
+            There are times when you would like to undeploy a deployed archive without
+            re-deploying again first. This is common as part of the "mvn clean" lifecycle
+            and allows you to undeploy everything you have before deploying the next version
+            on a multi-deployment setup.
         </para>
+
+        <orderedlist spacing="compact">
+            Add the following profile to the EAR and WAR modules. We use a profile to prevent the
+            goal from failing when the artifact does not currently exist. The caller must 
+            know the state and names to profile to be active.
+            <listitem><para>
+                </para>
+<programlisting language="xml"><![CDATA[    <profiles>
+    <!-- this profiles allow the EAR to be undeployed before it is deleted
+        during the clean target. This behavior requires the EAR to be
+        present, so it cannot be part of the default behavior. It is
+        only activated when -Pundeploy is present so that
+        normal cleans do not fail.  -->
+        <profile>
+            <id>undeploy</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.cargo</groupId>
+                        <artifactId>cargo-maven2-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>undeploy-ear</id>
+                                <phase>pre-clean</phase>
+                                <goals>
+                                    <goal>undeploy</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>                    
+                </plugins>
+            </build>
+        </profile>
+    </profiles>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Deploy the EAR and WAR artifacts to the server and note that they are deployed using the console or server.log.
+                </para>
+<programlisting language=""><![CDATA[
+$ mvn clean pre-integration-test
+]]></programlisting>                        
+<programlisting language=""><![CDATA[# server.log
+2014-10-11 17:24:02,553 INFO  [org.jboss.as.server] (management-handler-thread - 1) JBAS018559: Deployed "basicejb-ear-1.0-SNAPSHOT.ear" (runtime-name : "basicejb-ear-1.0-SNAPSHOT.ear")
+...
+2014-10-11 17:24:04,157 INFO  [org.jboss.as.server] (management-handler-thread - 1) JBAS018559: Deployed "basicejb-war-1.0-SNAPSHOT.war" (runtime-name : "basicejb-war-1.0-SNAPSHOT.war")
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                This is the point in which we can run our IT tests within the IDE once we resolve a few remaining dependencies on the 
+                failsafe plugins (later...)
+                </para>
+                </listitem>
+
+            <listitem><para>
+                Undeploy the EAR and WAR artifacts from the server and note they are undeployed using the output of the console or server.log.
+                </para>
+<programlisting language=""><![CDATA[
+$ mvn clean -Pundeploy
+]]></programlisting>                        
+<programlisting language=""><![CDATA[
+2014-10-11 17:24:15,019 INFO  [org.jboss.as.server] (management-handler-thread - 1) JBAS018558: Undeployed "basicejb-ear-1.0-SNAPSHOT.ear" (runtime-name: "basicejb-ear-1.0-SNAPSHOT.ear")
+...
+2014-10-11 17:24:15,662 INFO  [org.jboss.as.server] (management-handler-thread - 1) JBAS018558: Undeployed "basicejb-war-1.0-SNAPSHOT.war" (runtime-name: "basicejb-war-1.0-SNAPSHOT.war")
+]]></programlisting>                        
+                </listitem>
+        </orderedlist>
     </section>
         
     <section id="ejb-basicex-commands-summary">
        <title>Summary</title>
         <itemizedlist spacing="compact">
+            <listitem><para>Leverage build lifecycle phases to build what is needed</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Keeps from executing the entire build lifecycle</para></listitem>
+                    <listitem><para>Required in some cases (deployment) to achieve desired results (stay deployed)</para></listitem>
+                </itemizedlist>
+            </listitem>
             <listitem><para>Re-start the build at a specific module</para>
                 <itemizedlist spacing="compact">
                     <listitem><para>Saves time from building unchanged modules</para></listitem>
                     <listitem><para>User must know that skipped modules are not needed</para></listitem>
-                </itemizedlist>
-            </listitem>
-            <listitem><para>Deploy and leave module artifact deployed</para>
-                <itemizedlist spacing="compact">
-                    <listitem><para>Permits IT tests to be written and executed against deployed artifact</para></listitem>
-                    <listitem><para>Good for ad-hoc interface demonstration/development</para></listitem>
                 </itemizedlist>
             </listitem>
             <listitem><para>Undeploy module artifact</para>
