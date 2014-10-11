@@ -127,8 +127,7 @@ $ mkdir ejb-basichotel
                     pom to make sure JDK 1.7 or above is used and we use an up to date version
                     of the plugin. 
                     </para>
-<programlisting language="xml"><![CDATA[
-    <properties>
+<programlisting language="xml"><![CDATA[    <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.source.version>1.7</java.source.version>
         <java.target.version>1.7</java.target.version>
@@ -146,8 +145,7 @@ $ mkdir ejb-basichotel
                             <source>${java.source.version}</source>
                             <target>${java.target.version}</target>
                     </configuration>	                
-                </plugin>
-]]></programlisting>                        
+                </plugin>]]></programlisting>                        
                     </listitem>
 
                 <listitem><para>
@@ -263,8 +261,7 @@ $ mkdir basicejb-ejb
                             order to resolve dependencies on the server. 
                             </para></listitem>
                     </itemizedlist>
-<programlisting language="xml"><![CDATA[
-# basicejbEx/pom.xml
+<programlisting language="xml"><![CDATA[# basicejbEx/pom.xml
 
     <properties>
 ...
@@ -286,8 +283,7 @@ $ mkdir basicejb-ejb
                             </manifest>
                         </archive>
                     </configuration>
-                </plugin>
-]]></programlisting>                        
+                </plugin>]]></programlisting>                        
                     </listitem>
 
                 <listitem><para>
@@ -762,6 +758,26 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 ...
 [INFO] BUILD SUCCESS
 ]]></programlisting>                        
+                <note>
+                    <para>
+                        Notice the we are automatically getting a surefire execution and our JUnit test
+                        run. We get this because surefire is automatically brought in by the pom's packaging
+                        type *and* we ended the Java class with Test. Looking at the 
+                        <ulink url="http://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclusion.html">
+                        plugin page</ulink>, the other default name patterns include.
+                    </para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>**/Test*.java</para></listitem>
+                        <listitem><para>**/*Test.java</para></listitem>
+                        <listitem><para>**/*TestCase.java</para></listitem>
+                    </itemizedlist>
+                    <para>
+                        As discussed on that same web page -- you can expand or shrink that list with the 
+                        use of includes and excludes. This is commonly done to focus your testing around
+                        a specific unit test or to temporarily exclude all unit tests from the build to focus
+                        on a specific IT test (discussed later).
+                    </para>
+                </note>
                     </listitem>
 
                 <listitem><para>
@@ -837,12 +853,6 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
                         server's console output. The extra debug will be placed in the 
                         standalone/log/server.log file.
                     </para>
-                    </listitem>
-
-                <listitem><para>
-                    </para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
                     </listitem>
             </orderedlist>
         </section>

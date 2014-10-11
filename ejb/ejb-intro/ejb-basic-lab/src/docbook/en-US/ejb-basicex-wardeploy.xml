@@ -27,54 +27,1328 @@
             </itemizedlist>
         </section>
     </section>
+<!--
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+
+            <orderedlist spacing="compact">
+                <listitem><para>
+                    </para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                    </listitem>
+                <listitem><para>
+                    </para></listitem>
+            </orderedlist>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+-->
 
     <section id="ejb-basicex-wardeploy-earmodule">
         <title>Create WAR Module</title>
         <para>
+            WARs are typically used to deploy web-tier components and this
+            WAR may do that at some point. However, at this point in time we
+            would like to take advantage of the WAR as a deployment artifact
+            for EJBs. Starting with JavaEE 6, EJBs can be flexibly deployed 
+            embedded within the WAR or similar to an EAR by hosting EJB 
+            archives using dependencies.
         </para>
+
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Create the sub-project directory for the WAR.
+                </para>
+<programlisting language=""><![CDATA[
+$ mkdir basicejb-war
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Add the initial entries for the WAR pom.xml.
+                </para>
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>myorg.basicejb</groupId>
+        <artifactId>basicejbEx</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>basicejb-war</artifactId>
+    <packaging>war</packaging>
+
+    <name>Basic EJB Exercise::WAR</name>
+    <description>
+        This project provides a sample WAR for the Java EE components
+        associated with the overall project.
+    </description>
+
+    <dependencies>
+    </dependencies>
+
+    <build>
+    </build>
+</project>]]></programlisting>                        
+                <note>
+                    <para>
+                        It is important to note that the packaging type is "war"
+                        in this case. If you leave this out, Maven will default to a 
+                        standard "jar" packaging type and not build a WAR.
+                    </para>
+                </note>
+                </listitem>
+
+            <listitem><para>
+                Add the EJB dependency to the EAR. Use exclusions to keep
+                any unwanted 3rd party .jars from being brought along.
+                </para>
+<programlisting language="xml"><![CDATA[    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>basicejb-ejb</artifactId>
+            <version>${project.version}</version>
+            <type>ejb</type>
+            <exclusions>
+                <!-- server doesn't want to see already provided jars -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>]]></programlisting>                        
+                <note>
+                    <para>
+                        Since our WAR pom declared the dependency on slf4j-api as 
+                        scope=provided the above exclusion is not necessary but 
+                        included as an example of how this can be done.
+                    </para>
+                </note>
+                </listitem>
+
+            <listitem><para>
+                    Attempt to build the WAR. It should fail because we have not 
+                    yet added a WEB-INF/web.xml or have not configured the plugin 
+                    to ignore it.
+                </para>
+<programlisting language=""><![CDATA[$ mvn clean package
+...
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-war-plugin:2.2:war (default-war) on project basicejb-war: Error assembling WAR: webxml attribute is required (or
+pre-existing WEB-INF/web.xml if executing in update mode)
+]]></programlisting>
+                    <note>
+                        <para>
+                            J2EE 1.4 and prior relied heavily and exclusively on 
+                            XML deployment descriptors for component deployment
+                            definitions. Since JavaEE 5, components have been allowed
+                            to be configured by convention and @Annotations to the 
+                            point that we sometimes do not need the XML deployment
+                            descriptor at all.
+                        </para>
+                    </note>
+                </listitem>
+
+            <listitem><para>
+                    Add the following property and pluginManagement to your
+                    root pom.xml. The plugin definition allows our WAR to be 
+                    deployed without a WEB-INF/web.xml deployment descriptor.
+                    The version is required once we explicitly mention the plugin.
+                </para>
+<programlisting language="xml"><![CDATA[    <properties>
+        ...
+        <maven-war-plugin.version>2.4</maven-war-plugin.version>]]></programlisting>                        
+<programlisting language="xml"><![CDATA[    <build>
+    	<pluginManagement>
+            <plugins>
+                ...
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>${maven-war-plugin.version}</version>
+                    <configuration>
+                       <failOnMissingWebXml>false</failOnMissingWebXml>
+                    </configuration>
+                </plugin>
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                    Verify the WAR builds.
+                </para>
+<programlisting language=""><![CDATA[$ mvn clean package
+...
+...
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ basicejb-war ---
+...
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ basicejb-war ---
+...
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ basicejb-war ---
+...
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ basicejb-war ---
+...
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ basicejb-war ---
+...
+[INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ basicejb-war ---
+...
+[INFO] --- maven-war-plugin:2.4:war (default-war) @ basicejb-war ---
+[INFO] Packaging webapp
+[INFO] Assembling webapp [basicejb-war] in [/home/jcstaff/proj/basicejbEx/basicejb-war/target/basicejb-war-1.0-SNAPSHOT]
+[INFO] Processing war project
+[INFO] Webapp assembled in [34 msecs]
+[INFO] Building war: /home/jcstaff/proj/basicejbEx/basicejb-war/target/basicejb-war-1.0-SNAPSHOT.war
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Inspect the generated WAR archive. Notice how the EJB we developed in
+                the previous chapter and included as a dependency here was brought
+                into the archive.
+                </para>
+<programlisting language=""><![CDATA[$ jar tf target/basicejb-war-1.0-SNAPSHOT.war
+...
+WEB-INF/classes/
+WEB-INF/lib/basicejb-ejb-1.0-SNAPSHOT.jar
+...
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Add a cargo-maven-plugin declaration to the WAR module to deploy the 
+                WAR. Since we are deploying the local artifact and a WAR is a deployable
+                -- we do not need to specify this artifact as a deployable.
+                </para>
+<programlisting language="xml"><![CDATA[...
+    <build>
+        <plugins>
+            ...
+            <!-- artifacts to deploy to server. this module by default -->
+            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+            </plugin>]]></programlisting>                        
+                <note>
+                    <title>Cargo will Deploy Local Artifact by Default</title>
+                    <para>
+                        Since we are deploying the local artifact, we do not need
+                        to specify a dependency or deployable. This can also make 
+                        also make it a pain to turn off if our root pom wired 
+                        cargo into every module build. 
+                    </para>
+                    <para>
+                        This can also make also make it a pain to turn off if 
+                        on a per-module basis if our root pom declared cargo 
+                        and as a result wired it into every deployable module type
+                        build (i.e., all EJB, WAR, and EAR modules). That is one reason
+                        why it is nice to passively define a consistent use of 
+                        the plugins using pluginManagement in the root pom and then 
+                        actively declare them on a per-module basis in the implementation 
+                        modules.
+                    </para>
+                </note>
+                </listitem>
+
+            <listitem><para>
+                Verify the WAR module builds, deploys to the server, and undeploys
+                from the server as part of the build lifecycle.
+                </para>
+<programlisting language="xml"><![CDATA[$ mvn clean verify
+...
+[INFO] --- maven-war-plugin:2.4:war (default-war) @ basicejb-war ---
+[INFO] Packaging webapp
+[INFO] Assembling webapp [basicejb-war] in [/home/jcstaff/proj/basicejbEx/basicejb-war/target/basicejb-war-1.0-SNAPSHOT]
+[INFO] Processing war project
+[INFO] Webapp assembled in [56 msecs]
+[INFO] Building war: /home/jcstaff/proj/basicejbEx/basicejb-war/target/basicejb-war-1.0-SNAPSHOT.war
+[INFO] 
+[INFO] --- cargo-maven2-plugin:1.4.3:redeploy (cargo-prep) @ basicejb-war ---
+Oct 11, 2014 2:11:09 AM org.xnio.Xnio <clinit>
+INFO: XNIO version 3.2.2.Final
+Oct 11, 2014 2:11:09 AM org.xnio.nio.NioXnio <clinit>
+INFO: XNIO NIO Implementation Version 3.2.2.Final
+Oct 11, 2014 2:11:09 AM org.jboss.remoting3.EndpointImpl <clinit>
+INFO: JBoss Remoting version 4.0.3.Final
+...
+[INFO] --- cargo-maven2-plugin:1.4.3:undeploy (cargo-post) @ basicejb-war ---
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Note the JNDI names printed in the server console and server.log.
+                </para>
+<programlisting language=""><![CDATA[
+02:15:34,284 INFO  [org.jboss.as.ejb3.deployment.processors.EjbJndiBindingsDeploymentUnitProcessor] (MSC service thread 1-4) 
+JNDI bindings for session bean named ReservationEJB in deployment unit deployment "basicejb-war-1.0-SNAPSHOT.war" are as follows:
+
+        java:global/basicejb-war-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationLocal
+        java:app/basicejb-war-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationLocal
+        java:module/ReservationEJB!org.myorg.basicejb.ejb.ReservationLocal
+        java:global/basicejb-war-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+        java:app/basicejb-war-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+        java:module/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+        java:jboss/exported/basicejb-war-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+
+02:15:34,309 INFO  [org.jboss.weld.deployer] (MSC service thread 1-4) JBAS016005: Starting Services for CDI deployment: basicejb-war-1.0-SNAPSHOT.war
+02:15:34,317 INFO  [org.jboss.weld.deployer] (MSC service thread 1-1) JBAS016008: Starting weld service for deployment basicejb-war-1.0-SNAPSHOT.war
+02:15:34,624 INFO  [org.wildfly.extension.undertow] (MSC service thread 1-1) JBAS017534: Registered web context: /basicejb-war-1.0-SNAPSHOT
+02:15:34,636 INFO  [org.jboss.as.server] (management-handler-thread - 1) JBAS018559: Deployed "basicejb-war-1.0-SNAPSHOT.war" (runtime-name : "basicejb-war-1.0-SNAPSHOT.war")
+]]></programlisting>                        
+                <para>
+                   The JNDI names starting with java:jboss/exported are especially important because they are
+                   available to remote clients.
+                </para>
+<programlisting language=""><![CDATA[
+java:jboss/exported/basicejb-war-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+]]></programlisting>                        
+                <para>
+                    The following will be the base JNDI name of the EJB deployed by the WAR.
+                </para>
+<programlisting language=""><![CDATA[
+/basicejb-war-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+]]></programlisting>                        
+                <para>
+                    Compare that to the base name used by the EJB deployed by the EAR. Notice that we have no
+                    application name in the WAR-deployed EJB and the module is named after the hosting WAR and 
+                    and not the imported EJB.
+                </para>
+<programlisting language=""><![CDATA[
+                         /basicejb-war-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+basicejb-ear-1.0-SNAPSHOT/basicejb-ejb-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Add the WAR to the *root* level module and verify everything builds 
+                from the root.
+                </para>
+<programlisting language="xml"><![CDATA[    <modules>
+        <module>basicejb-ejb</module>
+        <module>basicejb-ear</module>
+        <module>basicejb-war</module>
+    </modules>]]></programlisting>                        
+<programlisting language="xml"><![CDATA[$ mvn clean install -DskipTests
+...
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Basic EJB Exercise ................................. SUCCESS [  0.448 s]
+[INFO] Basic EJB Exercise::EJB ............................ SUCCESS [  2.550 s]
+[INFO] Basic EJB Exercise::EAR ............................ SUCCESS [  0.432 s]
+[INFO] Basic EJB Exercise::Remote Test .................... SUCCESS [  5.934 s]
+[INFO] Basic EJB Exercise::WAR ............................ SUCCESS [  0.458 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                This is what our project looks like so far.
+                </para>
+<programlisting language=""><![CDATA[.
+|-- basicejb-ear
+|   `-- pom.xml
+|-- basicejb-ejb
+|   |-- pom.xml
+|   `-- src
+|       |-- main
+|       |   `-- java
+|       |       `-- org
+|       |           `-- myorg
+|       |               `-- basicejb
+|       |                   `-- ejb
+|       |                       |-- ReservationEJB.java
+|       |                       |-- ReservationLocal.java
+|       |                       `-- ReservationRemote.java
+|       `-- test
+|           |-- java
+|           |   `-- org
+|           |       `-- myorg
+|           |           `-- basicejb
+|           |               `-- ejb
+|           |                   `-- ReservationTest.java
+|           `-- resources
+|               `-- log4j.xml
+|-- basicejb-test
+|   |-- pom.xml
+|   `-- src
+|       `-- test
+|           |-- java
+|           |   `-- org
+|           |       `-- myorg
+|           |           `-- basicejb
+|           |               `-- earejb
+|           |                   `-- ReservationIT.java
+|           `-- resources
+|               |-- jboss-ejb-client.properties
+|               |-- jndi.properties
+|               `-- log4j.xml
+|-- basicejb-war
+|   `-- pom.xml
+`-- pom.xml
+]]></programlisting>                        
+                </listitem>
+        </orderedlist>
     </section>
 
     <section id="ejb-basicex-wardeploy-testmodule">
         <title>Add RMI Test</title>
         <para>
+            One advantage the WAR module has over the EAR module is that
+            it can contain production code, unit tests, and IT tests.
+            One could argue that is too much to place into a single
+            module but who wants to be limited in options before we see 
+            what mode is best for our application.
+            One could create the RMI Test for the WAR-deployed EJB in a separate
+            module -- but we already did that for the EAR and the steps would
+            be pretty much the same. In this section we will implement the 
+            RMI IT test within the WAR itself. This is a reasonable approach
+            for smaller applications.
         </para>
-    </section>
 
-    <section id="ejb-basicex-wardeploy-jndi">
-        <title>Locate JNDI Name of @Remote</title>
-        <para>
-        </para>
-    </section>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Add the dependencies to the WAR/pom.xml 
+                required to use logging and JUnit.
+                </para>
+<programlisting language="xml"><![CDATA[        <!-- core dependencies -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
-    <section id="ejb-basicex-wardeploy-invoke">
-        <title>Access/Test EJB Method</title>
-        <para>
-        </para>
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <scope>test</scope>
+        </dependency>]]></programlisting>                        
+                <note>
+                    <para>
+                        The parent pom.xml should already have a dependencyManagement definition
+                        for these dependencies.
+                    </para>
+                    <para>
+                        Notice we again will silently inherit the maven-compiler-plugin
+                        definition from the parent. We don't have to repeat any work to get a 
+                        properly configured compiler.
+                        This continues to show how work we do at the parent pom.xml can be used to 
+                        keep child modules consistent and allow child modules the flexibility to 
+                        determine whether they should or should not include a particular dependency.
+                    </para>
+                    <para>
+                        The dependency on slf4j-api was made scope=provided instead of scope=test
+                        to allow us to use this dependency in the src/main tree when we later add
+                        classes within the WAR module.
+                    </para>
+                </note>
+                </listitem>
+
+            <listitem><para>
+                    Add the dependencies required to be an RMI client of JBoss/Wildfly. 
+                    We can again leverage the info.ejava.examples.common:jboss-rmi-client
+                    dependency to automatically bring these dependencies in.
+                </para>
+<programlisting language="xml"><![CDATA[        <!-- dependencies used for remote interface -->
+        <dependency>
+            <groupId>info.ejava.examples.common</groupId>
+            <artifactId>jboss-rmi-client</artifactId>
+            <type>pom</type>
+            <scope>test</scope>
+        </dependency>]]></programlisting>
+                    <note>
+                        <para>
+                            The above dependency on the jboss-rmi-client should be 
+                            scope=test. If we made it scope=compile or scope=runtime it
+                            and its dependencies would be included in the WAR. We don't
+                            want these in the WAR. We want these dependencies made available 
+                            to the RMI Test client left behind.
+                        </para>
+                        <para>
+                            We should already have a dependencyManagement definition for the 
+                            jboss-rmi-client module in the parent pom from an earlier chapter
+                            when we did this same action for the EAR-based RMI IT test.
+                        </para>
+                    </note>
+                </listitem>
+
+            <listitem><para>
+                Create a JNDI configuration by copying your jndi.properties and jboss-ejb-client.properties
+                from the EAR-based RMI Test module.  Place these files in src/test/resources of the WAR.
+                </para>
+<programlisting language=""><![CDATA[
+$ mkdir -p basicejb-war/src/test/resources
+$ cp basicejb-test/src/test/resources/*.properties basicejb-war/src/test/resources/
+]]></programlisting>                        
+<programlisting language=""><![CDATA[$ cat basicejb-war/src/test/resources/jndi.properties
+
+#jndi.properties
+java.naming.factory.initial=${jboss.remoting.java.naming.factory.initial}
+java.naming.factory.url.pkgs=${jboss.ejbclient.java.naming.factory.url.pkgs}
+java.naming.provider.url=${jboss.remoting.java.naming.provider.url}
+#java.naming.security.principal=${jndi.user}
+#java.naming.security.credentials=${jndi.password}
+jboss.naming.client.ejb.context=true
+]]></programlisting>
+<programlisting language=""><![CDATA[$ cat basicejb-war/src/test/resources/jboss-ejb-client.properties
+
+#top level property listing the names of the connections. There will be a set 
+#of properties for each name listed here
+remote.connections=default
+
+#here we define the properties for the server we have called "default"
+remote.connection.default.host=${jboss.host}
+remote.connection.default.port=${jboss.naming.port}
+remote.connectionprovider.create.options.org.xnio.Options.SSL_ENABLED=false
+
+#remote.connection.default.username=${jndi.user}
+#remote.connection.default.password=${jndi.password}
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Add a log4j.xml file to configure Log4j loggers. You may use a copy of the
+                file you put into your EJB and RMI Test.
+                </para>
+<programlisting language=""><![CDATA[
+$ cp basicejb-test/src/test/resources/log4j.xml basicejb-war/src/test/resources/
+]]></programlisting>                        
+<programlisting language="xml"><![CDATA[$ cat basicejb-test/src/test/resources/log4j.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration PUBLIC
+  "-//APACHE//DTD LOG4J 1.2//EN" "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
+<log4j:configuration 
+    xmlns:log4j="http://jakarta.apache.org/log4j/" 
+    debug="false">
+   
+    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+        <param name="Target" value="System.out"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{HH:mm:ss,SSS} %-5p (%F:%L) -%m%n"/>
+        </layout>
+    </appender>
+
+    <appender name="logfile" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="target/log4j-out.txt"/>
+        <param name="Append" value="false"/>
+        <param name="MaxFileSize" value="100KB"/>
+        <param name="MaxBackupIndex" value="1"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" 
+                   value="%-5p %d{dd-MM HH:mm:ss,SSS} [%c] (%F:%M:%L)  -%m%n"/>
+        </layout>
+   </appender>
+
+   <logger name="org.myorg">
+      <level value="debug"/>
+      <appender-ref ref="logfile"/>  
+   </logger>
+   <root>
+      <priority value="info"/>    
+      <appender-ref ref="CONSOLE"/>  
+   </root>   
+</log4j:configuration>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Add resource filtering to test resources in the WAR/pom.xml. This
+                will cause the jndi.properties file to have variables replaced with 
+                physical values when copied to the target tree.
+                </para>
+<programlisting language="xml"><![CDATA[        <build>
+        <!-- filter test/resource files for profile-specific valies -->
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </testResource>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/*.properties</exclude>
+                </excludes>
+            </testResource>
+        </testResources>]]></programlisting>                        
+                <note>
+                    <title>Restrict Filtering to Targeted Files</title>
+                    <para>
+                        As done before in the RMI Test module...the above will filter
+                        files that match a specific name pattern and then copy the 
+                        remainder of files without filtering. It is important that you 
+                        do not accidentally filter a file that was not meant to be filtered.
+                        This can corrupt a binary file or expand a variable during compile
+                        time that was meant to be expanded at runtime.
+                    </para>
+                </note>
+                </listitem>
+
+            <listitem><para>
+                Rebuild just the WAR and verify the two JNDI/EJBClient files were filtered
+                and their variables properly expanded.
+                </para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-resources
+...
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ basicejb-war ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 2 resources
+[INFO] Copying 1 resource
+..
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+<programlisting language="xml"><![CDATA[$ cat basicejb-war/target/test-classes/jndi.properties
+#jndi.properties
+java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
+java.naming.factory.url.pkgs=org.jboss.ejb.client.naming
+java.naming.provider.url=http-remoting://localhost:8080
+#java.naming.security.principal=known
+#java.naming.security.credentials=password1!
+jboss.naming.client.ejb.context=true
+]]></programlisting>
+<programlisting language="xml"><![CDATA[$ cat basicejb-war/target/test-classes/jboss-ejb-client.properties
+#top level property listing the names of the connections. There will be a set 
+#of properties for each name listed here
+remote.connections=default
+
+#here we define the properties for the server we have called "default"
+remote.connection.default.host=localhost
+remote.connection.default.port=8080
+remote.connectionprovider.create.options.org.xnio.Options.SSL_ENABLED=false
+
+#remote.connection.default.username=known
+#remote.connection.default.password=password1!
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                    Copy your JUnit IT test from the EAR-based RMI Test module and 
+                    place it in your src/test tree. Use a new package directory (warejb
+                    versus earejb) for the copied IT test.
+                </para>
+<programlisting language=""><![CDATA[
+$ mkdir -p basicejb-war/src/test/java/org/myorg/basicejb/warejb/
+$ cp basicejb-test/src/test/java/org/myorg/basicejb/earejb/ReservationIT.java basicejb-war/src/test/java/org/myorg/basicejb/warejb/ReservationIT.java
+]]></programlisting>
+                <para>
+                    Modify the Java package spec to match the new directory. The rest is exactly 
+                    what we covered in the EAR deploy section.
+                </para>
+<programlisting language="java"><![CDATA[package org.myorg.basicejb.warejb; <<<<<<<<<<<<<<<<<<<<<<
+
+import static org.junit.Assert.*;
+
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.myorg.basicejb.ejb.ReservationRemote;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class ReservationIT {
+    private static final Logger logger = LoggerFactory.getLogger(ReservationIT.class);
+    private static final String reservationJNDI = System.getProperty("jndi.name.reservation"); 
+    private InitialContext jndi;
+    private ReservationRemote reservationist; 
+    
+    @Before
+    public void setUp() throws NamingException {
+        assertNotNull("jndi.name.reservation not supplied", reservationJNDI);
+
+        logger.debug("getting jndi initial context");
+        jndi=new InitialContext();
+        logger.debug("jndi={}", jndi.getEnvironment());
+        jndi.lookup("jms");
+        
+        logger.debug("jndi name:{}", reservationJNDI);
+        reservationist = (ReservationRemote) jndi.lookup(reservationJNDI);
+        logger.debug("reservationist={}", reservationist);
+    }
+    
+    @Test
+    public void testPing() throws NamingException {
+        logger.info("*** testPing ***");
+        reservationist.ping();
+    }
+}]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Attempt to build at this point. The IT test will be compiled but 
+                not run because we have not yet declared the failsafe plugin in our
+                WAR module to execute the JUnit IT tests. 
+                </para>
+<programlisting language=""><![CDATA[$ mvn clean verify
+...
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ basicejb-war ---
+...
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ basicejb-war ---
+...
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ basicejb-war ---
+...
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ basicejb-war ---
+...
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ basicejb-war ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 1 source file to /home/jcstaff/proj/basicejbEx/basicejb-war/target/test-classes
+...
+[INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ basicejb-war ---
+...
+[INFO] --- maven-war-plugin:2.4:war (default-war) @ basicejb-war ---
+...
+[INFO] --- cargo-maven2-plugin:1.4.3:redeploy (cargo-prep) @ basicejb-war ---
+...
+[INFO] --- cargo-maven2-plugin:1.4.3:undeploy (cargo-post) @ basicejb-war ---
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Declare the failsafe plugin to your WAR/pom.xml to cause our JUnit
+                IT test to be attempted.
+                </para>
+<programlisting language="xml"><![CDATA[        <plugins>
+            <!-- adds IT integration tests to the build -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <jndi.name.reservation>ejb:/basicejb-war-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote</jndi.name.reservation>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>]]></programlisting>                        
+                    <para>
+                        Remember to pass a jndi.name.reservation system property into the JVM
+                        using the failsafe configuration. The JNDI name differs slightly from the 
+                        EAR-based form and can be obtained from the names printed on the JBoss console
+                        or server.log.
+                    </para>
+<programlisting language=""><![CDATA[
+java:jboss/exported/basicejb-war-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+]]></programlisting>                        
+                    <note>
+                        <para>
+                            This JNDI name does not contain an EAR application name are the beginning
+                            because there is no EAR. It contains a WAR module name instead of an EJB 
+                            module name and then the rest of the EJB is the same.
+                        </para>
+                        <para>
+                            Be sure to include the leading "/" prior to the module name when there is 
+                            no EAR (e.g., "ejb:/".
+                        </para>
+                    </note>
+                </listitem>
+
+
+            <listitem><para>
+                Attempt to build at this point. The WAR should be deployed during the
+                pre-integration-test phase, the IT test run during the integration-test phase,
+                the WAR undeployed during the post-integration-test phase, and the results 
+                checked for failure during the verify phase.
+                </para>
+<programlisting language=""><![CDATA[$ mvn clean verify
+...
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ basicejb-war ---
+...
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ basicejb-war ---
+...
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ basicejb-war ---
+...
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ basicejb-war ---
+...
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ basicejb-war ---
+...
+[INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ basicejb-war ---
+...
+[INFO] --- maven-war-plugin:2.4:war (default-war) @ basicejb-war ---
+...
+[INFO] --- cargo-maven2-plugin:1.4.3:redeploy (cargo-prep) @ basicejb-war ---
+...
+[INFO] --- maven-failsafe-plugin:2.17:integration-test (default) @ basicejb-war ---
+...
+Running org.myorg.basicejb.warejb.ReservationIT
+...
+02:30:58,927 DEBUG (ReservationIT.java:26) -jndi={
+java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory, 
+java.naming.provider.url=http-remoting://localhost:8080, 
+java.naming.factory.url.pkgs=org.jboss.ejb.client.naming, 
+jboss.naming.client.ejb.context=true}
+...
+02:30:59,231 DEBUG (ReservationIT.java:29) -jndi name:ejb:/basicejb-war-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+02:30:59,247 DEBUG (ReservationIT.java:31) -reservationist=Proxy for remote EJB StatelessEJBLocator{
+appName='', 
+moduleName='basicejb-war-1.0-SNAPSHOT', 
+distinctName='', 
+beanName='ReservationEJB', view='interface org.myorg.basicejb.ejb.ReservationRemote'}
+02:30:59,248 INFO  (ReservationIT.java:36) -*** testPing ***
+...
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+...
+[INFO] --- cargo-maven2-plugin:1.4.3:undeploy (cargo-post) @ basicejb-war ---
+...
+[INFO] --- maven-failsafe-plugin:2.17:verify (default) @ basicejb-war ---
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                <note>
+                    <para>
+                        Notice the we are now getting a failsafe execution and our JUnit IT test
+                        run after the cargo deployment. We get this because we added a declaration
+                        of the failsafe plugin to the WAR module *and* we ended the Java class
+                        with IT. Looking at the <ulink url="http://maven.apache.org/surefire/maven-failsafe-plugin/examples/inclusion-exclusion.html">
+                        plugin page</ulink>, the other default name patterns
+                        include.
+                    </para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>**/IT*.java</para></listitem>
+                        <listitem><para>**/*IT.java</para></listitem>
+                        <listitem><para>**/*ITCase.java</para></listitem>
+                    </itemizedlist>
+                    <para>
+                        As discussed on that same web page -- you can expand or shrink that list with the 
+                        use of includes and excludes. This is commonly done to focus your testing around
+                        a specific IT test or to exclude a IT test that requires further work for later.
+                    </para>
+                </note>
+                </listitem>
+
+
+            <listitem><para>
+                Verify that everything builds from the root module.
+                </para>
+<programlisting language=""><![CDATA[$ cd ..; mvn clean install
+...
+[INFO] Basic EJB Exercise ................................. SUCCESS [  0.178 s]
+[INFO] Basic EJB Exercise::EJB ............................ SUCCESS [  3.014 s]
+[INFO] Basic EJB Exercise::EAR ............................ SUCCESS [  0.412 s]
+[INFO] Basic EJB Exercise::Remote Test .................... SUCCESS [  5.144 s]
+[INFO] Basic EJB Exercise::WAR ............................ SUCCESS [  2.571 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+                
+                
+        </orderedlist>
     </section>
 
     <section id="ejb-basicex-wardeploy-warejb">
-        <title>Add EJB to WAR Module</title>
+        <title>Embed EJB in WAR Module</title>
         <para>
+            In the previous section we deployed an EJB imported from an external 
+            EJB Module. In this section we will embed a new EJB within the WAR
+            module. This type of packaging can be used by JSP/Servlet writers to 
+            invoke lightweight POJOs injected by the container that can form transaction 
+            boundaries and other EJB functionality -- without having to create a separate EJB module.
+            The more you think of this as a "for internal use only" and the smaller/self-contained
+            your application -- the more this packaging scheme makes sense even though it
+            can also blur the boundaries between the architectural layers.
         </para>
+
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Create a source directory for Java classes that will be included in the production
+                WAR. This source is placed in src/main/java but will end up in WEB-INF/classes once
+                the WAR is built.
+                </para>
+<programlisting language=""><![CDATA[
+$ mkdir -p basicejb-war/src/main/java
+]]></programlisting>
+                </listitem>
+
+            <listitem><para>
+                Create a package directory for our EJB and interface classes.
+                </para>
+<programlisting language=""><![CDATA[
+$ mkdir -p basicejb-war/src/main/java/org/myorg/basicejb/webejb/
+]]></programlisting>
+                </listitem>
+
+            <listitem><para>
+                Create the following EJB @Remote interface in the WAR/src/main/java directory.
+                </para>
+<programlisting language="java"><![CDATA[$ cat basicejb-war/src/main/java/org/myorg/basicejb/webejb/ShopperRemote.java
+
+package org.myorg.basicejb.webejb;
+
+import javax.ejb.Remote;
+
+@Remote
+public interface ShopperRemote {
+    int ping();
+}]]></programlisting>
+                </listitem>
+
+            <listitem><para>
+                Create the following Stateful EJB class in the WAR/src/main/java directory. In the previous 
+                example our ReservationEJB was stateless and could not maintain any conversation state with
+                the client. In this example we will make the EJB stateful -- which means there will be a memory
+                allocated for each client to house information specific to their conversation with the EJB instance.
+                </para>
+<programlisting language="java"><![CDATA[$ cat basicejb-war/src/main/java/org/myorg/basicejb/webejb/ShopperEJB.java
+package org.myorg.basicejb.webejb;
+
+import javax.annotation.PostConstruct;
+
+import javax.annotation.PreDestroy;
+import javax.ejb.Stateful;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Stateful
+public class ShopperEJB implements ShopperRemote {
+    private static Logger logger = LoggerFactory.getLogger(ShopperEJB.class);
+    
+    //we can only track conversation state here if we are stateful
+    private int counter=0;
+
+    @PostConstruct
+    public void init() {
+        logger.debug("*** ShopperEJB({}).init() ***", super.hashCode());
+    }
+    
+    @PreDestroy
+    public void destroy() {
+        logger.debug("*** ShopperEJB({}).destroy() ***", super.hashCode());
+    }
+    
+    @Override
+    public int ping() {
+        logger.debug("ping({}) called, returned {}", super.hashCode(), counter);
+        return counter++;
+    }
+}]]></programlisting>
+                <note>
+                    <para>
+                        We have added information to the ping call debug text that will provide
+                        us an indication which EJB instance is being called.
+                    </para>
+                </note>
+                </listitem>
+
+            <listitem><para>
+                Deploy the WAR at this point so we can be sure the EJB was created correctly
+                and to be sure of the JNDI name created. Note that we are not yet done with the 
+                module. The problem is we have transitioned from a IT test-only module to one
+                that also hosts EJB code. We are missing a few dependencies.
+                </para>
+<programlisting language=""><![CDATA[
+$ mvn clean pre-integration-test
+
+...
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ basicejb-war ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 2 source files to /home/jcstaff/proj/basicejbEx/basicejb-war/target/classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /home/jcstaff/proj/basicejbEx/basicejb-war/src/main/java/org/myorg/basicejb/webejb/ShopperEJB.java:[6,17] package javax.ejb does not exist
+[ERROR] /home/jcstaff/proj/basicejbEx/basicejb-war/src/main/java/org/myorg/basicejb/webejb/ShopperRemote.java:[3,17] package javax.ejb does not exist
+[ERROR] /home/jcstaff/proj/basicejbEx/basicejb-war/src/main/java/org/myorg/basicejb/webejb/ShopperRemote.java:[5,2] cannot find symbol
+  symbol: class Remote
+[ERROR] /home/jcstaff/proj/basicejbEx/basicejb-war/src/main/java/org/myorg/basicejb/webejb/ShopperEJB.java:[11,2] cannot find symbol
+  symbol: class Stateful
+[INFO] 4 errors 
+...
+[INFO] BUILD FAILURE
+]]></programlisting>
+                </listitem>
+
+                <listitem><para>
+                        Add several dependencies to the WAR/pom.xml account for use 
+                        of EJB types.
+                    </para>
+<programlisting language="xml"><![CDATA[# basicejb-war/pom.xml
+        <!-- for EJBs embedded in WAR module -->
+        <dependency>
+            <groupId>javax.ejb</groupId>
+            <artifactId>javax.ejb-api</artifactId>
+            <scope>provided</scope>
+        </dependency>]]></programlisting>                        
+                    <note>
+                        <para>
+                            You should always declare a scope=provided dependency on the 
+                            JavaEE API artifacts so they are not unnecessarily deployed
+                            in the WAR to the server. The server already has a compliant
+                            version of these APIs and implementations for those APIs.
+                        </para>
+                    </note>
+                    </listitem>
+
+            <listitem><para>
+                Re-deploy the WAR with the compilation dependency corrected and look for the 
+                newly added EJB to show up in the console or server.log.
+                </para>
+<programlisting language=""><![CDATA[
+$ mvn clean pre-integration-test
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+<programlisting language=""><![CDATA[
+        java:global/basicejb-war-1.0-SNAPSHOT/ShopperEJB!org.myorg.basicejb.webejb.ShopperRemote
+        java:app/basicejb-war-1.0-SNAPSHOT/ShopperEJB!org.myorg.basicejb.webejb.ShopperRemote
+        java:module/ShopperEJB!org.myorg.basicejb.webejb.ShopperRemote
+        java:jboss/exported/basicejb-war-1.0-SNAPSHOT/ShopperEJB!org.myorg.basicejb.webejb.ShopperRemote
+        java:global/basicejb-war-1.0-SNAPSHOT/ShopperEJB
+        java:app/basicejb-war-1.0-SNAPSHOT/ShopperEJB
+        java:module/ShopperEJB
+]]></programlisting>
+                <para>
+                    We are specially interested in the java:jboss/exported name.
+                </para>
+<programlisting language=""><![CDATA[
+java:jboss/exported/basicejb-war-1.0-SNAPSHOT/ShopperEJB!org.myorg.basicejb.webejb.ShopperRemote
+]]></programlisting>
+                <para>
+                    This will form the base of our JNDI name used for the IT test.
+                </para>
+<programlisting language=""><![CDATA[
+/basicejb-war-1.0-SNAPSHOT/ShopperEJB!org.myorg.basicejb.webejb.ShopperRemote
+]]></programlisting>
+
+
+                <para>
+                    The main difference between the stateless and stateful JNDI names are 
+                    when we use EJB Client. When using the "ejb:" naming prefix we must append
+                    "?stateful" to the end of the name to tell EJB Client we are communicating with
+                    a stateful EJB. EJB Client, unlike JBoss Remoting, understands EJB
+                    communication and will attempt to setup for communication with the EJB in an 
+                    efficient manner. The extra text is not appropriate for using outside of 
+                    the "ejb:" naming.
+                </para>
+<programlisting language=""><![CDATA[
+ejb:/basicejb-war-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+ejb:/basicejb-war-1.0-SNAPSHOT/ShopperEJB!org.myorg.basicejb.webejb.ShopperRemote?stateful
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Create the following IT test in your WAR/src/test/java directory tree.
+                </para>
+<programlisting language="java"><![CDATA[$ cat basicejb-war/src/test/java/org/myorg/basicejb/warejb/ShopperIT.java
+
+package org.myorg.basicejb.warejb;
+
+import static org.junit.Assert.*;
+
+
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.myorg.basicejb.webejb.ShopperRemote;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class ShopperIT {
+    private static final Logger logger = LoggerFactory.getLogger(ShopperIT.class);
+    private static final String shopperJNDI = System.getProperty("jndi.name.shopper"); 
+    private InitialContext jndi;
+    
+    @Before
+    public void setUp() throws NamingException {
+        assertNotNull("jndi.name.reservation not supplied", shopperJNDI);
+
+        logger.debug("getting jndi initial context");
+        jndi=new InitialContext();
+        logger.debug("jndi={}", jndi.getEnvironment());
+    }
+    
+    @Test
+    public void testPing() throws NamingException {
+        logger.info("*** testPing ***");
+        ShopperRemote shopper1= (ShopperRemote) jndi.lookup(shopperJNDI);
+        for (int i=0; i<10; i++) {
+            int counter1=shopper1.ping();
+            assertEquals("unexpected count from shopper1",  i, counter1);
+        }
+    }
+}]]></programlisting>
+                <para>
+                    Notice the difference in the way we constructed the stateful instance
+                    for our IT test. Since the EJB is stateful, we create a reference to it
+                    close to where we will use it. Stateful EJBs have (in-memory) state related
+                    to a specific client and will be unique to each client.
+                </para>
+                </listitem>
+
+            <listitem><para>
+                Add the new EJB's jndi name to the failsafe configuration using the 
+                "jndi.name.shopper" token found in the IT class' System.getProperty() statement.
+                Remember to add the "?stateful" to the end of the JNDI name. This will
+                help the client library setup appropriately for communication with this EJB.
+                </para>
+<programlisting language="xml"><![CDATA[<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-failsafe-plugin</artifactId>
+    <configuration>
+        <systemPropertyVariables>
+            <jndi.name.reservation>ejb:/basicejb-war-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote</jndi.name.reservation>
+            <jndi.name.shopper>ejb:/basicejb-war-1.0-SNAPSHOT/ShopperEJB!org.myorg.basicejb.webejb.ShopperRemote?stateful</jndi.name.shopper>
+        </systemPropertyVariables>
+    </configuration>
+</plugin>]]></programlisting>
+                </listitem>
+
+            <listitem><para>
+                Build the WAR and note our IT test passes -- verifying the stateful behavior of the EJB. Note
+                the output in the server.log. It shows each call returning to the same bean instance.
+                </para>
+<programlisting language=""><![CDATA[$ mvn clean verify
+...
+Running org.myorg.basicejb.warejb.ReservationIT
+...
+Running org.myorg.basicejb.warejb.ShopperIT
+...
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+<programlisting language=""><![CDATA[
+2014-10-11 15:28:09,702 DEBUG [org.myorg.basicejb.ejb.ReservationEJB] (EJB default - 2) *** ReservationEJB.destroy() ***
+2014-10-11 15:28:09,734 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 10) *** ShopperEJB(626691370).init() ***
+2014-10-11 15:28:09,831 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 9) ping(626691370) called, returned 0
+2014-10-11 15:28:09,835 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 4) ping(626691370) called, returned 1
+...
+2014-10-11 15:28:09,864 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 2) ping(626691370) called, returned 8
+2014-10-11 15:28:09,868 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 10) ping(626691370) called, returned 9
+]]></programlisting>
+                </listitem>
+
+            <listitem><para>
+                Update the IT test to add a second instance used concurrently with the first.
+                </para>
+<programlisting language="java"><![CDATA[    @Test
+    public void testPing() throws NamingException {
+        logger.info("*** testPing ***");
+        ShopperRemote shopper1= (ShopperRemote) jndi.lookup(shopperJNDI);
+        ShopperRemote shopper2= (ShopperRemote) jndi.lookup(shopperJNDI);
+        for (int i=0; i<10; i++) {
+            int counter1=shopper1.ping();
+            int counter2=shopper2.ping();
+            assertEquals("unexpected count from shopper1",  i, counter1);
+            assertEquals("unexpected count from shopper2",  i, counter2);
+        }
+    }]]></programlisting>
+                </listitem>
+
+            <listitem><para>
+                Re-build the WAR and note the IT test continues to pass -- showing we have two independent 
+                instances. Note the output in the server.log showing the two sets of calls went to separate,
+                consistent instances on the server.
+                </para>
+<programlisting language=""><![CDATA[$ mvn clean verify
+...
+Running org.myorg.basicejb.warejb.ReservationIT
+...
+Running org.myorg.basicejb.warejb.ShopperIT
+...
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+<programlisting language=""><![CDATA[
+2014-10-11 15:38:44,380 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 4) *** ShopperEJB(2010115892).init() ***
+2014-10-11 15:38:44,457 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 3) *** ShopperEJB(741113002).init() ***
+2014-10-11 15:38:44,467 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 5) ping(2010115892) called, returned 0
+2014-10-11 15:38:44,472 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 6) ping(741113002) called, returned 0
+2014-10-11 15:38:44,477 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 8) ping(2010115892) called, returned 1
+2014-10-11 15:38:44,483 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 7) ping(741113002) called, returned 1
+...
+2014-10-11 15:38:44,548 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 10) ping(2010115892) called, returned 8
+2014-10-11 15:38:44,556 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 9) ping(741113002) called, returned 8
+2014-10-11 15:38:44,561 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 4) ping(2010115892) called, returned 9
+2014-10-11 15:38:44,566 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 3) ping(741113002) called, returned 9
+]]></programlisting>
+                </listitem>
+
+            <listitem><para>
+                Take a look at the produced WAR. Notice it contains the imported EJB archive
+                in the WEB-INF/lib directory and embedded EJB classes in WEB-INF/classes directory.
+                These are standard locations in a WAR for deploying executable code in the 
+                WAR's classloader.
+                </para>
+<programlisting language="xml"><![CDATA[
+$ jar tf basicejb-war/target/basicejb-war-1.0-SNAPSHOT.war 
+...
+WEB-INF/lib/basicejb-ejb-1.0-SNAPSHOT.jar
+WEB-INF/classes/org/myorg/basicejb/webejb/ShopperRemote.class
+WEB-INF/classes/org/myorg/basicejb/webejb/ShopperEJB.class
+...
+]]></programlisting>
+                </listitem>
+
+            <listitem><para>
+                Now that you have this working, experiment by removing the "?stateless" from the JNDI name in the WAR/pom.
+                </para>
+<programlisting language="xml"><![CDATA[<jndi.name.shopper>ejb:/basicejb-war-1.0-SNAPSHOT/ShopperEJB!org.myorg.basicejb.webejb.ShopperRemote</jndi.name.shopper>]]></programlisting>
+                </listitem>
+
+            <listitem><para>
+                Attempt to build and IT test your stateless EJB. Needless to say you will not get beyind the first call
+                to ping where the client library is trying to broker something in the call.
+                </para>
+<programlisting language=""><![CDATA[
+Running org.myorg.basicejb.warejb.ShopperIT
+java.lang.ClassCastException: java.lang.Class cannot be cast to java.lang.String
+	at org.jboss.ejb.client.remoting.ProtocolMessageHandler.readAttachments(ProtocolMessageHandler.java:55)
+	at org.jboss.ejb.client.remoting.InvocationExceptionResponseHandler$MethodInvocationExceptionResultProducer.getResult(InvocationExceptionResponseHandler.java:82)
+	at org.jboss.ejb.client.EJBClientInvocationContext.getResult(EJBClientInvocationContext.java:276)
+        ...
+	at org.jboss.ejb.client.EJBInvocationHandler.invoke(EJBInvocationHandler.java:144)
+	at com.sun.proxy.$Proxy6.ping(Unknown Source)
+	at org.myorg.basicejb.warejb.ShopperIT.testPing(ShopperIT.java:35)
+...
+Tests in error: 
+  ShopperIT.testPing:35 » ClassCast java.lang.Class cannot be cast to java.lang....
+
+Tests run: 2, Failures: 0, Errors: 1, Skipped: 0
+[INFO] BUILD FAILURE
+]]></programlisting>
+                </listitem>
+
+            <listitem><para>
+                Restore the JNDI name and verify your project tree looks like the following at this point.
+                </para>
+<programlisting language=""><![CDATA[
+.
+|-- basicejb-ear
+|   `-- pom.xml
+|-- basicejb-ejb
+|   |-- pom.xml
+|   `-- src
+|       |-- main
+|       |   `-- java
+|       |       `-- org
+|       |           `-- myorg
+|       |               `-- basicejb
+|       |                   `-- ejb
+|       |                       |-- ReservationEJB.java
+|       |                       |-- ReservationLocal.java
+|       |                       `-- ReservationRemote.java
+|       `-- test
+|           |-- java
+|           |   `-- org
+|           |       `-- myorg
+|           |           `-- basicejb
+|           |               `-- ejb
+|           |                   `-- ReservationTest.java
+|           `-- resources
+|               `-- log4j.xml
+|-- basicejb-test
+|   |-- pom.xml
+|   `-- src
+|       `-- test
+|           |-- java
+|           |   `-- org
+|           |       `-- myorg
+|           |           `-- basicejb
+|           |               `-- earejb
+|           |                   `-- ReservationIT.java
+|           `-- resources
+|               |-- jboss-ejb-client.properties
+|               |-- jndi.properties
+|               `-- log4j.xml
+|-- basicejb-war
+|   |-- pom.xml
+|   `-- src
+|       |-- main
+|       |   |-- java
+|       |   |   `-- org
+|       |   |       `-- myorg
+|       |   |           `-- basicejb
+|       |   |               `-- webejb
+|       |   |                   |-- ShopperEJB.java
+|       |   |                   `-- ShopperRemote.java
+|       |   `-- webapp
+|       `-- test
+|           |-- java
+|           |   `-- org
+|           |       `-- myorg
+|           |           `-- basicejb
+|           |               `-- warejb
+|           |                   |-- ReservationIT.java
+|           |                   `-- ShopperIT.java
+|           `-- resources
+|               |-- jboss-ejb-client.properties
+|               |-- jndi.properties
+|               `-- log4j.xml
+`-- pom.xml
+]]></programlisting>
+                </listitem>
+        </orderedlist>
     </section>
         
     <section id="ejb-basicex-wardeploy-summary">
        <title>Summary</title>
         <itemizedlist spacing="compact">
             <listitem><para>
+                Deploy EJB Dependency
                 </para>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>Part of the flexible deploymemt enhancement made in JavaEE 6</para></listitem>
+                    <listitem><para>Avoids requirement for separate EAR module just to add EJB behavior to an existing WAR</para></listitem>
+                    <listitem><para>Retains encapsulation of the EJB. It is deployed as an EJB.jar within the WAR.</para></listitem>
                 </itemizedlist>
             </listitem>
             <listitem><para>
+                Deploy Embedded EJB
                 </para>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>Another option in the flexible deployment feature</para></listitem>
+                    <listitem><para>Avoids requirement for separate EJB module just to add EJB behavior to an existing WAR</para></listitem>
+                    <listitem><para>Conceptually, the EJBs in this mode are likely a small extension of the web code</para></listitem>
+                    <listitem><para>No built-in feature for creating an EJB-client for remote clients. Must be done manually using JAR plugin</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>
+                Stateless EJB
+                </para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>No per-client conversational state maintained</para></listitem>
+                    <listitem><para>Like calling a function with supporting backend resources initialized and enterprise requirements 
+                         (e.g., security, transactions) enforced</para></listitem>
+                    <listitem><para>All information passed into and returned from the call except what is accessed/stored in backend resources (i.e., database)</para></listitem>
+                    <listitem><para>Easier to scale and load balance because each call may go to a separate instance and server</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>
+                Stateful EJB
+                </para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Dedicated resources allocated on the server per instance</para></listitem>
+                    <listitem><para>Holds state in-memory or serialized to temporary storage</para></listitem>
+                    <listitem><para>Like calling a method of an object which is caching information in a multi-step transaction</para></listitem>
+                    <listitem><para>Harder to scale since all calls either must return to the same instance or the state must be shared across the cluster</para></listitem>
                 </itemizedlist>
             </listitem>
         </itemizedlist>

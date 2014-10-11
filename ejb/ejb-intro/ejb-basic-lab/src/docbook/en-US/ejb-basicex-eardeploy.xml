@@ -466,11 +466,11 @@ $ rm -rf $HOME/.m2/repository/info/ejava/examples/common/jboss-rmi-client/4.0.0-
                 we get tangible values inserted.
                 </para>
 <programlisting language=""><![CDATA[
-$ mkdir -p javaeeExTest/src/test/resources
-$ vi javaeeExTest/src/test/resources/jndi.properties
+$ mkdir -p basicejb-test/src/test/resources
+$ vi basicejb-test/src/test/resources/jndi.properties
 ]]></programlisting>                        
 <programlisting language=""><![CDATA[
-$ cat javaeeExTest/src/test/resources/jndi.properties
+$ cat basicejb-test/src/test/resources/jndi.properties
 
 #jndi.properties for JBoss Remoting
 java.naming.factory.initial=${jboss.remoting.java.naming.factory.initial}
@@ -666,7 +666,7 @@ jboss.naming.client.ejb.context=true
                 </listitem>
 
             <listitem><para>
-                    [[1]] Create a JUnit IT test that will lookup the EJB and invoke the
+                    Create a JUnit IT test that will lookup the EJB and invoke the
                     ping method. 
                 </para>
 <programlisting language=""><![CDATA[
@@ -695,13 +695,6 @@ public class ReservationIT {
         logger.debug("jndi={}", jndi.getEnvironment());
     }
 
-    @After
-    public void tearDown() throws NamingException {
-        if (jndi!=null) {
-            jndi.close();
-        }
-    }
-    
     @Test
     public void testPing() {
         logger.info("*** testPing ***");
@@ -812,14 +805,12 @@ $ cp basicejb-ejb/src/test/resources/log4j.xml basicejb-test/src/test/resources/
                 Declare the failsafe plugin to your RMI Test/pom.xml to cause our JUnit
                 IT test to be attempted.
                 </para>
-<programlisting language=""><![CDATA[
-        <plugins>
+<programlisting language="xml"><![CDATA[        <plugins>
             <!-- adds IT integration tests to the build -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-            </plugin>
-]]></programlisting>                        
+            </plugin>]]></programlisting>                        
                 </listitem>
 
             <listitem><para>
@@ -1229,7 +1220,13 @@ deployment "basicejb-ear-1.0-SNAPSHOT.ear" are as follows:
                     That JNDI is available to external clients -- like our IT test.
                 </para>
 <programlisting language=""><![CDATA[
-    java:jboss/exported/basicejb-ear-1.0-SNAPSHOT/basicejb-ejb-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+java:jboss/exported/basicejb-ear-1.0-SNAPSHOT/basicejb-ejb-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+]]></programlisting>                        
+                <para>
+                    The following will be the base JNDI name of the EJB deployed by the EAR.
+                </para>
+<programlisting language=""><![CDATA[
+basicejb-ear-1.0-SNAPSHOT/basicejb-ejb-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
 ]]></programlisting>                        
                     <tip>
                         <para>
@@ -1419,6 +1416,147 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 2014-10-06 00:16:26,899 DEBUG [org.myorg.basicejb.ejb.ReservationEJB] (EJB default - 1) *** ReservationEJB.destroy() ***
 ]]></programlisting>                        
                 </listitem>
+
+            <listitem><para>
+                Now that you have everything working lets insert a common mistake made when 
+                forming a IT test. Rename your ReservationIT test to TestReservationIT or 
+                ReservationTest). Be sure
+                to rename both the Java class and the file.
+                </para>
+<programlisting language=""><![CDATA[
+$ mv basicejb-test/src/test/java/org/myorg/basicejb/earejb/ReservationIT.java basicejb-test/src/test/java/org/myorg/basicejb/earejb/TestReservationIT.java
+...
+public class TestReservationIT {
+    private static final Logger logger = LoggerFactory.getLogger(TestReservationIT.class);
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Attempt to build your RMI Test module. The problem here is that your 
+                IT test (which requires a JNDI name property passed to it) is being run
+                during the test phase and the failsafe configuration we put in place runs
+                in the integration-test-phase. It is running in the earlier test phase
+                because the name of the class now matches the 
+                <ulink url="http://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclusion.html">surefire pattern</ulink>.
+                </para>
+<programlisting language=""><![CDATA[$ mvn clean verify
+...
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ basicejb-test ---
+...
+[INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ basicejb-test ---
+[INFO] Surefire report directory: /home/jcstaff/proj/basicejbEx/basicejb-test/target/surefire-reports
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running org.myorg.basicejb.earejb.TestReservationIT
+Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.209 sec <<< FAILURE!
+testPing(org.myorg.basicejb.earejb.TestReservationIT)  Time elapsed: 0.013 sec  <<< FAILURE!
+java.lang.AssertionError: jndi.name.reservation not supplied
+	at org.junit.Assert.fail(Assert.java:88)
+	at org.junit.Assert.assertTrue(Assert.java:41)
+	at org.junit.Assert.assertNotNull(Assert.java:621)
+	at org.myorg.basicejb.earejb.TestReservationIT.setUp(TestReservationIT.java:22)
+
+Results :
+
+Failed tests:   testPing(org.myorg.basicejb.earejb.TestReservationIT): jndi.name.reservation not supplied
+
+Tests run: 1, Failures: 1, Errors: 0, Skipped: 0
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Lets go one more (mistaken) step and (mistakenly) assume all we have to 
+                do is copy our failsafe configuration to the surefire plugin. That should make the
+                assert happy.
+                </para>
+<programlisting language="xml"><![CDATA[
+        <plugins>
+            <!-- a mistaken step to attempt to correct an IT test setup problem -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <jndi.name.reservation>basicejb-ear-${project.version}/basicejb-ejb-${project.version}/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote</jndi.name.reservation>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+            <!-- adds IT integration tests to the build -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <jndi.name.reservation>basicejb-ear-${project.version}/basicejb-ejb-${project.version}/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote</jndi.name.reservation>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Attempt to build the RMI Test module with the assert for the JNDI name resolved and
+                notice the error we get. The IT test is configured correctly. It is doing all the right things.
+                The problem is that with its current name, it matches the surefire criteria and is being
+                run prior to the application being deployed to the server.
+                </para>
+<programlisting language=""><![CDATA[$ mvn clean verify
+...
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ basicejb-test ---
+...
+[INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ basicejb-test ---
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running org.myorg.basicejb.earejb.TestReservationIT
+12:59:48,726 DEBUG (TestReservationIT.java:24) -getting jndi initial context
+...
+12:59:49,546 INFO  (TestReservationIT.java:36) -*** testPing ***
+12:59:49,595 INFO  (VersionReceiver.java:103) -EJBCLIENT000017: Received server version 2 and marshalling strategies [river]
+12:59:49,596 INFO  (RemotingConnectionEJBReceiver.java:215) -EJBCLIENT000013: Successful version handshake completed for receiver context EJBReceiverContext{clientContext=org.jboss.ejb.client.EJBClientContext@3f7b86b6, receiver=Remoting connection EJB receiver [connection=org.jboss.ejb.client.remoting.ConnectionPool$PooledConnection@46c93749,channel=jboss.ejb,nodename=fedora17x64-kde]} on channel Channel ID d8293998 (outbound) of Remoting connection 6762a5f3 to localhost/127.0.0.1:8080
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 1.091 sec <<< FAILURE!
+testPing(org.myorg.basicejb.earejb.TestReservationIT)  Time elapsed: 0.891 sec  <<< ERROR!
+java.lang.IllegalStateException: EJBCLIENT000025: No EJB receiver available for handling [appName:basicejb-ear-1.0-SNAPSHOT, moduleName:basicejb-ejb-1.0-SNAPSHOT, distinctName:] combination for invocation context org.jboss.ejb.client.EJBClientInvocationContext@6e9af2a2
+	at org.jboss.ejb.client.EJBClientContext.requireEJBReceiver(EJBClientContext.java:749)
+
+...
+Tests in error: 
+  testPing(org.myorg.basicejb.earejb.TestReservationIT): EJBCLIENT000025: No EJB receiver available for handling [appName:basicejb-ear-1.0-SNAPSHOT, moduleName:basicejb-ejb-1.0-SNAPSHOT, distinctName:] combination for invocation context org.jboss.ejb.client.EJBClientInvocationContext@6e9af2a2
+
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0
+
+...
+[INFO] BUILD FAILURE
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Restore your IT test back to its original state so that it does not 
+                get executed during the test phase. Also remote the surefire configuration
+                since the JNDI name is never needed during a unit test and our RMI Test
+                module does not run any unit tests.
+                </para>
+<programlisting language=""><![CDATA[
+$ mv basicejb-test/src/test/java/org/myorg/basicejb/earejb/TestReservationIT.java basicejb-test/src/test/java/org/myorg/basicejb/earejb/ReservationIT.java
+...
+public class ReservationIT {
+    private static final Logger logger = LoggerFactory.getLogger(ReservationIT.class);
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Your build should now be working again.
+                </para>
+<programlisting language=""><![CDATA[
+$ mvn clean install
+]]></programlisting>                        
+                </listitem>
         </orderedlist>
     </section>
 
@@ -1547,7 +1685,7 @@ $ mvn dependency:tree
                     a handler for the "ejb:" prefix.
                 </para>
 <programlisting language=""><![CDATA[
-$ jar tf /home/jcstaff/.m2/repository2/org/jboss/jboss-ejb-client/2.0.1.Final/jboss-ejb-client-2.0.1.Final.jar | grep org.jboss.ejb.client.naming
+$ jar tf ~/.m2/repository/org/jboss/jboss-ejb-client/2.0.1.Final/jboss-ejb-client-2.0.1.Final.jar | grep org.jboss.ejb.client.naming
 org/jboss/ejb/client/naming/
 org/jboss/ejb/client/naming/ejb/
 org/jboss/ejb/client/naming/ejb/SecurityActions$1.class
