@@ -1,0 +1,482 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-basicex-parent">
+    <title>EJB Parent POM</title>
+    <para>
+        One last point before we wrap up. During the Maven module setup chapters you went 
+        through some extra hoops to separate plugin and dependency definitions from their 
+        declaration in the implementation modules. We placed those definitions, but default
+        into the parent module for the exercise. In this chapter we will gut that parent
+        of the generic setup that can be used in other projects based on EJB and related 
+        technologies.
+    </para>
+
+    <section id="ejb-basicex-parent-purpose">
+        <title>Purpose</title>
+        <section id="ejb-basicex-parent-goals">
+            <title>Goals</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Create a re-suable root pom that defines dependencies and plugins suitable for use by multiple applications</para></listitem>
+                <listitem><para>Releave the parent pom of the multi-module project of tracking those details</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejb-basicex-parent-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Have a root pom suitable for reuse in different EJB-based applications</para></listitem>
+            </itemizedlist>
+        </section>
+    </section>
+<!--
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+
+            <orderedlist spacing="compact">
+                <listitem><para>
+                    </para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                    </listitem>
+                <listitem><para>
+                    </para></listitem>
+            </orderedlist>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+        <variablelist spacing="compact">
+            <varlistentry>
+                <term><filename>
+                    </filename></term>
+                <listitem><para>
+                    </para></listitem>
+            </varlistentry>
+        </variablelist>
+-->
+
+    <section id="ejb-basicex-parent-parent">
+        <title>Create Root POM</title>
+        <para>
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Create a new module that will be used as a root pom. To cut down on redundancy,
+                have that pom inherit from the 
+                <ulink url="https://github.com/ejavaguy/ejava-student/blob/master/jpa/jpa-parent/pom.xml">jpa-parent pom</ulink>
+                created in the jpa portion of the course. Our EJB solutions will soon need the details contained in the 
+                data tier parent pom.
+                </para>
+<programlisting language="xml"><![CDATA[$ mkdir ../ejb-parent
+$ cat ../ejb-parent/pom.xml
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>info.ejava.examples.jpa</groupId>
+        <artifactId>jpa-parent</artifactId>
+        <version>4.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.myorg</groupId>
+    <artifactId>ejb-parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>EJB Parent POM</name>
+    <description>
+        This parent pom is intended to provide common and re-usable 
+        definitions and constructs across EJB related modules.
+        It extends and does not repeat the details contained in 
+        the jpa-parent module.
+    </description>
+
+    <properties>
+    </properties>
+
+    <repositories>
+    </repositories>
+
+    <pluginRepositories>
+    </pluginRepositories>
+
+    <dependencyManagement>
+        <dependencies>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+    	<pluginManagement>
+            <plugins>
+            </plugins>
+    	</pluginManagement>
+    </build>
+
+    <profiles>
+    </profiles>
+</project>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Update the current root/parent pom to inherit from this new pom.
+                </para>
+<programlisting language=""><![CDATA[    <parent>
+        <groupId>org.myorg</groupId>
+        <artifactId>ejb-parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>../ejb-parent</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>myorg.basicejb</groupId>
+    <artifactId>basicejbEx</artifactId>
+    <packaging>pom</packaging>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Verify the exercise still builds.
+                </para>
+<programlisting language=""><![CDATA[$ mvn clean install]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Remove the properties already defined in the jpa-parent that we have defined in 
+                this parent pom.
+                </para>
+<programlisting language="xml"><![CDATA[    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <java.source.version>1.7</java.source.version>
+    <java.target.version>1.7</java.target.version>
+
+    <junit.version>4.11</junit.version>
+    <log4j.version>1.2.13</log4j.version>
+
+    <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Define the properties unique to EJB development in the ejb-parent pom. 
+                Remove them from the current parent pom.
+                </para>
+<programlisting language="xml"><![CDATA[    <properties>
+        <ejava.version>4.0.0-SNAPSHOT</ejava.version>
+        <javax.ejb-api.version>3.2</javax.ejb-api.version>
+        <slf4j.version>1.6.1</slf4j.version>
+        <wildfly.version>8.1.0.Final</wildfly.version>
+
+        <cargo-maven2-plugin.version>1.4.3</cargo-maven2-plugin.version>
+        <maven-ear-plugin.version>2.9.1</maven-ear-plugin.version>
+        <maven-ejb-plugin.version>2.4</maven-ejb-plugin.version>
+        <maven-failsafe-plugin.version>2.17</maven-failsafe-plugin.version>
+        <maven-war-plugin.version>2.4</maven-war-plugin.version>
+
+        <cargo.containerId>wildfly8x</cargo.containerId>
+        <jboss.host>localhost</jboss.host>
+        <jboss.http.port>8080</jboss.http.port>
+        <jboss.remoting.port>${jboss.http.port}</jboss.remoting.port>
+        <jboss.naming.port>${jboss.remoting.port}</jboss.naming.port>
+        <jboss.mgmt.host>${jboss.host}</jboss.mgmt.host>
+        <jboss.mgmt.port>9990</jboss.mgmt.port>
+        <jndi.user>known</jndi.user>
+        <jndi.password>password1!</jndi.password>
+
+        <jboss.remoting.java.naming.factory.initial>org.jboss.naming.remote.client.InitialContextFactory</jboss.remoting.java.naming.factory.initial>
+        <jboss.remoting.java.naming.provider.url>http-remoting://${jboss.host}:${jboss.http.port}</jboss.remoting.java.naming.provider.url>
+        <jboss.remoting.java.naming.factory.url.pkgs/>
+
+        <jboss.ejbclient.java.naming.factory.url.pkgs>org.jboss.ejb.client.naming</jboss.ejbclient.java.naming.factory.url.pkgs>
+    </properties>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Verify the exercise still builds.
+                </para>
+<programlisting language=""><![CDATA[$ mvn clean install]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Remove the dependencyManagement definitions already defined in the jpa-parent that we have defined in 
+                this parent pom.
+                </para>
+<programlisting language="xml"><![CDATA[    <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>${log4j.version}</version>
+    </dependency>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Define the dependencyManagement definitions unique to EJB development in the ejb-parent pom. 
+                Remove them from the current parent pom.
+                </para>
+<programlisting language="xml"><![CDATA[    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.ejb</groupId>
+                <artifactId>javax.ejb-api</artifactId>
+                <version>${javax.ejb-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>info.ejava.examples.common</groupId>
+                <artifactId>jboss-rmi-client</artifactId>
+                <version>${ejava.version}</version>
+                <type>pom</type>
+            </dependency>    
+        </dependencies>
+    </dependencyManagement>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Verify the exercise still builds.
+                </para>
+<programlisting language=""><![CDATA[$ mvn clean install]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Remove the pluginManagement definitions already defined in the jpa-parent that we have defined in 
+                this parent pom.
+                </para>
+<programlisting language="xml"><![CDATA[<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven-compiler-plugin.version}</version>
+        <configuration>
+                <source>${java.source.version}</source>
+                <target>${java.target.version}</target>
+        </configuration>	                
+    </plugin>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Define the pluginManagement definitions unique to EJB development in the ejb-parent pom. 
+                Remove them from the current parent pom.
+                </para>
+<programlisting language="xml"><![CDATA[<build>
+    <pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ejb-plugin</artifactId>
+                <version>${maven-ejb-plugin.version}</version>
+                <configuration>
+                    <ejbVersion>3.2</ejbVersion>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>${maven-war-plugin.version}</version>
+                <configuration>
+                   <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ear-plugin</artifactId>
+                <version>${maven-ear-plugin.version}</version>
+                <configuration>
+                   <version>7</version>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${maven-failsafe-plugin.version}</version>
+                <configuration>
+                    <argLine>${surefire.argLine}</argLine>
+                </configuration>
+                <executions>
+                    <execution> 
+                       <goals>
+                           <goal>integration-test</goal>
+                           <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+                <version>${cargo-maven2-plugin.version}</version>
+                <configuration>
+                    <container>
+                        <containerId>${cargo.containerId}</containerId>
+                        <type>remote</type>
+                        <log>target/server.log</log>
+                        <output>target/output.log</output>
+                    </container>
+                    <configuration>
+                        <type>runtime</type>
+                        <properties>
+                            <cargo.hostname>${jboss.mgmt.host}</cargo.hostname>
+                            <cargo.jboss.management.port>${jboss.mgmt.port}</cargo.jboss.management.port>
+                        </properties>
+                    </configuration>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.wildfly</groupId>
+                        <artifactId>wildfly-controller-client</artifactId>
+                        <version>${wildfly.version}</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                   <execution>
+                       <id>cargo-prep</id> 
+                           <phase>pre-integration-test</phase>
+                       <goals>
+                            <goal>redeploy</goal>
+                       </goals>
+                   </execution>
+                    <execution>
+                        <id>cargo-post</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>undeploy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </pluginManagement>
+</build>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Verify the exercise still builds.
+                </para>
+<programlisting language=""><![CDATA[$ mvn clean install]]></programlisting>                        
+                </listitem>
+
+
+            <listitem><para>
+                Define the repository declarations we added for EJB development
+                that were not in the the jpa-parent pom. Remember that we used the
+                class maven repository to locate the jboss-rmi-client archive in 
+                order to more easily bring in JBoss dependencies into the RMI client.
+                </para>
+<programlisting language="xml"><![CDATA[    <repositories>
+        <repository>
+            <id>webdev-snapshot</id>
+            <name>ejava webdev snapshot repository</name>
+            <url>http://webdev.jhuep.com/~jcs/maven2-snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Verify the exercise still builds.
+                </para>
+<programlisting language=""><![CDATA[$ mvn clean install]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Define the profiles we added for EJB development that were not
+                in the jpa-parent pom. We added the following profile definition
+                to be able to perform remote debugging on an IT test running
+                within a full Maven build lifecycle.
+                </para>
+<programlisting language="xml"><![CDATA[    <profiles>
+        <profile> <!-- tells surefire/failsafe to run JUnit tests with remote debug -->
+            <id>debugger</id>
+            <activation>
+                <property>
+                    <name>debugger</name>
+                </property>
+            </activation>
+            <properties>
+                <surefire.argLine>-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE</surefire.argLine>
+            </properties>                                  
+        </profile>        
+    </profiles>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Verify the exercise still builds.
+                </para>
+<programlisting language=""><![CDATA[$ mvn clean install]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                The following is what should remain in the application's root pom.
+                Most other root application poms may also look as simple now that we 
+                have off-loaded the dependency and plugin specifics to the ejb-parent
+                and jpa-parent root poms.
+                </para>
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>org.myorg</groupId>
+        <artifactId>ejb-parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>../ejb-parent</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>myorg.basicejb</groupId>
+    <artifactId>basicejbEx</artifactId>
+    <packaging>pom</packaging>
+    <name>Basic EJB Exercise</name>
+    <version>1.0-SNAPSHOT</version>
+    <description>
+        This project is the root project for the example Java EE
+        Application.
+    </description>
+
+    <modules>
+        <module>basicejb-ejb</module>
+        <module>basicejb-ear</module>
+        <module>basicejb-test</module>
+        <module>basicejb-war</module>
+    </modules>
+</project>]]></programlisting>                        
+                </listitem>
+        </orderedlist>
+    </section>
+        
+    <section id="ejb-basicex-parent-summary">
+       <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para></para>
+                Extracted non-application-specific definitions to new root pom
+                <itemizedlist spacing="compact">
+                    <listitem><para>Extends our previous JavaSE/JPA consistency to JavaEE module concerns</para></listitem>
+                    <listitem><para>Reduced complexity of local application</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  

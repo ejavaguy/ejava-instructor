@@ -58,4 +58,5 @@
     <xi:include href="ejb-basicex-commands.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-basicex-jndi.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-basicex-debugging.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-basicex-parent.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </book>
