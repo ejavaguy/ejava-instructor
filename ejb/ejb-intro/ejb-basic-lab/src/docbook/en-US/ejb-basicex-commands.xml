@@ -183,6 +183,45 @@ $ mvn clean install -rf :basicejb-test
         </orderedlist>
     </section>
 
+    <section id="ejb-basicex-commands-specificmod">
+        <title>mvn (phase) -f (path to module)</title>
+        <para>
+            There are times when you are looking to build one of the child 
+            modules or a branch of the child module tree but you do not want
+            the build to continue from that point. You likely know that you
+            can execute a build in that module's directory or you can stay in the
+            same directory and point to the module you would like built. This
+            technique is useful when you configure a build server to build specific
+            bootstrap modules (in your tree checked out from CM) prior to moving
+            on to build the remaining modules.
+        </para>
+
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Re-build just the RMI Test module from the root directory by specifying
+                the module to the build.
+                </para>
+<programlisting language=""><![CDATA[
+$ mvn clean install -f basicejb-test/pom.xml
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+                <note>
+                    <para>
+                        The parameter to -f is a file reference and not a module name.
+                        You can use this to refer to a parent (e.g., mvn clean -f ../pom.xml),
+                        siblings, as well as children. Lets say you are in src/test/resources 
+                        actively editing jndi.properties. You can issue a building command
+                        that looks like
+                    </para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-resources -f ../../../pom.xml
+]]></programlisting>                        
+                </note>
+        </orderedlist>
+    </section>
+
     <section id="ejb-basicex-commands-undeploy">
         <title>mvn clean -Pundeploy</title>
         <para>

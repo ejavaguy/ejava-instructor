@@ -3,6 +3,41 @@
 
 <chapter id="ejb-basicex-jndi">
     <title>Controlling JNDI Names</title>
+    <para>
+        Although the instructions thus far have provided details at the filesystem 
+        and Maven level, you have surely started importing and developing the projects
+        within your IDE by now. The one gotcha remaining to solve are those pesky JNDI
+        names and keeping our Java code ignorant of version numbers. Version numbers 
+        have a place but they rarely have a place in lookups when the version# can
+        be updated with even trivial releases. 
+    </para>
+<programlisting language=""><![CDATA[
+basicejb-ear-1.0-SNAPSHOT/basicejb-ejb-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+]]></programlisting>                        
+    <para>
+        We initially solved the problem by getting the 
+        pom involved with expanding the version# and passing the result to the IT test
+        as a system property. That worked well within the Maven build. However, we want to 
+        develop and run our IT tests outside of Maven once we have leveraged enough of 
+        Maven to get started. 
+    </para>
+<programlisting language="xml"><![CDATA[<jndi.name.reservation>
+    ejb:basicejb-ear-${project.version}/basicejb-ejb-${project.version}/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+</jndi.name.reservation>]]></programlisting>
+<programlisting language="java"><![CDATA[private static final String reservationJNDI = System.getProperty("jndi.name.reservation");]]></programlisting>                        
+    <para>
+        In this section we are going to add configuration options
+        that will eliminate the version#s from the JNDI names
+    </para>
+<programlisting language=""><![CDATA[
+basicejb-ear/basicejb-ejb/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+]]></programlisting>                        
+    <para>
+        This will permit our IT tests to form a reasonable default. We can still 
+        override this default with a system property.
+    </para>
+<programlisting language="java"><![CDATA[private static final String reservationJNDI = System.getProperty("jndi.name.reservation",
+    "ejb:basicejb-ear/basicejb-ejb/ReservationEJB!"+ReservationRemote.class.getName());]]></programlisting>                        
 
     <section id="ejb-basicex-jndi-purpose">
         <title>Purpose</title>
@@ -17,37 +52,528 @@
             <title>Objectives</title>
             <para>At the completion of this topic, the student shall</para>
             <itemizedlist spacing="compact">
-                <listitem><para>Eliminate Version# from ...</para></listitem>
+                <listitem><para>Eliminate version# from EAR application name</para></listitem>
+                <listitem><para>Eliminate version# from EJB module name</para></listitem>
+                <listitem><para>Eliminate version# from WAR module name</para></listitem>
             </itemizedlist>
         </section>
     </section>
+<!--
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
 
-    <section id="ejb-basicex-jndi-">
-        <title>Section</title>
+            <orderedlist spacing="compact">
+                <listitem><para>
+                    </para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                    </listitem>
+            </orderedlist>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+-->
+    <section id="ejb-basicex-jndi-ear">
+        <title>Eliminate Version# from EAR-based JNDI Name</title>
         <para>
         </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Build the RMI Test module and notice the application/EAR portion of the JNDI name printed
+                to the server's console and server.log contains the version# of the EAR.
+                </para>
+<programlisting language=""><![CDATA[
+$ mvn verify -f basicejb-test
+]]></programlisting>                        
+<programlisting language=""><![CDATA[
+java:jboss/exported/basicejb-ear-1.0-SNAPSHOT/basicejb-ejb-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Add the following declaration of the EAR plugin and add a configuration
+                option to change the applicationName to be the artifactId for the module.
+                </para>
+<programlisting language="xml"><![CDATA[    <build>
+        <plugins>
+            <!-- provide properties here to impact the EAR packaging -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ear-plugin</artifactId>
+                <configuration>
+                    <!-- eliminates use of version in EAR JNDI name portion -->
+                    <applicationName>${project.artifactId}</applicationName>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Since this is our first reference to the EAR plugin, add a pluginManagement
+                definition of this plugin in the parent pom.xml.
+                </para>
+<programlisting language="xml"><![CDATA[    <properties>
+        ...
+        <maven-ear-plugin.version>2.9.1</maven-ear-plugin.version>
+    ...
+    <build>
+    	<pluginManagement>
+            <plugins>
+                ...
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-ear-plugin</artifactId>
+                    <version>${maven-ear-plugin.version}</version>
+                    <configuration>
+                       <version>7</version>
+                    </configuration>
+                </plugin>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Notice that with the lack of specification, the EAR plugin 
+                defaults to generate an application.xml according to a J2EE 1.3 DTD.
+                </para>
+<programlisting language="xml"><![CDATA[$ cat basicejb-ear/target/application.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE application PUBLIC
+	"-//Sun Microsystems, Inc.//DTD J2EE Application 1.3//EN"
+	"http://java.sun.com/dtd/application_1_3.dtd">
+<application>
+  <display-name>basicejb-ear</display-name>
+  <description>This project provides a sample EAR for the Java EE components
+        associated with the overall project.</description>
+  <module>
+    <ejb>basicejb-ejb-1.0-SNAPSHOT.jar</ejb>
+  </module>
+</application>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Once we add the plugin definition to use JavaEE 7, the EAR plugin
+                generates an application.xml according to a JavaEE 7 schema. There 
+                is no noticeable difference other than the change in schema 
+                versus DTD reference.
+                </para>
+<programlisting language="xml"><![CDATA[$ cat basicejb-ear/target/application.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<application xmlns="http://xmlns.jcp.org/xml/ns/javaee" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/application_7.xsd" version="7">
+
+  <application-name>basicejb-ear</application-name>
+  <description>This project provides a sample EAR for the Java EE components
+        associated with the overall project.</description>
+  <display-name>basicejb-ear</display-name>
+  <module>
+    <ejb>basicejb-ejb-1.0-SNAPSHOT.jar</ejb>
+  </module>
+</application>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Rebuild and redeploy the EAR and note the application portion of the JNDI name is 
+                now a fixed value. Since our IT test still references the older name it fails. 
+                </para>
+<programlisting language=""><![CDATA[
+java:jboss/exported/basicejb-ear/basicejb-ejb-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+]]></programlisting>                        
+<programlisting language=""><![CDATA[ $ mvn clean install -rf basicejb-ear
+...
+java.lang.IllegalStateException: EJBCLIENT000025: No EJB receiver available for handling 
+[appName:basicejb-ear-1.0-SNAPSHOT, moduleName:basicejb-ejb-1.0-SNAPSHOT, distinctName:] 
+combination for invocation context org.jboss.ejb.client.EJBClientInvocationContext@395c1703
+        ...
+	at org.myorg.basicejb.earejb.ReservationIT.testPing(ReservationIT.java:37)
+...
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Basic EJB Exercise::EAR ............................ SUCCESS [  1.533 s]
+[INFO] Basic EJB Exercise::Remote Test .................... FAILURE [  5.656 s]
+[INFO] Basic EJB Exercise::WAR ............................ SKIPPED
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Update the RMI Test/pom.xml to eliminate the version# of the application and re-run the prior build.
+                We should be working again but still with a version# in the EJB.
+                </para>
+<programlisting language="xml"><![CDATA[<jndi.name.reservation>ejb:basicejb-ear/basicejb-ejb-${project.version}/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote</jndi.name.reservation>]]></programlisting>                        
+<programlisting language=""><![CDATA[ $ mvn clean install -rf basicejb-ear
+...
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Basic EJB Exercise::EAR ............................ SUCCESS [  1.573 s]
+[INFO] Basic EJB Exercise::Remote Test .................... SUCCESS [  5.851 s]
+[INFO] Basic EJB Exercise::WAR ............................ SUCCESS [  3.068 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Add a modules section to the EAR plugin declaration. The default for this
+                relied on the dependencies and this caused the EJB.jar to be hosted in the 
+                EAR with its fully qualified version. Here we supply a specific name we 
+                want for the EJB.jar. This will get reflected in the JNDI name.
+                </para>
+                <para>
+                I also ask that you add a defaultLibBundleDir specification the to
+                descriptor at this time. This will define a directory within the EAR
+                (similar to WEB-INF/lib) whose contents will be added to the global classpath
+                of components loaded by the EAR. We don't have a use for that yet, but 
+                this is the last tweak we will be making to EARs for a while.
+                </para>
+<programlisting language="xml"><![CDATA[    <build>
+        <plugins>
+            <!-- provide properties here to impact the EAR packaging -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ear-plugin</artifactId>
+                <configuration>
+                    <!-- names directory within EAR to place jars to be in classpath -->
+                    <defaultLibBundleDir>lib</defaultLibBundleDir>
+
+                    <!-- eliminates use of version in EAR JNDI name portion -->
+                    <applicationName>${project.artifactId}</applicationName>
+
+                    <modules>
+                        <!-- eliminates use of the version in the EJB JNDI name -->
+                        <ejbModule>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>basicejb-ejb</artifactId>
+                            <bundleFileName>basicejb-ejb.jar</bundleFileName>
+                        </ejbModule>
+                    </modules>
+
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Rebuild and redeploy the EAR and note the module portion of the JNDI name is 
+                now a fixed value. Since our IT test still references the older name it fails. 
+                </para>
+<programlisting language=""><![CDATA[
+java:jboss/exported/basicejb-ear/basicejb-ejb/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
+]]></programlisting>                        
+<programlisting language=""><![CDATA[ $ mvn clean install -rf basicejb-ear
+...
+java.lang.IllegalStateException: EJBCLIENT000025: No EJB receiver available for handling [appName:basicejb-ear, moduleName:basicejb-ejb-1.0-SNAPSHOT, distinctName:] combination for invocation context org.jboss.ejb.client.EJBClientInvocationContext@3d01e5eb
+	at org.jboss.ejb.client.EJBClientContext.requireEJBReceiver(EJBClientContext.java:749)
+        ...
+	at org.myorg.basicejb.earejb.ReservationIT.testPing(ReservationIT.java:37)
+...
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Basic EJB Exercise::EAR ............................ SUCCESS [  1.369 s]
+[INFO] Basic EJB Exercise::Remote Test .................... FAILURE [  5.643 s]
+[INFO] Basic EJB Exercise::WAR ............................ SKIPPED
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Update the RMI Test/pom.xml to eliminate the version# of the module and re-run the prior build.
+                We should be working again but still with a version# in the EJB.
+                </para>
+<programlisting language="xml"><![CDATA[<jndi.name.reservation>ejb:basicejb-ear/basicejb-ejb/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote</jndi.name.reservation>]]></programlisting>                        
+<programlisting language=""><![CDATA[ $ mvn clean install -rf basicejb-ear
+...
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Basic EJB Exercise::EAR ............................ SUCCESS [  1.424 s]
+[INFO] Basic EJB Exercise::Remote Test .................... SUCCESS [  5.811 s]
+[INFO] Basic EJB Exercise::WAR ............................ SUCCESS [  3.000 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Update your IT test to assign a reasonable default for the JNDI name. To test the change,
+                comment out the system property specification in the failsafe configuration.
+                </para>
+<programlisting language="java"><![CDATA[public class ReservationIT {
+    private static final String reservationJNDI = System.getProperty("jndi.name.reservation",
+            "ejb:basicejb-ear/basicejb-ejb/ReservationEJB!"+ReservationRemote.class.getName());]]></programlisting>                        
+<programlisting language="xml"><![CDATA[<systemPropertyVariables>
+    <!--
+    <jndi.name.reservation>ejb:basicejb-ear/basicejb-ejb/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote</jndi.name.reservation>
+    -->
+</systemPropertyVariables>]]></programlisting>                        
+<programlisting language=""><![CDATA[ $ mvn clean install -rf basicejb-ear
+...
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Basic EJB Exercise::EAR ............................ SUCCESS [  1.522 s]
+[INFO] Basic EJB Exercise::Remote Test .................... SUCCESS [  5.810 s]
+[INFO] Basic EJB Exercise::WAR ............................ SUCCESS [  3.119 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                <para>
+                    If you are not sure if this is using your default JNDI name you can
+                    optionally munge the value in the IT test and note it will then fail.
+                </para>
+                </listitem>
+
+            <listitem><para>
+                You may optionally re-enable the system property for the JNDI name but 
+                I would suggest against it until there is a need to derive the name a 
+                different way. It can get confusing when a default gets derived from 
+                multiple locations.
+                </para>
+                </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="ejb-basicex-jndi-war">
+        <title>Eliminate Version# from WAR-based JNDI Name</title>
+        <para>
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Note the JNDI name of the WAR when it was deployed above. We want to remove the 
+                version# from the deployed WAR.
+                </para>
+<programlisting language=""><![CDATA[
+java:jboss/exported/basicejb-war-1.0-SNAPSHOT/ShopperEJB!org.myorg.basicejb.webejb.ShopperRemote
+]]></programlisting>                        
+                <para>
+                    If we were deploying the WAR within an EAR, we would have added the
+                    following to the EAR plugin.
+                </para>
+<programlisting language="xml"><![CDATA[    <webModule>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>basicejb-war</artifactId>
+        <contextRoot>basicejb-war</contextRoot>
+    </webModule>]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Since we deploy a naked WAR, we cannot use the standard EAR technique. However,
+                we can accomplish our goal by adding a jboss-specific deployment descriptor
+                (jboss-web.xml) to the WAR (WEB-INF directory).
+                </para>
+<programlisting language="xml"><![CDATA[$ mkdir basicejb-war/src/main/webapp/WEB-INF/
+$ cat basicejb-war/src/main/webapp/WEB-INF/jboss-web.xml
+
+<jboss-web>
+    <!-- needed to always assure that version# does not get into JNDI name -->
+    <context-root>basicejb-war</context-root>
+</jboss-web>
+]]></programlisting>
+                <note>
+                    <para>
+                        The source directory for the WEB-INF and WAR content data
+                        is in src/main/webapp. Artifacts in src/main/resources
+                        will end up in WEB-INF/classes.
+                    </para>
+                </note>
+                </listitem>
+
+            <listitem><para>
+                Rebuild and redeploy the WAR and note the module portion of the JNDI name is 
+                now a fixed value. Since our IT test still references the older name it fails. 
+                </para>
+<programlisting language=""><![CDATA[
+java:jboss/exported/basicejb-war/ShopperEJB!org.myorg.basicejb.webejb.ShopperRemote
+]]></programlisting>                        
+<programlisting language=""><![CDATA[ $ mvn clean install -rf basicejb-war
+...
+testPing(org.myorg.basicejb.warejb.ReservationIT)  Time elapsed: 0.766 sec  <<< ERROR!
+java.lang.IllegalStateException: EJBCLIENT000025: No EJB receiver available for handling [appName:, moduleName:basicejb-war-1.0-SNAPSHOT, distinctName:] combination for invocation context org.jboss.ejb.client.EJBClientInvocationContext@1fafcae2
+	at org.jboss.ejb.client.EJBClientContext.requireEJBReceiver(EJBClientContext.java:749)
+        ...
+	at com.sun.proxy.$Proxy5.ping(Unknown Source)
+	at org.myorg.basicejb.warejb.ReservationIT.testPing(ReservationIT.java:37)
+
+testPing(org.myorg.basicejb.warejb.ShopperIT)  Time elapsed: 0 sec  <<< ERROR!
+javax.naming.NamingException: Failed to create proxy
+	at org.jboss.ejb.client.EJBClientContext.requireEJBReceiver(EJBClientContext.java:813)
+        ...
+	at javax.naming.InitialContext.lookup(InitialContext.java:411)
+	at org.myorg.basicejb.warejb.ShopperIT.testPing(ShopperIT.java:32)
+...
+Tests in error: 
+  ReservationIT.testPing:37 » IllegalState EJBCLIENT000025: No EJB receiver avai...
+  ShopperIT.testPing:32 » Naming Failed to create proxy
+...
+[INFO] BUILD FAILURE
+]]></programlisting>                        
+                <note>
+                    <para>
+                        I thought it was interesting that the IT test for the stateless EJB does
+                        not fail until the call is actually made to ping(). The IT test for the 
+                        stateful EJB fails during the JNDI lookup().
+                    </para>
+                </note>
+                </listitem>
+
+            <listitem><para>
+                Update the WAR/pom.xml to eliminate the version# of the module for both JNDI names 
+                and re-run the prior build.  We should be working again but still with a version# in the WAR.
+                </para>
+<programlisting language="xml"><![CDATA[<jndi.name.reservation>ejb:/basicejb-war/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote</jndi.name.reservation>
+<jndi.name.shopper>ejb:/basicejb-war/ShopperEJB!org.myorg.basicejb.webejb.ShopperRemote?stateful</jndi.name.shopper>]]></programlisting>                        
+<programlisting language=""><![CDATA[ $ mvn clean install -rf basicejb-war
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+                <note>
+                    <para>
+                        Be sure to append "?stateful" to your stateful EJB JNDI name. We need this for 
+                        "ejb:" naming contexts for EJB Client to work correctly. there should be no issue
+                        promoting those details to the client since a client will be designed differently
+                        when working with a stateless or stateful EJB.
+                    </para>
+                </note>
+                </listitem>
+
+            <listitem><para>
+                Update your IT tests to assign a reasonable default for the JNDI name. To test the change,
+                comment out the system property specification in the failsafe configuration.
+                </para>
+<programlisting language="java"><![CDATA[
+public class ReservationIT {
+    private static final String reservationJNDI = System.getProperty("jndi.name.reservation",
+            "ejb:/basicejb-war/ReservationEJB!"+ReservationRemote.class.getName()); 
+]]></programlisting>                        
+<programlisting language="java"><![CDATA[
+public class ShopperIT {
+    private static final String shopperJNDI = System.getProperty("jndi.name.shopper",
+            "ejb:/basicejb-war/ShopperEJB!"+ShopperRemote.class.getName()+"?stateful"); 
+]]></programlisting>                        
+<programlisting language="xml"><![CDATA[<systemPropertyVariables>
+    <!--
+    <jndi.name.reservation>ejb:/basicejb-war/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote</jndi.name.reservation>
+    <jndi.name.shopper>ejb:/basicejb-war/ShopperEJB!org.myorg.basicejb.webejb.ShopperRemote?stateful</jndi.name.shopper>
+    -->
+</systemPropertyVariables>]]></programlisting>                        
+<programlisting language=""><![CDATA[ $ mvn clean install -rf basicejb-ear
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                <para>
+                    If you are not sure if this is using your default JNDI name you can
+                    optionally munge the value in the IT test and note it will then fail.
+                </para>
+                </listitem>
+
+            <listitem><para>
+                You may optionally re-enable the system property for the JNDI names but 
+                I would suggest against it until there is a need to derive the name a 
+                different way. It can get confusing when a default gets derived from 
+                multiple locations. If we end up with several IT tests forming the
+                same JNDI name, I would suggest moving the construction of the JNDI
+                name to a test utility class.
+                </para>
+                </listitem>
+        </orderedlist>
     </section>
         
     <section id="ejb-basicex-jndi-summary">
        <title>Summary</title>
         <itemizedlist spacing="compact">
             <listitem><para>
+                EAR-based names
                 </para>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>impacted using the META-INF/application.xml</para></listitem>
+                    <listitem><para>application.xml can be auto-built and configured using EAR plugin</para></listitem>
+                    <listitem><para>EAR name configured with application-name element of application.xml</para></listitem>
+                    <listitem><para>EJB name configured with the name of the EJB module within the EAR</para></listitem>
+                    <listitem><para>EJB module can be renamed using ejbModule.bundleFileName of EAR plugin</para></listitem>
+                    <listitem><para>WAR name configured with module.web.context-root element of application.xml</para></listitem>
                 </itemizedlist>
             </listitem>
             <listitem><para>
+                WAR-based names
                 </para>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>no JavaEE/WAR standard for naming a naked-deployed WAR</para></listitem>
+                    <listitem><para>could deploy WAR within WAR to help control JNDI name</para></listitem>
+                    <listitem><para>JBoss uses the context-root supplied in WEB-INF/jboss-web.xml</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>
+                Reasonable defaults in IT classes
+                </para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Makes them IDE-friendly</para></listitem>
+                    <listitem><para>Reduces dependency on full Maven build lifecycle for everything you do</para></listitem>
+                    <listitem><para>Can be developed, run, and re-factored more quickly</para></listitem>
                 </itemizedlist>
             </listitem>
         </itemizedlist>
+        <figure>
+            <title>Sample META-INF/application.xml</title>
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<application xmlns="http://xmlns.jcp.org/xml/ns/javaee" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/application_7.xsd" version="7">
+
+  <application-name>basicejb-ear</application-name>
+  <description>This project provides a sample EAR for the Java EE components
+        associated with the overall project.</description>
+  <display-name>basicejb-ear</display-name>
+  <module>
+    <web>
+      <web-uri>(example web module).war</web-uri>
+      <context-root>(example-fixed-web-module-name)</context-root>
+    </web>
+  </module>
+  <module>
+    <ejb>basicejb-ejb.jar</ejb>
+  </module>
+  <library-directory>lib</library-directory>
+</application>
+]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>Sample EAR plugin configuration</title>
+<programlisting language="xml"><![CDATA[<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-ear-plugin</artifactId>
+    <configuration>
+        <!-- names directory within EAR to place jars to be in classpath -->
+        <defaultLibBundleDir>lib</defaultLibBundleDir>
+        <!-- eliminates use of version in EAR JNDI name portion -->
+        <applicationName>${project.artifactId}</applicationName>
+        <modules>
+            <webModule>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>(example-web-module-artifactId)</artifactId>
+                <contextRoot>(example-fixed-web-module-name)</contextRoot>
+            </webModule>
+            <!-- eliminates use of the version in the EJB JNDI name -->
+            <ejbModule>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>basicejb-ejb</artifactId>
+                <bundleFileName>basicejb-ejb.jar</bundleFileName>
+            </ejbModule>
+        </modules>
+    </configuration>
+</plugin>]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>Sample WEB-INF/jboss-web.xml</title>
+<programlisting language="xml"><![CDATA[<jboss-web>
+    <!-- needed to always assure that version# does not get into JNDI name -->
+    <context-root>basicejb-war</context-root>
+</jboss-web>]]></programlisting>                        
+        </figure>
     </section>    
 </chapter>
   
