@@ -3,7 +3,7 @@
     "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <book id="ejb-basic-lab">
     <bookinfo>
-        <title>Basic Session EJB Exercise</title>
+        <title>Basic EJB Development Exercise</title>
         <subtitle>Developing and Deploying a Basic EJB</subtitle>
         <issuenum>${content.version}</issuenum>
         <pubdate>${docbook.pubdate}</pubdate>

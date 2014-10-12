@@ -139,6 +139,7 @@
             </row>
             <row rowsep="1">
                 <entry namest="topic"><para><link linkend="ejb-dev">EJB Development Scenarios</link></para></entry>
+                <entry namest="comment"><para><ulink url="../html/ejb-basic-lab.html">Exercise: Basic EJB Development</ulink></para></entry>
             </row>
             <!--
                 <entry namest="topic"><para><ulink url="../ppt/ejbSession.ppt">Enterprise JavaBean (EJB) Overview</ulink></para></entry>
