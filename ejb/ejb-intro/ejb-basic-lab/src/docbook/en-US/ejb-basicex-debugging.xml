@@ -3,12 +3,34 @@
 
 <chapter id="ejb-basicex-debug">
     <title>Debug Remote EJB</title>
+    <para>
+        Up until now we have kept our focus away from the IDE and onto the 
+        filesystem and Maven configurations to give better insight into 
+        the structure of a multi-module application and to show how IDE-agnostic
+        the build process is. This will be very important when you check in your
+        modules to be built/tested by a build server (e.g., 
+        <ulink url="http://cruisecontrol.sourceforge.net/">CruiseControl</ulink>,
+        <ulink url="http://hudson-ci.org/">Hudson,</ulink> or 
+        <ulink url="http://jenkins-ci.org/">Jenkins</ulink>). However, we want to
+        speed up the process to do actual development. We want to spend as much
+        of our time as possible within a development/test-bench that promotes
+        the efficient development of Java code. The command-line builds will still
+        be leveraged but all those copy/pastes/edits I asked you do would more than
+        likely be created with the use of a Java/JavaEE-knowledgeable IDE. The examples
+        in this section use 
+        <ulink url="https://www.eclipse.org/ide/">Eclipse</ulink>. 
+        Any other credible IDE (e.g., 
+        <ulink url="https://netbeans.org/">NetBeans</ulink>,
+        <ulink url="http://www.jetbrains.com/idea/">IntelliJ</ulink>)
+        should work in a similar manner and offer comparable functionality.
+    </para>
 
     <section id="ejb-basicex-debug-purpose">
         <title>Purpose</title>
         <section id="ejb-basicex-debug-goals">
             <title>Goals</title>
             <itemizedlist spacing="compact">
+                <listitem><para>Develop and test IT tests within IDE</para></listitem>
                 <listitem><para>Debug remote deployed application</para></listitem>
             </itemizedlist>
         </section>
@@ -17,27 +39,423 @@
             <title>Objectives</title>
             <para>At the completion of this topic, the student shall</para>
             <itemizedlist spacing="compact">
+                <listitem><para>Run IT tests within the IDE</para></listitem>
                 <listitem><para>Debug remote deployment to standalone server</para></listitem>
                 <listitem><para>Debug remote deployment to embedded server</para></listitem>
             </itemizedlist>
         </section>
     </section>
+<!--
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+
+            <orderedlist spacing="compact">
+                <listitem><para>
+                    </para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                    </listitem>
+                <listitem><para>
+                    </para></listitem>
+            </orderedlist>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+        <figure>
+            <title></title>
+            <graphic scale="60" fileref="images/"/>
+        </figure>
+-->
+
+    <section id="ejb-basicex-debug-ide">
+        <title>Running IT Tests in IDE</title>
+        <para>
+            In this section we want to break the cycle of having to issue a heavyweight
+            Maven build every time we want to run an IT test. We can do this by making
+            JUnit tests "IDE-friendly". What I mean by that is ... allow the IDE environment
+            derive usable values without relying on system
+            properties being passed in from failsafe. Failsafe won't be involved with running
+            your JUnit tests within the IDE. That means you can either get the usable
+            values thru reasonable defaults or through the use of filtered property files
+            in the classpath. Looking up the JNDI name for a remote EJB provides an 
+            excellent example of both techniques.
+        </para>
+
+        <para>
+            To derive properties for the InitialContext -- we used filtered property files.
+        </para>
+<programlisting language=""><![CDATA[#jndi.properties
+java.naming.factory.initial=${jboss.remoting.java.naming.factory.initial}
+java.naming.factory.url.pkgs=${jboss.ejbclient.java.naming.factory.url.pkgs}
+java.naming.provider.url=${jboss.remoting.java.naming.provider.url}
+#java.naming.security.principal=${jndi.user}
+#java.naming.security.credentials=${jndi.password}
+jboss.naming.client.ejb.context=true
+]]></programlisting>                        
+        <para>
+            That got expanded by out initial Maven build to contain the following. The
+            Maven/Eclipse plugin (<ulink url="https://www.eclipse.org/m2e/">m2e</ulink>) 
+            within Eclipse will continue to keep this up to date. It has a plugin
+            the provides understanding of what the maven-resource-plugin would do
+            outside of the IDE and re-creates that functionality within the IDE environment.
+        </para>
+<programlisting language=""><![CDATA[#jndi.properties
+java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
+java.naming.factory.url.pkgs=org.jboss.ejb.client.naming
+java.naming.provider.url=http-remoting://localhost:8080
+#java.naming.security.principal=known
+#java.naming.security.credentials=password1!
+jboss.naming.client.ejb.context=true
+]]></programlisting>                        
+        <para>
+            There is nothing magical about jndi.properties. We can add more properties to 
+            that file (not common) or create other property files (e.g., it.properties) to be filtered and made 
+            available to the IT test.  However, our other option was to pass in a system 
+            property (-DpropertyName=value) using the failsafe configuration.
+        </para>
+<programlisting language="xml"><![CDATA[<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-failsafe-plugin</artifactId>
+    <configuration>
+        <systemPropertyVariables>
+            <jndi.name.reservation>ejb:basicejb-ear/basicejb-ejb/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote</jndi.name.reservation>
+        </systemPropertyVariables>
+    </configuration>
+</plugin>]]></programlisting>                        
+        <para>
+            Anticipating the system property might not always be available or necessary in 99-100% of the IT tests
+            once we stablized some values, we started processing the system properties by deriving a reasonable 
+            default. This can be overriden but when not overriden it will work 99%-100% of the time as well.
+        </para>
+<programlisting language="java"><![CDATA[private static final String reservationJNDI = System.getProperty("jndi.name.reservation",
+    "ejb:basicejb-ear/basicejb-ejb/ReservationEJB!"+ReservationRemote.class.getName());]]></programlisting>                        
+        <para>
+            Let's show this in action by loading our application into the IDE, deploying the EAR and WAR,
+            and executing the IT tests from within Eclipse.
+        </para>
+
+        <orderedlist spacing="compact">
+            <listitem><para>
+                If you have not already done so, import your multi-module project into 
+                the IDE. For Eclipse that involves using Right-Click, Import Existing Maven Projects,
+                </para>
+                <tip>
+                    <para>
+                        We made several incremental changes to the plugins as we built the end-to-end application.
+                        If you initially loaded the project prior to making many of these incremental changes
+                        Eclipse could have some issues upgrading the "facet" of a particular module on the fly.
+                        That was the case in my environment so I ...
+                    </para>
+                    <orderedlist spacing="compact">
+                        <listitem><para>
+                            Removed all modules from Eclipse
+                            </para></listitem>
+                        <listitem><para>
+                            Deleted all .settings directories and .project and .classpath files
+                            </para></listitem>
+                        <listitem><para>
+                            Re-imported the modules fresh and everything cleared with the "facet" JavaEE versions.
+                            </para></listitem>
+                    </orderedlist>
+                </tip>
+                <orderedlist spacing="compact">
+                    <listitem><para>Right Click on a Working Group or Select File</para></listitem>
+                    <listitem><para>Select "Import Existing Maven Projects"</para></listitem>
+                    <listitem><para>Navigate to the root module</para></listitem>
+                    <listitem><para>Click OK. Eclipse will show you a list of modules at and under the root module.</para></listitem>
+                    <listitem><para>Select all modules in the tree. They should now show up in the various explorer tabs</para></listitem>
+                </orderedlist>
+                </listitem>
+
+            <listitem><para>
+                    Leverage existing Maven configuration to deploy the EAR and WAR artifacts to the server. 
+                </para>
+                <para>
+                    This can be done at the command line command line using techniques you are already 
+                    familiar with.
+                </para>
+<programlisting language=""><![CDATA[$ mvn clean pre-integration-test]]></programlisting>                        
+                <para>
+                    The Eclipse/Maven integration can also provide access to that functionality 
+                    through a re-usable Maven Build Run Configuration.
+                </para>
+                <orderedlist spacing="compact">
+                    <listitem><para>Right Click on the Root Module and select "Run As"</para>
+                        <figure>
+                            <title>Run As Maven Build...</title>
+                            <graphic scale="60" fileref="images/ejb-basicex-debugging-rootrunas.png"/>
+                        </figure>
+                    </listitem>
+                    <listitem><para>Select "Maven build...". An "Edit Configuration" panel is displayed</para>
+                        <figure>
+                            <title>Edit Configuration Panel Options: Main</title>
+                            <graphic scale="60" fileref="images/ejb-basicex-debugging-runconfig.png"/>
+                        </figure>
+                    </listitem>
+                    <listitem><para>Type "mvn pre-integration-test" for Name</para></listitem>
+                    <listitem><para>Type or select the variable "${project_loc}" for Base directory</para></listitem>
+                    <listitem><para>Type "clean pre-integration-test" for Goals</para></listitem>
+                    <listitem><para>Select "Skip Tests" option</para></listitem>
+                    <listitem><para>Click on the "Common" tab</para></listitem>
+                    <listitem><para>Select "Run" in the Display in favorites menu</para>
+                        <figure>
+                            <title>Edit Configuration Panel Options: Common</title>
+                            <graphic scale="60" fileref="images/ejb-basicex-debugging-runconfig-fav.png"/>
+                        </figure>
+                    </listitem>
+                    <listitem><para>Click Apply to save the run configuration</para></listitem>
+                    <listitem><para>Click Run to have it start and deploy the WAR and EAR to the server.
+                        This should provide the same output you experienced previously at the command
+                        line. The Maven command output is displayed in an Eclipse Console window and 
+                        the server output is available in the server console and server.log
+                        </para>
+                        <figure>
+                            <title>Maven Build Run Output</title>
+                            <graphic scale="60" fileref="images/ejb-basicex-debugging-pre-integration.png"/>
+                        </figure>
+                    </listitem>
+                    <listitem><para>Select the root module again</para></listitem>
+                    <listitem><para>With the root module actively selected, click the down-arrow to the
+                        right of the green circle with the white arrow.
+                        </para></listitem>
+                    <listitem><para>Select the "mvn pre-integration-test" build configuration you pinned 
+                        to this menu by selecting it as a favorite in the "Common" tab
+                        </para>
+                        <figure>
+                            <title>Maven Build Run Output</title>
+                            <graphic scale="60" fileref="images/ejb-basicex-debugging-favlaunch.png"/>
+                        </figure>
+                        </listitem>
+                    <listitem><para>Notice that the EAR and WAR get re-built and re-deployed again. You 
+                        can use this or the command-line technique at any time to achieve the same 
+                        goal of deploying the application(s) to the server. If you want to deploy just
+                        the EAR or WAR -- select that specific module. However, keep in mind that the 
+                        build will be constrained to that module and will not pick up changes in upsteam
+                        modules that have not installed those changes into the local repository.
+                        </para></listitem>
+                </orderedlist>
+                </listitem>
+
+            <listitem><para>
+                    Run the IT tests by selecting either the module, folder, or package with the IT tests
+                    or the specific IT test or specific test method and right-click, Run As, JUnit test.
+                </para>
+                <para>
+                    You should see the IT test run, the IT test communicate with the EJB on the server,
+                    and see activity in the server.log.
+                </para>
+                <figure>
+                    <title>Maven Build Run Output</title>
+                    <graphic scale="60" fileref="images/ejb-basicex-debugging-runit.png"/>
+                </figure>
+                </listitem>
+
+            <listitem><para>
+                    Make a change to the ReservationIT to invoke ping() several times in a row
+                    in a for-loop. 
+                </para>
+<programlisting language="java"><![CDATA[@Test
+public void testPing() throws NamingException {
+    logger.info("*** testPing ***");
+    for (int i=0; i<10; i++) {
+        reservationist.ping();
+    }
+}]]></programlisting>
+                </listitem>
+
+            <listitem><para>
+                    Rerun the ReservationIT#testPing() @Test method once your changes are complete. Notice you
+                    get multiple sets of debug on the server.
+                </para>
+<programlisting language=""><![CDATA[2014-10-11 23:42:19,474 DEBUG [org.myorg.basicejb.ejb.ReservationEJB] (EJB default - 8) *** ReservationEJB.init() ***
+2014-10-11 23:42:19,475 DEBUG [org.myorg.basicejb.ejb.ReservationEJB] (EJB default - 8) ping called
+2014-10-11 23:42:19,475 DEBUG [org.myorg.basicejb.ejb.ReservationEJB] (EJB default - 8) *** ReservationEJB.destroy() ***
+2014-10-11 23:42:19,521 DEBUG [org.myorg.basicejb.ejb.ReservationEJB] (EJB default - 7) *** ReservationEJB.init() ***
+2014-10-11 23:42:19,522 DEBUG [org.myorg.basicejb.ejb.ReservationEJB] (EJB default - 7) ping called
+2014-10-11 23:42:19,522 DEBUG [org.myorg.basicejb.ejb.ReservationEJB] (EJB default - 7) *** ReservationEJB.destroy() ***
+...]]></programlisting>                        
+                </listitem>
+
+            <listitem><para>
+                Set a breakpoint inside the for-loop where the method calls reservationist.ping()
+                and chose Debug As this time.
+                </para>
+                <figure>
+                    <title>Debug IT test</title>
+                    <graphic scale="60" fileref="images/ejb-basicex-debugging-runit.png"/>
+                </figure>
+                </listitem>
+
+            <listitem><para>
+                Keep clicking the green, right-facing arrow at the top or the yellow step over/into arrows
+                to move forward. Notice that you have access to the state variables of the IT test while
+                you move forward with the test.
+                </para>
+                </listitem>
+        </orderedlist>
+    </section>
 
     <section id="ejb-basicex-debug-standalone">
         <title>Debugging Deployment to Standalone Server</title>
         <para>
+            Getting to the point where you can run and debug the IT test within the IDE is a significant
+            amount of the work involved with being able to debug the code on the server-side. At this point
+            you have that code surrounded and now all you have to do is peek inside. Lets look at how this 
+            is done with a remote server first.
         </para>
+        <orderedlist spacing="compact">
+            Verify the server has the following JVM debugger options turned on and has been restarted since 
+            they were put in place.
+            <listitem><para>
+                </para>
+<programlisting language=""><![CDATA[wildfly-8.1.0.Final/bin/standalone.conf
+JAVA_OPTS="$JAVA_OPTS -agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=n"
+]]></programlisting>                        
+<programlisting language=""><![CDATA[wildfly-8.1.0.Final/bin/standalone.conf.bat
+set "JAVA_OPTS=%JAVA_OPTS% -agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=n"
+]]></programlisting>                        
+<programlisting language=""><![CDATA[=========================================================================
+
+Listening for transport dt_socket at address: 8787
+00:09:23,260 INFO  [org.jboss.modules] (main) JBoss Modules version 1.3.3.Final
+]]></programlisting>
+                <note>
+                    <para>
+                        The use of suspend=n allows the server to run normally until connected
+                        to a debugger client and a breakpoint is hit. Until then there is no 
+                        noticable impact so you can leave this setting active on your development
+                        server instance all the time.
+                    </para>
+                </note>
+                </listitem>
+
+            <listitem><para>
+                Attach a debugger client to the server using the following...
+                </para>
+            <orderedlist spacing="compact">
+                <listitem><para>
+                    Select the RMI Test module to make it the active project within Eclipse.
+                    </para>
+                    </listitem>
+                <listitem><para>
+                    Click on the arrow to the right of the green bug icon on the top menu bar
+                    and select Debug Configurations...
+                    </para>
+                    </listitem>
+                <listitem><para>
+                    Create a new "Remote Java Application"
+                    </para>
+                    </listitem>
+                <listitem><para>
+                    Change the Port to 8787 to match your JBoss configuration.
+                    </para>
+                    </listitem>
+                <listitem><para>
+                    Select the Source tab, click Add..., select Java Project and press Add. A selection box of Eclipse projects is 
+                    displayed for your to select from.
+                    </para>
+                    </listitem>
+                <listitem><para>
+                    Select all modules that are a part of this application and press OK to continue.
+                    </para>
+                    </listitem>
+                <listitem><para>
+                    Click Debug to start the debugging session. Nothing exiting will occur until we set and cause a breakpoint
+                    to be hit.
+                    </para>
+                    </listitem>
+            </orderedlist>
+                </listitem>
+
+            <listitem><para>
+                Create a breakpoint in the ReservationEJB ping() call and re-run the IT test in either 
+                Run As or Debug As mode. Your selection there only pertains to the IT test and
+                not what you do on the client. Notice you are now stopped on the server-side.
+                </para>
+                <figure>
+                    <title>Debug IT test</title>
+                    <graphic scale="60" fileref="images/ejb-basicex-debugging-ejbbreakpoint.png"/>
+                </figure>
+                </listitem>
+
+            <listitem><para>
+                Click the red bent line icon on the top menu bar to detach from the server and release 
+                control of the execution.
+                </para>
+                </listitem>
+
+        </orderedlist>
     </section>
 
     <section id="ejb-basicex-debug-embedded">
         <title>Debugging Deployment to Embedded Server</title>
         <para>
+            In the previous section we showed how the stand-alone server required some setup but was
+            very easy to establish a debugging session once much of the one-time setup was complete.
+            In this method we are going to show how that setup can get even easier if you are willing
+            and able to run the application server in the same JVM as the IDE.
         </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Shutdown the standalone server instance.
+                </para>
+                </listitem>
+
+            <listitem><para>
+                Activate the JavaEE profile, select the server you setup in the environment setup
+                instructions, right click, and select Debug. The server should start as usual.
+                </para>
+                </listitem>
+
+            <listitem><para>
+                The server will restart and likely still have the EAR and WAR deployed from the previous 
+                section. Ignore that they are already deployed and re-deploy using the "mvn pre-integration-test"
+                Build Configuration you created earlier. Be sure to have the appropriate module selected
+                prior to executing this Build Configuration so that ${project.loc} can get assigned a project.
+                </para>
+                </listitem>
+
+            <listitem><para>
+                Select the ReservationIT and execute it using Debug As. It matters what you select this time
+                because both the client IT test and server will be part of the same debugging session.
+                </para>
+                </listitem>
+
+            <listitem><para>
+                You should be soon looking at a breakpoint in ReservationIT.ping(). Select continue in 
+                order to hit the breakpoint on the server-side. If you get a prompt asking for the path
+                to the source for the EJB register the java projects as you did in the section prior to 
+                this.
+                </para>
+                <note>
+                    <para>
+                        I have found that I always have to restart the test for the new source paths
+                        to take effect.
+                    </para>
+                </note>
+            </listitem>
+
+            <listitem><para>
+                At this point you are in a similar state as with the stand-alone server. However, if you
+                click the red box icon for stop, you will kill both the IT test and the server. In the 
+                standalone server environment the kill only stops the IT test.
+                </para>
+            </listitem>
+        </orderedlist>
     </section>
         
     <section id="ejb-basicex-debug-summary">
        <title>Summary</title>
         <itemizedlist spacing="compact">
+            <listitem>Running IT tests within IDE<para>
+                </para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Much faster code, compile, test development cycle</para></listitem>
+                    <listitem><para>Enables debugging</para></listitem>
+                </itemizedlist>
+            </listitem>
             <listitem>Standalone server<para>
                 </para>
                 <itemizedlist spacing="compact">
@@ -47,6 +465,7 @@
                 </itemizedlist>
             </listitem>
             <listitem><para>
+                Embedded Server
                 </para>
                 <itemizedlist spacing="compact">
                     <listitem><para>Easy to setup</para></listitem>

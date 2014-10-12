@@ -299,6 +299,27 @@ $ mvn clean -Pundeploy
                 </listitem>
         </orderedlist>
     </section>
+
+    <section id="ejb-basicex-commands-ittest">
+        <title>mvn clean -Dit.test=fully.qualified.ITPath#testMethod</title>
+        <para>
+            To execute a single IT test case use the following
+        </para>
+<programlisting language=""><![CDATA[$ mvn verify -f basicejb-test -Dit.test=org.myorg.basicejb.earejb.ReservationIT]]></programlisting>                        
+        <para>
+            To execute a single IT test case method use the following
+        </para>
+<programlisting language=""><![CDATA[$ mvn verify -f basicejb-test -Dit.test=org.myorg.basicejb.earejb.ReservationIT#testPing]]></programlisting>                        
+        <note>
+            <para>
+                Maven and surefire have made it very tough to skip unit tests and only run a specific
+                IT test. However, you can always add a temporary set of includes/excludes to the 
+                surefire configuration in order to achieve the sometimes-desired result of turning
+                off any preceding unit tests. Note that this is not an issue when IT tests are hosted
+                in a separate module.
+            </para>
+        </note>
+    </section>
         
     <section id="ejb-basicex-commands-summary">
        <title>Summary</title>
