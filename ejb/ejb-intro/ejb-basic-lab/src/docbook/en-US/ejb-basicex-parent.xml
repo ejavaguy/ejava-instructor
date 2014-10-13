@@ -79,6 +79,7 @@ $ cat ../ejb-parent/pom.xml
         <groupId>info.ejava.examples.jpa</groupId>
         <artifactId>jpa-parent</artifactId>
         <version>4.0.0-SNAPSHOT</version>
+        <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
