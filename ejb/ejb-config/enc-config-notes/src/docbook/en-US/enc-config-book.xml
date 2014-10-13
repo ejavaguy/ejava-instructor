@@ -1,0 +1,44 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="enc-config">
+    <bookinfo>
+        <title>Configuring EJBs using ENC and JNDI</title>
+        <subtitle></subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>This presentation provides information for configuring
+                EJBs with resources using deployment descriptors and JNDI 
+                Enterprise Naming Context (ENC). Thru one or more of these mechanisms
+                you can inject resources -- such as Persistence Contexts, 
+                JMS Resources, references to other EJBs, etc -- into your EJB.
+            </para>
+        </abstract>
+    </bookinfo>
+    <preface id="enc-config-topics">
+        <title>Topics</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Java Environment Naming Context (ENC)</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Reading JNDI and ENC</para></listitem>
+                    <listitem><para>Populating ENC using XML Deployment Descriptor</para></listitem>
+                    <listitem><para>Populating ENC using Java Annotations</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>EJB Resource Injection</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Using XML Deployment Descriptor Injection</para></listitem>
+                    <listitem><para>Using Annotation Injection</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </preface>
+
+    <xi:include href="enc-config-jndienc.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="enc-config-populating.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>

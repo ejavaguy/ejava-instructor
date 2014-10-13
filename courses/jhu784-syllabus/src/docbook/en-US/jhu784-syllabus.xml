@@ -148,10 +148,11 @@
             <row rowsep="1">
                 <entry namest="session">8</entry>
                 <entry namest="date">Oct22</entry>
-                <entry namest="topic"><para><ulink url="../ppt/jndiENC.ppt">Configuring EJBs</ulink></para></entry>
+                <entry namest="topic"><para><link linkend="enc-config">Configuring EJBs using ENC and JNDI</link></para></entry>
                 <entry namest="comment"><para>Rubinger &amp; Burke: Ch 16</para></entry>
             </row>
             <!--
+                <entry namest="topic"><para><ulink url="../ppt/jndiENC.ppt">Configuring EJBs</ulink></para></entry>
             <row rowsep="1">
                 <entry namest="session"/>
                 <entry namest="topic">Configuring EJBs with CDI</entry>

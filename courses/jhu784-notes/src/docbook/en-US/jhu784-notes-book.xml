@@ -64,5 +64,6 @@
     <xi:include href="ejb-intro-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-basic-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-dev-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="enc-config-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="webejb-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </book>
