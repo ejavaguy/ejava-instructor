@@ -236,8 +236,12 @@ public class AgentReservationSessionEJB
         
 	    <section id="ejb-intro-ejb-singleton">
 	        <title>Singleton Session EJB</title>
-            <figure>
-                <title>Example Singleton EJB</title>
+                <figure>
+                    <title>Singleton EJB Lifecycle</title>
+                    <graphic scale="80" fileref="images/singleton-sessionbean-lifecycle.jpg"/>
+                </figure>
+                <figure>
+                    <title>Example Singleton EJB</title>
 <programlisting language="java"><![CDATA[
 @javax.ejb.Singleton
 @javax.ejb.Startup
@@ -532,6 +536,56 @@ public class ProductsResource {
 			        </itemizedlist>
 	            </listitem>
 	            <listitem><para>Eliminates need for EAR in some cases</para></listitem>
+	        </itemizedlist>
+	    </section>
+
+	    <section id="ejb-intro-ejb-deploy-classloader">
+	        <title>EAR Deployment Class Loaders</title>
+                <figure>
+                    <title>Class Loaders</title>
+                    <graphic fileref="images/ejb-intro-classloader.jpg"/>
+                </figure>        
+	        <itemizedlist spacing="compact">
+	            <listitem><para>Arranged in a parent/child relationship</para></listitem>
+	            <listitem><para>May access classes/resources loaded by local and parent class loaders</para></listitem>
+	            <listitem><para>Do not have access to classes/resources loaded by sibling class loaders</para></listitem>
+	            <listitem><para>Requests for classes are first delegated to parent class loader</para></listitem>
+	        </itemizedlist>
+
+                <figure>
+                    <title>Separate Deployments</title>
+                    <graphic fileref="images/ejb-intro-separatedeployments.jpg"/>
+                </figure>        
+	        <itemizedlist spacing="compact">
+	            <listitem><para>Classes loaded by one EJB deployment are not sharable with other deployments</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Must use remote interfaces and pass-by-value serialized data</para></listitem>
+                            <listitem><para>No pass by reference</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+	            <listitem><para>EJB classes/resources can be shared with single Web App if loaded in WEB-INF/lib</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Local interfaces/resources are local to that WAR</para></listitem>
+                            <listitem><para>EJB classes cannot be shared across WARs</para></listitem>
+                            <listitem><para>Must again resort to remote interfaces and pass-by-value serialized data to share implementations</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+	        </itemizedlist>
+
+                <figure>
+                    <title>EAR Class Loaders</title>
+                    <graphic fileref="images/ejb-intro-earclassloader.jpg"/>
+                </figure>        
+	        <itemizedlist spacing="compact">
+	            <listitem><para>EAR class loader is root to deployed application</para></listitem>
+	            <listitem><para>EJB class loader is host to all EJBs and root to WAR class loaders</para></listitem>
+	            <listitem><para>WAR class loaders are separate</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Allows two separate WARs to generate the same class from two separate index.jsp files</para></listitem>
+                            <listitem><para>Disallows WAR from duplicating EAR/EJB-supplied classes</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+	            <listitem><para>EJBs and WARs-to-EJBs can share information using pass-by-reference</para></listitem>
 	        </itemizedlist>
 	    </section>
     </section>
