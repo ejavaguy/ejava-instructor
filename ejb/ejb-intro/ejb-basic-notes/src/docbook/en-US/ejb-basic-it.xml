@@ -67,7 +67,8 @@ java.naming.provider.url=...
                 </listitem>
                 
                 <listitem><para>Get InitialContext to server JNDI tree</para>
-<programlisting language="java"><![CDATA[Context jndi = new InitialContext(jndiProperties);]]></programlisting>
+<programlisting language="java"><![CDATA[Context jndi = new InitialContext(jndiProperties); //jndi.properties augmented]]></programlisting>
+<programlisting language="java"><![CDATA[Context jndi = new InitialContext(); //jndi.properties is complete]]></programlisting>
                 </listitem>
                 <listitem><para>Obtain JNDI-name using deployment-specific name and access technique</para>
 <programlisting language="java"><![CDATA[String jndiName; // varies whether accessing EJB, WAR or EAR deployment and access]]></programlisting>
@@ -153,8 +154,55 @@ remote.connectionprovider.create.options.org.xnio.Options.SSL_ENABLED=false
                         the following string ("?stateful")must be appended to the JNDI name</para>
                     <para><ulink url="https://docs.jboss.org/author/display/WFLY8/EJB+invocations+from+a+remote+client+using+JNDI">Remote EJB JNDI Invocations Wiki Page</ulink></para>
                 </note>
+
+                <itemizedlist spacing="compact">
+                    <listitem><para>InitialContextFactory looks for custom naming extensions when encountering naming prefix ("ejb:")</para></listitem>
+                    <listitem><para>java.naming.factory.url.pkgs lists base package names to start looking for extensions</para></listitem>
+                    <listitem><para>jboss-ejb-client.jar must be in the classpath</para></listitem>
+                </itemizedlist>
+<programlisting language=""><![CDATA[
+$ mvn dependency:tree
+
+[INFO] +- info.ejava.examples.common:jboss-rmi-client:pom:4.0.0-SNAPSHOT:test
+[INFO] |  +- org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec:jar:1.0.0.Final:test
+[INFO] |  +- org.jboss.spec.javax.ejb:jboss-ejb-api_3.2_spec:jar:1.0.0.Final:test
+[INFO] |  +- org.jboss:jboss-ejb-client:jar:2.0.1.Final:test
+]]></programlisting>                        
+                <itemizedlist spacing="compact">
+                    <listitem><para>Provider looks for "ejb" extension below "org.jboss.ejb.client.naming" package</para></listitem>
+                </itemizedlist>
+<programlisting language=""><![CDATA[#jndi.properties
+java.naming.factory.url.pkgs=org.jboss.ejb.client.naming]]></programlisting>                        
+<programlisting language=""><![CDATA[$ jar tf ~/.m2/repository/org/jboss/jboss-ejb-client/2.0.1.Final/jboss-ejb-client-2.0.1.Final.jar | grep org.jboss.ejb.client.naming
+...
+org/jboss/ejb/client/naming/ejb/SecurityActions$1.class
+org/jboss/ejb/client/naming/ejb/EjbNamingContext$2.class
+org/jboss/ejb/client/naming/ejb/EjbNamingContext.class
+org/jboss/ejb/client/naming/ejb/EjbNamingContextSetup.class
+org/jboss/ejb/client/naming/ejb/ejbURLContextFactory.class
+org/jboss/ejb/client/naming/ejb/SecurityActions.class
+org/jboss/ejb/client/naming/ejb/EjbJndiIdentifier.class
+org/jboss/ejb/client/naming/ejb/EjbJndiNameParser.class
+org/jboss/ejb/client/naming/ejb/SecurityActions$2.class
+org/jboss/ejb/client/naming/ejb/SecurityActions$3.class
+org/jboss/ejb/client/naming/ejb/EjbNamingContext$1.class]]></programlisting>                        
             </section>
         </section>
+
+        <section id="ejb-basic-it-ejbaccess-jndiblend">
+            <title>Blending JBoss Remoting and EJB Client</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>EJB Client only works for EJBs</para></listitem>
+                <listitem><para>InitialContext may need to locate other non-EJB resources (e.g., JMS)</para></listitem>
+                <listitem><para>Replace default InitialContextFactory with JBoss Remoting</para></listitem>
+                <listitem><para>Extend JBoss Remoting InitialContextFactory with EJB Client</para></listitem>
+            </itemizedlist>
+            
+<programlisting language=""><![CDATA[java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
+java.naming.factory.url.pkgs=org.jboss.ejb.client.naming
+java.naming.provider.url=http-remoting://localhost:8080
+jboss.naming.client.ejb.context=true]]></programlisting>
+            </section>
     </section>
         
     <section id="ejb-basic-it-tests">

@@ -10,10 +10,27 @@
     <section id="ejb-basic-wardeploy-war">
         <title>WAR Artifact</title>
 <programlisting language=""><![CDATA[`-- WEB-INF
+`-- WEB-INF
     |-- classes
+    |   `-- info
+    |       `-- ejava
+    |           `-- examples
+    |               `-- ejb
+    |                   `-- basic
+    |                       `-- webejb
+    |                           `-- WebGreeterEJB.class
     |-- jboss-web.xml
     `-- lib
         `-- ejb-basic-ejb-4.0.0-SNAPSHOT.jar]]></programlisting>
+        <para>WARs may host</para>
+        <itemizedlist spacing="compact">
+            <listitem><para>imported EJBs - developed in a separate EJB module</para></listitem>
+            <listitem><para>embedded EJBs - developed within this module</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>(WebGreeterEJB is a copy/paste clone of GreeterEJB)</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
                         
         <section id="ejb-basic-wardeploy-jbossweb">
             <title>WEB-INF/jboss-web.xml</title>
@@ -34,8 +51,8 @@
         <itemizedlist spacing="compact">
             <listitem><para>EJB module deployed within WAR</para></listitem>
         </itemizedlist>
-<programlisting language=""><![CDATA[
-20:47:51,929 INFO  [org.jboss.as.ejb3.deployment.processors.EjbJndiBindingsDeploymentUnitProcessor] (MSC service thread 1-2) JNDI bindings for session bean named GreeterEJB in deployment unit deployment "ejb-basic-war.war" are as follows:
+<programlisting language=""><![CDATA[20:47:51,929 INFO  [org.jboss.as.ejb3.deployment.processors.EjbJndiBindingsDeploymentUnitProcessor] 
+(MSC service thread 1-2) JNDI bindings for session bean named GreeterEJB in deployment unit deployment "ejb-basic-war.war" are as follows:
 
         java:global/ejb-basic-war/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote
         java:app/ejb-basic-war/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote
@@ -66,7 +83,18 @@
                 </itemizedlist>
             </listitem>
             <listitem><para>Local and No-interface interfaces are not exposed to remote clients</para></listitem>
+            <listitem><para>Embedded EJBs have same naming structure</para>
+<programlisting language=""><![CDATA[java:global/ejb-basic-war/WebGreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote
+java:app/ejb-basic-war/WebGreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote
+java:module/WebGreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote
+java:jboss/exported/ejb-basic-war/WebGreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote
+java:global/ejb-basic-war/WebGreeterEJB
+java:app/ejb-basic-war/WebGreeterEJB
+java:module/WebGreeterEJB
+]]></programlisting>                        
+            </listitem>
         </itemizedlist>
+
     </section>
     
     
@@ -110,6 +138,19 @@
         <finalName>ejb-basic-war</finalName>
     </build>
 </project>]]></programlisting>
+
+            <para>Support for embedded EJB development will require standard POJO and EJB dependencies</para>
+<programlisting language="xml"><![CDATA[        <!-- for embedded code/EJBs -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.ejb</groupId>
+            <artifactId>javax.ejb-api</artifactId>
+            <scope>provided</scope>
+        </dependency>]]></programlisting>
         </section>
 
 

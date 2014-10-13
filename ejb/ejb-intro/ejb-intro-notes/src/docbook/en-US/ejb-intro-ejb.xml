@@ -108,8 +108,13 @@ public class Reservation {
 
 	    <section id="ejb-intro-ejb-stateless">
 	        <title>Stateless Session EJB</title>
-            <figure>
-                <title>Example Stateless EJB</title>
+                <figure>
+                    <title>Stateless EJB Lifecycle</title>
+                    <graphic scale="60" fileref="images/stateless-sessionbean-lifecycle.jpg"/>
+                </figure>
+
+                <figure>
+                    <title>Example Stateless EJB</title>
 <programlisting language="java"><![CDATA[@javax.ejb.Stateless
 public class HotelRegistrationEJB implements HotelRegistrationRemote,
         HotelRegistrationLocal {
@@ -165,7 +170,12 @@ public class HotelRegistrationEJB implements HotelRegistrationRemote,
         
 	    <section id="ejb-intro-ejb-stateful">
 	        <title>Stateful Session EJB</title>
-            <figure>
+                <figure>
+                    <title>Stateful EJB Lifecycle</title>
+                    <graphic scale="60" fileref="images/stateful-sessionbean-lifecycle.jpg"/>
+                </figure>
+
+                <figure>
                 <title>Example Stateful EJB</title>
 <programlisting language="java"><![CDATA[@javax.ejb.Stateful
 @javax.ejb.TransactionAttribute(javax.ejb.TransactionAttributeType.NOT_SUPPORTED)
