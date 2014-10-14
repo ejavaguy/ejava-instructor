@@ -17,7 +17,7 @@
     
     <properties>
        <doc.base>jpa-tuning-book</doc.base>
-       <content.version>v2013-11-14</content.version>
+       <content.version>v2014-10-13</content.version>
     </properties>
 
     <build>
