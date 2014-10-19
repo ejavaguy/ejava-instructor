@@ -18,5 +18,6 @@
 
     <modules>
         <module>enc-config-notes</module>
+        <module>enc-config-lab</module>
     </modules>
 </project>

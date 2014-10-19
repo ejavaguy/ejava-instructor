@@ -1,0 +1,304 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="enc-configex-encjndi">
+    <title>Configuring EJB using JNDI Lookups of ENC</title>
+    <para>In this chapter we will keep populating the JNDI ENC via XML but we
+        will revert back to an older configuration technique that requires 
+        a programmatic lookup of resources within the JNDI ENC. This technique 
+        allows for deployment of an EJB to be separated from the resource availability
+        -- permitting a "lazy" lookup of the resources at runtime. It also blazes
+        a trail for standard POJO classes to perform resource lookups within their 
+        hosting component's ENC.</para>
+    <para>The <code>@Resource</code> and <code>@PersistenceContext</code> injections
+        so far work only with EJB bean classes. We want to show how standard POJO
+        classes, embedded within the EJB bean, will also have access to resources without
+        being coupled to a specific EJB or other JavaEE component type. The embedded
+        POJO can use standard JNDI lookups to locate the resources within the local
+        component's JNDI ENC context. Although this lab does not instantiate a
+        POJO class for this purpose -- it does demonstrate what the POJO classes
+        must do and places that code within the <code>@PostConstruct</code>.
+        Since we are still within the EJB bean, we will be using a mixture of 
+        InitialContext/java:comp/env lookups and SessionContext lookups.</para>
+    <para>One other change made during this chapter is the movement of the 
+        lookup JNDI names have been moved to the vendor-specific 
+        <code>META-INF/jboss-ejb3.xml</code> file. The core/standard ENC configuration
+        is placed within the <code>META-INF/ejb-jar.xml</code> and used on multiple platforms
+        and platform configurations. The additional file would be unique to the 
+        JBoss platform and our specific configuration of JBoss resources.
+    </para>
+    <para>We will primarily be working with the following files</para>
+    <itemizedlist>
+        <listitem><para>src/test/java/.../JNDIAuditorIT.java</para></listitem>
+        <listitem><para>src/main/java/.../JNDIAuditorEJB.java</para></listitem>
+        <listitem><para>src/main/resources/META-INF/ejb-jar.xml</para></listitem>
+        <listitem><para>src/main/resources/META-INF/jboss-ejb3.xml</para></listitem>
+    </itemizedlist>
+<programlisting language=""><![CDATA[src/
+|-- main
+|   |-- java
+|   |   `-- org
+|   |       `-- myorg
+|   |           `-- encconfig
+|   |               `-- ejb
+|   |                   `-- JNDIAuditorEJB.java
+|   `-- resources
+|       `-- META-INF
+|           |-- ejb-jar.xml
+|           `-- jboss-ejb3.xml
+`-- test
+    |-- java
+    |   `-- org
+    |       `-- myorg
+    |           `-- encconfig
+    |               `-- auditor
+    |                   `-- ejb
+    |                       `-- it
+    |                           `-- JNDIAuditorEJBIT.java
+]]></programlisting>
+        
+    <section id="enc-configex-encjndi-setup">
+        <title>Setup</title>
+        <orderedlist>
+            <listitem><para>Start JBoss. If you run JBoss within Eclipse, you 
+                may want to start it in debug mode.</para></listitem>
+            <listitem><para>Deploy the EJB module to JBoss using the maven cargo plugin</para>
+            
+<programlisting language=""><![CDATA[$ mvn pre-integration-test
+...
+[INFO] --- cargo-maven2-plugin:1.4.3:redeploy (cargo-prep) @ encconfig-labex-ejb ---
+...
+[INFO] BUILD SUCCESS]]></programlisting>                        
+
+            </listitem>
+            <listitem><para>Run all IT tests within Eclipse or at the command 
+                line. They should all pass, but if you look closely -- many are
+                still being ignored until we fix some things.</para>
+            </listitem>
+        </orderedlist>
+    </section>
+    
+
+    <section id="enc-configex-encjndi-resources">
+        <title>Inject Resources</title>
+
+        <orderedlist>
+            <listitem><para>Activate the <code>JNDIAuditorEJBIT</code> test case.
+                Since this test case extends the same base class as the previous
+                two test cases (where we activated all the test methods) all test
+                methods will immediately become active.</para>
+
+<programlisting language="java"><![CDATA[//TODO enc-config 17: activate this testcase 
+@Ignore
+public class JNDIAuditorEJBIT extends AuditorCheckerITBase {]]></programlisting>
+                        
+            </listitem>
+
+            <listitem><para>Re-run the IT tests for the EJB module. The test case
+                you just activated above will fail with several errors</para>
+<programlisting language=""><![CDATA[java.lang.AssertionError: publishJMS value not injected
+java.lang.AssertionError: persistence context not injected
+java.lang.AssertionError: topic not injected
+java.lang.AssertionError: connection factory not injected
+java.lang.AssertionError: EJB not properly initialized expected:<2> but was:<0>]]></programlisting>                        
+            </listitem>
+
+
+            <listitem><para>Activate the PostCostruct initialization method for the 
+               EJB under test. This method depends on an injected SessionContext
+               for doing ENC lookups and instantiates a default InitialContext to
+               simulate what lower-level components can do with the <code>java:comp/env</code>
+               namespace.</para>
+<programlisting language="java"><![CDATA[@Stateless
+public class JNDIAuditorEJB extends AuditorBase 
+...
+private @Resource SessionContext ctx;
+
+//TODO enc-config 18: activate initialization method to perform ENC lookups 
+//@PostConstruct
+public void init() {
+    InitialContext jndi = null;
+    try {
+        jndi=new InitialContext();
+...
+    } catch (NamingException ex) {
+        log.error("error looking up resources", ex);
+        throw new EJBException("error looking up resources:" + ex);
+    } finally {
+        close(jndi);
+    }
+    super.setLog(log);
+    super.setConnectionFactory(cf);
+    super.setEntityManager(em);
+    super.setTopic(topic);
+    super.setPublishJMS(isPublishJMS());
+}
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Correct the first issue by looking up the value 
+                from the JNDI ENC placed there by the <code>META-INF/ejb-jar.xml</code></para>
+<programlisting language="xml"><![CDATA[<session>
+    <ejb-name>JNDIAuditorEJB</ejb-name>
+    <env-entry>
+        <env-entry-name>val/publishJMS</env-entry-name>
+        <env-entry-type>java.lang.Boolean</env-entry-type>
+        <env-entry-value>true</env-entry-value>
+    </env-entry>
+...
+</session>]]></programlisting>
+                <para>The value can be looked up using an injected <code>SessionContext</code>
+                   and the ENC name used by the XML and in the previous chapter.
+                   Perform a programmatic lookup of the ENC value and assign
+                   it to the <code>publishJMS</code> Java attribute.</para>
+<programlisting language="java"><![CDATA[@Stateless
+public class JNDIAuditorEJB extends AuditorBase 
+...
+//TODO enc-config 19: lookup resource value in ENC 
+//publishJMS = (Boolean) ctx.lookup("val/publishJMS");]]></programlisting>                        
+                        
+            </listitem>
+
+            <listitem><para>Re-deploy the EJB module using the maven cargo plugin</para>
+<programlisting language=""><![CDATA[$ mvn pre-integration-test]]></programlisting>                        
+            </listitem>
+            <listitem><para>Re-run the IT tests. The test you addressed above should 
+                now pass.</para></listitem>
+
+
+            <listitem><para>Correct the next issue by looking up the persistence 
+                context from the JNDI ENC placed there by the <code>META-INF/ejb-jar.xml</code></para>
+<programlisting language="xml"><![CDATA[<persistence-context-ref>
+    <persistence-context-ref-name>jpa/em</persistence-context-ref-name>
+    <persistence-unit-name>encconfig-lab</persistence-unit-name>
+</persistence-context-ref>]]></programlisting>
+
+                <para>Perform the ENC lookup using the injected <code>SessionContext</code>
+                    and the ENC name. Assign the value to the <code>em</code> Java
+                    attribute with the <code>JNDIAuditorEJB</code> class.</para>
+<programlisting language="java"><![CDATA[@Stateless
+public class JNDIAuditorEJB extends AuditorBase 
+...
+//TODO enc-config 20: lookup persistence context in ENC 
+//em = (EntityManager) ctx.lookup("jpa/em");]]></programlisting>
+                <para>Although it would be nicer to simply have the value injected as
+                    we did in the previous chapter -- the lookup is made simple using
+                    the injected <code>SessionContext</code>. This injected object
+                    is specific to being an EJB component and not available to all
+                    Java classes running in the server. We will address that aspect
+                    for the follow-on properties.</para>
+            </listitem>
+
+            <listitem><para>Re-deploy the EJB module using the maven cargo plugin</para>
+<programlisting language=""><![CDATA[$ mvn pre-integration-test]]></programlisting>                        
+            </listitem>
+            <listitem><para>Re-run the IT tests. The test you addressed above should 
+                now pass.</para></listitem>
+
+            <listitem><para>Correct the next issue by looking up the administered JMS topic 
+                from the JNDI ENC placed there by the <code>META-INF/ejb-jar.xml</code></para>
+<programlisting language="xml"><![CDATA[<resource-env-ref>
+    <resource-env-ref-name>jms/topic</resource-env-ref-name>
+    <resource-env-ref-type>javax.jms.Topic</resource-env-ref-type>
+</resource-env-ref>]]></programlisting>
+
+                <para>The JNDI name is being supplied by the <code>META-INF/jboss-ejb3.xml file.</code></para>
+<programlisting language="xml"><![CDATA[<?xml version="1.0"?>  
+<jboss:ejb-jar 
+...
+    <enterprise-beans>
+        <session>
+            <ejb-name>JNDIAuditorEJB</ejb-name>
+...
+            <resource-env-ref>
+                <resource-env-ref-name>jms/topic</resource-env-ref-name>
+                <resource-env-ref-type>javax.jms.Topic</resource-env-ref-type>
+                <jndi-name>java:/topic/test</jndi-name>
+            </resource-env-ref>
+        </session>
+</jboss:ejb-jar>
+]]></programlisting>                        
+                <note>
+                    <para>
+                        By separating the platform-neutral ENC definitions in the ejb-jar.xml
+                        from the platform-specific JNDI names in the jboss-ejb3.xml you 
+                        can better isolate fixed and templated files during module builds
+                        if your module must operate in different deployment environments.
+                    </para>
+                </note>
+                <para>Perform the ENC lookup using an <code>InitialContext</code>
+                    and the ENC name prefixed with <code>java:comp/env</code>. 
+                    Assign the value to the <code>topic</code> Java
+                    attribute with the <code>JNDIAuditorEJB</code> class.</para>
+<programlisting language="java"><![CDATA[//TODO enc-config 21: lookup resource in ENC using JNDI java:comp/env 
+//topic = (Topic) jndi.lookup("java:comp/env/jms/topic");]]></programlisting>
+                <para>Notice how this technique is independent of the code being within 
+                     the EJB bean class. Any Java class can instantiate a default
+                     InitialContext and lookup the ENC for its hosting component using
+                     the "java:comp/env" context. This is functionally the same as using the
+                     the shorter name with the SessionContext.lookup() except that it
+                     can be used outside of the EJB. 
+                </para>
+            </listitem>            
+            
+            <listitem><para>Re-deploy the EJB module using the maven cargo plugin</para>
+<programlisting language=""><![CDATA[$ mvn pre-integration-test]]></programlisting>                        
+            </listitem>
+            <listitem><para>Re-run the IT tests. The test you addressed above should 
+                now pass.</para></listitem>
+
+            <listitem><para>Correct the next issue by looking up the administered JMS connection
+                factory from the JNDI ENC placed there by the <code>META-INF/ejb-jar.xml</code></para>
+<programlisting language="xml"><![CDATA[<resource-ref>
+    <res-ref-name>jms/cf</res-ref-name>
+    <res-type>javax.jms.ConnectionFactory</res-type>
+</resource-ref>]]></programlisting>
+                <para>The JNDI name is being supplied by the <code>jboss-ejb3.xml</code> file.</para>
+<programlisting language="xml"><![CDATA[
+<resource-ref>
+    <res-ref-name>jms/cf</res-ref-name>
+    <res-type>javax.jms.ConnectionFactory</res-type>
+    <jndi-name>java:/JmsXA</jndi-name>
+</resource-ref>]]></programlisting>                        
+
+                <para>
+                    Perform the ENC lookup using the <code>InitialContext</code>
+                    and the ENC name prefixed with <code>java:comp/env</code>. 
+                    Assign the value to the <code>cf</code> Java
+                    attribute with the <code>JNDIAuditorEJB</code> class. 
+                 </para>
+<programlisting language="java"><![CDATA[//TODO enc-config 22: lookup resource in ENC using JNDI java:comp/env
+//cf = (ConnectionFactory) jndi.lookup("java:comp/env/jms/cf");]]></programlisting>
+            </listitem>
+            
+            <listitem><para>Re-deploy the EJB module using the maven cargo plugin</para>
+<programlisting language=""><![CDATA[$ mvn pre-integration-test]]></programlisting>                        
+            </listitem>
+            <listitem><para>Re-run the IT tests. This time all tests for the <code>JNDIAuditorEJBIT</code>
+                test case should now pass -- including the testAudit since all resources have now
+                been injected and the <code>@PostConstruct</code> method has been activated to push
+                those resources up the to base class helper.</para></listitem>
+        </orderedlist>
+        <para>You have finished configuring your EJB using programmatic JNDI lookups of 
+            resources populated in the ENC using XML descriptor files.</para>
+    </section>
+
+
+    <section id="enc-configex-encjndi-summary">
+       <title>Summary</title>
+       <para>In this chapter you successfully activated a <code>@PostConstruct</code> method
+           in the EJB bean class that performed programmatic JNDI lookups of the ENC
+           using an injected <code>SessionContext</code> and alternately an <code>InitialContext</code>.
+           Lookups that used the <code>SessionContext</code> could use the core ENC name. Lookups
+           that used the <code>InitialContext</code> had to prefix the ENC name with the 
+           string <code>java:comp/env/</code>. The <code>SessionContext</code> is unique to being an EJB
+           class. The <code>InitialContext</code> can be used by any Java class delegated to by the EJB.
+       </para>
+       <para>This technique has the benefit of keeping the global/physical JNDI names away from the 
+           Java classes but requires a programmatic lookup -- rather than injection. This would only
+           be desirable for helper classes delegated to by the EJB. In the next section we will use
+           a declarative approach that requires no knowledge of any resource injection by the EJB bean.
+           All will be handled by the XML deployment descriptor.</para>
+    </section>    
+</chapter>
+  

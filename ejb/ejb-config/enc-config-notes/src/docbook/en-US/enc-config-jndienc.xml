@@ -72,8 +72,9 @@ java:/JmsXA
 java:/queue/test
 java:/topic/test]]></programlisting>                        
                 </listitem>
-                <listitem><para>JavaEE 6/EJB3.1 added a portable JNDI naming standard for EJB that provides scoping for 
-                    global, application, and module for the EJB's local and remote interfaces</para>
+                <listitem><para>JavaEE 6/EJB3.1 added a 
+                <ulink url="http://docs.oracle.com/javaee/6/tutorial/doc/gipjf.html">portable JNDI naming standard</ulink>
+                for EJB that provides scoping for global, application, and module for the EJB's local and remote interfaces</para>
 <programlisting language=""><![CDATA[java:global/enc-config-example-ejb/InjectedEJB!ejava.ejb.examples.encconfig.ejb.InjectedEJB
 java:app/enc-config-example-ejb/InjectedEJB!ejava.ejb.examples.encconfig.ejb.InjectedEJB
 java:module/InjectedEJB!ejava.ejb.examples.encconfig.ejb.InjectedEJB
