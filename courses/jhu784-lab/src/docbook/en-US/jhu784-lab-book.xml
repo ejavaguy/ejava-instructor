@@ -55,6 +55,9 @@
                 <row rowsep="1">
                   <entry namest="topic"><para><link linkend="ejb-basic-lab">Basic EJB Development</link></para></entry>
                 </row>
+                <row rowsep="1">
+                  <entry namest="topic"><para><link linkend="encconfig-lab">JNDI/ENC Configuration Lab</link></para></entry>
+                </row>
             </tbody>
             </tgroup>
         </table>    
@@ -67,4 +70,5 @@
     <xi:include href="jpa-relation-ex-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="jpa-query-ex-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-basic-lab-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="enc-config-lab-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </book>

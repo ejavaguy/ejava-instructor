@@ -151,6 +151,9 @@
                 <entry namest="topic"><para><link linkend="enc-config">Configuring EJBs using ENC and JNDI</link></para></entry>
                 <entry namest="comment"><para>Rubinger &amp; Burke: Ch 16</para></entry>
             </row>
+            <row rowsep="1">
+                <entry namest="comment"><para><ulink url="../html/encconfig-lab.html">Exercise: JNDI/ENC Configuration</ulink></para></entry>
+            </row>
             <!--
                 <entry namest="topic"><para><ulink url="../ppt/jndiENC.ppt">Configuring EJBs</ulink></para></entry>
             <row rowsep="1">
