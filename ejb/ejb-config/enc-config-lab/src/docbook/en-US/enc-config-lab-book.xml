@@ -31,4 +31,5 @@
     <xi:include href="enc-config-encinject.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="enc-config-encjndi.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="enc-config-xmlinject.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="enc-config-ejb.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </book>

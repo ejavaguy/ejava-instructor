@@ -23,7 +23,7 @@
     
     <properties>
        <doc.base>enc-config-lab-book</doc.base>
-       <content.version>v2014-10-18</content.version>
+       <content.version>v2014-10-22</content.version>
     </properties>
 
     <build>
