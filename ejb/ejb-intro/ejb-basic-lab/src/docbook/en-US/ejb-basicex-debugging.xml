@@ -75,7 +75,7 @@
             In this section we want to break the cycle of having to issue a heavyweight
             Maven build every time we want to run an IT test. We can do this by making
             JUnit tests "IDE-friendly". What I mean by that is ... allow the IDE environment
-            derive usable values without relying on system
+            to derive usable values without relying on system
             properties being passed in from failsafe. Failsafe won't be involved with running
             your JUnit tests within the IDE. That means you can either get the usable
             values thru reasonable defaults or through the use of filtered property files
@@ -176,7 +176,7 @@ jboss.naming.client.ejb.context=true
                     This can be done at the command line command line using techniques you are already 
                     familiar with.
                 </para>
-<programlisting language=""><![CDATA[$ mvn clean pre-integration-test]]></programlisting>                        
+<programlisting language=""><![CDATA[$ mvn pre-integration-test]]></programlisting>                        
                 <para>
                     The Eclipse/Maven integration can also provide access to that functionality 
                     through a re-usable Maven Build Run Configuration.
@@ -196,7 +196,7 @@ jboss.naming.client.ejb.context=true
                     </listitem>
                     <listitem><para>Type "mvn pre-integration-test" for Name</para></listitem>
                     <listitem><para>Type or select the variable "${project_loc}" for Base directory</para></listitem>
-                    <listitem><para>Type "clean pre-integration-test" for Goals</para></listitem>
+                    <listitem><para>Type "pre-integration-test" for Goals</para></listitem>
                     <listitem><para>Select "Skip Tests" option</para></listitem>
                     <listitem><para>Click on the "Common" tab</para></listitem>
                     <listitem><para>Select "Run" in the Display in favorites menu</para>

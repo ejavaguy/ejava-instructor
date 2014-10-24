@@ -1244,7 +1244,7 @@ basicejb-ear-1.0-SNAPSHOT/basicejb-ejb-1.0-SNAPSHOT/ReservationEJB!org.myorg.bas
     <section id="ejb-basicex-eardeploy-jndi">
         <title>Lookup and Invoke @Remote Interface</title>
         <para>
-            Each EJB interface will have an entres in the JNDI tree. Clients will use
+            Each EJB interface will have an entry in the JNDI tree. Clients will use
             the JNDI tree to locate the interface object they need based on 
             a hierarchical name. The names available locally within the server
             were standardized in JavaEE 6. However that specification

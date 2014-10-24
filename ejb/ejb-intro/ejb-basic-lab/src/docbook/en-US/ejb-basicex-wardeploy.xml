@@ -333,6 +333,7 @@ basicejb-ear-1.0-SNAPSHOT/basicejb-ejb-1.0-SNAPSHOT/ReservationEJB!org.myorg.bas
 <programlisting language="xml"><![CDATA[    <modules>
         <module>basicejb-ejb</module>
         <module>basicejb-ear</module>
+        <module>basicejb-test</module>
         <module>basicejb-war</module>
     </modules>]]></programlisting>                        
 <programlisting language="xml"><![CDATA[$ mvn clean install -DskipTests

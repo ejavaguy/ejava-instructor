@@ -288,7 +288,7 @@ $ mkdir basicejb-ejb
 
                 <listitem><para>
                         Add in the maven-ejb-plugin declaration to the EJB/pom.xml.
-                        This will contain pertions of the plugin definition that 
+                        This will contain portions of the plugin definition that 
                         could be unique per EJB module. 
                     </para>
                     <itemizedlist spacing="compact">
