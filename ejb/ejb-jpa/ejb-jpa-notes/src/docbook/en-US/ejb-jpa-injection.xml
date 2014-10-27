@@ -1,0 +1,154 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-jpa-injection">
+    <title>Persistence Unit/Context Injection</title>
+    <variablelist spacing="compact">
+        <varlistentry>
+            <term><filename>@PersistenceContext</filename></term>
+            <listitem><para>Injected with EntityManager</para>
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>Transaction Scoped</filename></term>
+                        <listitem>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>persistence context only sees a single Tx</para></listitem>
+                                <listitem><para>container injects EntityManager with Tx active</para></listitem>
+                            </itemizedlist>            
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>Extended Scope</filename></term>
+                        <listitem>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>persistence context may see multiple Tx</para></listitem>
+                                <listitem><para>only relevant for Stateful EJBs</para></listitem>
+                            </itemizedlist>            
+                        </listitem>
+                    </varlistentry>
+                </variablelist>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><filename>@PersistenceUnit</filename></term>
+            <listitem><para>Injected with EntityManagerFactory</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>May be used to implement BEAN-managed transactions</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </varlistentry>
+    </variablelist>
+
+        
+    <section id="ejb-jpa-injection-pc">
+        <title>@PersistenceContext Injection</title>
+        
+        <figure>
+            <title>@PersistenceContext Injection</title>
+<programlisting language="java"><![CDATA[@Stateless
+public class HotelMgmtEJB implements HotelMgmtRemote, HotelMgmtLocal {
+    @PersistenceContext(unitName="ejbjpa-hotel")
+    private EntityManager em;
+
+    private HotelDAO dao;                                                                                                                                                                                                                                                                                                                                   
+    private HotelMgmt hotelMgmt; 
+    
+    @PostConstruct
+    public void init() {
+        dao = new JPAHotelDAO();
+        ((JPAHotelDAO)dao).setEntityManager(em);
+        
+        hotelMgmt = new HotelMgmtImpl();
+        ((HotelMgmtImpl)hotelMgmt).setHotelDao(dao);
+    }]]></programlisting>
+        </figure>
+        
+    </section>
+    
+    <section id="ejb-jpa-injection-pu">
+        <title>@PersistenceUnit Injection</title>
+        
+        <figure>
+            <title>@PersistenceUnit Injection</title>
+<programlisting language="java"><![CDATA[@Singleton
+@Startup
+public class HotelInitEJB implements HotelInitRemote {
+    @PersistenceUnit(unitName="ejbjpa-hotel")
+    private EntityManagerFactory emf;
+    
+    @Override
+    public void businessMethod() {
+        EntityManager em=emf.createEntityManager();
+        HotelDAO dao = new JPAHotelDAO();
+        ((JPAHotelDAO)dao).setEntityManager(em);
+        em.joinTransaction(); //tells the EM to join the JTA Tx
+        ...
+        em.close();
+    }
+}]]></programlisting>
+            
+        </figure>
+    </section>
+
+
+    <section id="ejb-jpa-injection-section2">
+        <title>Context and Dependency Injection (CDI)</title>
+        <para>Newer technique -- JavaEE's answer to Spring Configuration</para>
+  
+        <itemizedlist spacing="compact">
+
+            <listitem><para>Define qualifier annotation</para>
+<programlisting language="java"><![CDATA[
+package ejava.examples.jndidemo;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import static java.lang.annotation.RetentionPolicy.*;
+import static java.lang.annotation.ElementType.*;
+import javax.inject.Qualifier;
+
+@Qualifier
+@Retention(RUNTIME)
+@Target({METHOD, FIELD, PARAMETER, TYPE})
+public @interface JndiDemo {
+}]]></programlisting>                        
+            </listitem>
+
+
+            <listitem><para>Define producer of Persistence Context</para>
+<programlisting language="java"><![CDATA[
+import javax.enterprise.inject.Produces;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+public class SchedulerResources {
+    @PersistenceContext(name="jndidemo")
+    @Produces
+    @JndiDemo
+    public EntityManager em;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Define injection point</para>
+<programlisting language="java"><![CDATA[
+@Stateless
+public class TrainSchedulerEJB 
+    extends SchedulerBase implements TrainSchedulerRemote {
+
+    @Inject @JndiDemo
+    private EntityManager em;
+]]></programlisting>                        
+            </listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="ejb-jpa-injection-summary">
+       <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>@PersistenceContext - EntityManager</para></listitem>
+            <listitem><para>@PersistenceUnit - EntityManagerFactory</para></listitem>
+            <listitem><para>peek at CDI injection</para></listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  

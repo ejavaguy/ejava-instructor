@@ -1,0 +1,35 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="ejb-jpa">
+    <bookinfo>
+        <title>JPA Server-Side Deployment</title>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>This presentation provides coverage of how to package a JPA persistence unit
+                 within an EJB or WAR deployed to the server. It covers the resources involved
+                 and how they can be injected into the beans of the data tier as well as various
+                 issues that can arise and suggested solutions. 
+            </para>
+        </abstract>
+    </bookinfo>
+    <preface id="jpa-serverside-purpose">
+        <title>Purpose</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Server-side Resources</para></listitem>
+            <listitem><para>EJB and WAR deployment</para></listitem>
+            <listitem><para>Resource injection</para></listitem>
+        </itemizedlist>
+    </preface>
+
+    <toc/>
+
+    <xi:include href="ejb-jpa-resources.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-jpa-injection.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-jpa-remote.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>
