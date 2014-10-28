@@ -62,7 +62,10 @@ public class HotelMgmtEJB implements HotelMgmtRemote, HotelMgmtLocal {
         ((HotelMgmtImpl)hotelMgmt).setHotelDao(dao);
     }]]></programlisting>
         </figure>
-        
+        <itemizedlist spacing="compact">
+            <listitem><para>@PersistenceContext.unitName is the name used within the persistence.xml</para></listitem>
+            <listitem><para>@PersistenceContext.name would be the ENC name normally defined in ejb-jar.xml</para></listitem>
+        </itemizedlist>
     </section>
     
     <section id="ejb-jpa-injection-pu">
@@ -72,22 +75,41 @@ public class HotelMgmtEJB implements HotelMgmtRemote, HotelMgmtLocal {
             <title>@PersistenceUnit Injection</title>
 <programlisting language="java"><![CDATA[@Singleton
 @Startup
+@TransactionManagement(TransactionManagementType.BEAN)
 public class HotelInitEJB implements HotelInitRemote {
     @PersistenceUnit(unitName="ejbjpa-hotel")
     private EntityManagerFactory emf;
+    
+    @Resource
+    private UserTransaction tx;
     
     @Override
     public void businessMethod() {
         EntityManager em=emf.createEntityManager();
         HotelDAO dao = new JPAHotelDAO();
         ((JPAHotelDAO)dao).setEntityManager(em);
+        tx.begin();        
         em.joinTransaction(); //tells the EM to join the JTA Tx
         ...
+        tx.commit();
         em.close();
     }
 }]]></programlisting>
-            
         </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>BEAN-managed transactions means JTA transaction controlled thru injected UserTransaction</para></listitem>
+            <listitem><para>Persistence unit (EntityManagerFactory) being injected from a JTA-managed source</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>i.e., the transaction must be managed at JTA level</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Method programmatically controlling scope of JTA transaction</para></listitem>
+            <listitem><para>
+                em.joinTransaction() called on EntityManager created outside scope of JTA transaction 
+                </para></listitem>
+        </itemizedlist>
+        
+        
     </section>
 
 
@@ -122,7 +144,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 public class SchedulerResources {
-    @PersistenceContext(name="jndidemo")
+    @PersistenceContext(name="jndidemo") //using ENC-name
     @Produces
     @JndiDemo
     public EntityManager em;

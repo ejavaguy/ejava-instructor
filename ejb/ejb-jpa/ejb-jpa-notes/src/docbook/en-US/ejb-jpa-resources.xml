@@ -127,6 +127,10 @@
        
     <section id="ejb-jpa-resources-persistencexml-entities">
         <title>Reference External @Entities</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>to have persistence.xml reference @Entity class(es) outside of local archive</para></listitem>
+        </itemizedlist>
+        
 
        <figure>
            <title>Reference External @Entities: EAR Deploy</title>
@@ -188,9 +192,16 @@ ejbsessionBankEAR-4.0.0-SNAPSHOT
         </properties>
     </persistence-unit>            
 </persistence>]]></programlisting>
-<programlisting language=""><![CDATA[
-]]></programlisting>
        </figure>
+       <note>
+           <para>
+                There is no need to declare "class" entity references into a properly 
+                configured "jar-file" that is located in the classpath of a deployed EAR. 
+                Use "class" entity references when using a WEB-INF/classes/META-INF deployment 
+                of a WAR -- or if you really need to only include specific entities in the 
+                archive. 
+           </para>
+       </note>
     
         </section>
     </section>

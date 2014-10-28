@@ -11,15 +11,20 @@
             <listitem><para>Provider places proxy classes on managed entities to watch for changes</para></listitem>
             <listitem><para>Provider classes can get marshaled back to client</para></listitem>
             <listitem><para>Client must have hibernate-core in classpath to avoid ClassNotFoundException</para>
+                <figure>
+                    <title>Remote Client De-serialization Error with Missing Provider Class</title>
 <programlisting language=""><![CDATA[javax.ejb.EJBException: java.lang.ClassNotFoundException: org.hibernate.proxy.pojo.javassist.SerializableProxy]]></programlisting>
+                </figure>
+                <figure>
+                    <title>Hibernate dependency allowing @Entity classes to be DTOs</title>
 <programlisting language="xml"><![CDATA[<!-- used if hibernate entities re-used as DTOs -->
 <dependency>
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-core</artifactId>
     <scope>test</scope>
 </dependency>]]></programlisting>
+                </figure>
             </listitem>
-            <listitem><para></para></listitem>
         </itemizedlist>
         
        <figure>
@@ -44,18 +49,18 @@ public class Room implements Serializable {
         </itemizedlist>
         
         <figure>
-            <title>Example: EJB @Remote Method Returns Query Result to Directly Client</title>
-<programlisting language="java"><![CDATA[    @Override
-    public List<Room> getAvailableRooms(Integer level, int offset, int limit) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<Room> qdef = cb.createQuery(Room.class);
-        Root<Room> r = qdef.from(Room.class);
-        ...
-        em.createQuery(qdef)
-          .setFirstResult(offset);
-          .setMaxResults(limit);
-          .getResultList();
-    }]]></programlisting>
+            <title>Example: EJB @Remote Method Returns Query Result Directly to Client</title>
+<programlisting language="java"><![CDATA[@Override
+public List<Room> getAvailableRooms(Integer level, int offset, int limit) {
+    CriteriaBuilder cb = em.getCriteriaBuilder();
+    CriteriaQuery<Room> qdef = cb.createQuery(Room.class);
+    Root<Room> r = qdef.from(Room.class);
+    ...
+    em.createQuery(qdef)
+      .setFirstResult(offset);
+      .setMaxResults(limit);
+      .getResultList();
+}]]></programlisting>
         </figure>
         <itemizedlist spacing="compact">
             <listitem><para>Room entities returned from query are passed to client</para></listitem>
@@ -64,7 +69,7 @@ public class Room implements Serializable {
         
         <figure>
             <title>Example: Provider Proxy Classes Marshaled to Client</title>
-<programlisting language="java"><![CDATA[ 72         List<Room> rooms = hotelMgmt.getAvailableRooms(null, 0, 1);
+<programlisting language="java"><![CDATA[72  List<Room> rooms = hotelMgmt.getAvailableRooms(null, 0, 1);
 75  Room room = rooms.get(0);
 77  logger.info("what's floor is this??? {}", room.getFloor().getClass());
 78  assertFalse("floor was not proxy", room.getFloor().getClass().equals(Floor.class));
@@ -75,7 +80,7 @@ public class Room implements Serializable {
 HotelMgmtEJBIT:82 - final guest: class info.ejava.examples.ejb.ejbjpa.bo.Guest:Guest [id=11, name=Cosmo Kramer]]]></programlisting>
         </figure>
         <itemizedlist spacing="compact">
-            <listitem><para>Room returned with proxy class between Room and Floor</para></listitem>
+            <listitem><para>Room returned with proxy class (<code>Floor_$$_jvst9a8_0</code>)between Room and Floor</para></listitem>
             <listitem><para>Requires client to have hibernate-core in classpath</para></listitem>
         </itemizedlist>
     </section>
@@ -84,40 +89,40 @@ HotelMgmtEJBIT:82 - final guest: class info.ejava.examples.ejb.ejbjpa.bo.Guest:G
         <title>Cleansed DTOs</title>
         <itemizedlist spacing="compact">
             <listitem><para>Allows @Entity classes to be used as POJOs except never managed</para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Contains no provider proxy classes</para></listitem>
         </itemizedlist>
 
         <figure>
             <title>Example: EJB Copies Managed @Entity to new Instance</title>
-<programlisting language="java"><![CDATA[    @Override
-    public List<Room> getCleanAvailableRooms(Integer level, int offset, int limit) {
-        List<Room> rooms = getAvailableRooms(level, 0, 1);
-        return toClean(rooms);
-    }
+<programlisting language="java"><![CDATA[@Override
+public List<Room> getCleanAvailableRooms(Integer level, int offset, int limit) {
+    List<Room> rooms = getAvailableRooms(level, offset, limit);
+    return toClean(rooms);
+}
 
-    /**
-     * This helper method will instantiate new entity classes to re-use as DTOs.
-     * This is done to remove hibernate-proxy classes that are part of the managed 
-     * entity.
-     */
-    private List<Room> toClean(List<Room> rooms) {
-        if (rooms==null) { return null; }
-        List<Room> cleanRooms = new ArrayList<Room>(rooms.size());
-        for (Room room : rooms) {
-            Floor floor = room.getFloor();
-            Floor cleanFloor = new Floor(floor.getLevel());
-            Room cleanRoom = new Room(cleanFloor, room.getNumber());            
-            cleanFloor.withRoom(cleanRoom);
-            Guest occupant = room.getOccupant();
-            if (occupant!=null) {
-                Guest cleanOccupant = new Guest(occupant.getId());
-                cleanOccupant.setName(occupant.getName());
-                cleanRoom.setOccupant(cleanOccupant);
-            }
-            cleanRooms.add(cleanRoom);
+/**
+ * This helper method will instantiate new entity classes to re-use as DTOs.
+ * This is done to remove hibernate-proxy classes that are part of the managed 
+ * entity.
+ */
+private List<Room> toClean(List<Room> rooms) {
+    if (rooms==null) { return null; }
+    List<Room> cleanRooms = new ArrayList<Room>(rooms.size());
+    for (Room room : rooms) {
+        Floor floor = room.getFloor();
+        Floor cleanFloor = new Floor(floor.getLevel());
+        Room cleanRoom = new Room(cleanFloor, room.getNumber());            
+        cleanFloor.withRoom(cleanRoom);
+        Guest occupant = room.getOccupant();
+        if (occupant!=null) {
+            Guest cleanOccupant = new Guest(occupant.getId());
+            cleanOccupant.setName(occupant.getName());
+            cleanRoom.setOccupant(cleanOccupant);
         }
-        return cleanRooms;
-    }]]></programlisting>
+        cleanRooms.add(cleanRoom);
+    }
+    return cleanRooms;
+}]]></programlisting>
         </figure>
         <itemizedlist spacing="compact">
             <listitem><para>EJB Remote facade creating new instances of @Entity classes</para></listitem>
@@ -126,8 +131,8 @@ HotelMgmtEJBIT:82 - final guest: class info.ejava.examples.ejb.ejbjpa.bo.Guest:G
 
         <figure>
             <title>Example: Client Receives Pure POJOs without Provider Classes</title>
-<programlisting language=""><![CDATA[HotelMgmtEJBIT:96 - this looks like a good floor: class info.ejava.examples.ejb.ejbjpa.bo.Floor
-HotelMgmtEJBIT:101 - final guest: class info.ejava.examples.ejb.ejbjpa.bo.Guest:Guest [id=17, name=Cosmo Kramer]]]></programlisting>
+<programlisting language=""><![CDATA[this looks like a good floor: class info.ejava.examples.ejb.ejbjpa.bo.Floor
+final guest: class info.ejava.examples.ejb.ejbjpa.bo.Guest:Guest [id=17, name=Cosmo Kramer]]]></programlisting>
         </figure>
         <itemizedlist spacing="compact">
             <listitem><para>Client now gets Room.floor without provider proxy class in between</para></listitem>
@@ -136,30 +141,329 @@ HotelMgmtEJBIT:101 - final guest: class info.ejava.examples.ejb.ejbjpa.bo.Guest:
     
     <section id="ejb-jpa-remote-lazyload">
         <title>Lazy Load Exception</title>
-        <para></para>
+        <itemizedlist spacing="compact">
+            <listitem><para>DB session closed before necessary references resolved</para></listitem>
+            <listitem><para>Common when using @Entities across transaction boundaries</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Not unique to RMI</para></listitem>
+                </itemizedlist>       
+            </listitem>
+        </itemizedlist>       
+        
+        <figure>
+            <title>Floor @Entity</title>
+<programlisting language="java"><![CDATA[@Entity
+public class Floor implements Serializable {
+    @Id
+    @Column(name="LEVEL", nullable=false)
+    int level;
+    
+    @OneToMany(mappedBy="floor", 
+            fetch=FetchType.LAZY,
+            cascade={CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.DETACH},
+            orphanRemoval=true)
+    @OrderBy("number")
+    List<Room> rooms;]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Rooms fetch=LAZY</para></listitem>
+            <listitem><para>Rooms must be fetched within same DB session when using that collection</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Standard @Entity Access</title>
+<programlisting language="java"><![CDATA[@Stateless
+public class HotelMgmtEJB implements HotelMgmtRemote, HotelMgmtLocal {
+...
+    @Override
+    public Floor getFloor(int level) {
+        return em.find(Floor.class,  level);
+    }]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Floor being marshaled directly back to client without addressing LAZY fetches</para></listitem>
+        </itemizedlist>
+
+        
+        <figure>
+            <title>Remote Client Causing LAZY-load Exception</title>
+<programlisting language="java"><![CDATA[112  Floor floor = hotelMgmt.getFloor(0);
+113  assertNotNull("floor not found", floor);
+114  try {
+115      logger.info("foor has {} rooms", floor.getRooms().size());
+116      fail("did not get lazy-load exception");
+117  } catch (LazyInitializationException expected) {
+118      logger.info("got expected exception:{}", expected.toString());
+119  }]]></programlisting>
+
+<programlisting language=""><![CDATA[
+HotelMgmtEJBIT:118 - got expected exception:org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role: info.ejava.examples.ejb.ejbjpa.bo.Floor.rooms, could not initialize proxy - no Session
+]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Floor can be accessed</para></listitem>
+            <listitem><para>Floor.room access causes Lazy-load exception of collection</para></listitem>
+        </itemizedlist>
     </section>
     
     <section id="ejb-jpa-remote-touch">
         <title>Load thru "Touching" Object Tree in Remote Facade</title>
-        <para></para>
+        <itemizedlist spacing="compact">
+            <listitem><para>Simple/brute force technique to stimulate resolution of references</para></listitem>
+            <listitem><para>Where do you stop???</para></listitem>
+            <listitem><para>Repetitive round trips to DB can be expensive</para></listitem>
+        </itemizedlist>       
+        
+        <figure>
+            <title>Server-side Stimulates References To Be Loaded</title>
+<programlisting language="java"><![CDATA[@Override
+public Floor getTouchedFloor(int level) {
+    Floor floor = getFloor(level);
+    if (floor!=null) {
+        //touch the managed-floor to cause lazy-loads to be resolved            
+        floor.getRooms().isEmpty();
+        for (Room room: floor.getRooms()) {
+            Guest guest = room.getOccupant();
+            if (guest!=null) {
+                guest.getName(); //touch all occupants to cause lazy-loads to be resolved
+            }
+        }
+    }
+    return floor;
+}]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Server-side code, within the DB session boundary stimulates references to be loaded prior to marshaling back to client</para></listitem>
+        </itemizedlist>       
+        
+        <figure>
+            <title>Initial getFloor() queries parent FLOOR table</title>
+<programlisting language="java"><![CDATA[Floor floor = getFloor(level);]]></programlisting>
+<programlisting language=""><![CDATA[select
+    floor0_.LEVEL as LEVEL1_0_0_ 
+from
+    EJBJPA_FLOOR floor0_ 
+where
+    floor0_.LEVEL=?]]></programlisting>
+        </figure>
+        
+        <figure>
+            <title>Accessing Rooms Collection Causes Child Table Load</title>
+<programlisting language="java"><![CDATA[if (floor!=null) {
+    floor.getRooms().isEmpty();]]></programlisting>
+<programlisting language=""><![CDATA[select
+    rooms0_.FLOOR_ID as FLOOR_ID2_0_0_,
+    rooms0_.ROOM_NUMBER as ROOM_NUM1_2_0_,
+    rooms0_.ROOM_NUMBER as ROOM_NUM1_2_1_,
+    rooms0_.FLOOR_ID as FLOOR_ID2_2_1_,
+    rooms0_.occupant_GUEST_ID as occupant3_2_1_ 
+from
+    EJBJPA_ROOM rooms0_ 
+where
+    rooms0_.FLOOR_ID=? 
+order by
+    rooms0_.ROOM_NUMBER]]></programlisting>
+        </figure>
+        
+        <figure>
+            <title>Additional Child Table Load Occurring One-at-a-Time</title>
+<programlisting language=""><![CDATA[for (Room room: floor.getRooms()) {
+    Guest guest = room.getOccupant();
+    if (guest!=null) {
+        guest.getName(); //touch all occupants to cause lazy-loads to be resolved]]></programlisting>
+<programlisting language=""><![CDATA[select
+    guest0_.GUEST_ID as GUEST_ID1_1_0_,
+    guest0_.name as name2_1_0_ 
+from
+    EJBJPA_GUEST guest0_ 
+where
+    guest0_.GUEST_ID=?
+
+select
+    guest0_.GUEST_ID as GUEST_ID1_1_0_,
+    guest0_.name as name2_1_0_ 
+from
+    EJBJPA_GUEST guest0_ 
+where
+    guest0_.GUEST_ID=?]]></programlisting>
+        </figure>
     </section>
     
     <section id="ejb-jpa-remote-fetch">
         <title>Load thru Fetching Object Tree in Query</title>
-        <para></para>
+        <itemizedlist spacing="compact">
+            <listitem><para>DAO queries crafted to support remote access patterns</para></listitem>
+            <listitem><para>LAZY fetches resolved through "join fetch" queries</para></listitem>
+        </itemizedlist>       
+        
+        <figure>
+            <title>DAO Query Fetches Child Tables</title>
+<programlisting language="java"><![CDATA[@Override
+public Floor getFetchedFloor(int level) {
+    List<Floor> floors = em.createNamedQuery("Floor.fetchFloor",
+            Floor.class)
+            .setParameter("level", level)
+            .getResultList();
+    return floors.isEmpty() ? null : floors.get(0);
+}]]></programlisting>
+<programlisting language="java"><![CDATA[@Entity
+@NamedQueries({
+    @NamedQuery(name="Floor.fetchFloor", 
+            query="select f from Floor f "
+                    + "join fetch f.rooms r "
+                    + "join fetch r.occupant "
+                    + "where f.level=:level")
+})
+public class Floor implements Serializable {]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Join fetch used to EAGER-ly load child rows</para></listitem>
+            <listitem><para>Less trips to DB for fatch=LAZY mappings</para></listitem>
+        </itemizedlist>       
+        
+        <figure>
+            <title>Returned Object Tree Accessed in fewer Queries</title>
+<programlisting language=""><![CDATA[select
+    floor0_.LEVEL as LEVEL1_0_0_,
+    rooms1_.ROOM_NUMBER as ROOM_NUM1_2_1_,
+    guest2_.GUEST_ID as GUEST_ID1_1_2_,
+    rooms1_.FLOOR_ID as FLOOR_ID2_2_1_,
+    rooms1_.occupant_GUEST_ID as occupant3_2_1_,
+    rooms1_.FLOOR_ID as FLOOR_ID2_0_0__,
+    rooms1_.ROOM_NUMBER as ROOM_NUM1_2_0__,
+    guest2_.name as name2_1_2_ 
+from
+    EJBJPA_FLOOR floor0_ 
+inner join
+    EJBJPA_ROOM rooms1_ 
+        on floor0_.LEVEL=rooms1_.FLOOR_ID 
+inner join
+    EJBJPA_GUEST guest2_ 
+        on rooms1_.occupant_GUEST_ID=guest2_.GUEST_ID 
+where
+    floor0_.LEVEL=? 
+order by
+    rooms1_.ROOM_NUMBER]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Still have to know "when is enough -- enough"</para></listitem>
+        </itemizedlist>       
+
     </section>
     
     <section id="ejb-jpa-remote-dto">
         <title>Abstract Remote Interface View with DTO</title>
-        <para></para>
+        <itemizedlist spacing="compact">
+            <listitem><para>Server-side has job to implement overall capability</para></listitem>
+            <listitem><para>Client may have an "outsider" role</para></listitem>
+        </itemizedlist>       
+        
+        <figure>
+            <title>Room @Entity references Sensitive Occupant Information</title>
+<programlisting language="java"><![CDATA[@Entity
+public class Room implements Serializable {
+    @Id
+    @Column(name="ROOM_NUMBER")
+    private int number;
+...
+    @OneToOne(optional=true, fetch=FetchType.LAZY)
+    @JoinColumn(name="OCCUPANT_ID")
+    private Guest occupant;]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>More information than the client wants/needs</para></listitem>
+            <listitem><para>More information than what client should have</para></listitem>
+            <listitem><para>But that is how out server-side model is designed...</para></listitem>
+        </itemizedlist>       
+
+        <figure>
+            <title>@Entity Model mis-used by Client</title>
+<programlisting language="java"><![CDATA[//lets see if we can manually find a vacant room.....
+Floor floor = hotelMgmt.getFetchedFloor(0);
+//all floors have at least one occupant
+for (Room room: floor.getRooms()) {
+    Guest occupant = room.getOccupant();
+    if (occupant!=null) {
+        logger.info("hey {}, are you done with room {} yet?", 
+                occupant.getName(), room.getNumber());
+        //that is just rude
+    }
+}]]></programlisting>
+<programlisting language=""><![CDATA[hey guest 1, are you done with room 0 yet?
+hey guest 3, are you done with room 2 yet?]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Client only needed to know if room was occupied -- not by who</para></listitem>
+        </itemizedlist>       
+        
+        <figure>
+            <title>DTO Represents what Clients Can/Should Know</title>
+<programlisting language="java"><![CDATA[public class RoomDTO implements Serializable {
+    private int number;
+    private boolean occupied;]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Room DTO class is only expressing that room is occupied</para></listitem>
+        </itemizedlist>       
+
+        <figure>
+            <title>Server-side constructs DTOs</title>
+<programlisting language="java"><![CDATA[@Override
+public FloorDTO getFetchedFloorDTO(int level) {        
+    Floor floor = getFetchedFloor(level);
+    return toDTO(floor);
+}
+
+private FloorDTO toDTO(Floor floor) {
+    if (floor==null) { return null; }
+    FloorDTO floorDTO = new FloorDTO(floor.getLevel());
+    if (floor.getRooms()!=null) { for (Room room: floor.getRooms()) {
+        floorDTO.withRoom(toDTO(room));
+    }}
+    return floorDTO;
+}
+
+private RoomDTO toDTO(Room room) {
+    if (room==null) { return null; }
+    RoomDTO roomDTO = new RoomDTO(room.getNumber());
+    //remote client shouldn't care who is in the room -- just if busy
+    roomDTO.setOccupied(room.getOccupant()!=null);
+    return roomDTO;
+}]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Similar to @Entity cleansing since DTO classes aren't managed</para></listitem>
+            <listitem><para>Can indirectly solve LAZY-load issue because @Entity is walked on server-side</para></listitem>
+            <listitem><para>Must still pay attention to DB access for performance reasons</para></listitem>
+        </itemizedlist>       
+
+        <figure>
+            <title>Client receives more Appropriate Abstraction</title>
+<programlisting language="java"><![CDATA[//lets see if we can manually find a vacant room.....
+FloorDTO floor = hotelMgmt.getFetchedFloorDTO(0);
+//all floors have at least one occupant
+for (RoomDTO room: floor.getRooms()) {
+    if (room.isOccupied()) {
+        logger.info("hey whoever, are you done with room {} yet?", room.getNumber());
+        //still rude, but a bit more private
+    }
+}]]></programlisting>
+<programlisting language=""><![CDATA[hey whoever, are you done with room 0 yet?
+hey whoever, are you done with room 2 yet?]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Client no longer has access to who is in each room -- but server-side does</para></listitem>
+        </itemizedlist>       
     </section>
 
     <section id="ejb-jpa-remote-summary">
        <title>Summary</title>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Serializaing Managed @Entities</para></listitem>
+            <listitem><para>Lazy-load Exception</para></listitem>
+            <listitem><para>"Touching" @Entities to Stimulate Child Load</para></listitem>
+            <listitem><para>Join Fetch to provide query support for detaching @Entities</para></listitem>
+            <listitem><para>DTO classes</para></listitem>
         </itemizedlist>
     </section>    
 </chapter>
