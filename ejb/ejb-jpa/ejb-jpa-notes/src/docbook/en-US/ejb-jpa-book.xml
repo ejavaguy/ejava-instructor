@@ -32,4 +32,5 @@
     <xi:include href="ejb-jpa-resources.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-jpa-injection.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-jpa-remote.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-jpa-propagation.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </book>
