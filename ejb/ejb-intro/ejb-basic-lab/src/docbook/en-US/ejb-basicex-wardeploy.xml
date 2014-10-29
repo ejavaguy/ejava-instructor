@@ -106,7 +106,7 @@ $ mkdir basicejb-war
                 </listitem>
 
             <listitem><para>
-                Add the EJB dependency to the EAR. Use exclusions to keep
+                Add the EJB dependency to the WAR. Use exclusions to keep
                 any unwanted 3rd party .jars from being brought along.
                 </para>
 <programlisting language="xml"><![CDATA[    <dependencies>
@@ -333,6 +333,7 @@ basicejb-ear-1.0-SNAPSHOT/basicejb-ejb-1.0-SNAPSHOT/ReservationEJB!org.myorg.bas
 <programlisting language="xml"><![CDATA[    <modules>
         <module>basicejb-ejb</module>
         <module>basicejb-ear</module>
+        <module>basicejb-test</module>
         <module>basicejb-war</module>
     </modules>]]></programlisting>                        
 <programlisting language="xml"><![CDATA[$ mvn clean install -DskipTests
@@ -1208,7 +1209,7 @@ WEB-INF/classes/org/myorg/basicejb/webejb/ShopperEJB.class
                 </listitem>
 
             <listitem><para>
-                Now that you have this working, experiment by removing the "?stateless" from the JNDI name in the WAR/pom.
+                Now that you have this working, experiment by removing the "?stateful" from the JNDI name in the WAR/pom.
                 </para>
 <programlisting language="xml"><![CDATA[<jndi.name.shopper>ejb:/basicejb-war-1.0-SNAPSHOT/ShopperEJB!org.myorg.basicejb.webejb.ShopperRemote</jndi.name.shopper>]]></programlisting>
                 </listitem>

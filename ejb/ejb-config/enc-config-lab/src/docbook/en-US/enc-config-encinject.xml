@@ -1,0 +1,261 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="enc-configex-encinject">
+    <title>Configure EJB using Injection of ENC Resources</title>
+    <para>In this section we will remove the specification of the JNDI lookups
+        from the EJB bean class and perform injections indirectly through the 
+        JNDI ENC context populated by one of the XML deployment 
+        descriptors.  We will again...</para>
+    <itemizedlist>
+        <listitem><para>Inject Value Resources</para></listitem>
+        <listitem><para>Inject Persistence Context</para></listitem>
+        <listitem><para>Inject Administered Resources</para></listitem>
+    </itemizedlist>
+    <para>We will primarily be working with the following files</para>
+    <itemizedlist>
+        <listitem><para>src/test/java/.../ENCAuditorIT.java</para></listitem>
+        <listitem><para>src/main/java/.../ENCAuditorEJB.java</para></listitem>
+        <listitem><para>src/main/resources/META-INF/ejb-jar.xml</para></listitem>
+    </itemizedlist>
+<programlisting language=""><![CDATA[src/
+|-- main
+|   |-- java
+|   |   `-- org
+|   |       `-- myorg
+|   |           `-- encconfig
+|   |               `-- ejb
+|   |                   `-- ENCAuditorEJB.java
+|   `-- resources
+|       `-- META-INF
+|           `-- ejb-jar.xml
+`-- test
+    |-- java
+    |   `-- org
+    |       `-- myorg
+    |           `-- encconfig
+    |               `-- auditor
+    |                   `-- ejb
+    |                       `-- it
+    |                           `-- ENCAuditorEJBIT.java]]></programlisting>
+    
+        
+    <section id="enc-configex-encinject-setup">
+        <title>Setup</title>
+        <orderedlist>
+            <listitem><para>Start JBoss. If you run JBoss within Eclipse, you 
+                may want to start it in debug mode.</para></listitem>
+            <listitem><para>Deploy the EJB module to JBoss using the maven cargo plugin</para>
+            
+<programlisting language=""><![CDATA[$ mvn pre-integration-test
+...
+[INFO] --- cargo-maven2-plugin:1.4.3:redeploy (cargo-prep) @ encconfig-labex-ejb ---
+...
+[INFO] BUILD SUCCESS]]></programlisting>                        
+
+            </listitem>
+            <listitem><para>Run all IT tests within Eclipse or at the command 
+                line. They should all pass, but if you look closely -- many are
+                still being ignored until we fix some things.</para>
+            </listitem>
+        </orderedlist>
+    </section>
+    
+    <section id="enc-configex-encinject-resources">
+        <title>Inject Resources</title>
+
+        <orderedlist>
+            <listitem><para>Activate the <code>ENCAuditorEJBIT</code> test case.
+                Since this test case extends the same base class as the previous
+                test case (where we activated all the test methods) all test
+                methods will immediately become active.</para>
+
+<programlisting language="java"><![CDATA[//TODO enc-config 11: activate this testcase 
+@Ignore
+public class ENCAuditorEJBIT extends AuditorCheckerITBase {]]></programlisting>
+                        
+            </listitem>
+            
+            
+            <listitem><para>Re-run the IT tests for the EJB module. The test case
+                you just activated above will fail with several errors</para>
+<programlisting language=""><![CDATA[java.lang.AssertionError: publishJMS value not injected
+java.lang.AssertionError: persistence context not injected
+java.lang.AssertionError: topic not injected
+java.lang.AssertionError: connection factory not injected
+java.lang.AssertionError: EJB not properly initialized expected:<2> but was:<0>]]></programlisting>                        
+            </listitem>
+            
+            <listitem><para>Correct the first issue by injecting the value 
+                from the JNDI ENC placed there by the <code>META-INF/ejb-jar.xml</code></para>
+<programlisting language="xml"><![CDATA[<session>
+    <ejb-name>ENCAuditorEJB</ejb-name>
+    <env-entry>
+        <env-entry-name>val/publishJMS</env-entry-name>
+        <env-entry-type>java.lang.Boolean</env-entry-type>
+        <env-entry-value>true</env-entry-value>
+    </env-entry>
+...
+</session>]]></programlisting>
+
+                <para>
+                    Follow that up by injecting the the ENC name into the <code>publishJMS</code>
+                    property in the <code>ENCAuditorEJB</code>. We would have encountered
+                    a deployment error if this was not defined first.
+                </para>
+<programlisting language="java"><![CDATA[@Stateless
+public class ENCAuditorEJB extends AuditorBase 
+...
+//TODO enc-config 12: define a resource value ENC injection
+//@Resource(name="val/publishJMS")
+private Boolean publishJMS;]]></programlisting>
+                        
+            </listitem>
+            
+            <listitem><para>Re-deploy the EJB module using the maven cargo plugin</para>
+<programlisting language=""><![CDATA[$ mvn pre-integration-test]]></programlisting>                        
+            </listitem>
+            <listitem><para>Re-run the IT tests. The test you addressed above should 
+                now pass.</para></listitem>
+                
+                
+            <listitem><para>Correct the next issue by injecting the persistence 
+                context from the JNDI ENC placed there by the <code>META-INF/ejb-jar.xml</code></para>
+<programlisting language="xml"><![CDATA[<persistence-context-ref>
+    <persistence-context-ref-name>jpa/em</persistence-context-ref-name>
+    <persistence-unit-name>encconfig-lab</persistence-unit-name>
+</persistence-context-ref>]]></programlisting>
+
+                <para>The value is injected within <code>ENCAuditorEJB</code>
+                    using the <code>@javax.persistence.PersistenceContext</code> annotation</para>
+<programlisting language="java"><![CDATA[@Stateless
+public class ENCAuditorEJB extends AuditorBase 
+...
+//TODO enc-config 13: define a persistence context ENC injection
+//@PersistenceContext(name="jpa/em")
+private EntityManager em;]]></programlisting>
+                <para>Notice how the EJB class now knows less about the specific
+                    name of the persistence unit and simply accepts whatever is assigned
+                    to the logical name in the ENC. Now that we have this information
+                    in an XML file -- this opens up the possibility to change this 
+                    assignment at build time through the manipulation of the XML
+                    file during the resource copy.</para>
+                    <note>
+                        <para>
+                            In the previous chapter we injected a PersistenceContext 
+                            using its direct persistence unit name ("encconfig-lab"). In this case we 
+                            are using an indirect ENC name ("jpa/em") and leaving it 
+                            up to the assembler to register the appropriate persistence
+                            unit at that location.
+                        </para>
+                    </note>
+            </listitem>
+
+            <listitem><para>Re-deploy the EJB module using the maven cargo plugin</para>
+<programlisting language=""><![CDATA[$ mvn pre-integration-test]]></programlisting>                        
+            </listitem>
+            <listitem><para>Re-run the IT tests. The test you addressed above should 
+                now pass.</para></listitem>
+
+            <listitem><para>Correct the next issue by injecting the JMS topic
+                 from the JNDI ENC placed there by the <code>META-INF/ejb-jar.xml</code></para>
+<programlisting language="xml"><![CDATA[<resource-env-ref>
+    <resource-env-ref-name>jms/topic</resource-env-ref-name>
+    <resource-env-ref-type>javax.jms.Topic</resource-env-ref-type>
+    <lookup-name>java:/topic/test</lookup-name>
+</resource-env-ref>]]></programlisting>
+                <para>This element uses a resource-env-ref since it is a value and
+                    not an object the container will communicate with.</para>
+                <note>
+                    <para>
+                        The assembler of this application is assigning a server-specific
+                        JNDI name ("java:/topic/test") to a logical ENC name ("jms/topic")
+                        the EJB will depend upon.
+                    </para>
+                </note>
+
+                <para>The value is injected within <code>ENCAuditorEJB</code>
+                    using the <code>@javax.annotation.Resource</code> annotation</para>
+<programlisting language="java"><![CDATA[@Stateless
+public class ENCAuditorEJB extends AuditorBase 
+...
+//TODO enc-config 14: define a resource-env ENC injection
+//@Resource(name="jms/topic")
+private Topic topic;]]></programlisting>
+            </listitem>
+
+            <listitem><para>Re-deploy the EJB module using the maven cargo plugin</para>
+<programlisting language=""><![CDATA[$ mvn pre-integration-test]]></programlisting>                        
+            </listitem>
+            <listitem><para>Re-run the IT tests. The test you addressed above should 
+                now pass.</para></listitem>
+
+            <listitem><para>Correct the next issue by injecting the JMS connection
+                 factory from the JNDI ENC placed there by the <code>META-INF/ejb-jar.xml</code></para>
+<programlisting language="xml"><![CDATA[<resource-ref>
+    <res-ref-name>jms/cf</res-ref-name>
+    <res-type>javax.jms.ConnectionFactory</res-type>
+    <lookup-name>java:/JmsXA</lookup-name>
+</resource-ref>]]></programlisting>
+                <para>This element uses a resource-ref since it is an object
+                    the container will communicate with.</para>
+
+                <para>The value is injected within <code>ENCAuditorEJB</code>
+                    using the <code>@javax.annotation.Resource</code> annotation</para>
+<programlisting language="java"><![CDATA[@Stateless
+public class ENCAuditorEJB extends AuditorBase 
+...
+//TODO enc-config 15: define a resource ENC injection
+//@Resource(name="jms/cf")
+private ConnectionFactory cf;]]></programlisting>
+            </listitem>
+
+            <listitem><para>Re-deploy the EJB module using the maven cargo plugin</para>
+<programlisting language=""><![CDATA[$ mvn pre-integration-test]]></programlisting>                        
+            </listitem>
+            <listitem><para>Re-run the IT tests. The test you addressed above should 
+                now pass.</para></listitem>
+
+            <listitem><para>Correct the last issue by activating the EJB's 
+                @PostConstruct method so that it gets called after the resources 
+                have been injected. The method is activated within <code>ENCAuditorEJB</code>
+                    using the <code>@javax.annotation.PostConstruct</code> annotation</para>
+                    
+<programlisting language="java"><![CDATA[@Stateless
+public class ENCAuditorEJB extends AuditorBase 
+...
+//TODO enc-config 16: activate this method after injection
+//@PostConstruct
+public void init() {
+    super.setLog(log);
+    super.setConnectionFactory(cf);
+    super.setEntityManager(em);
+    super.setTopic(topic);
+    super.setPublishJMS(isPublishJMS());
+}]]></programlisting>
+            </listitem>
+
+            <listitem><para>Re-deploy the EJB module using the maven cargo plugin</para>
+<programlisting language=""><![CDATA[$ mvn pre-integration-test]]></programlisting>                        
+            </listitem>
+            <listitem><para>Re-run the IT tests. All tests associated with this 
+                test case should now be passing.</para></listitem>
+
+        </orderedlist>
+        <para>You have finished injecting resources into your EJB bean using resources
+             populated in the JNDI ENC using the <code>META-INF/ejb-jar.xml</code>.</para>
+    </section>
+
+
+    <section id="enc-configex-encinject-summary">
+       <title>Summary</title>
+       <para>In this chapter you successfully injected a value, persistence context,
+           and administered resources into the EJB using the JNDI ENC. This technique
+           allowed the actual JNDI names be abstracted away from the Java class and
+           moved into an XML deployment descriptor where it can either be defined
+           or form an override for the value in the Java class. Next we will take a 
+           look at a more programmatic way to access the JNDI ENC values that can 
+           make them available to any class within the EJB bean's scope.</para>
+    </section>    
+</chapter>
+  

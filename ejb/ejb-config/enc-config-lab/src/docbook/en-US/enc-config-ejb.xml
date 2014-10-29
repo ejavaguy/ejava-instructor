@@ -1,0 +1,300 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="enc-configex-ejb">
+    <title>EJB Injection</title>
+    <para>
+        In the previous chapters we covered several techniques that can be used to
+        configure EJBs with different types of resources. In this chapter we will
+        limit the number of options but have you configure a new type of property --
+        a dependency EJB. EJBs can be injected with the <code>@EJB</code> annotation.
+        If there is only one choice for the type of EJB and it is available within the 
+        local application, then all we need is the annotation.
+        If there are multiple choices, we must identify which choice to make using either:  
+    </para>
+    <itemizedlist>
+        <listitem><para>beanName -- this is the name of the EJB to use</para></listitem>
+        <listitem><para>lookup -- JNDI name of the EJB to use</para></listitem>
+        <listitem><para>name -- ENC name of the EJB to use</para></listitem>
+    </itemizedlist>
+    <para>If the EJB is only available from a remote application, then we must use
+        some form of JNDI lookup.</para>
+    <para>We will primarily be working with the following files</para>
+    <itemizedlist>
+        <listitem><para>src/test/java/.../ConfigBeanIT.java</para></listitem>
+        <listitem><para>src/main/java/.../SampleLocal.java</para></listitem>
+        <listitem><para>src/main/java/.../SampleRemote.java</para></listitem>
+        <listitem><para>src/main/java/.../SampleNoIfaceEJB.java</para></listitem>
+        <listitem><para>src/main/java/.../Choice1EJB.java</para></listitem>
+        <listitem><para>src/main/java/.../Choice2EJB.java</para></listitem>
+        <listitem><para>src/main/java/.../ConfigBeanEJB.java</para></listitem>
+    </itemizedlist>
+<programlisting language=""><![CDATA[src
+|-- main
+|   |-- java
+|   |   `-- org
+|   |       `-- myorg
+|   |           `-- encconfig
+|   |               `-- ejb
+|   |                   |-- Choice1EJB.java
+|   |                   |-- Choice2EJB.java
+|   |                   |-- ConfigBeanEJB.java
+|   |                   |-- ConfigBeanRemote.java
+|   |                   |-- SampleLocal.java
+|                       |-- SampleNoIfaceEJB.java
+|                       `-- SampleRemote.java
+`-- test
+    |-- java
+    |   `-- org
+    |       `-- myorg
+    |           `-- encconfig
+    |               `-- auditor
+    |                   `-- ejb
+    |                       `-- it
+    |                           `-- ConfigBeanIT.java]]></programlisting>
+    
+    <section id="enc-configex-ejb-setup">
+        <title>Setup</title>
+        <orderedlist>
+            <listitem><para>Start JBoss. If you run JBoss within Eclipse, you 
+                may want to start it in debug mode.</para></listitem>
+            <listitem><para>Deploy the EJB module to JBoss using the maven cargo plugin</para>
+            
+<programlisting language=""><![CDATA[$ mvn pre-integration-test
+...
+[INFO] --- cargo-maven2-plugin:1.4.3:redeploy (cargo-prep) @ encconfig-labex-ejb ---
+...
+[INFO] BUILD SUCCESS]]></programlisting>                        
+
+            </listitem>
+            <listitem><para>Run all IT tests within Eclipse or at the command 
+                line. They should all pass, but if you look closely -- many are
+                still being ignored until we fix some things.</para>
+            </listitem>
+        </orderedlist>
+    </section>
+
+        
+
+    <section id="enc-configex-ejb-noiface">
+        <title>@EJB Inject No Interface EJB</title>
+        <para>
+            In this section we are going to demonstrate how we can simply use 
+            an @EJB annotation and type information for the container to inject
+            a dependency EJB instance into our parent EJB. 
+        </para>            
+
+        <orderedlist>
+            <listitem><para>Remove the @Ignore on the <code>ConfigBeanIT</code> test case.</para>
+
+<programlisting language="java"><![CDATA[//TODO: enc-config 29
+@Ignore
+public class ConfigBeanIT {]]></programlisting>                        
+                        
+            </listitem>
+            <listitem><para>Re-run the IT tests. You should get a failure for the 
+               test case you just activated.</para>
+               
+<programlisting language=""><![CDATA[
+java.lang.IllegalStateException: EJBCLIENT000025: No EJB receiver available for handling 
+[appName:, moduleName:encconfig-labex-ejb, distinctName:] 
+combination for invocation context org.jboss.ejb.client.EJBClientInvocationContext@5000cc80]]></programlisting>
+
+                <para>
+                    The error basically states there is no EJB posted to the given JNDI name.
+                    This is because the EJB module was deployed without adding @Stateless
+                    to the EJB we are trying to lookup.
+                </para>
+               </listitem>
+            <listitem><para>Activate the EJB within the EJB module by adding @Stateless
+                to the <code>ConfigBeanEJB</code>. 
+                </para>
+
+<programlisting language="java"><![CDATA[//TODO: enc-config 30
+//@Stateless
+public class ConfigBeanEJB implements ConfigBeanRemote {]]></programlisting>       
+                 
+            </listitem>
+            <listitem><para>Re-deploy the EJB module to the server.</para>
+<programlisting language=""><![CDATA[$ mvn pre-integration-test]]></programlisting>                        
+            </listitem>
+            <listitem><para>Re-run the JUnit tests. The following error should occur.</para>
+<programlisting language=""><![CDATA[no interface EJB not injected]]></programlisting>
+                <para>
+                    The error is caused by no injection defined for the EJB. In this case
+                    we want to use a "no interface" EJB that has no local interface --
+                    so we inject the EJB class itself.
+                </para>            
+<programlisting language="java"><![CDATA[private SampleNoIfaceEJB noIface;]]></programlisting>                
+            </listitem>
+               
+            <listitem><para>
+                Add injection of the no interface EJB by adding an @EJB annotation. This 
+                will trigger the container to look for a <code>SampleNoIfaceEJB</code>,
+                locate it, and inject it.
+                </para>
+<programlisting language="java"><![CDATA[@Stateless
+public class ConfigBeanEJB implements ConfigBeanRemote {
+    //TODO: enc-config 31
+    //@EJB
+    private SampleNoIfaceEJB noIface;]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Re-deploy the EJB module to the server.</para>
+<programlisting language=""><![CDATA[$ mvn pre-integration-test]]></programlisting>                        
+            </listitem>
+            <listitem><para>Re-run the JUnit tests. The test case should now pass.</para>
+            </listitem>
+        </orderedlist>
+            
+            <para>
+                You have finished injecting a dependency EJB using just an @EJB annotation
+                and type information from the Java variable. We happen to use a no interface
+                bean in this example but the same can be done with @Local and @Remote
+                interfaces as long as the dependency EJB is deployed within the application.
+            </para>
+    </section>
+
+
+    <section id="enc-configex-ejb-beanname">
+        <title>@EJB Inject Local Interface Bean</title>
+        <para>
+            In this section we are going to demonstrate what can happen when there
+            are multiple valid choices and how we can distinguish the right one 
+            by using its EJB name. 
+        </para>            
+
+        <orderedlist>
+            <listitem><para>Update the <code>Choice2EJB</code> to also implement the 
+                SampleLocal interface.</para>
+
+<programlisting language="java"><![CDATA[@Stateless
+//TODO: enc-config 32
+public class Choice2EJB implements /*SampleLocal, */ SampleRemote {]]></programlisting>                        
+                <para>
+                    This will cause an ambiguity conflict now that
+                    we have two EJBs that implement the same interface.
+                </para>
+<programlisting language="java"><![CDATA[    @EJB
+    private SampleLocal localEJB;]]></programlisting>
+            </listitem>
+            
+            <listitem><para>Attempt to re-deploy the EJB module to the server.
+                This will fail.</para>
+<programlisting language=""><![CDATA[
+2014-10-22 02:17:28,981 ERROR [org.jboss.msc.service.fail] (MSC service thread 1-4) MSC000001: 
+Failed to start service jboss.deployment.unit."encconfig-labex-ejb.jar".INSTALL: ...
+...
+Caused by: org.jboss.as.server.deployment.DeploymentUnitProcessingException: 
+JBAS011058: Failed to install component ConfigBeanEJB
+...
+Caused by: org.jboss.as.server.deployment.DeploymentUnitProcessingException: JBAS014546: 
+More than one EJB found with interface of type 'org.myorg.encconfig.ejb.SampleLocal' for 
+binding org.myorg.encconfig.ejb.ConfigBeanEJB/localEJB. Found: ...]]></programlisting>                        
+            </listitem>
+            
+            <listitem><para>Fix the ambiguity by explicitly referencing Choice1EJB 
+                using its EJB name in the @EJB annotation.</para>
+               
+<programlisting language="java"><![CDATA[@Stateless
+public class ConfigBeanEJB implements ConfigBeanRemote {
+    //TODO: enc-config 33
+    @EJB//(beanName="Choice1EJB")
+    private SampleLocal localEJB;]]></programlisting>
+               </listitem>
+               
+            <listitem><para>Re-deploy the application. This should succeed.</para>
+<programlisting language=""><![CDATA[$ mvn clean pre-integration-test]]></programlisting>       
+            </listitem>
+            <listitem><para>Re-run the JUnit tests. This should also work.</para>
+            </listitem>
+        </orderedlist>
+            
+            <para>
+                You have finished injecting a dependency EJB using an EJB beanName.
+                The beanName (or other techniques) is required when the type-alone
+                is not clear enough to locate the right dependency EJB.
+            </para>
+    </section>
+
+
+    <section id="enc-configex-ejb-lookup">
+        <title>@EJB Inject Remote Interface using Lookup</title>
+        <para>
+            In this section we are going to again demonstrate an ambiguity for an
+            interface type except this time we will use a @Remote interface and 
+            dis-ambiguate the choices using the JNDI name of the target EJB using 
+            the lookup property of @EJB.
+        </para>            
+
+        <orderedlist>
+            <listitem><para>Update the <code>Choice1EJB</code> to also implement the 
+                SampleRemote interface.</para>
+
+<programlisting language="java"><![CDATA[@Stateless
+//TODO: enc-config 34
+public class Choice1EJB implements SampleLocal/*, SampleRemote*/ {]]></programlisting>                        
+                <para>
+                    This will again cause an ambiguity conflict now that
+                    we have two EJBs that implement the same interface.
+                </para>
+<programlisting language="java"><![CDATA[    @EJB
+    private SampleRemote remoteEJB;]]></programlisting>
+            </listitem>
+            
+            <listitem><para>Attempt to re-deploy the EJB module to the server.
+                This will fail.</para>
+<programlisting language=""><![CDATA[More than one EJB found with interface of type 'org.myorg.encconfig.ejb.SampleRemote' 
+for binding org.myorg.encconfig.ejb.ConfigBeanEJB/remoteEJB. Found: ...]]></programlisting>                        
+            </listitem>
+            
+            <listitem><para>Fix the ambiguity by explicitly referencing Choice2EJB 
+                using one of its remote JNDI lookup names in the @EJB annotation.
+                Since the EJB is local to the module -- we have the choice of several
+                JNDI names to locate the EJB. The remote name in the "java:jboss/exported"
+                namespace is the only one available to remote clients outside of the 
+                server.
+                </para>
+<programlisting language=""><![CDATA[
+java:global/encconfig-labex-ejb/Choice2EJB!org.myorg.encconfig.ejb.SampleRemote
+java:app/encconfig-labex-ejb/Choice2EJB!org.myorg.encconfig.ejb.SampleRemote
+java:module/Choice2EJB!org.myorg.encconfig.ejb.SampleRemote
+java:jboss/exported/encconfig-labex-ejb/Choice2EJB!org.myorg.encconfig.ejb.SampleRemote
+]]></programlisting>
+                
+               
+<programlisting language="java"><![CDATA[@Stateless
+public class ConfigBeanEJB implements ConfigBeanRemote {
+    //TODO: enc-config 35
+    @EJB//(lookup="java:module/Choice2EJB!org.myorg.encconfig.ejb.SampleRemote")
+    private SampleRemote remoteEJB;]]></programlisting>
+               </listitem>
+               
+            <listitem><para>Re-deploy the application. This should succeed.</para>
+<programlisting language=""><![CDATA[$ mvn clean pre-integration-test]]></programlisting>       
+            </listitem>
+            <listitem><para>Re-run the JUnit tests. This should also work.</para>
+            </listitem>
+        </orderedlist>
+            
+            <para>
+                You have finished injecting a dependency EJB using a JNDI lookup.
+            </para>
+    </section>
+
+
+
+    <section id="enc-configex-ejb-summary">
+       <title>Summary</title>
+       <para>In this chapter you successfully injected a dependency EJB into a parent EJB
+            thru a few different but simple techniques. The simplest technique was to use
+            @EJB and the type information of the Java variable to completely wire-up the 
+            injection. That works until there is an ambiguity of choices or if the EJB
+            is not deployed within the local application. Ambiguity can be solved using
+            the beanName, JNDI lookup, or ENC name (we did not demonstrate this option).
+            If the EJB is not deployed within the same module or application, we must use
+            the lookup name to reference the JNDI name in a separate deployment.
+        </para>
+    </section>    
+</chapter>
+  

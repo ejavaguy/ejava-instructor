@@ -284,7 +284,7 @@ Fetch Eager Thick Parent.Get Parent:warmups=2, rounds=10, ave=2.59 [+- 0.06]
             
             
             <section id="jpa-tuning-jpa-fetch-parent-eager-resultclass">
-               <title>Get Parent with NativeQuery and Result Class</title>
+               <title>Get Parent with JPA Query and Result Class</title>
                <para>Get just the root parent and *ONLY* the parent of an object graph with fetch=EAGER 
                    relationships by using a NativeQuery and Result Class</para>
                    

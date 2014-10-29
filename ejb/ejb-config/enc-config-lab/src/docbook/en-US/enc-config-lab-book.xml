@@ -1,0 +1,35 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="encconfig-lab">
+    <bookinfo>
+        <title>JNDI/ENC Configuration Lab</title>
+        <subtitle></subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>This document provides an exercise configuring EJBs 
+                through JNDI lookups and injection from the Enterprise
+                Naming Context (ENC).
+            </para>
+        </abstract>
+    </bookinfo>
+    <preface id="enc-configex-topics">
+        <title>Topics</title>
+        <itemizedlist>
+            <listitem><para>Configure EJB using annotations</para></listitem>
+            <listitem><para>Populate ENC using annotations for embedded POJO modules</para></listitem>
+            <listitem><para>Override annotations using XML</para></listitem>
+        </itemizedlist>
+    </preface>
+
+    <xi:include href="enc-config-lookup.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="enc-config-encinject.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="enc-config-encjndi.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="enc-config-xmlinject.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="enc-config-ejb.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>

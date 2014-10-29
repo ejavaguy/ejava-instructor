@@ -2,22 +2,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>info.ejava.docs.jpa</groupId>
-        <artifactId>jpa-tuning</artifactId>
+        <groupId>info.ejava.docs.ejb</groupId>
+        <artifactId>ejb-jpa</artifactId>
         <version>4.0.0-SNAPSHOT</version>
-    </parent>
+   </parent>
 
-    <artifactId>jpa-tuning-notes</artifactId>
+    <artifactId>ejb-jpa-notes</artifactId>
     <packaging>pom</packaging>
-
-    <name>JPA::Tuning::Notes</name>
-    <description>
-        This module contains documentation for performance topics related to JPA and SQL.
-    </description>
     
+    <name>EJB::JPA Server-Side::Notes</name>
     <properties>
-       <doc.base>jpa-tuning-book</doc.base>
-       <content.version>v2014-10-13</content.version>
+       <doc.base>ejb-jpa-book</doc.base>
+       <content.version>v2014-10-29</content.version>
     </properties>
 
     <build>

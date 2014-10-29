@@ -17,7 +17,7 @@
     
     <properties>
        <doc.base>jhu784-lab-book</doc.base>
-       <content.version>v2014-10-12</content.version>
+       <content.version>v2014-10-19</content.version>
     </properties>
 
     <dependencies>
@@ -61,6 +61,12 @@
         <dependency>
             <groupId>info.ejava.docs.ejb</groupId>
             <artifactId>ejb-basic-lab</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+        <dependency>
+            <groupId>info.ejava.docs.ejb</groupId>
+            <artifactId>enc-config-lab</artifactId>
             <version>${project.version}</version>
             <classifier>docsrc</classifier>
         </dependency>

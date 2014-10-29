@@ -1,0 +1,414 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="enc-configex-lookup">
+    <title>Configuring EJB Using Annotation Lookups</title>
+    <para>This chapter will take a look at the easiest way to configure
+        your EJBs -- using Annotation lookups and injection. This technique
+        provides a 100% declarative approach to resolve resource dependencies
+        -- which removes the need for tedious JNDI lookups and extra XML
+        configuration files. The only negative is that vendor/configuration-specific
+        global JNDI names are baked into the Java class as an override-able
+        default. We will specifically...</para>
+    <itemizedlist>
+        <listitem><para>Inject Value Resources</para></listitem>
+        <listitem><para>Inject Persistence Context</para></listitem>
+        <listitem><para>Inject Administered Resources</para></listitem>
+    </itemizedlist>
+    <para>We will primarily be working with the following files</para>
+    <itemizedlist>
+        <listitem><para>src/test/java/.../LookupAuditorIT.java</para></listitem>
+        <listitem><para>src/test/java/.../AuditorCheckerITBase.java</para></listitem>
+        <listitem><para>src/main/java/.../LookupAuditorEJB.java</para></listitem>
+        <listitem><para>src/main/resources/META-INF/ejb-jar.xml</para></listitem>
+        <listitem><para>src/main/resources/META-INF/persistence.xml</para></listitem>
+    </itemizedlist>
+<programlisting language=""><![CDATA[src/
+|-- main
+|   |-- java
+|   |   `-- org
+|   |       `-- myorg
+|   |           `-- encconfig
+|   |               `-- ejb
+|   |                   |-- AuditorBase.java
+|   |                   `-- LookupAuditorEJB.java
+|   `-- resources
+|       `-- META-INF
+|           |-- ejb-jar.xml
+|           `-- persistence.xml
+`-- test
+    |-- java
+    |   `-- org
+    |       `-- myorg
+    |           `-- encconfig
+    |               `-- auditor
+    |                   `-- ejb
+    |                       |-- AuditorCheckerITBase.java
+    |                       `-- it
+    |                           `-- LookupAuditorEJBIT.java
+]]></programlisting>
+    
+        
+    <section id="enc-configex-lookup-setup">
+        <title>Setup</title>
+        <note>
+            <para>All steps of this exercise do not work properly when the EJB module
+                is deployed to JBoss within the Eclipse environment. You can run 
+                and debug the client JUnit code and server-side EJB classes within 
+                Eclipse, but you must build and deploy the changes to the EJB 
+                module using maven/cargo to achieve consistent and repeatable 
+                container behavior at this time.
+            </para>
+        </note>
+
+        <orderedlist>
+            <listitem><para>Locate the <code>encconfig-labex-ejb</code> module</para></listitem>
+            <listitem><para>Start JBoss. If you run JBoss within Eclipse, you 
+                may want to start it in debug mode.</para></listitem>
+            <listitem><para>Deploy the EJB module to JBoss using the maven cargo plugin</para>
+            
+<programlisting language=""><![CDATA[$ mvn pre-integration-test
+...
+[INFO] --- cargo-maven2-plugin:1.4.3:redeploy (cargo-prep) @ encconfig-labex-ejb ---
+...
+[INFO] BUILD SUCCESS]]></programlisting>                        
+
+            </listitem>
+            
+            <listitem><para>Run all IT tests within Eclipse or at the command 
+                line. They should all pass, but if you look closely -- many are
+                being ignored until we fix some things.</para>
+                <figure>
+                    <title>Initial State of all IT Tests</title>
+                    <graphic scalefit="0" scale="50" fileref="images/enc-configex-starting-state.png"/>
+                </figure>   
+            </listitem>
+        </orderedlist>
+        
+        <para>
+            You will be making edits to both IT and EJB classes. Both have a 
+            base implementation with derived classes providing technique-specific
+            implementations for how things get injected.
+        </para>
+        <tip>
+            <title>Invoke JUnit tests from Concrete Test classes</title>
+            <para>
+                Since we have consolidated all common IT @Tests into a 
+                single, common base class -- the base class can be often 
+                mistaken as being a JUnit IT test. It is not. When running
+                the IT tests be sure to run them from the perspective of a 
+                derived IT test so the test knows how to operate in a 
+                technique-specific manner.
+            </para>
+            <para>
+                Try to always re-run the entire test case from JUnit and keep
+                the concrete test case in view to make it easier to advance to
+                the next testMethod.
+            </para>
+        </tip>
+    </section>
+
+    <section id="enc-configex-lookup-resources">
+        <title>Inject Resources</title>
+        <para>Lets begin by injecting a basic boolean value into one of the Java attributes.
+        We have defined a <code>java.lang.Boolean</code> value in the EJB's ENC using <code>ejb-jar.xml</code>
+        and assigned it to the <code>val/publishJMS</code> ENC name.
+        </para>            
+<programlisting language="xml"><![CDATA[<session>
+    <ejb-name>LookupAuditorEJB</ejb-name>
+    <env-entry>
+        <env-entry-name>val/publishJMS</env-entry-name>
+        <env-entry-type>java.lang.Boolean</env-entry-type>
+        <env-entry-value>true</env-entry-value>
+    </env-entry>
+</session>]]></programlisting>                        
+
+        <orderedlist>
+            <listitem><para>Remove the @Ignore on the <code>testPublishJMS</code>
+                test method within <code>AuditorCheckerITBase</code> to enable it.</para>
+
+<programlisting language="java"><![CDATA[public abstract class AuditorCheckerITBase {
+...
+//TODO enc-config 01: run this test
+@Ignore
+@Test
+public void testPublishJMS() throws NamingException {
+    log.info("*** testPublishJMS() ***");
+    assertTrue("publishJMS value not injected", 
+            getAuditor().isPublishJMS());
+}]]></programlisting>
+                        
+            </listitem>
+            <listitem><para>Re-run the IT tests. You should get a failure for the 
+               test you just activated.</para>
+               
+<programlisting language=""><![CDATA[java.lang.AssertionError: publishJMS value not injected]]></programlisting>
+
+                <para>The test checks to see if the <code>publishJMS</code>
+                    EJB property has been set and fails because nothing 
+                    was injected into the EJB.
+                </para>
+               </listitem>
+            <listitem><para>Activate the injection for the property within the 
+                <code>LookupAuditorEJB</code> class using a @Resource annotation.
+                    This will inject the value from the <code>val/publishJMS</code>
+                    ENC name put in place earlier by the XML deployment descriptor.
+                </para>
+
+<programlisting language="java"><![CDATA[@Stateless
+public class LookupAuditorEJB extends AuditorBase 
+...
+//TODO enc-config 02: define a resource value injection here 
+//@Resource(name="val/publishJMS")
+private Boolean publishJMS;
+]]></programlisting>       
+                 
+            </listitem>
+            <listitem><para>Re-deploy the EJB module to the server.</para>
+<programlisting language=""><![CDATA[$ mvn pre-integration-test]]></programlisting>                        
+            </listitem>
+            <listitem><para>Re-run the JUnit tests. The previous failing test should succeed</para>
+                <note>
+                    <para>You can get a better sense of what is and is not being set
+                        by setting a breakpoint in the EJB method on the server,
+                        pausing the EJB during the business method, and inspecting 
+                        the variable values for the EJB during the call.</para>
+                </note>
+                <figure>
+                    <title>EJB Breakpoint Injecting Boolean Property</title>
+                    <graphic scalefit="0" scale="50" fileref="images/enc-configex-bool-breakpoint.png"/>
+                </figure>                
+            </listitem>
+               
+            <listitem><para>Activate the following test within <code>AuditorCheckerITBase</code></para>
+
+<programlisting language="java"><![CDATA[public abstract class AuditorCheckerITBase {
+...
+//TODO enc-config 03: run this test
+@Ignore
+@Test 
+public void testPersistenceContext() throws NamingException {]]></programlisting>                        
+
+            </listitem>
+
+            <listitem><para>Re-run the IT tests for the EJB module. The test you just
+                activated should now fail with the following error.</para>
+            
+<programlisting language=""><![CDATA[java.lang.AssertionError: persistence context not injected]]></programlisting>
+
+                <para>The injection source for the persistence context is being
+                    supplied by a <code>META-INF/persistence.xml</code> file 
+                    within the module</para>
+                    
+<programlisting language="xml"><![CDATA[`-- META-INF
+    |-- ejb-jar.xml
+    |-- jboss-ejb3.xml
+    |-- MANIFEST.MF
+    `-- persistence.xml
+...
+    <persistence-unit name="encconfig-lab">
+...]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Inject the persistence context into the EJB property
+                using the <code>@javax.persistence.Persistence</code> annotation
+                and supply the <code>encconfig-lab</code> persistence unit name
+                that comes from the <code>persistence.xml</code> file</para>
+
+<programlisting language="java"><![CDATA[@Stateless
+public class LookupAuditorEJB extends AuditorBase 
+...
+//TODO enc-config 04: define a persistence context injection here 
+//@PersistenceContext(unitName="encconfig-lab")
+private EntityManager em;]]></programlisting>
+                        
+            </listitem>
+
+            <listitem><para>Re-deploy the EJB module to the server.</para>
+<programlisting language=""><![CDATA[$ mvn pre-integration-test]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Re-run the IT tests for the EJB module. They should now pass.</para></listitem>
+            
+            <listitem><para>Activate the following IT test within <code>AuditorCheckerITBase</code></para>
+
+<programlisting language="java"><![CDATA[public abstract class AuditorCheckerITBase {
+...
+//TODO enc-config 05: run this test
+@Ignore
+@Test
+public void testTopic() throws NamingException {]]></programlisting>                        
+
+            </listitem>
+            
+            <listitem><para>Re-run the IT tests for the EJB module. The test you 
+                just activated should fail with the following error.</para>
+<programlisting language=""><![CDATA[java.lang.AssertionError: topic not injected]]></programlisting>
+                <para>The injection source for the JMS topic comes from the administered 
+                    JMS resources within the application server. The profile we 
+                    are using comes with a stock set of example resources to use
+                    during demonstrations such as this.</para>
+<programlisting language="xml"><![CDATA[# standalone/configuration/standalone.xml
+<jms-topic name="testTopic">
+    <entry name="topic/test"/>
+    <entry name="java:jboss/exported/jms/topic/test"/>
+</jms-topic>]]></programlisting>
+            </listitem>
+            
+            <listitem><para>Inject the JMS Topic located at the <code>java:/topic/test</code>
+                using the <code>@javax.annotation.Resource</code> annotation and the 
+                lookup attribute. You can locate the definition of this resource within the JBoss 
+                <code>standalone-full.xml</code> profile.</para>
+
+<programlisting language="java"><![CDATA[@Stateless
+public class LookupAuditorEJB extends AuditorBase 
+...
+//TODO enc-config 06: define a resource value lookup and injection here
+//@Resource(lookup="java:/topic/test")
+private Topic topic;]]></programlisting>                        
+                <note>
+                    <para>
+                        Injecting administered server resources using direct 
+                        JNDI names is a quick and convenient default but ties the deployed 
+                        code the the specific names of the server. We will look
+                        at how to override that injection later.
+                    </para>
+                </note>
+            </listitem>
+            
+            <listitem><para>Re-deploy the EJB module to the server.</para>
+<programlisting language=""><![CDATA[$ mvn pre-integration-test]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Re-run the IT tests for the EJB module. They should now pass.</para></listitem>
+
+            <listitem><para>Activate the following IT test within <code>AuditorCheckerITBase</code></para>
+
+<programlisting language="java"><![CDATA[public abstract class AuditorCheckerITBase {
+...
+//TODO enc-config 07: run this test
+@Ignore
+@Test
+public void testConnectionFactory() throws NamingException {]]></programlisting>                        
+
+            </listitem>
+
+            <listitem><para>Re-run the IT tests for the EJB module. The test you 
+                just activated should fail with the following error.</para>
+<programlisting language=""><![CDATA[java.lang.AssertionError: connection factory not injected]]></programlisting>
+                <para>The injection source for the JMS connection factory also 
+                    comes from the administered JMS resources within the application server.
+                </para>            
+<programlisting language="xml"><![CDATA[# standalone/configuration/standalone.xml
+<pooled-connection-factory name="hornetq-ra">
+    <transaction mode="xa"/>
+    <connectors>
+        <connector-ref connector-name="in-vm"/>
+    </connectors>
+    <entries>
+        <entry name="java:/JmsXA"/>
+        <entry name="java:jboss/DefaultJMSConnectionFactory"/>
+    </entries>
+</pooled-connection-factory>]]></programlisting>                            
+            </listitem>
+
+            <listitem><para>Inject the JMS ConnectionFactory located at the <code>java:/JmsXA</code>
+                using the <code>@javax.annotation.Resource</code> annotation and the 
+                lookup attribute. You can locate the definition of this resource within the JBoss 
+                <code>standalone-full.xml</code> profile.</para>
+
+<programlisting language="java"><![CDATA[@Stateless
+public class LookupAuditorEJB extends AuditorBase 
+...
+//TODO enc-config 06: define a resource lookup and injection here
+//@Resource(lookup="java:/JmsXA")
+private ConnectionFactory cf;]]></programlisting>                        
+
+            </listitem>
+            
+            <listitem><para>Re-deploy the EJB module to the server.</para>
+<programlisting language=""><![CDATA[$ mvn pre-integration-test]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Re-run the IT tests for the EJB module. They should now pass.</para></listitem>
+
+                        
+            <listitem><para>The above step registered the last of the required resources. It is 
+                now time to see if our EJB is ready to function with these resources by invoking
+                a business method that makes use of all of the above. Enable to last test
+                method in <code>AuditorCheckerITBase</code>.</para>
+
+<programlisting language="java"><![CDATA[public abstract class AuditorCheckerITBase {
+...
+//TODO enc-config 09: run this test
+@Ignore
+@Test
+public void testAudit() throws NamingException {]]></programlisting>                        
+
+            </listitem>
+            
+            
+            <listitem><para>Re-run the IT tests for the EJB module. The test you 
+                just activated should fail with the following error.</para>
+<programlisting language=""><![CDATA[java.lang.AssertionError: EJB not properly initialized expected:<2> but was:<0>]]></programlisting>                        
+                <para>The (successes and current) error indicates that although you have 
+                    successfully in injected the resources into EJB properties -- there
+                    is still some unfinished EJB initialization that needs to take place.
+                </para>                        
+            </listitem>
+
+            
+            <listitem><para>Activate the EJB's initialization method using the 
+                <code>@javax.annotation.PostConstruct</code> annotation.
+                This tells the EJB container to call out <code>init()</code>
+                method after all injections are complete. At this point all 
+                injected resources are safe to use. The method is required to 
+                accept and return no arguments and to not throw any checked exceptions.
+                All resources and the EJB will be discarded if this method throws 
+                an unchecked exception.
+                </para>
+
+<programlisting language="java"><![CDATA[@Stateless
+public class LookupAuditorEJB extends AuditorBase 
+...
+//TODO enc-config 10: activate this method after injection occurs
+//@PostConstruct
+public void init() {
+    super.setLog(log);
+    super.setConnectionFactory(cf);
+    super.setEntityManager(em);
+    super.setTopic(topic);
+    super.setPublishJMS(isPublishJMS());
+}]]></programlisting>
+
+                <para>The container...</para>                        
+                <orderedlist>
+                    <listitem><para>Determines an instance of the EJB is needed to satisfy client request</para></listitem>
+                    <listitem><para>Instantiates the EJB class</para></listitem>
+                    <listitem><para>Performs injection</para></listitem>
+                    <listitem><para>Calls the EJB's @PostConstruct method</para></listitem>
+                    <listitem><para>Makes EJB available for dispatch of business methods</para></listitem>
+                </orderedlist>
+            </listitem>
+            
+            <listitem><para>Re-deploy the EJB module to the server.</para>
+<programlisting language=""><![CDATA[$ mvn pre-integration-test]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Re-run the IT tests for the EJB module. They should now pass.</para></listitem>
+        </orderedlist>
+        <para>You have finished configuring an EJB with value resources, a persistence context,
+            and administered JMS resources using annotations.</para>
+    </section>
+
+    <section id="enc-configex-lookup-summary">
+       <title>Summary</title>
+       <para>In this chapter you successfully injected various resources using just Java class
+           annotations. Where necessary, you supplied a JNDI name to the lookup attribute so the 
+           container could find the resources and inject them into your EJB. The technique
+           used here is attractive because it is simple -- everything is within a single
+           Java class. In the next chapters we will look at techniques to remove the JNDI 
+           name specifications from the Java class.</para>
+    </section>    
+</chapter>
+  

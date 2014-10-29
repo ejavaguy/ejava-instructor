@@ -97,7 +97,7 @@ $mvn (phase)
                     </para></listitem>
             </varlistentry>
             <varlistentry>
-                <term><filename>package
+                <term><filename>mvn package
                     </filename></term>
                 <listitem><para>
                     Build Java, EJB, WAR, and EAR archives
@@ -133,7 +133,7 @@ $mvn (phase)
                 <term><filename>mvn verify
                     </filename></term>
                 <listitem><para>
-                    Evaludate the IT test results and wait to fail until this point so that the deployed artifacts can be undeployed.
+                    Evaluate the IT test results and wait to fail until this point so that the deployed artifacts can be undeployed.
                     </para></listitem>
             </varlistentry>
             <varlistentry>
@@ -152,7 +152,7 @@ $mvn (phase)
     <section id="ejb-basicex-commands-restart">
         <title>mvn (phase) -rf :module</title>
         <para>
-            It is common, when building a multi-module application when the first 
+            It is common, when building a multi-module application that the first 
             set of modules build fine but an error is encountered when building one
             of the later modules.
         </para>

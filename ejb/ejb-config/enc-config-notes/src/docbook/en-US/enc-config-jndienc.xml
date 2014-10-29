@@ -1,0 +1,187 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="enc-config-jndienc">
+    <title>Global JNDI and the Enterprise Naming Context (ENC)</title>
+    <para></para>
+    
+    
+    <section id="enc-config-jndienc-jndi">
+        <title>Java Naming and Directory Interface</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Naming - provides a "white pages" lookup of an object based on name</para></listitem>
+            <listitem><para>Directory - provides a "yellow pages" lookup of an object based on properties</para></listitem>
+            <listitem><para>JavaEE providers required to supply Naming implementation</para></listitem>
+            <listitem><para>Naming consists of hierarchical Contexts (directories) and Objects</para></listitem>
+            <listitem><para>Reference to JNDI Naming tree through javax.naming.InitialContext</para>
+<programlisting language="java"><![CDATA[InitialContext jndi = null;
+try {
+    jndi = new InitialContext();
+...
+    Object object = jndi.lookup(jndiName);
+} catch (NamingException ex) {
+    throw new EJBException(ex);
+}]]></programlisting>                        
+            </listitem>
+            <listitem><para>Lookups are passed a JNDI name</para></listitem>
+            <listitem><para>JNDI name have prefixes that can given them special meaning</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>(no prefix) - global namespace (available remotely)</para></listitem>
+                    <listitem><para>java: - namespace available only within JVM</para></listitem>
+                    <listitem><para>java:comp - an Enterprise Naming Context (ENC) relative to a specific component</para></listitem>
+                    <listitem><para>ejb: - namespace for use by JBoss EJB Client</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="enc-config-jndienc-global-jndi">
+        <title>Global JNDI Naming Context</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>JavaEE resources are registered in the JNDI tree</para></listitem>
+            <listitem><para>Not all resources are available from remote clients</para></listitem>
+        </itemizedlist>
+
+        <section id="enc-config-jndienc-global-jndi-remote">
+            <title>Remote JNDI Naming Context</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Resources in the global JNDI Naming Context are available to all clients</para>
+<programlisting language=""><![CDATA[jms/RemoteConnectionFactory
+jms/queue/test
+jms/topic/test
+enc-config-example-ejb/XMLConfiguredEJB!ejava.ejb.examples.encconfig.ejb.JNDIReaderRemote]]></programlisting>                        
+                </listitem>
+                <listitem><para>You can locate these global names using the java:/jboss/exported local context</para>
+<programlisting language=""><![CDATA[java:jboss/exported/jms/RemoteConnectionFactory
+java:jboss/exported/jms/queue/test
+java:jboss/exported/jms/topic/test
+java:jboss/exported/enc-config-example-ejb/XMLConfiguredEJB!ejava.ejb.examples.encconfig.ejb.JNDIReaderRemote]]></programlisting>                        
+                </listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="enc-config-jndienc-global-jndi-local">
+            <title>Local JNDI Naming Context</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Resources in the local JNDI Naming Context are available to components within the server</para>
+<programlisting language=""><![CDATA[java:jboss/datasources/ExampleDS
+java:jboss/jaxr/ConnectionFactory
+java:jboss/mail/Default
+java:/ConnectionFactory
+java:/JmsXA
+java:/queue/test
+java:/topic/test]]></programlisting>                        
+                </listitem>
+                <listitem><para>JavaEE 6/EJB3.1 added a 
+                <ulink url="http://docs.oracle.com/javaee/6/tutorial/doc/gipjf.html">portable JNDI naming standard</ulink>
+                for EJB that provides scoping for global, application, and module for the EJB's local and remote interfaces</para>
+<programlisting language=""><![CDATA[java:global/enc-config-example-ejb/InjectedEJB!ejava.ejb.examples.encconfig.ejb.InjectedEJB
+java:app/enc-config-example-ejb/InjectedEJB!ejava.ejb.examples.encconfig.ejb.InjectedEJB
+java:module/InjectedEJB!ejava.ejb.examples.encconfig.ejb.InjectedEJB
+java:global/enc-config-example-ejb/InjectedEJB
+java:app/enc-config-example-ejb/InjectedEJB
+java:module/InjectedEJB]]></programlisting>                        
+                </listitem>
+            </itemizedlist>
+        </section>
+
+
+    </section>
+
+    <section id="enc-config-jndienc-enc">
+        <title>Enterprise Naming Context (ENC)</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Component-specific namespace within JNDI tree</para></listitem>
+            <listitem><para>Holds references to values and objects in the environment</para></listitem>
+            <listitem><para>Theoretical equivalent to Unix soft links</para>
+<programlisting language=""><![CDATA[ln -s <some physical file path> $HOME/<my logical path>]]></programlisting>                        
+            </listitem>
+            <listitem><para>Accessible through "java:comp/env/(encname)" when using InitialContext</para>
+            
+<programlisting language="java"><![CDATA[Context jndi = new InitialContext();
+String jndiName = "java:comp/env/" + encname;
+Object object = jndi.lookup(jndiName);]]></programlisting>                        
+            </listitem>
+            
+            <listitem><para>Accessible through "(encname)" when using injected SessionContext</para>
+<programlisting language="java"><![CDATA[private @Resource SessionContext ctx;
+...        
+Object object = ctx.lookup(encname);]]></programlisting>                        
+            </listitem>
+            <listitem><para>Populated into ENC using</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Annotations</para>
+                    
+<programlisting language="java"><![CDATA[@Resource(lookup="java:jboss/datasources/ExampleDS", name="jdbc/ds2")
+private DataSource ds2;]]></programlisting>
+                        
+                    </listitem>                    
+                    <listitem><para>XML using META-INF/ejb-jar.xml</para>
+                    
+<programlisting language="xml"><![CDATA[<resource-ref>
+    <res-ref-name>jdbc/ds2</res-ref-name>
+    <res-type>javax.sql.DataSource</res-type>
+    <lookup-name>java:jboss/datasources/ExampleDS</lookup-name>
+</resource-ref>]]></programlisting>
+                        
+                    </listitem>
+                    <listitem><para>XML using META-INF/jboss-ejb3.xml</para>
+                    
+<programlisting language="xml"><![CDATA[<resource-ref>
+    <res-ref-name>jdbc/ds3</res-ref-name>
+    <jndi-name>java:jboss/datasources/ExampleDS</jndi-name>
+</resource-ref>]]></programlisting>
+                        
+                    </listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Injected into EJB using</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Annotations without ENC</para>
+<programlisting language="java"><![CDATA[@Resource(lookup="java:jboss/datasources/ExampleDS")
+private DataSource ds1;]]></programlisting>                        
+                    </listitem>
+                    <listitem><para>Annotations with populated ENC</para>
+<programlisting language="java"><![CDATA[@Resource(name="jdbc/ds3")
+private DataSource ds3;]]></programlisting>                        
+                    </listitem>
+                    <listitem><para>XML using META-INF/ejb-jar.xml</para>
+<programlisting language="xml"><![CDATA[<resource-ref>
+    <res-ref-name>jdbc/ds1</res-ref-name>
+    <res-type>javax.sql.DataSource</res-type>
+    <injection-target>
+        <injection-target-class>ejava.ejb.examples.encconfig.ejb.XMLConfiguredEJB</injection-target-class>
+        <injection-target-name>ds1</injection-target-name>
+    </injection-target>
+    <lookup-name>java:jboss/datasources/ExampleDS</lookup-name>
+</resource-ref>]]></programlisting>                        
+                    </listitem>
+                </itemizedlist>
+            </listitem>
+            
+            <listitem><para>Perform actions on injected resources after injection
+                complete using <code>@PostConstruct</code></para>
+<programlisting language="java"><![CDATA[@PostConstruct
+public void init() {
+...    
+}]]></programlisting>                        
+            </listitem>
+
+        </itemizedlist>
+    </section>
+        
+    <section id="enc-config-jndienc-summary">
+       <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Java Naming and Directory Interface (JNDI)</para></listitem>
+            <listitem><para>Global Naming Context</para>
+                <orderedlist>
+                    <listitem><para>Remote</para></listitem>
+                    <listitem><para>Local</para></listitem>
+                </orderedlist>
+            </listitem>
+            <listitem><para>ENC Naming Context</para></listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  

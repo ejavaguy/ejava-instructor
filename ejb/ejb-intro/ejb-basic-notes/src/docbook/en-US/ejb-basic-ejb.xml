@@ -71,6 +71,33 @@ public class GreeterEJB implements Greeter {]]></programlisting>
                 </listitem>
             </itemizedlist>
         </section>
+
+        <section id="ejb-basic-ejb-class-callbacks">
+            <title>@PostConstruct/@PreDestory</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Optional callbacks to initialize and destroy resources</para></listitem>
+            </itemizedlist>
+
+<programlisting language="java"><![CDATA[    @PostConstruct
+    public void init() {
+        logger.info("*** GreeterEJB:init({}) ***", super.hashCode());
+    }]]></programlisting>                    
+            <itemizedlist spacing="compact">
+                <listitem><para>Called after all resources have been injected and before first business method called</para></listitem>
+                <listitem><para>No args, void return, no declared checked exceptions</para></listitem>
+                <listitem><para>Used to ready bean to satisfy business methods</para></listitem>
+            </itemizedlist>
+    
+<programlisting language="java"><![CDATA[
+    @PreDestroy
+    public void destroy() {
+        logger.info("*** GreeterEJB:destroy({}) ***", super.hashCode());
+    }
+]]></programlisting>                        
+            <itemizedlist spacing="compact">
+                <listitem><para>If called, will be after last business method</para></listitem>
+            </itemizedlist>
+        </section>
     </section>
     
     
@@ -228,6 +255,65 @@ JNDI bindings for session bean named GreeterEJB in deployment unit deployment "e
 </project>]]></programlisting>
     </section>
 
+    <section id="ejb-basic-ejb-jboss-pool">
+        <title>JBoss Session EJB Pooling</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Initialized EJB bean instances can be cached in a pool</para></listitem>
+            <listitem><para>Instances from the pool can be re-used rather than destroy and re-intialize a new instance</para></listitem>
+            <listitem><para>JBoss pools singleton and stateful session beans by default</para>
+<programlisting language="xml"><![CDATA[# standalone/configuration/standalone.xml
+<session-bean>
+    <stateful default-access-timeout="5000" cache-ref="simple" passivation-disabled-cache-ref="simple"/>
+    <singleton default-access-timeout="5000"/>
+</session-bean>]]></programlisting>
+            </listitem>
+            <listitem><para>JBoss defines a stateless session bean pool for use but left unassigned</para>
+<programlisting language="xml"><![CDATA[# standalone/configuration/standalone.xml
+<pools>
+    <bean-instance-pools>
+        <strict-max-pool name="slsb-strict-max-pool" max-pool-size="20" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
+        <strict-max-pool name="mdb-strict-max-pool" max-pool-size="20" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
+    </bean-instance-pools>
+</pools>]]></programlisting>
+            </listitem>
+            <listitem><para>No pooling can be costly when initialization costs are high</para></listitem>
+            <listitem><para>Stateless and MDB EJB pooling can be enabled globally</para>
+<programlisting language="xml"><![CDATA[# standalone/configuration/standalone.xml
+<session-bean>
+    <stateless>
+        <bean-instance-pool-ref pool-name="slsb-strict-max-pool"/>
+    </stateless>
+    <stateful default-access-timeout="5000" cache-ref="simple" passivation-disabled-cache-ref="simple"/>
+    <singleton default-access-timeout="5000"/>
+</session-bean>
+]]></programlisting>
+            </listitem>
+            <listitem><para>Pooling can be costly when initialization costs are low</para></listitem>
+            <listitem><para>Stateless and MDB EJB pooling can be enabled on a per-application(*)/per-EJB(GreeterEJB) basis</para>
+<programlisting language="xml"><![CDATA[# META-INF/jboss-ejb3.xml
+<jboss:ejb-jar xmlns:jboss="http://www.jboss.com/xml/ns/javaee" 
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:s="urn:security" 
+    xmlns:c="urn:clustering:1.0"
+    xmlns:p="urn:ejb-pool:1.0"
+    xsi:schemaLocation="http://www.jboss.com/xml/ns/javaee http://www.jboss.org/j2ee/schema/jboss-ejb3-2_0.xsd
+                     http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_1.xsd"
+    version="3.1" 
+    impl-version="2.0">
+
+    <assembly-descriptor>
+        <!-- defines EJB pool else not pooled -->
+        <p:pool>
+          <ejb-name>*</ejb-name>
+          <p:bean-instance-pool-ref>slsb-strict-max-pool</p:bean-instance-pool-ref>
+        </p:pool>    
+    </assembly-descriptor>
+</jboss:ejb-jar>]]></programlisting>
+            </listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>
 
     <section id="ejb-basic-ejb-summary">
        <title>Summary</title>
