@@ -13,7 +13,7 @@
     <name>EJB::JPA Server-Side::Notes</name>
     <properties>
        <doc.base>ejb-jpa-book</doc.base>
-       <content.version>v2014-10-25</content.version>
+       <content.version>v2014-10-29</content.version>
     </properties>
 
     <build>

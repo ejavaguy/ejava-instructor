@@ -5,15 +5,17 @@
     <title>Persistence Context Propagation</title>
     <itemizedlist spacing="compact">
         <listitem><para>EJB will instantiate persistence context if does not yet exist</para></listitem>
+        <listitem><para>Stateless EJBs may only have transaction-scope persistence contexts</para></listitem>
+        <listitem><para>Stateful EJBs may have transaction-scope or extended persistence contexts</para></listitem>
         <listitem><para>EJBs can share persistence contexts</para>
             <itemizedlist spacing="compact">
-                <listitem><para>Stateless EJB can propagate its transaction-scoped persistence context to called EJB</para></listitem>
-                <listitem><para>Stateful EJB can propagate its tx-scoped or extended persistence context to called EJB</para></listitem>
-                <listitem><para>Stateless EJB can work with extended persistence context provided by Stateful client</para></listitem>
+                <listitem><para>Stateless EJB can propagate its tx-scope persistence context to a called EJB</para></listitem>
+                <listitem><para>Stateful EJB can propagate its tx-scoped or extended persistence context to a called EJB</para></listitem>
+                <listitem><para>Stateless EJB can work with extended persistence context provided by upstream Stateful client</para></listitem>
+                <listitem><para>Stateful EJB cannot transform propagated tx-scope persistence context into an extended</para></listitem>
             </itemizedlist>
         </listitem>
         <listitem><para>EJB Facade can act as sharing point for common persistence context</para></listitem>
-        <listitem><para></para></listitem>
     </itemizedlist>
     
     
@@ -65,7 +67,7 @@ for (Room room: availableRooms) {
             <title>EJB Gets Available Rooms from DB</title>
 <programlisting language="java"><![CDATA[client: hotelMgmt.getAvailableRooms(null, 0, 0);
 
-[HotelMgmtEJB] *** HotelMgmtEJB:init(1898030100) ***
+[HotelMgmtEJB] *** HotelMgmtEJB(1543684701):init ***
 [stdout] Hibernate: 
 [stdout]     select
 [stdout]         room0_.ROOM_NUMBER as ROOM_NUM1_2_,
@@ -76,7 +78,8 @@ for (Room room: availableRooms) {
 [stdout]     where
 [stdout]         room0_.OCCUPANT_ID is null 
 [stdout]     order by
-[stdout]         room0_.ROOM_NUMBER asc]]></programlisting>
+[stdout]         room0_.ROOM_NUMBER asc
+[HotelMgmtEJB] *** HotelMgmtEJB(1543684701):destroy ***]]></programlisting>
         </figure>
         <itemizedlist spacing="compact">
             <listitem><para>Persistence context created</para></listitem>
@@ -89,8 +92,8 @@ for (Room room: availableRooms) {
             <title>EJB Gets Specific Room</title>
 <programlisting language="java"><![CDATA[Room hotelRoom = dao.getRoom(room.getNumber());
 
-[HotelMgmtEJB] *** HotelMgmtEJB:init(2026963085) ***
-[HotelMgmtEJB] checkin(guest=org.jboss.as.jpa.container.TransactionScopedEntityManager@617b66f2, room={})
+[HotelMgmtEJB] *** HotelMgmtEJB(613346935):init ***
+[HotelMgmtEJB] checkin(guest=Guest [id=0, name=member 0], room=Room [number=1, occupant=null])
 [stdout] Hibernate: 
 [stdout]     select
 [stdout]         room0_.ROOM_NUMBER as ROOM_NUM1_2_0_,
@@ -104,6 +107,7 @@ for (Room room: availableRooms) {
         <itemizedlist spacing="compact">
             <listitem><para>Persistence context created</para></listitem>
             <listitem><para>Specific room loaded into persistence context</para></listitem>
+            <listitem><para>Guest inserted into DB</para></listitem>
         </itemizedlist>
         
         <figure>
@@ -112,6 +116,7 @@ for (Room room: availableRooms) {
 
 [stdout] Hibernate: 
 [stdout]     call next value for hibernate_sequence
+[HotelMgmtEJB] *** HotelMgmtEJB(613346935):destroy ***
 [stdout] Hibernate: 
 [stdout]     insert 
 [stdout]     into
@@ -123,6 +128,14 @@ for (Room room: availableRooms) {
         <itemizedlist spacing="compact">
             <listitem><para>Guest inserted into DB</para></listitem>
         </itemizedlist>
+        <note>
+            <para>
+                The transaction does not end until existing the Stateless EJB method. 
+                That means any DB constraint violations will not occur within the 
+                context of the EJB call that caused it unless you call em.flush() 
+                (as a form of debug) prior to exiting the business method. 
+            </para>
+        </note>
         
         <figure>
             <title>EJB associates Guest with Room</title>
@@ -149,14 +162,13 @@ for (Room room: availableRooms) {
         <itemizedlist spacing="compact">
             <listitem><para>State can be cached in-memory on server-side</para></listitem>
             <listitem><para>Facade EJB propagates persistence context to called EJBs</para></listitem>
-            <listitem><para></para></listitem>
         </itemizedlist>
         
         <figure>
             <title>Example Stateful Reservation EJB Caches Guest Requests for Client</title>
 <programlisting language="java"><![CDATA[@Stateful
 public class ReservationEJB implements ReservationRemote {
-    @PersistenceContext(unitName="ejbjpa-hotel")
+    @PersistenceContext(unitName="ejbjpa-hotel", type=PersistenceContextType.EXTENDED)
     private EntityManager em;
     
     List<Guest> guests = new LinkedList<Guest>();
@@ -164,16 +176,18 @@ public class ReservationEJB implements ReservationRemote {
     @Override
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public int addGuest(Guest guest) {
-        logger.debug("em={}", em);
+        logger.debug("addGuest={}", guest);
         if (guest!=null) {
             guests.add(guest);
+            em.persist(guest); //<== no transaction active yet
         }
         return guests.size();
     }]]></programlisting>
         </figure>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Stateful EJB injects @PersistenceContext -- propagated in downstream EJB calls</para></listitem>
+            <listitem><para>Extended persistence context -- may be associated with zero or more transactions</para></listitem>
+            <listitem><para>Performing in-memory actions outside of transaction boundary</para></listitem>
         </itemizedlist>
 
         
@@ -183,18 +197,16 @@ public class ReservationEJB implements ReservationRemote {
 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 @Remove
 public List<Guest> reserveRooms() throws RoomUnavailableExcepton {
-    //do not get any locks on each room prior to making changes 
     List<Room> rooms = hotelMgmt.getAvailableRooms(null, 0, guests.size());
 
     //assign each one of them a room
+    em.flush(); //<== flush guests persisted outside of a TX for demonstration
     List<Guest> completed = new ArrayList<Guest>(guests.size());
     Iterator<Room> roomItr = rooms.iterator();
     for (Guest guest: guests) {
         Room room = roomItr.next();
         try {
-            logger.debug("stateful.em contains(guest) before checkin={}", em.contains(guest));
-            guest = hotelMgmt.checkIn(guest, room);
-            logger.debug("stateful.em contains(guest) after checkin={}", em.contains(guest));
+            guest = hotelMgmt.checkIn(guest, room); //<== will attempt to also persist guest
             completed.add(guest);
         } catch (RoomUnavailableExcepton ex) {
             //rollback any previous reservations
@@ -206,14 +218,16 @@ public List<Guest> reserveRooms() throws RoomUnavailableExcepton {
 }]]></programlisting>
         </figure>
             <itemizedlist spacing="compact">
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Method executed within active JTA transaction with persistence context associated with transaction</para></listitem>
+                <listitem><para>Guests already managed but will be fully persisted in this method</para></listitem>
+                <listitem><para>Calls to Stateless HotelMgmtEJB executed on this EJB's persistence context</para></listitem>
+                <listitem><para>@Remove indicates stateful instance to be discarded after method called</para></listitem>
             </itemizedlist>
 
 
         <figure>
             <title>Stateful EJB Example Client Check-in</title>
-<programlisting language=""><![CDATA[int availableRooms = hotelMgmt.getAvailableRooms(null, 0, 0).size();
+<programlisting language="java"><![CDATA[int availableRooms = hotelMgmt.getAvailableRooms(null, 0, 0).size();
 logger.debug("we have {} available rooms", availableRooms);
 
 ReservationRemote checkin = (ReservationRemote) jndi.lookup(reservationJNDI);
@@ -230,138 +244,364 @@ List<Guest> guests = checkin.reserveRooms();]]></programlisting>
         </itemizedlist>
         
         <figure>
-            <title></title>
-<programlisting language=""><![CDATA[
+            <title>Stateful EJB Persists Guests Prior to Active JTA Transaction</title>
+<programlisting language="java"><![CDATA[@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+...
+em.persist(guest); //<== no transaction active yet
+
+[ReservationEJB] *** ReservationEJB(12230192):init ***
+[ReservationEJB] addGuest=Guest [id=0, name=member 0]
+[stdout] Hibernate: 
+[stdout]     call next value for hibernate_sequence
+[ReservationEJB] addGuest=Guest [id=0, name=member 1]
+[stdout] Hibernate: 
+[stdout]     call next value for hibernate_sequence
+[ReservationEJB] addGuest=Guest [id=0, name=member 2]
+[stdout] Hibernate: 
+[stdout]     call next value for hibernate_sequence
+[ReservationEJB] addGuest=Guest [id=0, name=member 3]
+[stdout] Hibernate: 
+[stdout]     call next value for hibernate_sequence
 ]]></programlisting>
         </figure>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>em.persist() outside of transaction causing causing sequence call but no table inserts</para></listitem>
         </itemizedlist>
         
         <figure>
-            <title></title>
-<programlisting language=""><![CDATA[
+            <title>Stateless EJB Populates Propagated Persistence Context with Rooms</title>
+<programlisting language="java"><![CDATA[List<Room> rooms = hotelMgmt.getAvailableRooms(null, 0, guests.size());
+
+[HotelMgmtEJB] *** HotelMgmtEJB(1162892707):init ***
+[stdout] Hibernate: 
+[stdout]     select
+[stdout]         room0_.ROOM_NUMBER as ROOM_NUM1_2_,
+[stdout]         room0_.FLOOR_ID as FLOOR_ID2_2_,
+[stdout]         room0_.OCCUPANT_ID as OCCUPANT3_2_ 
+[stdout]     from
+[stdout]         EJBJPA_ROOM room0_ 
+[stdout]     where
+[stdout]         room0_.OCCUPANT_ID is null 
+[stdout]     order by
+[stdout]         room0_.ROOM_NUMBER asc limit ?
+[HotelMgmtEJB] *** HotelMgmtEJB(1162892707):destroy ***
 ]]></programlisting>
         </figure>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Downstream Stateless HotelMgmtEJB queried for rooms</para></listitem>
+            <listitem><para>Rooms loaded into persistence context</para></listitem>
         </itemizedlist>
         
+        
         <figure>
-            <title></title>
-<programlisting language=""><![CDATA[
+            <title>Stateful EJB Method Activates Transaction and flush()es Guests in EntityManager Cache</title>
+<programlisting language="java"><![CDATA[@TransactionAttribute(TransactionAttributeType.REQUIRED)
+...
+logger.debug("reserving {} rooms for {} guests", rooms.size(), guests.size());
+em.flush(); //<== flush guests persisted outside of a TX for demonstration
+
+[ReservationEJB] reserving 4 rooms for 4 guests
+[stdout] Hibernate: 
+[stdout]     insert 
+[stdout]     into
+[stdout]         EJBJPA_GUEST
+[stdout]         (name, GUEST_ID) 
+[stdout]     values
+[stdout]         (?, ?)]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>SQL inserts issued to DB during flush (requires transaction active)</para></listitem>
+        </itemizedlist>
+
+
+        <figure>
+            <title>Stateful EJB uses pre-loaded Rooms and Guests without accessing DB (until association)</title>            
+<programlisting language="java"><![CDATA[guest = hotelMgmt.checkIn(guest, room); //<== will attempt to also persist guest
+
+
+[HotelMgmtEJB] *** HotelMgmtEJB(1086999670):init ***
+[HotelMgmtEJB] checkin(guest=Guest [id=65, name=member 0], room=Room [number=1, occupant=null])
+[HotelMgmtEJB] *** HotelMgmtEJB(1086999670):destroy ***
+[HotelMgmtEJB] *** HotelMgmtEJB(99312186):init ***
+[HotelMgmtEJB] checkin(guest=Guest [id=66, name=member 1], room=Room [number=100, occupant=null])
+[HotelMgmtEJB] *** HotelMgmtEJB(99312186):destroy ***
+[HotelMgmtEJB] *** HotelMgmtEJB(545116383):init ***
+[HotelMgmtEJB] checkin(guest=Guest [id=67, name=member 2], room=Room [number=102, occupant=null])
+[HotelMgmtEJB] *** HotelMgmtEJB(545116383):destroy ***
+[HotelMgmtEJB] *** HotelMgmtEJB(605810979):init ***
+[HotelMgmtEJB] checkin(guest=Guest [id=68, name=member 3], room=Room [number=201, occupant=null])
+[HotelMgmtEJB] *** HotelMgmtEJB(605810979):destroy ***
+
+[stdout] Hibernate: 
+[stdout]     update
+[stdout]         EJBJPA_ROOM 
+[stdout]     set
+[stdout]         FLOOR_ID=?,
+[stdout]         OCCUPANT_ID=? 
+[stdout]     where
+[stdout]         ROOM_NUMBER=?
+[stdout] Hibernate: 
+...
+[ReservationEJB] *** ReservationEJB(12230192):destroy ***
 ]]></programlisting>
         </figure>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Stateless HotelMgmtEJB accesses Rooms from EntityManager first-level cache -- no additional DB access</para></listitem>
+            <listitem><para>Stateless HotelMgmtEJB updates Room.occupant FK to reference Guest -- who is also already managed and in first-level cache</para></listitem>
+            <listitem><para>JTA Transaction committed by container after Stateful EJB method exits</para></listitem>
+            <listitem><para>Stateful EJB and persistence context also destroyed after method exits</para></listitem>
         </itemizedlist>
     </section>
 
     <section id="ejb-jpa-propagation-rollback">
         <title>Transaction Rollbacks</title>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Part of transaction ACID properties</para>
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>Atomic</filename></term>
+                        <listitem><para>All or nothing</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>Consistent</filename></term>
+                        <listitem><para>Valid state</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>Isolation</filename></term>
+                        <listitem><para>Visibility of incomplete changes</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>Durable</filename></term>
+                        <listitem><para>Not forgotten once committed</para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </listitem>
         </itemizedlist>
+
+            <figure>
+                <title>Stateless EJB will Reject New Check-in when Occupied</title>
+<programlisting language="java"><![CDATA[@Override
+public Guest checkIn(Guest guest, Room room) throws RoomUnavailableExcepton {
+    Room hotelRoom = dao.getRoom(room.getNumber());
+    if (hotelRoom==null) {
+        throw new RoomUnavailableExcepton(String.format("room [%d] does not exist", room.getNumber()));
+    }
+    
+    if (hotelRoom.getOccupant()!=null) {
+        throw new RoomUnavailableExcepton(String.format("room is occupied by %s", hotelRoom.getOccupant()));
+    }
+    
+    dao.addGuest(guest);
+    hotelRoom.setOccupant(guest);
+    return guest;
+}]]></programlisting>
+        </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Rejects checkin when invalid</para></listitem>
+                <listitem><para>Completes check-in when valid</para></listitem>
+            </itemizedlist>
 
         <section id="ejb-jpa-propagation-rollback-stateless">
             <title>Stateless Transaction Rollback</title>
             <itemizedlist spacing="compact">
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Transaction per call, no rolling back previous calls</para></listitem>
             </itemizedlist>
         
             <figure>
-                <title></title>
-<programlisting language=""><![CDATA[
-]]></programlisting>
-        </figure>
+                <title>Client uses up all Available Rooms</title>
+<programlisting language="java"><![CDATA[List<Guest> members = new ArrayList<Guest>(availableRooms.size());
+int i=0;
+for (Room room: availableRooms) {
+    Guest member = new Guest("member " + i++);
+    member = hotelMgmt.checkIn(member, room);
+    members.add(member);
+}]]></programlisting>
+            </figure>
             <itemizedlist spacing="compact">
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Stateless EJB commits each of these check-ins</para></listitem>
+            </itemizedlist>
+
+
+            <figure>
+                <title>Client Attempts an Invalid Check-in</title>
+<programlisting language="java"><![CDATA[//try doing it again
+Room room = availableRooms.get(0);
+Guest member = new Guest("member " + i++);
+try {
+    member = hotelMgmt.checkIn(member, room);
+    members.add(member);
+    fail("fail to detect bad checkin");
+} catch (RoomUnavailableExcepton ex) {
+    logger.debug("expected exception making too many reservations:{}", ex.toString());
+}]]></programlisting>
+<programlisting language=""><![CDATA[expected exception making too many reservations:info.ejava.examples.ejb.ejbjpa.bl.RoomUnavailableExcepton: 
+room is occupied by Guest [id=103, name=member 0]]]></programlisting>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Additional check-in rejected -- nothing committed</para></listitem>
             </itemizedlist>
             
             <figure>
-                <title></title>
-<programlisting language=""><![CDATA[
-]]></programlisting>
+                <title>Server still has Initial Committed Check-ins</title>
+<programlisting language="java"><![CDATA[logger.info("completed reservations for {} guests", members.size());
+int availableRooms2 = hotelMgmt.getAvailableRooms(null, 0, 0).size();
+logger.info("hotel has {} rooms available", availableRooms2);
+assertEquals("", availableRooms.size()-members.size(), availableRooms2);]]></programlisting>
+
+<programlisting language=""><![CDATA[completed reservations for 4 guests
+hotel has 0 rooms available]]></programlisting>
             </figure>
             <itemizedlist spacing="compact">
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Each check-in occured in own transaction</para></listitem>
+                <listitem><para>Later error did not impact previous completed transactions</para></listitem>
             </itemizedlist>
         </section>
 
         <section id="ejb-jpa-propagation-rollback-stateful">
             <title>Stateful Transaction Rollback</title>
             <itemizedlist spacing="compact">
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>
-        
-            <figure>
-                <title></title>
-<programlisting language=""><![CDATA[
-]]></programlisting>
-        </figure>
-            <itemizedlist spacing="compact">
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Multiple resource actions part of same transaction</para></listitem>
+                <listitem><para>All-or-none performed</para></listitem>
             </itemizedlist>
             
             <figure>
-                <title></title>
+                <title>Client Issues Guests Up Front</title>
+<programlisting language="java"><![CDATA[ReservationRemote checkin = (ReservationRemote) jndi.lookup(reservationJNDI);
+for (int i=0; i<availableRooms+1; i++) {
+    Guest member = new Guest("member " + i);
+    int count=checkin.addGuest(member);
+    logger.debug("we have {} in our group so far", count);
+}]]></programlisting>
+                
 <programlisting language=""><![CDATA[
+00:47:20 DEBUG HotelMgmtEJBIT:326 - we have 4 available rooms
+00:47:20 DEBUG HotelMgmtEJBIT:332 - we have 1 in our group so far
+00:47:20 DEBUG HotelMgmtEJBIT:332 - we have 2 in our group so far
+00:47:20 DEBUG HotelMgmtEJBIT:332 - we have 3 in our group so far
+00:47:20 DEBUG HotelMgmtEJBIT:332 - we have 4 in our group so far
+00:47:20 DEBUG HotelMgmtEJBIT:332 - we have 5 in our group so far
 ]]></programlisting>
             </figure>
             <itemizedlist spacing="compact">
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Same stateful process as before -- but with one additional Guest (one too many)</para></listitem>
             </itemizedlist>
+        
+            <figure>
+                <title>Client Attempts to Check-in all Guests at Once</title>
+<programlisting language="java"><![CDATA[try {
+    checkin.reserveRooms();
+    fail("too many check-ins not detected");
+} catch (RoomUnavailableExcepton ex) {
+    logger.debug("expected exception making too many reservations:{}", ex.toString());
+}]]></programlisting>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Client attempts to check-in to all Rooms</para></listitem>
+                <listitem><para>Checked exception will be thrown</para></listitem>
+            </itemizedlist>
+            
+            <figure>
+                <title>Stateful EJB Attempts to flush() Guests and Reserve all Rooms</title>
+<programlisting language="java"><![CDATA[@TransactionAttribute(TransactionAttributeType.REQUIRED)
+...
+em.flush(); //<== flush guests persisted outside of a TX for demonstration
+
+[ReservationEJB] reserving 4 rooms for 5 guests
+[stdout] Hibernate: 
+[stdout]     insert 
+[stdout]     into
+[stdout]         EJBJPA_GUEST
+[stdout]         (name, GUEST_ID) 
+[stdout]     values
+[stdout]         (?, ?)
+...
+]]></programlisting>
+
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Five (5) Guests are flushed to database prior to the rollback</para></listitem>
+            </itemizedlist>
+            
+            
+            <figure>
+                <title>Stateful EJB rolls back Transaction on Stateless HotelMgmtEJB Exception</title>
+<programlisting language="java"><![CDATA[@Resource
+private SessionContext ctx;
+
+} catch (RoomUnavailableExcepton ex) {
+    //rollback any previous reservations
+    ctx.setRollbackOnly();
+    throw ex;
+}]]></programlisting>
+<programlisting language=""><![CDATA[[ReservationEJB] *** ReservationEJB(271512057):destroy ***]]></programlisting>
+<programlisting language=""><![CDATA[expected exception making too many reservations:info.ejava.examples.ejb.ejbjpa.bl.RoomUnavailableExcepton: 
+found on 4 out of 5 required]]></programlisting>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Persisted Guests removed from database as a part of transaction rollback</para></listitem>
+                <listitem><para>Early check-ins never flushed to DB -- discarded as part of rollback</para></listitem>
+            </itemizedlist>
+            
+            <figure>
+                <title>Client Checks and finds Rooms Still Available -- all Check-ins Rolled Back</title>
+<programlisting language="java"><![CDATA[int availableRooms2 = hotelMgmt.getAvailableRooms(null, 0, 0).size();
+logger.info("hotel has {} rooms available", availableRooms2);
+assertEquals("unexpected room count", availableRooms, availableRooms2);]]></programlisting>
+<programlisting language=""><![CDATA[hotel has 4 rooms available]]></programlisting>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>All check-ins associated with Rooms removed as a part of rollback</para></listitem>
+            </itemizedlist>
+            
+            
         </section>
     </section>
 
     <section id="ejb-jpa-propagation-locking">
-        <title>Pessamistic Locking</title>
+        <title>Pessamistic Locking</title>        
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>One concurrency strategy</para></listitem>
+            <listitem><para>Create/wait-for a lock on data up-front, prior to getting the data</para></listitem>
         </itemizedlist>
         
         <figure>
-            <title></title>
-<programlisting language=""><![CDATA[
-]]></programlisting>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>
+            <title>Stateful Scenario Ontaining Pessamistic Lock with Rooms</title>
+<programlisting language="java"><![CDATA[@Override
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@Remove
+public List<Guest> reserveRoomsPessimistic() throws RoomUnavailableExcepton {
+    List<Room> rooms = em.createQuery(...)
+        .setFirstResult(0)
+        .setMaxResults(guests.size())
+        .setLockMode(LockModeType.PESSIMISTIC_WRITE)
+        .setHint("javax.persistence.lock.timeout", 5000) //can also be set globally as persistence.xml property
+        .getResultList();
         
-        <figure>
-            <title></title>
-<programlisting language=""><![CDATA[
-]]></programlisting>
+    return reserveRooms(rooms);
+}]]></programlisting>
+<programlisting language=""><![CDATA[[stdout]     select
+[stdout]         room0_.ROOM_NUMBER as ROOM_NUM1_2_,
+[stdout]         room0_.FLOOR_ID as FLOOR_ID2_2_,
+[stdout]         room0_.OCCUPANT_ID as OCCUPANT3_2_ 
+[stdout]     from
+[stdout]         EJBJPA_ROOM room0_ 
+[stdout]     where
+[stdout]         room0_.OCCUPANT_ID is null 
+[stdout]     order by
+[stdout]         room0_.ROOM_NUMBER asc limit ? for update]]></programlisting>
         </figure>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>setLockMode(LockModeType.PESSIMISTIC_WRITE) - locks row (or table) for remainder of transaction</para></listitem>
+            <listitem><para>select ... FOR UPDATE issued for query</para></listitem>
         </itemizedlist>
     </section>
 
     <section id="ejb-jpa-propagation-summary">
        <title>Summary</title>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Persistence Context Propagation</para></listitem>
+            <listitem><para>Rollbacks (ACID)</para></listitem>
+            <listitem><para>Pessamistic Locking</para></listitem>
         </itemizedlist>
     </section>    
 </chapter>

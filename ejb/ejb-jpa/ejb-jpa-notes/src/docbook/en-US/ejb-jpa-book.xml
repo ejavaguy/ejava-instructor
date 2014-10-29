@@ -22,8 +22,9 @@
         <title>Purpose</title>
         <itemizedlist spacing="compact">
             <listitem><para>Server-side Resources</para></listitem>
-            <listitem><para>EJB and WAR deployment</para></listitem>
-            <listitem><para>Resource injection</para></listitem>
+            <listitem><para>PersistenceUnit/PersistenceContext injection</para></listitem>
+            <listitem><para>Managed Entities and Remote Interfaces</para></listitem>
+            <listitem><para>Persistence Context Propagation</para></listitem>
         </itemizedlist>
     </preface>
 
