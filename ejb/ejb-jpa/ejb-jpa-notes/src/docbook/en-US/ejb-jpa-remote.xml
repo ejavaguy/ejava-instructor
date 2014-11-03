@@ -196,9 +196,9 @@ public class HotelMgmtEJB implements HotelMgmtRemote, HotelMgmtLocal {
 118      logger.info("got expected exception:{}", expected.toString());
 119  }]]></programlisting>
 
-<programlisting language=""><![CDATA[
-HotelMgmtEJBIT:118 - got expected exception:org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role: info.ejava.examples.ejb.ejbjpa.bo.Floor.rooms, could not initialize proxy - no Session
-]]></programlisting>
+<programlisting language=""><![CDATA[HotelMgmtEJBIT:118 - got expected exception:org.hibernate.LazyInitializationException: 
+failed to lazily initialize a collection of role: info.ejava.examples.ejb.ejbjpa.bo.Floor.rooms, 
+could not initialize proxy - no Session]]></programlisting>
         </figure>
         <itemizedlist spacing="compact">
             <listitem><para>Floor can be accessed</para></listitem>

@@ -13,8 +13,7 @@
         
         <figure>
            <title>Server SQL DataSource (standalone.xml)</title>
-<programlisting language="xml"><![CDATA[
-<subsystem xmlns="urn:jboss:domain:datasources:1.0">
+<programlisting language="xml"><![CDATA[<subsystem xmlns="urn:jboss:domain:datasources:1.0">
     <datasources>
         <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true">
             <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1</connection-url>
@@ -43,8 +42,7 @@
         
         <figure>
             <title>Server-side persistence.xml</title>
-<programlisting language="xml"><![CDATA[
-<?xml version="1.0" encoding="UTF-8"?>
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <persistence xmlns="http://java.sun.com/xml/ns/persistence"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" version="2.0">
@@ -134,8 +132,7 @@
 
        <figure>
            <title>Reference External @Entities: EAR Deploy</title>
-<programlisting language=""><![CDATA[
-ejbsessionBankEAR-4.0.0-SNAPSHOT
+<programlisting language=""><![CDATA[ejbsessionBankEAR-4.0.0-SNAPSHOT
 |-- ejbsessionBankEJB.jar
 |-- ejbsessionBankWAR-4.0.0-SNAPSHOT.war
 |-- lib
@@ -143,8 +140,7 @@ ejbsessionBankEAR-4.0.0-SNAPSHOT
 |   `-- ejbsessionBankImpl-4.0.0-SNAPSHOT.jar
 `-- META-INF
     `-- application.xml]]></programlisting>
-<programlisting language="xml"><![CDATA[
-<?xml version="1.0" encoding="UTF-8"?>
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <persistence xmlns="http://java.sun.com/xml/ns/persistence"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" version="2.0">
@@ -161,8 +157,7 @@ ejbsessionBankEAR-4.0.0-SNAPSHOT
 ...
         </properties>
     </persistence-unit>        
-</persistence>
-]]></programlisting>
+</persistence>]]></programlisting>
        </figure>
        <itemizedlist spacing="compact">
            <listitem><para>jar-file element able to reference external JAR using a deterministic, portable path in EAR</para></listitem>
