@@ -45,6 +45,22 @@
         <tag>HEAD</tag>
     </scm>
 
+    <repositories>
+        <repository>
+            <id>jboss-nexus</id>
+            <name>JBoss Nexus Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <build>
         <extensions> <!-- needed for site deploy over scp -->
             <extension>
@@ -133,21 +149,6 @@
                     </dependency>
                 </dependencies>
             </dependencyManagement>
-            <repositories>
-                <repository>
-                    <id>jboss-nexus</id>
-                    <name>JBoss Nexus Repository</name>
-                    <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-                    <releases>
-                        <enabled>true</enabled>
-                        <updatePolicy>never</updatePolicy>
-                    </releases>
-                    <snapshots>
-                        <enabled>true</enabled>
-                        <updatePolicy>never</updatePolicy>
-                    </snapshots>
-                </repository>
-            </repositories>
             <pluginRepositories>
                 <pluginRepository>
                     <id>jboss-nexus</id>
@@ -467,6 +468,27 @@
                     <id>webdev.snapshot.repo</id>
                     <name>ejava JHU snapshot repository</name>
                     <url>scpexe://webdev.jhuep.com/home/jcs/public_html/maven2-snapshot</url>
+                    <uniqueVersion>false</uniqueVersion>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>srau</id>
+            <distributionManagement>
+                <site>
+                    <id>ejava-ejb.website</id>
+                    <name>SRA-U EJB</name>
+                    <url>scpexe://srau.ejava.info/var/www/ejava.info/html/sites/ejava-ejb</url>
+                </site>
+                <repository>
+                    <id>srau-releases</id>
+                    <name>srau releases</name>
+                    <url>https://srau.ejava.info/nexus/content/repositories/srau-releases/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>srau-snapshots</id>
+                    <name>srau snapshots</name>
+                    <url>https://srau.ejava.info/nexus/content/repositories/srau-snapshots/</url>
                     <uniqueVersion>false</uniqueVersion>
                 </snapshotRepository>
             </distributionManagement>
