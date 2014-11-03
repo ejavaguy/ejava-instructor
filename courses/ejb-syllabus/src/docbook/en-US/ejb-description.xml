@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding="utf-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-syllabus-description">
+    <title>Course Description</title>
+
+    <section id="ejb-course-meeting">
+        <title>Meeting Times/Location</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Wednesdays, 8:00-10:00am EST</para></listitem>
+            <listitem><para>Webex Details on Portal</para></listitem>
+            <listitem><para><ulink url="https://corpteams.sranet.sra.com/support/sra-u/wildfly/"></ulink></para></listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="ejb-course-description">
+        <title>Description</title>
+        <para>
+            This course covers the development of the service tier
+            using JavaEE standards, focusing on Enterprise JavaBeans
+            (EJB). It will cover characteristics required by a service
+            tier and why we need EJB and technologies associated with
+            EJB. This course covers development use cases related to
+            building and deploying service tiers and deploying to a
+            JavaEE application server. The student will make full use
+            of Maven, and IDE (default is Eclipse) and an application
+            server (JBoss/Wildfly) and a relational database (H2).
+        </para>
+        <para>
+            The material currently covers standards adopted as of 
+            JavaEE 6 (JPA 2.0, EJB 3.1, and JMS 1.1) and is being actively updated with information
+            from JavaEE 7 (JPA 2.1, EJB 3.2, and JMS 2.0). The development environment used in class
+            is JavaSE and JavaEE 7-compliant.
+        </para>
+        <para>
+            Using modern development tools, commercial persistence providers, and application servers, students will
+            design and implement several significant programming projects using the above mentioned technologies and
+            deploy them to a Java EE environment that they will manage.
+        </para>
+    </section>
+
+    <section id="ejb-course-student-background">
+        <title>Student Background</title>
+        <para>
+            The course is open to all levels of interest in developing EJB solutions. Since there are no 
+            required assignments or tests -- the student will have the freedom to get out of the course
+            according to their experience level and the amount of work they put into it. However, the 
+            course is specifically designed for students comfortable with JavaSE development and lectures 
+            and exercises will be primarily geared at that level of audience.
+        </para>
+        <itemizedlist spacing="compact">
+            <listitem><para>Java programming skills are assumed.</para></listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="ejb-course-texts">
+        <title>Course Text(s)</title>
+        <section id="ejb-course-texts-optional">
+            <title>Optional Text(s)</title>
+            <itemizedlist spacing="compact">
+	            <listitem><para>
+                        <ulink
+                        url="http://www.amazon.com/Practical-Java-EE-Development-WildFly-ebook/dp/B00LAN338C"><emphasis>"Practical
+                        JavaEE 7 Development on Wildfly"</emphasis></ulink>, 
+                        Francesco Marchioni, 2014, ItBuzzPress, ASIN: B00LAN338C
+                        </para>
+                        </listitem>
+	            <listitem><para>
+                        <ulink url="http://www.amazon.com/WildFly-8-Administration-Francesco-Marchioni-ebook/dp/B00HOGN0C8"><emphasis>"Wildfly 8 Administration"</emphasis></ulink>, 
+                        Francesco Marchioni, 2014, ItBuzzPress, ASIN: B00HOGN0C8
+                        </para>
+                        </listitem>
+	            <listitem><para>
+                        <ulink url="http://www.coreservlets.com/"><emphasis>"coreservlets.com"</emphasis></ulink>, 
+                        Marty Hall (web site packet with related materials)
+                        </para>
+                        </listitem>
+            </itemizedlist>
+        </section>
+    </section>
+        
+    <section id="ejb-course-required-software">
+        <title>Required Software</title>
+        <para>
+            This course will make heavy use of development tools
+            (Git, Maven 3, JUnit, Log4j, and Eclipse), a database 
+            (H2 Database Engine), persistence provider
+            (Hibernate), and application server (JBoss/Wildfly 8). 
+            Students are strongly encouraged to establish a local
+            development environment. Detailed instructions for setup are
+            part of the first exercise (Development Environment Setup).
+        </para>
+    </section>
+    
+    <section id="ejb-course-references">
+        <title>References</title>
+        <para>
+            The "optional" texts are current and relevant to the platform
+            we will be using. However, the course will not make any explicit
+            reference to them. All material will be available in example form
+            froms this course.
+        </para>
+    </section>
+
+    <section id="ejb-course-grading">
+        <title>Grading</title>
+        <itemizedlist spacing="compact">            
+            <listitem><para>Must attent five (5) of six (6) course sessions to receive credit</para></listitem>
+            <listitem><para>"week 0" does not count</para></listitem>
+            <listitem><para>session will be recorded and offered as course make-up</para></listitem>
+        </itemizedlist>
+    </section>
+    
+    <section id="ejb-course-instructor-availability">
+        <title>Instructor Availability</title>
+        <para>
+            I am available 20-30min before and after class, e-mail, and more detailed assistance 
+            upon request. I will try to start the web-ex at least 30min prior to class beginning
+            and will keep it open until the last question has been addressed. I do not generally have
+            access to the Internet during the work-day so most questions will be answered in the 
+            morning and evening hours.
+        </para>
+        <para>
+            Please make use of the discussion board as much as possible. If you have a question
+            -- it will likely be the same question over half the class also has or will have.
+        </para>
+    </section>
+</chapter>
+  

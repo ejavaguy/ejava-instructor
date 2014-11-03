@@ -1,0 +1,65 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="ejb-syllabus-intro">
+    <bookinfo>
+        <title>Building the Service Tier with JavaEE/EJB Course Syllabus</title>
+        <subtitle></subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>
+                This book contains the course syllabus for Developing 
+                the Service Tier with JavaEE/EJB and JBoss/Wildfly.
+                The course meets weekly via web-ex. Class attendance is 
+                required for credit. Sessions are recorded for make-up work. 
+                Exercises are provided but nothing is required to be turned
+                in. You are welcome to seek additional assistance from the 
+                instructor before or after class and any time via e-mail.
+            </para>
+            <para>
+                A "week 0" is conducted prior to the course to  give 
+                students (and the instructor) a change to verify
+                their access to the webex and course materials and 
+                take care of any pre-course pre-requisites. The assignments
+                for that week are geared at getting your development 
+                environment up and running and to provide a Maven primer
+                for those not familar with Maven. All topics discussed 
+                during week 0 will be generally applicable to JavaSE
+                development and will not cover details that are specific
+                to the course. This is all about getting ready...
+            </para>
+            <para>
+                The remainder of the course will meet weekly for six sessions
+                and will focus on EJB topics within the JavaEE framework.
+                We will use JBoss/Wildfly for examples and exercises. The 
+                Eclipse IDE is also used, but other IDE's should be usable
+                in class and instructions will be highly Maven-based and 
+                avoid IDE specifics where possible.
+            </para>
+            <para>
+                The technical platform for the course is JavaSE and 
+                JavaEE 7. The course materials are up to date with
+                JavaEE 6 with on-going updates to cover newer additions
+                based on JavaEE 7.
+            </para>
+        </abstract>
+    </bookinfo>
+    <preface id="ejb-syllabus-topics">
+        <title>Welcome!</title>
+        <itemizedlist>
+            <listitem><para>Course combines a mixture of presentation, discussion, and lab exercises to provide an introduction
+                and thorough coverage of building the service tier with Enterprise Java (JavaEE) with specific emphasis on Enterprise
+                JavaBeans (EJB) and using JBoss/Wildfly.</para></listitem>
+            <listitem><para>Concepts are based on JavaEE standards and grounded using a specific JavaEE provider (JBoss/Wildfly Application Server)</para></listitem>
+            <listitem><para>Lab environment is based on Maven and IDE agnostic (this is not an IDE wizard course)</para></listitem>
+        </itemizedlist>
+    </preface>
+    
+    <xi:include href="ejb-description.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-syllabus.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>

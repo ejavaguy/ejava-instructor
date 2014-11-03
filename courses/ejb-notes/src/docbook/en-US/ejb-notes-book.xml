@@ -1,0 +1,40 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="ejb-notes">
+    <bookinfo>
+        <title>Building the Service Tier with JavaEE/EJB Course Notes</title>
+        <subtitle></subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>
+                This book contains the course notes for Developing 
+                the Service Tier with JavaEE/EJB and JBoss/Wildfly.
+                This course provides background for service tier requirements
+                and how they can be met with JavaEE/EJB technologies.
+                This course covers development environment topics such as
+                module layout, Maven and useful Maven plugins, IDE-integration, 
+                and application-server management. 
+            </para>
+            <para>
+                The material currently covers standards adopted as of 
+                JavaEE 6 and is being actively updated with information
+                from JavaEE 7.
+            </para>
+        </abstract>
+    </bookinfo>
+    <xi:include href="ejb-syllabus-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="javaee-intro-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="devenv-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-intro-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-basic-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-dev-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="enc-config-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-jpa-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="webejb-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>

@@ -1,0 +1,58 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="jhu784-lab">
+    <bookinfo>
+        <title>Building the Service Tier with JavaEE/EJB Course Exercises</title>
+        <subtitle></subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>
+                This book contains lab exercises for the EJB class.
+            </para>
+        </abstract>
+    </bookinfo>
+    <preface id="ejb-lab-topics">
+        <title>General Instructions</title>
+        <para></para>
+    </preface>
+    
+    <chapter id="ejb-lab-labs">
+        <title>Lab Exercises</title>
+        <table>
+            <title>General Lab Exercises</title>
+            <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="topic"/>
+            <thead>
+                <row>
+                  <entry>Topic</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="topic"><para><link linkend="jhu784-devenv-setup">Development Environment Setup</link></para></entry>
+                </row>
+                <row rowsep="1">
+                  <entry namest="topic"><para><link linkend="first-simplemodule-ex">First Simple Module</link></para></entry>
+                </row>
+                <row rowsep="1">
+                  <entry namest="topic"><para><link linkend="ejb-basic-lab">Basic EJB Development</link></para></entry>
+                </row>
+                <row rowsep="1">
+                  <entry namest="topic"><para><link linkend="encconfig-lab">JNDI/ENC Configuration Lab</link></para></entry>
+                </row>
+            </tbody>
+            </tgroup>
+        </table>    
+    </chapter>
+    
+    <xi:include href="jhu784-devenv-setup-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="first-simplemodule-ex-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-basic-lab-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="enc-config-lab-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>

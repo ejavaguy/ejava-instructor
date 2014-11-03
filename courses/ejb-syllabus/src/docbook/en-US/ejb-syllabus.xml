@@ -1,0 +1,128 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-syllabus-schedule">
+    <title>Syllabus</title>
+
+    <table>
+        <title>Sound Check/Setup</title>
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+        <colspec colname="session"/>
+        <colspec colname="date"/>
+        <colspec colname="topic"/>
+        <colspec colname="comment"/>
+        <thead>
+            <row>
+              <entry>Session</entry>
+              <entry>Date</entry>
+              <entry>Topic</entry>
+              <entry>Comment</entry>
+            </row>
+        </thead>
+        <tbody>
+        
+            <row rowsep="1">
+               <entry namest="session">0</entry>
+               <entry namest="date">Nov04</entry>
+               <entry namest="topic"><para>Course Basics and Web Resources Introduction</para></entry>
+            </row>
+            
+            <row rowsep="1">
+              <entry namest="session"></entry>
+              <entry namest="date"></entry>
+              <entry namest="topic"><para><link linkend="devenv">Development Environment Overview</link></para></entry>
+              <entry namest="comment"><para>Exercise: Development Environment Setup</para></entry>
+            </row>
+            <row rowsep="1">
+              <entry namest="comment"><para>Exercise: First Simple Application</para></entry>
+            </row>
+        </tbody>
+        </tgroup>
+    </table>    
+
+
+    <table>
+        <title>Main Course</title>
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+        <colspec colname="session"/>
+        <colspec colname="date"/>
+        <colspec colname="topic"/>
+        <colspec colname="comment"/>
+        <thead>
+            <row>
+              <entry>Session</entry>
+              <entry>Date</entry>
+              <entry>Topic</entry>
+              <entry>Comment</entry>
+            </row>
+        </thead>
+        <tbody>
+
+            <row rowsep="1">
+                <entry namest="session">1</entry>
+                <entry namest="date">Nov12</entry>
+                <entry namest="topic"><para><link linkend="javaeeejb-intro">JavaEE/EJB Introduction</link></para></entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic"><para><link linkend="ejb-basic">Basic Session EJB</link></para></entry>
+                <entry namest="comment"><para><ulink url="../html/ejb-basic-lab.html">Exercise: Basic EJB Development</ulink></para></entry>
+            </row>
+
+
+            <row rowsep="1">
+                <entry namest="session">2</entry>
+                <entry namest="date">Nov19</entry>
+                <entry namest="topic"><para><link linkend="ejb-dev">EJB Development Scenarios</link></para></entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic"><para><link linkend="enc-config">Configuring EJBs using ENC and JNDI</link></para></entry>
+                <entry namest="comment"><para><ulink url="../html/encconfig-lab.html">Exercise: JNDI/ENC Configuration</ulink></para></entry>
+            </row>
+
+
+            <row rowsep="1">
+                <entry namest="session">3</entry>
+                <entry namest="date">Nov26</entry>
+                <entry namest="topic"><para><link linkend="ejb-jpa">EJB/Server-Side JPA Topics</link></para></entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic"><para><ulink url="../ppt/javaeeTransactions.ppt">JavaEE Transactions</ulink></para></entry>
+            </row>
+
+
+            <row rowsep="1">
+                <entry namest="session">4</entry>
+                <entry namest="date">Dec03</entry>
+                <entry namest="topic"><para>Web-Tier Integration with Contexts and Dependency Injection (CDI)</para></entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic"><para><link linkend="webejb">Web-enabled EJBs with JAX-RS</link></para></entry>
+            </row>
+
+
+            <row rowsep="1">
+                <entry namest="session">5</entry>
+                <entry namest="date">Dec10</entry>
+                <entry namest="topic"><para>EJB Security</para></entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic"><para>JavaEE Interceptors</para></entry>
+            </row>
+
+
+            <row rowsep="1">
+                <entry namest="session">6</entry>
+                <entry namest="date">Dec17</entry>
+                <entry namest="topic"><para>Asynchronous Methods</para></entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic"><para>EJB Timers</para></entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic"><para>EJB and JMS</para></entry>
+            </row>
+        </tbody>
+        </tgroup>
+    </table>    
+</chapter>
+  
