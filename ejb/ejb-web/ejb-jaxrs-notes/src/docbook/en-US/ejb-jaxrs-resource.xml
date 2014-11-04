@@ -1,11 +1,11 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="webejb-resource">
+<chapter id="ejb-jaxrs-resource">
     <title>Resources, URI, and Methods</title>
     <subtitle>Exposing EJB methods to the Web</subtitle>
 
-    <section id="webejb-resource-resources">
+    <section id="ejb-jaxrs-resource-resources">
         <title>Resources</title>
         <itemizedlist spacing="compact">
             <listitem><para>An asset to be exposed to the web</para></listitem>
@@ -21,7 +21,7 @@
         </itemizedlist>                   
     </section>
 
-    <section id="webejb-resource-uris">
+    <section id="ejb-jaxrs-resource-uris">
         <title>URIs</title>
         <itemizedlist spacing="compact">
             <listitem><para>An address to access a particular resource</para></listitem>
@@ -77,7 +77,7 @@ return UriBuilder.fromUri(appURI)
         </itemizedlist>                   
     </section>
 
-    <section id="webejb-resource-methods">
+    <section id="ejb-jaxrs-resource-methods">
         <title>Methods</title>
         <itemizedlist spacing="compact">
             <listitem><para>Bounded ("uniform interface")</para></listitem>
@@ -104,7 +104,7 @@ GET http://127.0.0.1:8080/jaxrsInventoryWAR/rest/products/1
         </itemizedlist>                   
     </section>
     
-    <section id="webejb-resource-response-codes">
+    <section id="ejb-jaxrs-resource-response-codes">
         <title>Response Codes</title>
         <itemizedlist spacing="compact">
             <listitem><para>Standardized</para>
@@ -127,7 +127,7 @@ GET http://127.0.0.1:8080/jaxrsInventoryWAR/rest/products/1
         </itemizedlist>                   
     </section>
 
-    <section id="webejb-resource-jaxrsclass">
+    <section id="ejb-jaxrs-resource-jaxrsclass">
         <title>JAX-RS Resource Class</title>
         <itemizedlist spacing="compact">
             <listitem><para>Annotated with @Path</para></listitem>
@@ -146,7 +146,7 @@ public class ProductsResource {
     ...
 ]]></programlisting>
         
-        <section id="webejb-resource-jaxrsclass-post">
+        <section id="ejb-jaxrs-resource-jaxrsclass-post">
             <title>JAX-RS Resource POST Method</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Create new resource or tunnel service</para></listitem>
@@ -175,7 +175,7 @@ public Response addCustomer(Customer customer) {
         
         
 
-        <section id="webejb-resource-jaxrsclass-get">
+        <section id="ejb-jaxrs-resource-jaxrsclass-get">
             <title>JAX-RS GET Resource Method</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Non-destructive read</para></listitem>
@@ -206,7 +206,7 @@ public Response getProduct(@PathParam("id")int id) {
 ]]></programlisting>
         </section>
 
-        <section id="webejb-resource-jaxrsclass-put">
+        <section id="ejb-jaxrs-resource-jaxrsclass-put">
             <title>JAX-RS PUT Resource Method</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Create new or update existing</para></listitem>
@@ -231,7 +231,7 @@ public Response getProduct(@PathParam("id")int id) {
         </section>
 
 
-        <section id="webejb-resource-jaxrsclass-delete">
+        <section id="ejb-jaxrs-resource-jaxrsclass-delete">
             <title>JAX-RS DELETE Resource Method</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Deletes specified resource</para></listitem>
@@ -254,7 +254,7 @@ public Response deleteCustomer(@PathParam("id") int id) {
         </section>
     </section>
 
-        <section id="webejb-resource-http">
+        <section id="ejb-jaxrs-resource-http">
         <title>HTTP Request/Response</title>
         <itemizedlist spacing="compact">
             <listitem><para>Request supplies method, URI, optional payload, and other properties</para></listitem>

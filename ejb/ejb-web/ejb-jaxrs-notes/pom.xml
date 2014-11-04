@@ -1,15 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>info.ejava.docs.ejb</groupId>
-        <artifactId>ejb</artifactId>
+        <artifactId>ejb-web</artifactId>
         <version>4.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>webejb-notes</artifactId>
+    <artifactId>ejb-jaxrs-notes</artifactId>
     <packaging>pom</packaging>
 
-    <name>EJB::Web-oriented EJB::Notes</name>
+    <name>EJB::WEB::JAX-RS Notes</name>
     <description>
         This project contains the documentation for the 
         deployment of EJBs in the web tier and exposing them
@@ -17,8 +17,8 @@
     </description>
     
     <properties>
-       <doc.base>webejb-book</doc.base>
-       <content.version>v2014-08-31</content.version>
+       <doc.base>ejb-jaxrs-book</doc.base>
+       <content.version>v2014-11-03</content.version>
     </properties>
 
     <build>
