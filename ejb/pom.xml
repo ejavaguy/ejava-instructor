@@ -20,6 +20,7 @@
         <module>ejb-intro</module>
         <module>ejb-config</module>
         <module>ejb-jpa</module>
+        <module>ejb-web</module>
         <module>ejbsessionBank</module>
         <module>jndiDemo</module>
         <module>txReservation</module>

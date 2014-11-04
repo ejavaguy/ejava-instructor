@@ -1,11 +1,11 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="webejb-xmlrep">
+<chapter id="ejb-jaxrs-xmlrep">
     <title>XML Representations</title>
     <subtitle>Using JAXB and JAX-RS Marshallers</subtitle>
 
-    <section id="webejb-xmlrep-xml">
+    <section id="ejb-jaxrs-xmlrep-xml">
         <title>XML Payload</title>
         <itemizedlist spacing="compact">
             <listitem><para>Elements</para></listitem>
@@ -23,7 +23,7 @@
 ]]></programlisting>
     </section>
 
-    <section id="webejb-xmlrep-jaxb">
+    <section id="ejb-jaxrs-xmlrep-jaxb">
         <title>Defining JAXB DTOs</title>
         <itemizedlist spacing="compact">
             <listitem><para>@XmlRootElement - needed to be able to manipulate object independently of graph</para></listitem>
@@ -49,7 +49,7 @@ public class Category extends InventoryRepresentation {
 }
 ]]></programlisting>
                            
-        <section id="webejb-xmlrep-jaxb-attributes">
+        <section id="ejb-jaxrs-xmlrep-jaxb-attributes">
             <title>Defining JAXB Attributes</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Typically used for identifying properties</para></listitem>
@@ -70,7 +70,7 @@ public class Category extends InventoryRepresentation {
 ]]></programlisting>
         </section>
                            
-        <section id="webejb-xmlrep-jaxb-elements">
+        <section id="ejb-jaxrs-xmlrep-jaxb-elements">
             <title>Defining JAXB Elements</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Typically used for descriptive properties</para></listitem>
@@ -84,7 +84,7 @@ public class Category extends InventoryRepresentation {
 ]]></programlisting>
         </section>
                            
-        <section id="webejb-xmlrep-jaxb-collections">
+        <section id="ejb-jaxrs-xmlrep-jaxb-collections">
             <title>Defining JAXB Collections/Sequences</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Express repeating values</para></listitem>
@@ -100,10 +100,10 @@ public class Category extends InventoryRepresentation {
         </section>
     </section>
 
-    <section id="webejb-xmlrep-jaxb-marshalling">
+    <section id="ejb-jaxrs-xmlrep-jaxb-marshalling">
         <title>JAXB Marshalling/Demarshalling</title>
 
-        <section id="webejb-xmlrep-jaxb-marshaller">
+        <section id="ejb-jaxrs-xmlrep-jaxb-marshaller">
             <title>JAXB Marshalling</title>
             <itemizedlist spacing="compact">
                 <listitem><para>JAXBContext</para></listitem>
@@ -120,7 +120,7 @@ return writer.toString();
 ]]></programlisting>
         </section>                   
 
-        <section id="webejb-xmlrep-jaxb-demarshaller">
+        <section id="ejb-jaxrs-xmlrep-jaxb-demarshaller">
             <title>JAXB Demarshalling</title>
             <itemizedlist spacing="compact">
                 <listitem><para>JAXBContext</para></listitem>
@@ -135,14 +135,14 @@ return (T) marshaller.unmarshal(is);
     </section>
 
 
-    <section id="webejb-xmlrep-jaxrs">
+    <section id="ejb-jaxrs-xmlrep-jaxrs">
         <title>Marshaling XML to/from Resource Methods</title>
         <itemizedlist spacing="compact">
             <listitem><para>JAX-RS requires built-in provider support for JAXB</para></listitem>
             <listitem><para>JAX-RS defines marshalling framework to add extensions</para></listitem>
         </itemizedlist>                   
 
-        <section id="webejb-xmlrep-jaxrs-request">
+        <section id="ejb-jaxrs-xmlrep-jaxrs-request">
             <title>Marshaling XML Requests to Resource Methods</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Client request payload demarshalled into input JAXB class</para></listitem>
@@ -154,7 +154,7 @@ public Response addCustomer(Customer customer) {
 ]]></programlisting>
         </section>
         
-        <section id="webejb-xmlrep-jaxrs-response">
+        <section id="ejb-jaxrs-xmlrep-jaxrs-response">
             <title>Marshaling XML Response from Resource Methods</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Response entity checked for JAXB type</para></listitem>

@@ -1,7 +1,7 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="webejb-wardeploy">
+<chapter id="ejb-jaxrs-wardeploy">
     <title>EJB WAR Deployment</title>
     <subtitle>Flexible EJB Deployment</subtitle>
     <itemizedlist spacing="compact">
@@ -19,7 +19,7 @@
         </listitem>
     </itemizedlist>
 
-    <section id="webejb-warstructure">
+    <section id="ejb-jaxrs-warstructure">
         <title>WAR Structure</title>
 <programlisting language=""><![CDATA[
 |-- index.html                                                                                                                                                        
@@ -36,7 +36,7 @@
             <listitem><para>WEB-INF/web.xml - standard WAR deployment descriptor</para></listitem>
         </itemizedlist>
                            
-        <section id="webejb-warstructure-external">
+        <section id="ejb-jaxrs-warstructure-external">
             <title>Deploying External EJB JARs</title>
             <itemizedlist spacing="compact">
                 <listitem><para>EJB beans developed external to WAR</para></listitem>
@@ -107,7 +107,7 @@ META-INF/persistence.xml
             </itemizedlist>                   
         </section>
 
-        <section id="webejb-warstructure-embedded">
+        <section id="ejb-jaxrs-warstructure-embedded">
             <title>Deploying Embedded EJBs</title>
             <itemizedlist spacing="compact">
                 <listitem><para>EJB beans developed as part of WAR</para></listitem>
@@ -170,14 +170,14 @@ java:module/InventoryMgmtRMIEJB
         </section>
     </section>
 
-    <section id="webejb-warclients">
+    <section id="ejb-jaxrs-warclients">
         <title>WAR Clients</title>
         <itemizedlist spacing="compact">
             <listitem><para>Alternative: Use traditional RMI interface (specific to Java)</para></listitem>
             <listitem><para>Alternative: Use Web-oriented HTTP interface (open to all platforms)</para></listitem>
         </itemizedlist>
 
-        <section id="webejb-warclients-httpclient">
+        <section id="ejb-jaxrs-warclients-httpclient">
             <title>Accessing HTTP Resources</title>
             <itemizedlist spacing="compact">
                 <listitem><para>JAX-RS 1.x only addresses server side</para></listitem>

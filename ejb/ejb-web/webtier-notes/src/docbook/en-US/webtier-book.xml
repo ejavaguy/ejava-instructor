@@ -1,0 +1,60 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="webtier">
+    <bookinfo>
+        <title>Web/UI Applications</title>
+        <subtitle></subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>This presentation contains introductory topics for building web-based
+                user interfaces that may use EJBs or JPA.
+            </para>
+        </abstract>
+    </bookinfo>
+    <preface id="ejb-jaxrs-purpose">
+        <title>Purpose</title>
+
+        <section id="ejb-jaxrs-goals">
+            <title>Goals</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Build a basic, web-based user-front end to integrate with service tier</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejb-jaxrs-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>have more understanding of:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Basic Web Components</para></listitem>
+                        <listitem><para>Web Frameworks</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>be able to implement a basic application using:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Servlets</para></listitem>
+                        <listitem><para>JSPs</para></listitem>
+                        <listitem><para>Java ServerFaces</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+    </preface>
+
+    <toc/>
+
+    <!--
+    <xi:include href="webtier-html.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="webtier-jsp.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="webtier-servlets.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="webtier-filters.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    -->
+    <xi:include href="webtier-jsf.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>

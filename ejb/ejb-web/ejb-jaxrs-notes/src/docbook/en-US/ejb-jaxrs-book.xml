@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
     "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
-<book id="webejb">
+<book id="ejb-jaxrs">
     <bookinfo>
         <title>JAX-RS EJB</title>
         <subtitle>Web-centric EJB deployment</subtitle>
@@ -17,10 +17,10 @@
             </para>
         </abstract>
     </bookinfo>
-    <preface id="webejb-purpose">
+    <preface id="ejb-jaxrs-purpose">
         <title>Purpose</title>
 
-        <section id="webejb-goals">
+        <section id="ejb-jaxrs-goals">
             <title>Goals</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Introduce key technology for exposing resources
@@ -29,7 +29,7 @@
             </itemizedlist>
         </section>
 
-        <section id="webejb-objectives">
+        <section id="ejb-jaxrs-objectives">
             <title>Objectives</title>
             <para>At the completion of this topic, the student shall</para>
             <itemizedlist spacing="compact">
@@ -54,7 +54,7 @@
 
     <toc/>
 
-    <xi:include href="webejb-wardeploy.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="webejb-resource.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="webejb-xmlrep.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-jaxrs-wardeploy.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-jaxrs-resource.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-jaxrs-xmlrep.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </book>

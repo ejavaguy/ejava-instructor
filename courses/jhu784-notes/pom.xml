@@ -126,7 +126,7 @@
         </dependency>
         <dependency>
             <groupId>info.ejava.docs.ejb</groupId>
-            <artifactId>webejb-notes</artifactId>
+            <artifactId>ejb-jaxrs-notes</artifactId>
             <version>${project.version}</version>
             <classifier>docsrc</classifier>
         </dependency>
