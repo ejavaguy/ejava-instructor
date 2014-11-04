@@ -9,7 +9,146 @@
         <listitem><para></para></listitem>
     </itemizedlist>
 
-    <section id="webtier-chapter-">
+    <section id="webtier-chapter-controller">
+        <title>Controller Bean</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Provides access to model state and actions</para></listitem>
+            <listitem><para>Referred by assigned name in page</para></listitem>
+            <listitem><para>Caches state for page</para></listitem>
+            <listitem><para>Scope of state depends on declaration</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>RequestScoped - stateless</para></listitem>
+                    <listitem><para>ConversationScoped - state maintained across requests within a conversation boundary</para></listitem>
+                    <listitem><para>SessionScoped - state maintained for lifetime of user session</para></listitem>
+                    <listitem><para>ApplicationScoped - state maintained for life of application</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Example JSF Controller Bean</title>
+<programlisting language="java"><![CDATA[@Named("sellerController") //named used by the JSF page to access properties and actions
+                           //#{sellerController.xxx}
+@ConversationScoped        //controls lifespan of instance
+public class SellerController implements Serializable {  
+]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>CDI @Named used to specify name for page to use</para></listitem>
+            <listitem><para>Class required to implement Serializable unless RequestScoped</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Controller Bean Example Business Data State</title>
+<programlisting language="java"><![CDATA[    private Product product;]]></programlisting>
+<programlisting language="java"><![CDATA[    public Product getProduct() { return product; }
+    public void setProduct(Product product) {
+        logger.debug("setProduct({})", product);
+        this.product = product;
+    }]]></programlisting>
+<programlisting language="xml"><![CDATA[<h:inputText value="#{sellerController.product.name}" required="true"/>]]></programlisting>
+    
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Page refers to @Name.property and accesses using associated methods (getProperty() and setName() in this case)</para></listitem>
+            <listitem><para>Controller holds this state until action called</para></listitem>
+        </itemizedlist>
+
+
+        <figure>
+            <title>Controller Bean Example Action</title>
+<programlisting language="java"><![CDATA[    public String addNew() {
+        this.product = new Product(); //create a new Product instance
+        return null;                  
+    }
+    public String add() {
+        products.add(product);
+        return "/seller/seller-products";
+    }    
+    public String save() {
+        product.setSeller(user.getMember());
+        try {
+            product = catalog.addProduct(product);
+            Collections.sort(products, new Product.ProductASC());
+            return null;
+        } catch (InvalidProduct ex) {
+            error.setError("error saving product:" + product);
+            error.setException(ex);
+            return "error";
+        }
+    }]]></programlisting>
+<programlisting language="xml"><![CDATA[    <h:commandButton ... 
+        action="#{sellerController.addNew}" 
+        value="Sell New Product"/>
+        ...
+        <h:commandButton value="Add Product" action="#{sellerController.add}"/>
+        ...
+        <h:commandButton value="save" action="#{sellerController.save}">
+...
+        </h:commandButton>]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Page refers to action using @Name.methodName</para></listitem>
+            <listitem><para>Action methods take no arguments. They act on state supplied by setters.</para></listitem>
+            <listitem><para>Action methods return a String result used for navigation</para></listitem>
+            <listitem><para>Action methods may interact with business methods/resources to perform task</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Controller Bean Business Resources</title>
+<programlisting language=""><![CDATA[    @Inject @Tx //back-end business logic that can manage products
+    private ProductCatalog catalog;
+
+    @Inject //place to stash errors to be displayed
+    private ErrorController error;]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title></title>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title></title>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+   
+   
+       
+    </section>
+
+    <section id="webtier-chapter-1">
+        <title></title>
+        <para></para>
+<programlisting language=""><![CDATA[
+        ]]></programlisting>
+    </section>
+
+    <section id="webtier-chapter-2">
+        <title></title>
+        <para></para>
+<programlisting language=""><![CDATA[
+        ]]></programlisting>
+    </section>
+
+    <section id="webtier-chapter-3">
         <title></title>
         <para></para>
 <programlisting language=""><![CDATA[
