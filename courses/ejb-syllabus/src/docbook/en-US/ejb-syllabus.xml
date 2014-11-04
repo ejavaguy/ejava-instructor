@@ -31,10 +31,10 @@
               <entry namest="session"></entry>
               <entry namest="date"></entry>
               <entry namest="topic"><para><link linkend="devenv">Development Environment Overview</link></para></entry>
-              <entry namest="comment"><para>Exercise: Development Environment Setup</para></entry>
+              <entry namest="comment"><para><ulink url="../html/jhu784-devenv-setup.html">Exercise: Development Environment Setup</ulink></para></entry>
             </row>
             <row rowsep="1">
-              <entry namest="comment"><para>Exercise: First Simple Application</para></entry>
+              <entry namest="comment"><para><ulink url="../html/first-simplemodule-ex.html">Exercise: First Simple Application</ulink></para></entry>
             </row>
         </tbody>
         </tgroup>

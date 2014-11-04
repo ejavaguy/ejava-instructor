@@ -31,11 +31,11 @@ bin  boot  conf  lib  LICENSE.txt  NOTICE.txt  README.txt
                 </para>
                 <programlisting><![CDATA[
 //my linux system -- should be done in .bashrc
-export MAVEN_HOME=/opt/apache-maven-3.2.1
+export MAVEN_HOME=/opt/apache-maven-3.2.3
 export PATH=$MAVEN_HOME/bin:$PATH
 
 //my windows system -- should be done in Advanced System Settings->Environment Variables
-set MAVEN_HOME=/apps/apache-maven-3.2.1
+set MAVEN_HOME=/apps/apache-maven-3.2.3
 set PATH=%MAVEN_HOME%\bin;%PATH%
 ]]></programlisting>
             </listitem>
