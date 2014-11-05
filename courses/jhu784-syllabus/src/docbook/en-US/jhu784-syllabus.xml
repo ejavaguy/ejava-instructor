@@ -186,7 +186,10 @@
             <row rowsep="1">
                 <entry namest="session">10</entry>
                 <entry namest="date">Nov05</entry>
-                <entry namest="topic"><para><ulink url="../ppt/webTier.ppt">Web-Tier</ulink></para></entry>
+                <entry namest="topic"><para><link linkend="webtier">Web/UI Applications</link><ulink url="../ppt/webTier.ppt">slides</ulink></para></entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic"><para><link linkend="cdi-config">CDI</link></para></entry>
             </row>
             <row rowsep="1">
                 <entry namest="topic"><para><link linkend="ejb-jaxrs">Web-enabled EJBs with JAX-RS</link></para></entry>

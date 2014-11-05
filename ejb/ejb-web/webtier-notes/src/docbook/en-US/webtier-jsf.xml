@@ -1,36 +1,39 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="webtier-chapter">
-    <title></title>
+<chapter id="webtier-jsf">
+    <title>JavaServer Faces</title>
     <itemizedlist spacing="compact">
-        <listitem><para></para></listitem>
-        <listitem><para></para></listitem>
-        <listitem><para></para></listitem>
+        <listitem><para>Provides a rich Model View Controller (MVC) framework for developing web-based UIs</para></listitem>
+        <listitem><para>Integrates well with many CDI concepts</para></listitem>
     </itemizedlist>
+        
+    <figure>
+        <title>JSF Basic Elements</title>
+        <graphic scalefit="1" fileref="images/webtier-jsf-elements.png"/>
+    </figure>
 
-    <section id="webtier-chapter-controller">
+    <section id="webtier-jsf-controller">
         <title>Controller Bean</title>
         <itemizedlist spacing="compact">
             <listitem><para>Provides access to model state and actions</para></listitem>
-            <listitem><para>Referred by assigned name in page</para></listitem>
+            <listitem><para>Referred by assigned name in page <code>#{sellerController.xxx}</code></para></listitem>
             <listitem><para>Caches state for page</para></listitem>
             <listitem><para>Scope of state depends on declaration</para>
                 <itemizedlist spacing="compact">
-                    <listitem><para>RequestScoped - stateless</para></listitem>
-                    <listitem><para>ConversationScoped - state maintained across requests within a conversation boundary</para></listitem>
-                    <listitem><para>SessionScoped - state maintained for lifetime of user session</para></listitem>
-                    <listitem><para>ApplicationScoped - state maintained for life of application</para></listitem>
+                    <listitem><para>@RequestScoped - stateless</para></listitem>
+                    <listitem><para>@ConversationScoped - state maintained across requests within a conversation boundary</para></listitem>
+                    <listitem><para>@SessionScoped - state maintained for lifetime of user session</para></listitem>
+                    <listitem><para>@ApplicationScoped - state maintained for life of application</para></listitem>
                 </itemizedlist>
             </listitem>
         </itemizedlist>
-
+        
         <figure>
             <title>Example JSF Controller Bean</title>
-<programlisting language="java"><![CDATA[@Named("sellerController") //named used by the JSF page to access properties and actions
-                           //#{sellerController.xxx}
+<programlisting language="java"><![CDATA[@Named("sellerController") //named used by the JSF page to access properties and actions                           
 @ConversationScoped        //controls lifespan of instance
-public class SellerController implements Serializable {  
+public class SellerController implements Serializable { //#{sellerController.xxx} 
 ]]></programlisting>
         </figure>
         <itemizedlist spacing="compact">
@@ -41,40 +44,39 @@ public class SellerController implements Serializable {
         <figure>
             <title>Controller Bean Example Business Data State</title>
 <programlisting language="java"><![CDATA[    private Product product;]]></programlisting>
-<programlisting language="java"><![CDATA[    public Product getProduct() { return product; }
-    public void setProduct(Product product) {
-        logger.debug("setProduct({})", product);
+<programlisting language="java"><![CDATA[    public Product getProduct() { return product; } //value="#{sellerController.product.name}
+    public void setProduct(Product product) { //value="#{sellerController.product.name}
         this.product = product;
     }]]></programlisting>
 <programlisting language="xml"><![CDATA[<h:inputText value="#{sellerController.product.name}" required="true"/>]]></programlisting>
     
         </figure>
         <itemizedlist spacing="compact">
-            <listitem><para>Page refers to @Name.property and accesses using associated methods (getProperty() and setName() in this case)</para></listitem>
+            <listitem><para>Page refers to @Name.property and accesses using associated methods (SellerController.getProperty() and Product.setName() in this case)</para></listitem>
             <listitem><para>Controller holds this state until action called</para></listitem>
         </itemizedlist>
 
 
         <figure>
             <title>Controller Bean Example Action</title>
-<programlisting language="java"><![CDATA[    public String addNew() {
+<programlisting language="java"><![CDATA[    public String addNew() { //action="#{sellerController.addNew}"
         this.product = new Product(); //create a new Product instance
-        return null;                  
+        return null; //for navigation                 
     }
-    public String add() {
+    public String add() { //action="#{sellerController.add}"
         products.add(product);
-        return "/seller/seller-products";
+        return "/seller/seller-products"; //for navigation
     }    
-    public String save() {
+    public String save() { //action="#{sellerController.save}"
         product.setSeller(user.getMember());
         try {
             product = catalog.addProduct(product);
             Collections.sort(products, new Product.ProductASC());
-            return null;
+            return null;    //for navigation
         } catch (InvalidProduct ex) {
             error.setError("error saving product:" + product);
             error.setException(ex);
-            return "error";
+            return "error"; //for navigation
         }
     }]]></programlisting>
 <programlisting language="xml"><![CDATA[    <h:commandButton ... 
@@ -95,72 +97,368 @@ public class SellerController implements Serializable {
         </itemizedlist>
 
         <figure>
-            <title>Controller Bean Business Resources</title>
-<programlisting language=""><![CDATA[    @Inject @Tx //back-end business logic that can manage products
+            <title>JSF Basic Flow</title>
+            <graphic scalefit="1" fileref="images/webtier-jsf-flow.png"/>
+        </figure>
+
+        <figure>
+            <title>Controller Bean Back-end Business Resources</title>
+<programlisting language="java"><![CDATA[public class SellerController implements Serializable {
+...
+    @Inject @Tx //back-end business logic that can manage products
     private ProductCatalog catalog;
 
     @Inject //place to stash errors to be displayed
     private ErrorController error;]]></programlisting>
         </figure>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Useful in interacting with back-end resources and other page controllers</para></listitem>
+            <listitem><para>ProductCatalog is a Java business interface that is implemented by a DAO and EJB.</para></listitem>
+            <listitem><para>@Inject tells the provider to inject an implementation that matches the specified type</para></listitem>
+            <listitem><para>@Tx is defined within the application to further qualify which provider of the ProductCatalog interface is used</para></listitem>
+            <listitem><para>ErrorController is a sibling PageController for crudely displaying error messages and stack traces</para></listitem>
         </itemizedlist>
 
         <figure>
-            <title></title>
-<programlisting language=""><![CDATA[
-]]></programlisting>
+            <title>Example Error Controller Bean</title>
+<programlisting language="java"><![CDATA[@Named("errorController") // #{errorController.xxx}
+@SessionScoped
+public class ErrorController implements Serializable { 
+    private String error;
+    private Exception exception;
+        
+    public String getError() { return error; } // #{errorController.error}
+    public void setError(String error) {
+        this.error = error;
+    }    
+    public String getStackTrace() { // #{errorController.stackTrace}
+        if (exception != null) {
+            StringWriter sw = new StringWriter();
+            exception.printStackTrace(new PrintWriter(sw));
+            return sw.toString();
+        } else {
+            return null;
+        }
+    }
+    public void setException(Exception exception) {
+        this.exception = exception;
+    }
+}]]></programlisting>
         </figure>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Simple example contains business data state and data access methods</para></listitem>
+        </itemizedlist>       
+    </section>
+
+
+
+
+    <section id="webtier-jsf-page">
+        <title>JSF Page</title>
+        <para>Many mark-up languages can be used (e.g., JSP, XHTML, etc.)</para>
+
+        <figure>
+            <title>Example XHTML Error Page</title>
+<programlisting language="xml"><![CDATA[<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+<h:head>
+    <title>Error Page</title>
+</h:head>
+<h:body>
+    <h2>Error: #{errorController.error}</h2>
+    <p>
+        #{errorController.stackTrace}
+    </p>
+    <h:link value="Home" outcome="/index" />
+</h:body>
+</html>]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Page uses XHTML markup -- must be a legacy XML document</para></listitem>
+            <listitem><para>Page uses JSF types <code>xmlns:h="http://xmlns.jcp.org/jsf/html"</code> to interact with framework and controller bean</para></listitem>
         </itemizedlist>
 
         <figure>
-            <title></title>
-<programlisting language=""><![CDATA[
-]]></programlisting>
+            <title>Example Seller Page Display</title>
+            <graphic scalefit="1" fileref="images/webtier-jsf-cdisales.png"/>
+        </figure>
+
+
+        <figure>
+            <title>Outer Page Structure</title>
+<programlisting language="xml"><![CDATA[<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+<h:head>
+    <title>Sell Products (#{sellerController.seller.name})</title>
+</h:head>
+<h:body>
+    <h3>Sell Products (#{sellerController.seller.name})</h3>
+</h:body>
+</html>]]></programlisting>
         </figure>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Standard html begin/end tags and basic HTML document formatting</para></listitem>
+            <listitem><para>JSF provides replacement h:head and h:body tags</para></listitem>
         </itemizedlist>
-   
-   
-       
+
+        <figure>
+            <title>Example Form</title>
+<programlisting language="xml"><![CDATA[<h:form binding="#{sellerController.form}">
+    <h:outputText value="Category"/>
+    <h:selectOneMenu value="#{sellerController.product.category}" required="true">
+        <f:selectItems value="#{sellerController.categories}"/>
+    </h:selectOneMenu>
+    
+    <h:outputText value="Name"/>
+    <h:inputText value="#{sellerController.product.name}" required="true"/>
+    
+    <h:outputText value="Year"/>
+    <h:inputText value="#{sellerController.product.year}"/>
+    
+    <h:outputText value="Price"/>
+    <h:inputText value="#{sellerController.product.price}"/>
+    
+    <p></p>
+    <h:commandButton value="Add Product" action="#{sellerController.add}"/>
+</h:form>]]></programlisting>
+<programlisting language="java"><![CDATA[public class SellerController implements Serializable {
+    private UIForm form;]]></programlisting>
+<programlisting language="java"><![CDATA[    public UIForm getForm() {  return form;  } //binding="#{sellerController.form}"
+    public void setForm(UIForm form) { //binding="#{sellerController.form}"
+        this.form = form;
+    }]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Form bound to <code>UIForm</code> instance supplied by provider. Permits controller bean to manage page form.</para></listitem>
+            <listitem><para>Form will display the starting state of Product</para></listitem>
+            <listitem><para>Form will update the properties of Product</para></listitem>
+            <listitem><para>commandButton registered to action method in controller</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Example Choice List</title>
+<programlisting language="xml"><![CDATA[    <h:selectOneMenu value="#{sellerController.product.category}" required="true">
+        <f:selectItems value="#{sellerController.categories}"/>
+    </h:selectOneMenu>]]></programlisting>    
+    
+<programlisting language="java"><![CDATA[    public List<SelectItem> getCategories() {
+        List<SelectItem> list = new ArrayList<SelectItem>(ProductCategory.values().length);
+        for (ProductCategory pc: ProductCategory.values()) {
+            list.add(new SelectItem(pc, pc.getPrettyName()));
+        }
+        return list;
+    }]]></programlisting>
+
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>selectMenu calls <code>getCategories()</code> to obtain choice list</para></listitem>
+            <listitem><para>selectMenu will store that value in <code>SellerController.getProduct().setCatagory()</code></para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Example commandButton</title>
+<programlisting language="xml"><![CDATA[<h:commandButton value="Add Product" action="#{sellerController.add}"/>]]></programlisting>
+<programlisting language="java"><![CDATA[    private UIForm form;
+    private UICommand addCommand;]]></programlisting>
+    
+<programlisting language="java"><![CDATA[    public String add() {
+        products.add(product);
+        Collections.sort(products, new Product.ProductASC());
+        form.setRendered(false);
+        addCommand.setRendered(true);
+        return "/seller/seller-products";
+    }]]></programlisting>
+
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>commandButton calls <code>SellerController.add()</code> action</para></listitem>
+            <listitem><para>SellerController.add() action acts on the state and provides a navigation result</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Example Table with Row Actions</title>
+<programlisting language="xml"><![CDATA[    <h:form>
+     <h:dataTable value="#{sellerController.products}" var="p">
+...         
+            <h:column>
+                <f:facet name="header">
+                    <h:column>
+                        <h:outputText value="Name"></h:outputText>
+                    </h:column>
+                </f:facet>
+                <h:outputText value="#{p.name}"/>
+            </h:column>
+...         
+         <h:column>
+             <f:facet name="header">
+                 <h:column>
+                     <h:outputText value="Actions"></h:outputText>
+                 </h:column>
+             </f:facet>
+             <h:panelGrid columns="2">
+                 <h:commandButton value="save" action="#{sellerController.save}">
+                     <f:setPropertyActionListener 
+                         target="#{sellerController.product}" 
+                         value="#{p}"/>
+                 </h:commandButton>
+             </h:panelGrid>
+         </h:column>
+     </h:dataTable>
+    </h:form>]]></programlisting>
+    
+<programlisting language="java"><![CDATA[    public String save() {
+        product.setSeller(user.getMember());
+        product = catalog.addProduct(product);  //EJB call
+        Collections.sort(products, new Product.ProductASC());
+        return null;
+    }]]></programlisting>    
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Table displays column and row data</para></listitem>
+            <listitem><para>Example shows columns for each property of the product</para></listitem>
+            <listitem><para>Example adds commandButton to each row to control actions with back-end</para></listitem>
+        </itemizedlist>
     </section>
 
-    <section id="webtier-chapter-1">
-        <title></title>
-        <para></para>
-<programlisting language=""><![CDATA[
-        ]]></programlisting>
-    </section>
+    <section id="webtier-jsf-jsf-structure">
+        <title>WAR Structure and Descriptors</title>
+        
+        <figure>
+            <title></title>
+<programlisting language=""><![CDATA[target/cdisales-war
+|-- index.xhtml
+|-- seller
+|   `-- seller-products.xhtml
+`-- WEB-INF
+    |-- beans.xml
+    |-- classes
+    |-- content
+    |   `-- error.xhtml
+    |-- faces-config.xml
+    |-- lib
+    `-- web.xml]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>index.xhtml and seller-products.xhtml meant to be bookmarked and called at any time -- please in public web space</para></listitem>
+            <listitem><para>error.xhtml meant to be navigated to from other controllers. Placed in non-public WEB-INF directory</para></listitem>
+            <listitem><para>faces-config.xml can be used for navigation flow and pre-dates @Annotations</para></listitem>
+            <listitem><para>beans.xml enables CDI processing</para></listitem>
+        </itemizedlist>
 
-    <section id="webtier-chapter-2">
-        <title></title>
-        <para></para>
-<programlisting language=""><![CDATA[
-        ]]></programlisting>
-    </section>
+        <figure>
+            <title>Example JSF web.xml</title>
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns="http://xmlns.jcp.org/xml/ns/javaee" 
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" 
+    version="3.1">
+    
+  <context-param>
+    <param-name>javax.faces.PROJECT_STAGE</param-name>
+    <param-value>Development</param-value>
+  </context-param>
 
-    <section id="webtier-chapter-3">
-        <title></title>
-        <para></para>
-<programlisting language=""><![CDATA[
-        ]]></programlisting>
-    </section>
+  <session-config>
+    <session-timeout>30</session-timeout>
+  </session-config>
 
+  <servlet>
+    <servlet-name>Faces Servlet</servlet-name>
+    <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Faces Servlet</servlet-name>
+    <url-pattern>*.xhtml</url-pattern>
+  </servlet-mapping>
+
+  <welcome-file-list>
+    <welcome-file>index.xhtml</welcome-file>
+  </welcome-file-list>
+</web-app>]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para><code>FacesServlet</code> declared to process all JSF pages</para></listitem>
+            <listitem><para>PROJECT_STAGE=Development enables extra debug in output</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Example welcome-file</title>
+<programlisting language="xml"><![CDATA[<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+<h:head>
+    <title>CDI Sales</title>
+</h:head>
+<h:body>
+        <h2>CDI Sales Main Menu</h2>
+       <ul>
+           <li><h:link value="Sell Products" outcome="seller/seller-products"/></li>
+       </ul>
+   </h:body>
+</html>]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Provides a top level entry page</para></listitem>
+            <listitem><para>Example provides link(s) to more detailed pages</para></listitem>
+            <listitem><para>This and follow-on pages may or may not reference a controller</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Example faces-config.xml</title>
+<programlisting language="xml"><![CDATA[<?xml version="1.0"?>
+<faces-config
+    xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+    http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_2.xsd"
+    version="2.2">
+
+    <navigation-rule>
+        <from-view-id>/seller/seller-products.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>error</from-outcome>
+            <to-view-id>/WEB-INF/content/error.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+</faces-config>]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Any <code>"error"</code> output from seller-products will navigate to error page</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Example (empty) beans.xml</title>
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<beans bean-discovery-mode="all" version="1.1"
+     xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+     xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/beans_1_1.xsd">
+
+</beans>]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>CDI activated when file exists (blank, empty, or populated)</para></listitem>
+        </itemizedlist>
+        
+    </section>
+    
     <section id="webtier-summary">
         <title>Summary</title>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Much richer framework than simple Servlets and JSPs (and this intro only scratched surface)</para></listitem>
+            <listitem><para>Provides a good example for integrating EJBs with Web-UIs</para></listitem>
+            <listitem><para>Provides a good example to show basic configuration capabilities for CDI</para></listitem>
         </itemizedlist>
     </section>
 

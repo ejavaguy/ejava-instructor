@@ -19,5 +19,6 @@
     <modules>
         <module>enc-config-notes</module>
         <module>enc-config-lab</module>
+        <module>cdi-config-notes</module>
     </modules>
 </project>

@@ -17,17 +17,17 @@
             </para>
         </abstract>
     </bookinfo>
-    <preface id="ejb-jaxrs-purpose">
+    <preface id="webtier-purpose">
         <title>Purpose</title>
 
-        <section id="ejb-jaxrs-goals">
+        <section id="webtier-goals">
             <title>Goals</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Build a basic, web-based user-front end to integrate with service tier</para></listitem>
             </itemizedlist>
         </section>
 
-        <section id="ejb-jaxrs-objectives">
+        <section id="webtier-objectives">
             <title>Objectives</title>
             <para>At the completion of this topic, the student shall</para>
             <itemizedlist spacing="compact">
