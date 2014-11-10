@@ -7,18 +7,19 @@
         <version>4.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>ejb-config</artifactId>
+    <artifactId>ejb-web</artifactId>
     <packaging>pom</packaging>
 
-    <name>EJB::EJB Configuration</name>
+    <name>EJB::WEB</name>
     <description>
-        This project provides the home for configuring EJBs with 
-        resources.
+        This project provides information related to using EJB's in web environments.
     </description>
 
     <modules>
-        <module>enc-config-notes</module>
-        <module>enc-config-lab</module>
-        <module>cdi-config-notes</module>
+        <module>webtier-notes</module>
+        <!--
+        <module>cdi-notes</module>
+        -->
+        <module>ejb-jaxrs-notes</module>
     </modules>
 </project>

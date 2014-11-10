@@ -1,0 +1,152 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="cdi-config-injection">
+    <title>CDI Injection</title>
+
+    <section id="cdi-config-injection-pfield">
+        <title>Producer Field</title>
+<programlisting language="java"><![CDATA[	public class SchedulerResources {
+	    @PersistenceContext(unitName="jndidemo")-->-+
+	    @Produces                                   |
+	    @JndiDemo                                   |
+ +-<----public EntityManager em; <------------------+
+ |	
+ |	@Stateless
+ |	public class TrainSchedulerEJB 
+ |	    extends SchedulerBase implements TrainSchedulerRemote {
+ |	    
+ |      @Inject @JndiDemo
+ `----->private EntityManager em;]]></programlisting>
+        <itemizedlist spacing="compact">
+            <listitem><para>Public field used as injection source</para></listitem>
+            <listitem><para>Useful when no behavior is required</para></listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="cdi-config-injection-pmethod">
+        <title>Producer Method</title>
+<programlisting language="java"><![CDATA[	public class DAOFactory {
+	    @PersistenceContext(unitName="ejbcdi-sales")
+	    @Produces
+	    public EntityManager em;
+	    
+	    @Produces
+	    @Dependent
+ +-<----public UserMgmtDAO getUserMgmtDAO(EntityManager em, Validator validator) {
+ |	        UserMgmtDAO dao = new UserMgmtDAO();
+ |	        dao.setEntityManager(em);
+ |	        dao.setValidator(validator);
+ |	        return dao;
+ |	    }
+ |	
+ |	@Stateless
+ |	public class UserMgmtEJB implements UserMgmtLocal {
+ |	    @Inject
+ `----->private UserMgmtDAO dao;]]></programlisting>
+        
+        <itemizedlist spacing="compact">
+            <listitem><para>Injection type was not ambiguous - no @Qualifier required</para></listitem>
+            <listitem><para>Method called by container</para></listitem>
+            <listitem><para>Method declares parameters for what it needs to build product</para></listitem>
+            <listitem><para>Method parameters automatically injected</para></listitem>
+            <listitem><para>@Dependent allows injection point to determine scope for the bean (e.g., request, session, etc.)</para></listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="cdi-config-injection-lookup">
+        <title>Other Producers</title>
+        
+        <figure>
+            <title>JNDI Resource Lookup</title>
+<programlisting language="java"><![CDATA[    @Resource(lookup="java:jboss/datasources/ExampleDS")
+    @Produces
+    @JndiDemo
+    public DataSource ds;]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Injection source populated from a JNDI lookup</para></listitem>
+        </itemizedlist>                   
+        
+        <figure>
+            <title>String Resource</title>
+<programlisting language="java"><![CDATA[    @Produces
+    @JndiDemo
+    public String message="Hello CDI!!!";]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Injection source populated from hard coded value. Could be changed to method.</para></listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="cdi-config-injection-any">
+        <title>@Any Instance</title>
+<programlisting language="java"><![CDATA[	    @EJB(lookup="java:app/jndiDemoEJB/CookEJB!ejava.examples.jndidemo.ejb.CookLocal")
+	    @Produces                                            |
+	    @Cook                                                |
+ +---<--public Scheduler cook; <-----------------------------+
+ |	
+ |	@Stateless
+ |	public class TrainSchedulerEJB 
+ |	    @Inject @Any
+ `----> protected Instance<Scheduler> anyCook;
+	    protected Scheduler cook2;      |
+	                +-------------------+
+                    v 
+        cook2 = anyCook.select(new CookQualifier()).get();]]></programlisting>
+<programlisting language="java"><![CDATA[public class CookQualifier extends javax.enterprise.util.AnnotationLiteral<Cook>{}]]></programlisting>
+        <itemizedlist spacing="compact">
+            <listitem><para>Allows bean to hold onto all implementations of type</para></listitem>
+            <listitem><para>Bean can select from different implementations at runtime</para></listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="cdi-config-injection-beantypes">
+        <title>Bean Types</title>
+<programlisting language="java"><![CDATA[@Named
+public class JPASchedulerDAOImpl extends JPADAOBase<Task> implements SchedulerDAO {]]></programlisting>        
+        <itemizedlist spacing="compact">
+            <listitem><para>Assignable to four (4) different types</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>JPASchedulerDAOImpl</para></listitem>
+                    <listitem><para>JPADAOBase&lt;Task&gt;</para></listitem>
+                    <listitem><para>SchedulerDAO</para></listitem>
+                    <listitem><para>java.lang.Object</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+                           
+<programlisting language="java"><![CDATA[@Typed({SchedulerDAO.class, JPASchedulerDAOImpl.class})
+public class JPASchedulerDAOImpl extends JPADAOBase<Task> implements SchedulerDAO {]]></programlisting>        
+        <itemizedlist spacing="compact">
+            <listitem><para>@Type reduces number of types allowed</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>JPASchedulerDAOImpl</para></listitem>
+                    <listitem><para>SchedulerDAO</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="cdi-config-injection-named">
+        <title>Named Beans</title>
+<programlisting language="java"><![CDATA[@Named("sellerController")
+@ConversationScoped
+public class SellerController implements Serializable {]]></programlisting>
+<programlisting language="xml"><![CDATA[<h3>Sell Products (#{sellerController.seller.name})</h3>]]></programlisting>
+        <itemizedlist spacing="compact">
+            <listitem><para>Used for document expression languages to reference intended bean</para></listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="cdi-config-injection-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Producer Fields</para></listitem>
+            <listitem><para>Producer Methods</para></listitem>
+            <listitem><para>Produver Sources</para></listitem>
+        </itemizedlist>                   
+    </section>
+
+</chapter>
+  

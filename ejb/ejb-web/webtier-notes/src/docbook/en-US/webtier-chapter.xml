@@ -1,0 +1,29 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="webtier-chapter">
+    <title></title>
+    <itemizedlist spacing="compact">
+        <listitem><para></para></listitem>
+        <listitem><para></para></listitem>
+        <listitem><para></para></listitem>
+    </itemizedlist>
+
+    <section id="webtier-chapter-">
+        <title></title>
+        <para></para>
+<programlisting language=""><![CDATA[
+        ]]></programlisting>
+    </section>
+
+    <section id="webtier-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>
+
+</chapter>
+  

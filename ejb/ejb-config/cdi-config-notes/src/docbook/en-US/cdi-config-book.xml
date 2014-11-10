@@ -1,0 +1,60 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="cdi-config">
+    <bookinfo>
+        <title>Context and Dependency Injection (CDI)</title>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>This presentation contains topics related to configuring EJB and other
+                JavaEE-deployed beans using Context and Dependency Injection (CDI).
+            </para>
+        </abstract>
+    </bookinfo>
+    <preface id="cdi-config-purpose">
+        <title>Purpose</title>
+
+        <section id="cdi-config-goals">
+            <title>Goals</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Java standards</para></listitem>
+                <listitem><para>Injection Targets</para></listitem>
+                <listitem><para>Injection Sources</para></listitem>
+                <listitem><para>Injection Qualifiers</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="cdi-config-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>have more understanding of:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>What parts of injection is portable across JavaEE and other frameworks</para></listitem>
+                        <listitem><para>How to wire-up a JavaEE application using CDI</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>be able to:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Define injection points</para></listitem>
+                        <listitem><para>Define injection sources</para></listitem>
+                        <listitem><para>Define injection qualifiers</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+    </preface>
+
+    <toc/>
+
+    <xi:include href="cdi-config-background.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="cdi-config-injection.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <!-- 
+    <xi:include href="cdi-config-contexts.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+     -->
+</book>

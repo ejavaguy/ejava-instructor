@@ -1,0 +1,190 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="cdi-config-background">
+    <title>Context and Dependency Injection (CDI) JSR-299</title>
+
+    <section id="cdi-config-background-history">
+        <title>History</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>JSR-299 (CDI 1.0), JSR-346 (CDI 1.1)</para></listitem>
+            <listitem><para>Started as "Web Beans"</para></listitem>
+            <listitem><para>Derived from <ulink url="http://seamframework.org/">"Seam"</ulink></para></listitem>
+            <listitem><para>Original draft conflicted with Google and Spring JSR submission</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>JSR-330 (Java Injection)</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Approved version refactored to account for JSR-330</para></listitem>
+        </itemizedlist>                   
+    </section>
+
+
+    <section id="cdi-config-background-concept">
+        <title>Injection Concept</title>
+        
+        <figure>
+            <title>Beans</title>
+<programlisting language="java"><![CDATA[@Named
+public class JPASchedulerDAOImpl extends JPADAOBase<Task> implements SchedulerDAO {
+]]></programlisting>            
+<programlisting language="java"><![CDATA[@Stateless
+public class CookEJB extends SchedulerBase implements CookLocal {
+]]></programlisting>            
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Beans can be simple POJOs, EJBs, Servlets, etc.</para></listitem>
+            <listitem><para>CDI Beans generalize behavior provided by larger frameworks</para></listitem>
+        </itemizedlist>
+        
+        <figure>
+            <title>Injection</title>
+<programlisting language="java"><![CDATA[@Inject
+protected Scheduler cook; ]]></programlisting>            
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Type-safe, Java-based container injection</para></listitem>
+            <listitem><para>Container will match injection point with managed bean of requested type</para></listitem>
+            <listitem><para>Error if container finds multiple classes satisfying requested type</para></listitem>
+        </itemizedlist>
+        
+        <figure>
+            <title>Qualifiers and Qualified Injection</title>
+<programlisting language="java"><![CDATA[@Inject @Cook
+protected Scheduler cook; ]]></programlisting>            
+<programlisting language="java"><![CDATA[@Stateless
+@Cook
+public class CookEJB extends SchedulerBase implements CookLocal {]]></programlisting>            
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>@Annotation qualifier specializes injection type to remove ambiguity</para></listitem>
+        </itemizedlist>
+        
+        <figure>
+            <title>Qualifier Annotations</title>
+<programlisting language="java"><![CDATA[package ejava.examples.jndidemo;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import static java.lang.annotation.RetentionPolicy.*;
+import static java.lang.annotation.ElementType.*;
+import javax.inject.Qualifier;
+
+@Qualifier
+@Retention(RUNTIME)
+@Target({METHOD, FIELD, PARAMETER, TYPE})
+public @interface Cook {
+}]]></programlisting>            
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>java.lang.annoation</para>
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>@Retention</filename></term>
+                        <listitem><para>how long the class is retained (default=CLASS)</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>RententionPolict</filename></term>
+                        <listitem><para></para>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>CLASS - annotation recorded in class file but not available at runtime</para></listitem>
+                                <listitem><para>RUNTIME - annotation recorded in class and available at runtime</para></listitem>
+                                <listitem><para>SOURCE - annotation discarded by compiler</para></listitem>
+                            </itemizedlist>                
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>@Target</filename></term>
+                        <listitem><para>kind of Java construct the annotation applies to</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>ElementType</filename></term>
+                        <listitem><para></para>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>TYPE</para></listitem>
+                                <listitem><para>FIELD</para></listitem>
+                                <listitem><para>METHOD</para></listitem>
+                                <listitem><para>PARAMETER</para></listitem>
+                                <listitem><para>(more)</para></listitem>
+                            </itemizedlist>                
+                        </listitem>
+                    </varlistentry>
+                </variablelist>
+            </listitem>
+            <listitem><para>javax.inject (JSR-330)</para>
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>@Inject</filename></term>
+                        <listitem><para>an injection target</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>@Named</filename></term>
+                        <listitem><para>string qualifier (for JSPs, etc. to reference bean using text)</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>@Qualifier</filename></term>
+                        <listitem><para>identifies qualifier annotations</para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </listitem>
+            <listitem><para>javax.enterprise.inject (JSR-299)</para>
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>@Produces</filename></term>
+                        <listitem><para>an injection source</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>@Any</filename></term>
+                        <listitem><para>no qualifiers</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>Instance&lt;Bean&gt;</filename></term>
+                        <listitem><para>runtime source of type Bean</para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </listitem>
+        </itemizedlist>
+    </section>
+    
+    <section id="cdi-config-background-beans">
+        <title>CDI Activation</title>
+        
+        <para>Activated when beans.xml is located in appropriate location</para>
+        <itemizedlist spacing="compact">
+            <listitem><para>META-INF/beans.xml for EJBs and regular JARs</para></listitem>
+            <listitem><para>WEB-INF/beans.xml for WARs</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>beans.xml</title>
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<beans bean-discovery-mode="all" version="1.1"
+     xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+     xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/beans_1_1.xsd">
+   <scan>
+      <exclude name="info.ejava.examples.ejb.cdisales.dao.UserMgmtDAO"/>
+   </scan>
+</beans>]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Can be blank or empty</para></listitem>
+            <listitem><para>Example shows XML alternative to using @Veto - which makes a bean unavailable for injection</para></listitem>
+        </itemizedlist>
+
+
+    </section>
+
+    <section id="cdi-config-background-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>JSR-330 is common to both JavaEE, Spring, and Google frameworks</para></listitem>
+            <listitem><para>JSR-299 (CDI) is JavaEE's answer to Spring injection (but purposely lacks XML)</para></listitem>
+            <listitem><para>Beans and more POJO than EJB and Servlet POJOs</para></listitem>
+            <listitem><para>Injection by Type</para></listitem>
+            <listitem><para>Qualifiers resolve ambiguities</para></listitem>
+        </itemizedlist>                   
+    </section>
+
+</chapter>
+  
