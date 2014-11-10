@@ -93,10 +93,13 @@
             <row rowsep="1">
                 <entry namest="session">4</entry>
                 <entry namest="date">Dec03</entry>
-                <entry namest="topic"><para>Web-Tier Integration with Contexts and Dependency Injection (CDI)</para></entry>
+                <entry namest="topic"><para><link linkend="webtier">Web-Tier Integration with CDI</link></para></entry>
             </row>
             <row rowsep="1">
-                <entry namest="topic"><para><link linkend="webejb">Web-enabled EJBs with JAX-RS</link></para></entry>
+                <entry namest="topic"><para><link linkend="cdi-config">CDI Configuration</link></para></entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic"><para><link linkend="ejb-jaxrs">Web-enabled EJBs with JAX-RS</link></para></entry>
             </row>
 
 

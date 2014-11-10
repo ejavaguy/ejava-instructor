@@ -17,7 +17,7 @@
     
     <properties>
        <doc.base>ejb-notes-book</doc.base>
-       <content.version>v2014-11-03</content.version>
+       <content.version>v2014-11-10</content.version>
 
        <docProfile>ejb-style</docProfile>
        <copyright.holder>jim stafford (ejavaguy@gmail.com)</copyright.holder>
@@ -75,7 +75,19 @@
         </dependency>
         <dependency>
             <groupId>info.ejava.docs.ejb</groupId>
-            <artifactId>webejb-notes</artifactId>
+            <artifactId>webtier-notes</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+        <dependency>
+            <groupId>info.ejava.docs.ejb</groupId>
+            <artifactId>cdi-config-notes</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+        <dependency>
+            <groupId>info.ejava.docs.ejb</groupId>
+            <artifactId>ejb-jaxrs-notes</artifactId>
             <version>${project.version}</version>
             <classifier>docsrc</classifier>
         </dependency>
