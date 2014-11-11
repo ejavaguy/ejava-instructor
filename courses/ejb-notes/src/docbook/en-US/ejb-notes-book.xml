@@ -29,9 +29,8 @@
         </abstract>
     </bookinfo>
     <xi:include href="ejb-syllabus-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="javaee-intro-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="devenv-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="ejb-intro-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="javaeeejb-intro-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-basic-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-dev-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="enc-config-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />

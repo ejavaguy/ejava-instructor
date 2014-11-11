@@ -32,12 +32,6 @@
         </dependency>
         <dependency>
             <groupId>info.ejava.docs.intro</groupId>
-            <artifactId>javaee-intro-notes</artifactId>
-            <version>${project.version}</version>
-            <classifier>docsrc</classifier>
-        </dependency>
-        <dependency>
-            <groupId>info.ejava.docs.intro</groupId>
             <artifactId>devenv-docbook</artifactId>
             <version>${project.version}</version>
             <classifier>docsrc</classifier>
@@ -45,7 +39,7 @@
 
         <dependency>
             <groupId>info.ejava.docs.ejb</groupId>
-            <artifactId>ejb-intro-notes</artifactId>
+            <artifactId>javaeeejb-intro-notes</artifactId>
             <version>${project.version}</version>
             <classifier>docsrc</classifier>
         </dependency>

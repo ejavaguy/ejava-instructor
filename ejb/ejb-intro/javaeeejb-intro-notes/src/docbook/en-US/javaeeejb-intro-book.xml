@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
     "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
-<book id="javaee-intro">
+<book id="javaeeejb-intro">
     <bookinfo>
         <title>JavaEE/EJB Intro</title>
         <subtitle></subtitle>
@@ -19,7 +19,7 @@
         </abstract>
     </bookinfo>
     
-    <preface id="javaeeintro-purpose">
+    <preface id="javaeeejbintro-purpose">
         <title>Purpose</title>
         <section id="javaeeintro-purpose-goals">
             <title>Goals</title>
@@ -31,7 +31,7 @@
             </itemizedlist>
         </section>
 
-        <section id="javaeeintro-purpose-objectives">
+        <section id="javaeeejbintro-purpose-objectives">
             <title>Objectives</title>
             <para>At the completion of this topic, the student shall be able to:</para>
             <itemizedlist spacing="compact">
@@ -50,7 +50,7 @@
     <xi:include href="javaee-intro-javaee-versions.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-intro-ejb.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 
-    <chapter id="javaeeintro-summary">
+    <chapter id="javaeeejbintro-summary">
         <title>Summary</title>
         <itemizedlist spacing="compact">
             <listitem><para>Made a technical case for JavaEE and EJB</para></listitem>
@@ -61,7 +61,7 @@
         </itemizedlist>
 	</chapter>
     
-    <appendix id="javaeeintro-sources">
+    <appendix id="javaeeejbintro-sources">
         <title>Sources</title>
         <orderedlist>
             <listitem><para>

@@ -20,9 +20,5 @@
         <module>jhu784-syllabus</module>
         <module>jhu784-notes</module>
         <module>jhu784-lab</module>
-
-        <module>ejb-syllabus</module>
-        <module>ejb-notes</module>
-        <module>ejb-lab</module>
     </modules>
 </project>
