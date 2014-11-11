@@ -1,0 +1,11 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="javaee-security-acp">
+    <title>JavaEE Security Access Control Points</title>
+    <figure>
+       <title>JavaEE Security Access Control Points</title>
+       <graphic scalefit="1" fileref="images/javaee-security-access-control-points.png"/>
+    </figure>
+</chapter>
+  
