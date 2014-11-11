@@ -17,6 +17,7 @@
 
     <modules>
         <module>ejb-intro-notes</module>
+        <module>javaeeejb-intro-notes</module>
         <module>ejb-basic-notes</module>
         <module>ejb-dev-notes</module>
         <module>ejb-basic-lab</module>

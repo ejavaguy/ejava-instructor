@@ -1,0 +1,83 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="javaee-intro">
+    <bookinfo>
+        <title>JavaEE/EJB Intro</title>
+        <subtitle></subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>
+                This presentation introduces the Java Enterprise Edition (JavaEE) enterprise framework and
+                its associated API standards with a focus on Enterprise JavaBeans (EJB).
+            </para>
+        </abstract>
+    </bookinfo>
+    
+    <preface id="javaeeintro-purpose">
+        <title>Purpose</title>
+        <section id="javaeeintro-purpose-goals">
+            <title>Goals</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Understand the purpose of enterprise applications</para></listitem>
+                <listitem><para>Understand the role of a container</para></listitem>
+                <listitem><para>Introduce the overall architecture for JavaEE</para></listitem>
+                <listitem><para>Introduce the standards contained within the JavaEE framework</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="javaeeintro-purpose-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall be able to:</para>
+            <itemizedlist spacing="compact">
+                    <listitem><para>Identity characteristics of enterprise applications</para></listitem>
+                    <listitem><para>Identify the difference between a JavaEE API, JavaEE provider, and a JavaEE module</para></listitem>
+                    <listitem><para>Identify the different container types for JavaEE</para></listitem>
+                    <listitem><para>Identify the standards that make up a JavaEE</para></listitem>
+            </itemizedlist>
+        </section>
+    </preface>
+
+    <xi:include href="javaee-intro-java-levels.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="javaee-intro-why.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="javaee-intro-javaee-arch.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="javaeeejb-intro-javaee-specs.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="javaee-intro-javaee-versions.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-intro-ejb.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+    <chapter id="javaeeintro-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Made a technical case for JavaEE and EJB</para></listitem>
+            <listitem><para>Described an envolution of EJB</para></listitem>
+            <listitem><para>Showed where EJB fits within the JavaEE Specs</para></listitem>
+            <listitem><para>Introduced 4 types of EJBs</para></listitem>
+            <listitem><para>Introduced 3 EJB deployment types</para></listitem>
+        </itemizedlist>
+	</chapter>
+    
+    <appendix id="javaeeintro-sources">
+        <title>Sources</title>
+        <orderedlist>
+            <listitem><para>
+                <emphasis>"Java Platform, Enterprise Edition 7 Specification (JSR-342 Final Release)"</emphasis>,
+                Linda DeMichiel and Bill Shannon, 
+                <ulink url="https://jcp.org/aboutJava/communityprocess/final/jsr342/index.html">https://jcp.org/aboutJava/communityprocess/final/jsr342/index.html</ulink>,
+                2013 Oracle America, Inc.
+                </para>
+            </listitem>
+            <listitem><para>
+                <emphasis>"JavaEE Version History"</emphasis>,
+                Wikipedia, 
+                <ulink url="http://en.wikipedia.org/wiki/Java_EE_version_history">http://en.wikipedia.org/wiki/Java_EE_version_history</ulink>,
+                September 3. 2012.
+                </para>
+            </listitem>
+        </orderedlist>
+    </appendix>
+</book>

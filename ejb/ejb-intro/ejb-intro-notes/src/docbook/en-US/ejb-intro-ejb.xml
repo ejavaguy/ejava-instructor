@@ -116,26 +116,24 @@ public class Reservation {
                 <figure>
                     <title>Example Stateless EJB</title>
 <programlisting language="java"><![CDATA[@javax.ejb.Stateless
-public class HotelRegistrationEJB implements HotelRegistrationRemote,
-        HotelRegistrationLocal {
-    @javax.persistence.PersistenceContext(unitName="txhotel")
-    private javax.persistence.EntityManager em; 
-    @javax.annotation.Resource
-    private javax.ejb.SessionContext ctx;
-    private HotelReservationist reservationist;
-
-    @javax.annotation.PostConstruct
+public class HotelMgmtEJB implements HotelMgmtRemote, HotelMgmtLocal {
+    @PersistenceContext(unitName="ejbjpa-hotel")
+    private EntityManager em;
+    private HotelDAO dao;                                                                                                                                                                                                                                                                                                                                   
+    private HotelMgmt hotelMgmt; 
+    
+    @PostConstruct
     public void init() {
-        ReservationDAO dao = new JPAReservationDAO();
-        ((JPAReservationDAO)dao).setEntityManager(em);
-        reservationist = new HotelReservationImpl();
-        ((HotelReservationImpl)reservationist).setDao(dao);
-    }   
+        dao = new JPAHotelDAO();
+        ((JPAHotelDAO)dao).setEntityManager(em);
+        
+        hotelMgmt = new HotelMgmtImpl();
+        ((HotelMgmtImpl)hotelMgmt).setHotelDao(dao);
+    }
 
-    @javax.ejb.TransactionAttribute(javax.ejb.TransactionAttributeType.REQUIRED)
-    public Reservation createReservation(Person person, Date startDate,
-            Date endDate) throws HotelReservationException {
-        return reservationist.createReservation(person, startDate, endDate);
+    @Override
+    public Room getRoom(int number) {
+        return hotelMgmt.getRoom(number);
     }
 }]]></programlisting>                        
             </figure>
@@ -178,28 +176,55 @@ public class HotelRegistrationEJB implements HotelRegistrationRemote,
                 <figure>
                 <title>Example Stateful EJB</title>
 <programlisting language="java"><![CDATA[@javax.ejb.Stateful
-@javax.ejb.TransactionAttribute(javax.ejb.TransactionAttributeType.NOT_SUPPORTED)
-public class AgentReservationSessionEJB
-    implements AgentReservationSessionLocal, AgentReservationSessionRemote,
-            javax.ejb.SessionSynchronization {
-    private AgentReservationSession agentSession;
-...
-    public void addReservation(Person person, Date startDate, Date endDate)
-        throws AgentReservationException {
-        agentSession.addReservation(person, startDate, endDate);
+public class ReservationEJB implements ReservationRemote {
+    @PersistenceContext(unitName="ejbjpa-hotel", type=PersistenceContextType.EXTENDED)
+    private EntityManager em;
+    
+    @EJB
+    private HotelMgmtLocal hotelMgmt;
+    
+    @Resource
+    private SessionContext ctx;
+    
+    private List<Guest> guests = new LinkedList<Guest>();
+
+    @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+    public int addGuest(Guest guest) {
+        if (guest!=null) {
+            guests.add(guest);
+            em.persist(guest); //<== no transaction active yet
+        }
+        return guests.size();
     }
 
-    @javax.ejb.TransactionAttribute(javax.ejb.TransactionAttributeType.REQUIRED)
-    public Booking book() throws AgentReservationException {
-        return agentSession.book();
-    }
+    @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+    @Remove
+    public List<Guest> reserveRooms() throws RoomUnavailableExcepton {
+        List<Room> rooms = hotelMgmt.getAvailableRooms(null, 0, guests.size());
+        if (rooms.size() < guests.size()) {
+            //no rollback needed, we didn't do anything
+            throw new RoomUnavailableExcepton(String.format("found on %d out of %d required", 
+                    rooms.size(), guests.size()));
+        }
 
-    //transaction callbacks
-    public void afterBegin()  {
-    }
-    public void beforeCompletion() throws EJBException, RemoteException {
-    }
-    public void afterCompletion(boolean status)  {
+        //assign each one of them a room
+        List<Guest> completed = new ArrayList<Guest>(guests.size());
+        Iterator<Room> roomItr = rooms.iterator();
+        for (Guest guest: guests) {
+            Room room = roomItr.next();
+            try {
+                //the room could be unavailable -- depending on whether pessimistic lock created
+                guest = hotelMgmt.checkIn(guest, room); //<== will attempt to also persist guest
+                completed.add(guest);
+            } catch (RoomUnavailableExcepton ex) {
+                //rollback any previous reservations
+                ctx.setRollbackOnly();
+                throw ex;
+            }
+        }
+        return completed;
     }
 }]]></programlisting>                        
             </figure>
@@ -242,8 +267,7 @@ public class AgentReservationSessionEJB
                 </figure>
                 <figure>
                     <title>Example Singleton EJB</title>
-<programlisting language="java"><![CDATA[
-@javax.ejb.Singleton
+<programlisting language="java"><![CDATA[@javax.ejb.Singleton
 @javax.ejb.Startup
 @javax.ejb.ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)
 @javax.ejb.AccessTimeout(value=3000)
