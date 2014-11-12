@@ -1,0 +1,223 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="web-security">
+    <title>Web Tier Access Control</title>
+    <itemizedlist spacing="compact">
+        <listitem><para>Lock down access to web pages and commands</para></listitem>
+        <listitem><para>Identify user prior to EJB interaction</para></listitem>
+    </itemizedlist>
+
+    <section id="web-security-auth">
+        <title>Authentication</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>HTTP Basic Authentication</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>supported by HTTP protocol</para></listitem>
+                    <listitem><para>username/password-based</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>browser collects information from client</para></listitem>
+                            <listitem><para>authenticates user in a realm</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                    <listitem><para>not secure; passwords sent simple base64 encoding</para></listitem>
+                    <listitem><para>short-comings overcome by layering over SSL (HTTPS)</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Form-based Authentication</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>permits JSP/HTML forms to gather user info</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>HTTPS</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>encrypts communication channel</para></listitem>
+                    <listitem><para>based on public/private key</para></listitem>
+                    <listitem><para>hides all client/server exchange, including username/password info</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="web-security-constraints">
+        <title>Security Constraints (web.xml)</title>
+
+        <figure>
+            <title>Example Security Constraints</title>
+<programlisting language="xml"><![CDATA[<security-constraint>
+    <web-resource-collection>
+        <web-resource-name>admin-only</web-resource-name>
+        <url-pattern>/model/admin/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+        <role-name>admin</role-name>
+    </auth-constraint>
+    <user-data-constraint>
+        <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+    </user-data-constraint>
+</security-constraint>]]></programlisting>
+        </figure>
+            <itemizedlist spacing="compact">
+        <listitem><para>Anything accessed via specified url-pattern must have admin role-name</para></listitem>
+        <listitem><para>Communication must be encrypted (i.e., switch to HTTPS)</para></listitem>
+    </itemizedlist>
+
+
+        <figure>
+            <title>Example FORM-based Login</title>
+<programlisting language="xml"><![CDATA[<login-config>
+    <!--
+        <auth-method>BASIC</auth-method>
+    -->
+    <auth-method>FORM</auth-method>
+    <form-login-config>
+        <form-login-page>/WEB-INF/content/Login.jsp</form-login-page>
+        <form-error-page>/WEB-INF/content/Login.jsp</form-error-page>
+    </form-login-config>
+</login-config>    ]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Obtain missing user credentials using FORM when navigating to protected urls</para></listitem>
+        </itemizedlist>
+
+
+        <figure>
+            <title>Example Protected Servlet Mapping</title>
+<programlisting language="xml"><![CDATA[<servlet>
+    <servlet-name>Handler</servlet-name>
+    <servlet-class>info.ejava.examples.secureping.web.SecurePingHandlerServlet</servlet-class>
+</servlet>]]></programlisting>
+
+<programlisting language="xml"><![CDATA[<servlet-mapping>
+    <servlet-name>Handler</servlet-name>
+    <url-pattern>/model/admin/handler</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+    <servlet-name>Handler</servlet-name>
+    <url-pattern>/model/user/handler</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+    <servlet-name>Handler</servlet-name>
+    <url-pattern>/model/known/handler</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+    <servlet-name>Handler</servlet-name>
+    <url-pattern>/model/handler</url-pattern>
+</servlet-mapping>]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Servlet accessible via multiple URLs</para></listitem>
+        </itemizedlist>
+
+        <warning>
+            <title>Example Creates Security Hole on Purpose</title>
+            <para>
+                The example creates a security hole on purpose to be able to demonstrate
+                EJB security backs the WEB security. The servlet mapped above is accessible
+                through multiple URLs -- each restricted differently but attempting to provide
+                the same functionality. If you access the servlet through the anonymous URL
+                you will encounter many access failures communicating with the EJB. If you 
+                access the servlet using the admin URL you will be able to access all functionality.
+            </para>
+        </warning>
+
+       <figure>
+           <title>WEB-INF/jboss-web.xml: security-domain</title>
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE jboss-web PUBLIC
+  "-//JBoss//DTD Web Application 2.4//EN"
+  "http://www.jboss.org/j2ee/dtd/jboss-web_4_0.dtd">
+<jboss-web>
+      <security-domain>other</security-domain>      
+</jboss-web>]]></programlisting>
+       </figure>
+       <itemizedlist spacing="compact">
+           <listitem><para>Assigning web-tier to same security-domain as EJB tier</para></listitem>
+       </itemizedlist>
+    </section>
+
+    <section id="web-security-form">
+        <title>FORM-based Login</title>
+        
+        <figure>
+            <title></title>
+<programlisting language="xml"><![CDATA[<html>
+  <body>
+    <h1>Login Required</h1>
+
+    <form action="j_security_check" method="POST">
+        User Name:
+        <input type="text" size="20" name="j_username">
+        Password:
+        <input type="password" size="10" name="j_password">
+        <input type="submit" value="Login"> 
+       </table>
+    </form>
+
+  </body>
+</html>]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>form action <code>j_security_check</code> is a standard container action for login forms</para></listitem>
+            <listitem><para><code>j_username</code> input field name standard for username</para></listitem>
+            <listitem><para><code>j_password</code> input field name standard for password</para></listitem>
+        </itemizedlist>
+        
+        
+        <figure>
+            <title>transport-guarantee=CONFIDENTIAL</title>
+            <graphic scale="60" fileref="images/web-security-https.png"/>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>uri-path constrained to use only HTTPS</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Web Authentication Context Passed to EJB</title>
+            <graphic scale="60" fileref="images/web-security-caller-roles.png"/>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>EJB returning formatted string with caller role information</para></listitem>
+            <listitem><para>Caller authenticated at web-tier and passed to EJB</para></listitem>
+            <listitem><para>EJB and WAR using same security-domain</para></listitem>
+        </itemizedlist>
+    </section>
+    
+    <section id="web-security-basic">
+        <title>BASIC Authentication</title>
+        
+        <figure>
+            <title></title>
+<programlisting language=""><![CDATA[<login-config>
+    <auth-method>BASIC</auth-method>
+</login-config>]]></programlisting>            
+       <graphic scale="60" fileref="images/web-security-basic.png"/>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>BASIC authentication requested for any missing credentials</para></listitem>
+            <listitem><para>URL selected also not enforcing confidential (i.e., HTTPS)</para></listitem>
+        </itemizedlist>
+
+
+        <figure>
+            <title>EJB Access Violation</title>
+            <graphic scale="60" fileref="images/web-security-access-violation.png"/>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Authenticate user passed to EJB</para></listitem>
+            <listitem><para>EJB rejects unauthorized caller</para></listitem>
+        </itemizedlist>
+    </section>
+    
+
+    <section id="web-security-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>URL-based access restrictions</para></listitem>
+            <listitem><para>FORM/BASIC login</para></listitem>
+            <listitem><para>Login context sharing between Web Tier and EJB</para></listitem>
+        </itemizedlist>
+    </section>
+
+</chapter>
+  

@@ -186,7 +186,7 @@
             <row rowsep="1">
                 <entry namest="session">10</entry>
                 <entry namest="date">Nov05</entry>
-                <entry namest="topic"><para><link linkend="webtier">Web/UI Applications</link><ulink url="../ppt/webTier.ppt">slides</ulink></para></entry>
+                <entry namest="topic"><para><link linkend="webtier">Web/UI Applications</link> <ulink url="../ppt/webTier.ppt">slides</ulink></para></entry>
             </row>
             <row rowsep="1">
                 <entry namest="topic"><para><link linkend="cdi-config">CDI</link></para></entry>
@@ -224,7 +224,7 @@
             <row rowsep="1">
                 <entry namest="session">11</entry>
                 <entry namest="date">Nov12</entry>
-                <entry namest="topic"><para><ulink url="../ppt/javaeeSecurity.ppt">JavaEE Security</ulink></para></entry>
+                <entry namest="topic"><para><link linkend="javaee-security">JavaEE Security</link></para></entry>
                 <entry namest="comment"><para>Rubinger &amp; Burke: Ch 15</para></entry>
             </row>
             <!--

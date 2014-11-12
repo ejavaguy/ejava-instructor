@@ -1,0 +1,277 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-security">
+    <title>EJB Security</title>
+    <itemizedlist spacing="compact">
+        <listitem><para>EJB access restrictions</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Declarative</para></listitem>
+                <listitem><para>Programmatic</para></listitem>
+            </itemizedlist>
+        </listitem>
+        <listitem><para>EJB assignment to Security Domain</para></listitem>
+        <listitem><para>Server definition of Security Domain</para></listitem>
+        <listitem><para>Server Security Domain authentication and authorization</para></listitem>
+    </itemizedlist>
+
+    <section id="ejb-security-access-control">
+        <title>EJB Access Control (Declarative)</title>
+        
+        <figure>
+            <title>EJB Access Control: Annotations</title>
+<programlisting language="java"><![CDATA[@Stateless(name="SecurePingEJB")
+public class SecurePingEJB implements SecurePingRemote, SecurePingLocal {
+    ...
+    @PermitAll
+    public String pingAll() {
+        return getInfo("pingAll");
+    }
+
+    @RolesAllowed({"user"})
+    public String pingUser() {
+        return getInfo("pingUser");
+    }
+
+    @RolesAllowed({"admin"})
+    public String pingAdmin() {        
+        return getInfo("pingAdmin");
+    }
+
+    @DenyAll
+    public String pingExcluded() {
+        return getInfo("pingExcluded");
+    }
+}]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para><code>javax.annotation.security</code> annotations define access requirements to EJB methods</para></listitem>
+        </itemizedlist>
+        
+        
+        <figure>
+            <title>EJB Access Control: ejb-jar.xml</title>
+<programlisting language="xml"><![CDATA[<assembly-descriptor>
+...
+    <method-permission>
+        <unchecked/>
+        <method>
+            <ejb-name>SecurePingEJB</ejb-name>
+            <method-name>pingAllmethod-name>
+        </method>
+    </method-permission>
+    <method-permission>
+        <role-name>admin</role-name>
+        <method>
+            <ejb-name>SecurePingEJB</ejb-name>
+            <method-name>pingAdmin</method-name>
+        </method>
+    </method-permission>
+    <method-permission>
+        <role-name>user</role-name>
+        <method>
+            <ejb-name>SecurePingEJB</ejb-name>
+            <method-name>pingUser</method-name>
+        </method>
+    </method-permission>
+    <method-permission>
+        <excluded/>
+        <method>
+            <ejb-name>SecurePingEJB</ejb-name>
+            <method-name>pingExcluded</method-name>
+        </method>
+    </method-permission>
+</assembly-descriptor>]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Access restrictions can also be defined in the ejb-jar.xml deployment descriptor</para></listitem>
+        </itemizedlist>
+
+    </section>
+
+    <section id="ejb-security-programmatic">
+        <title>Programmatic Security</title>
+        
+        <figure>
+            <title>Programmatic Security Check</title>
+<programlisting language="java"><![CDATA[    @Resource
+    SessionContext ctx;
+
+        if (ctx.isCallerInRole(role)) { 
+            ... 
+        }]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Permits more fine-grain access control down to the object level</para></listitem>
+            <listitem><para>role can be literal or a logical mapping (see below)</para></listitem>
+        </itemizedlist>
+        
+        <figure>
+            <title>Optional Role Mapping: ejb-jar.xml</title>
+<programlisting language="xml"><![CDATA[    <enterprise-beans>
+        <session>
+            <ejb-name>SecurePingEJB</ejb-name>
+            <security-role-ref>
+                <description>role-name checked within EJB</description>
+                <role-name>internalRole</role-name>
+                <role-link>admin</role-link>
+            </security-role-ref>
+        </session>
+    </enterprise-beans>    
+    <assembly-descriptor>
+        <security-role>
+            <role-name>admin</role-name>
+        </security-role>
+        <security-role>
+            <role-name>user</role-name>
+        </security-role>
+    </assembly-descriptor>]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Permits role-name within Java code to be mapped to security role</para></listitem>
+        </itemizedlist>
+        
+        <figure>
+            <title>EJB Security Setup: META-INF/jboss-ejb3.xml</title>
+<programlisting language="xml"><![CDATA[<?xml version="1.0"?>  
+<jboss:ejb-jar 
+   xmlns:jboss="http://www.jboss.com/xml/ns/javaee"
+   xmlns:sec="urn:security" 
+   xmlns="http://java.sun.com/xml/ns/javaee"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.jboss.com/xml/ns/javaee http://www.jboss.org/j2ee/schema/jboss-ejb3-2_0.xsd
+      http://java.sun.com/xml/ns/javaee http://www.jboss.org/j2ee/schema/jboss-ejb3-spec-2_0.xsd
+      urn:security urn:security"
+   version="3.1"
+   impl-version="2.0">
+    <assembly-descriptor>
+        <sec:security>
+            <ejb-name>*</ejb-name>
+            <sec:security-domain>other</sec:security-domain>
+        </sec:security>
+    </assembly-descriptor>    
+</jboss:ejb-jar>]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Assigns one or more EJBs to a security-domain defined on server</para></listitem>
+            <listitem><para>Security is ignored until this is place</para></listitem>
+            <listitem><para>JBoss default security-domain is "other"</para></listitem>
+        </itemizedlist>
+        
+    </section>
+
+    <section id="ejb-security-jbossauth">
+        <title>Authentication/Authorization JBoss Setup</title>
+        <para><ulink url="https://docs.jboss.org/author/display/WFLY8/Security+Realms">Wildfly Security Realms Wiki</ulink></para>
+        <itemizedlist spacing="compact">
+            <listitem><para>Realm</para></listitem>
+            <listitem><para>User Credentials (username and password)</para></listitem>
+        </itemizedlist>
+        
+        <figure>
+            <title>Example Security Domain: "other"</title>
+<programlisting language="xml"><![CDATA[<security-domain name="other" cache-type="default">
+    <authentication>
+        <login-module code="Remoting" flag="optional">
+            <module-option name="password-stacking" value="useFirstPass"/>
+        </login-module>
+        <login-module code="RealmDirect" flag="required">
+            <module-option name="password-stacking" value="useFirstPass"/>
+        </login-module>
+    </authentication>
+</security-domain>]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Watches over interactions</para></listitem>
+            <listitem><para>Defines policy on what can take place</para></listitem>
+        </itemizedlist>
+
+     
+        <figure>
+            <title>Example Application Realm: "ApplicationRealm"</title>
+<programlisting language="xml"><![CDATA[<security-realm name="ApplicationRealm">
+    <authentication>
+        <local default-user="$local" allowed-users="*" skip-group-loading="true"/>
+        <properties path="application-users.properties" relative-to="jboss.server.config.dir"/>
+    </authentication>
+    <authorization>
+        <properties path="application-roles.properties" relative-to="jboss.server.config.dir"/>
+    </authorization>
+</security-realm>]]></programlisting>
+   </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Defines authentication and authorization sources</para></listitem>
+            <listitem><para>Optionally defines a default user for anonymous</para></listitem>
+        </itemizedlist>
+        <note>
+            <title>$local default user bypasses authentication</title>
+            <para>
+                JBoss can operate in a mode to trust a user connecting from the same machine
+                and running under the same operating system identity that launched the server.
+                This allows for development scenarios to bypass login credentials and 
+                Command Line Interface (CLI) to operate without credential prompts.
+            </para>
+<programlisting language="xml"><![CDATA[<local default-user="$local" allowed-users="*" skip-group-loading="true"/>]]></programlisting>
+        </note>
+        
+        <note>
+            <title>JBoss Ships with Sample Authentication and Authorization Impl</title>
+            <para>
+                JBoss installs with a set of static files to implement user authentication
+                and authorization. This can be augmented or replaced by more dynamic sources
+                such as a database or LDAP.
+            </para>
+        </note>
+        
+        <figure>
+            <title>Example Authentication Source: application-users.properties</title>
+<programlisting language="xml"><![CDATA[$ cat standalone/configuration/application-users.properties                                                                                      
+known=0aea67d2fdd25e4207f0bc2a5c84a1a6
+user1=b802b482f67706cb453ab9294b88a9ea
+admin1=7357a05355829fb2855412b69297a55b
+publisher1=a15cfe086e59fea3fe4c787b834f55b8
+subscriber1=838a4d7dceb6655e0297947d9677c6cb
+requestor1=21a138aa0eeec44ee9cf08ebd9a1dcb5
+worker1=41c30fe6af7d12f7b7fd9aa60060f13d
+admin2=f064c7710b767a156f7e07469f8ad944]]></programlisting>
+   </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Authenticates identity of user</para></listitem>
+            <listitem><para>Username and hashed password stored in static file</para></listitem>
+        </itemizedlist>
+
+        
+        <figure>
+            <title>Example Access Control Source: application-roles.properties</title>
+<programlisting language="xml"><![CDATA[$ cat standalone/configuration/application-roles.properties 
+user1=user,esales-user
+admin1=user,admin,dmv-admin,mayberry-admin,eleague-admin,eclub-admin
+publisher1=publisher
+subscriber1=subscriber
+requestor1=requestor
+worker1=worker
+admin2=admin]]></programlisting>
+   </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Assigns roles to authenticated user</para></listitem>
+            <listitem><para>Username and roles stored in static file</para></listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="ejb-security-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>EJB access restrictions</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Declarative</para></listitem>
+                    <listitem><para>Programmatic</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>EJB assignment to Security Domain</para></listitem>
+            <listitem><para>Server definition of Security Domain</para></listitem>
+            <listitem><para>Server Security Domain authentication and authorization</para></listitem>
+        </itemizedlist>
+    </section>
+
+</chapter>
+  

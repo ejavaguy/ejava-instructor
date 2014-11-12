@@ -69,4 +69,5 @@
     <xi:include href="webtier-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="cdi-config-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-jaxrs-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="javaee-security-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </book>

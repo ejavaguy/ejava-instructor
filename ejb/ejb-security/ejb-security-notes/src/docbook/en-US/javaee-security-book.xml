@@ -1,0 +1,58 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="javaee-security">
+    <bookinfo>
+        <title>JavaEE Security</title>
+        <subtitle></subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>This presentation contains topics for securing EJB and Web applications.
+            </para>
+        </abstract>
+    </bookinfo>
+    <preface id="javaee-security-purpose">
+        <title>Purpose</title>
+
+        <section id="javaee-security-goals">
+            <title>Goals</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Secure access to EJB and Web applications</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="javaee-security-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>have more understanding of:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>the basic concepts behind JavaEE Security</para></listitem>
+                        <listitem><para>how to runAs another user within JavaEE</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>be able to:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>define access control policy for EJB and Web applications</para></listitem>
+                        <listitem><para>authenticate and obtain proper access to the application</para></listitem>
+                        <listitem><para>implement login using JNDI InitialContext using JBoss Remoting</para></listitem>
+                        <listitem><para>implement login using EJB Client and other JBoss proprietary APIs</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+    </preface>
+
+    <toc/>
+
+    <xi:include href="javaee-security-acp.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-security.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-security-rmiclient.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-security-runas.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="web-security.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>
