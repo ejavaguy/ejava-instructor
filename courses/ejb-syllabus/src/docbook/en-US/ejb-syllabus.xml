@@ -106,7 +106,7 @@
             <row rowsep="1">
                 <entry namest="session">5</entry>
                 <entry namest="date">Dec10</entry>
-                <entry namest="topic"><para>EJB Security</para></entry>
+                <entry namest="topic"><para><link linkend="javaee-security">JavaEE Security</link></para></entry>
             </row>
             <row rowsep="1">
                 <entry namest="topic"><para>JavaEE Interceptors</para></entry>
