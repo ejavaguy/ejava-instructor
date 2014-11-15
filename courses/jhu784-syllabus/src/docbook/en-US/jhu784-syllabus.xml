@@ -266,10 +266,10 @@
                 <entry namest="session">14</entry>
                 <entry namest="date">Dec10</entry>
                 <entry namest="topic">Complete Final Project (no class)</entry>
-              <entry namest="comment">Project 3 - due by Wed evening/midnight, Dec10</entry>
                 <!--
-              <entry namest="comment"><link linkend="edatashare-project3-part">Project 3</link> due by Wed evening/midnight, Dec10</entry>
+              <entry namest="comment">Project 3 - due by Wed evening/midnight, Dec10</entry>
               -->
+              <entry namest="comment"><link linkend="edatashare-project3-part">Project 3</link> due by Wed evening/midnight, Dec10</entry>
             </row>
         </tbody>
         </tgroup>
