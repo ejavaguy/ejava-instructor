@@ -11,11 +11,6 @@
         objects and database persistence technology is so seamless that it will 
         definitely come up within this context.  
     </para>
-    <itemizedlist spacing="compact">
-        <listitem><para></para></listitem>
-        <listitem><para></para></listitem>
-        <listitem><para></para></listitem>
-    </itemizedlist>
 
 
     <section id="ejb-jpaex-remote-serializable">
