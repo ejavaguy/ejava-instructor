@@ -1,0 +1,48 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-jpaex-chapter">
+    <title></title>
+    <para>
+    </para>
+    <itemizedlist spacing="compact">
+        <listitem><para></para></listitem>
+        <listitem><para></para></listitem>
+        <listitem><para></para></listitem>
+    </itemizedlist>
+
+
+    
+    <section id="ejb-jpaex-chapter-">
+        <title></title>
+        <orderedlist spacing="compact">
+            <listitem><para></para>
+
+            <figure>
+                <title></title>
+       <programlisting language=""><![CDATA[
+]]></programlisting>                        
+            </figure>
+            
+            </listitem>
+            
+            <listitem><para></para>
+
+            <figure>
+                <title></title>
+       <programlisting language=""><![CDATA[
+]]></programlisting>                        
+            </figure>
+            
+            </listitem>
+        </orderedlist>
+    </section>
+
+
+    <section id="ejb-jpaex-chapter-summary">
+       <title>Summary</title>
+       <para>
+        </para>
+    </section>    
+</chapter>
+  
