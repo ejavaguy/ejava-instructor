@@ -18,9 +18,9 @@
         <para>
             A Data Transfer Object (DTO) is anything you pass between the client
             and server to express information. They could be based on XML or JSON
-            with class representations on either end. The could be simple Serializable
+            with class representations on either end. They could be simple Serializable
             Java data structures or business objects (BOs) that are also mapped as 
-            JPA entities. Whatever the approach -- on key requirement is that all
+            JPA entities. Whatever the approach -- one key requirement is that all
             Java objects passed through an RMI interface to a remote client must 
             implement Serializable. Lets demonstrate that in this section. 
         </para>
@@ -75,9 +75,9 @@ combination for invocation context org.jboss.ejb.client.EJBClientInvocationConte
                 </figure>
                 <para>
                     This problem can be hard to solve because there is no pointer to the 
-                    problem. We have a DTO in one of out interface methods that has not
+                    problem. We have a DTO in one of our interface methods that has not
                     implemented Serializable. I can usually tell that when one or more other
-                    methods work and a specific method does not and the client simply reports
+                    methods work and a specific method does not work and the client simply reports
                     "No EJB receiver...".
                 </para>
             </listitem>
@@ -158,7 +158,7 @@ org.hibernate.collection.internal.PersistentBag]]></programlisting>
             Depending on our situation, it could have been this or a different Hibernate class.            
         </para>
         <para>
-            So where this this Hibernate class come from? It came from the fact the EJB returned 
+            So where does this this Hibernate class come from? It came from the fact the EJB returned 
             the result of a JPA query/access that returned a managed entity with proxy class instances
             attached to watch for changes. These proxy classes were serialized along with the 
             business object it was watching. The following is a gisting of the code executed on the 
@@ -221,7 +221,8 @@ public Event getEvent(int id) {
             
             <listitem><para>Re-test the application. Note that since the changes we 
                 made were only on the client-side, there is no need to re-build or 
-                even re-deploy the entire application.
+                even re-deploy the entire application. If you are using an IDE you can just 
+                make the IT test code change and re-run the test without re-deploying.
                 </para>
                 <figure>
                     <title>Successfully Resolve Class with new Client Dependency</title>
@@ -718,9 +719,7 @@ EventMgmtEJB] (EJB default - 6) *** EventMgmtEJB:destroy(1746126146) ***
     |       `-- myorg
     |           `-- jpatickets
     |               `-- ejbclient
-    |                   |-- EventMgmtIT.java
-    |                   |-- TicketsITFactory.java
-    |                   `-- VenueMgmtIT.java]]></programlisting>                        
+    |                   |-- EventMgmtIT.java]]></programlisting>                        
 <programlisting language="java"><![CDATA[@Test
 //@Ignore
 public void eventFetchedSome() throws UnavailableException {
