@@ -18,5 +18,6 @@
 
     <modules>
         <module>ejb-jpa-notes</module>
+        <module>ejb-jpa-lab</module>
     </modules>
 </project>

@@ -73,32 +73,31 @@
                 <entry namest="session">2</entry>
                 <entry namest="date">Nov19</entry>
                 <entry namest="topic"><para><link linkend="ejb-dev">EJB Development Scenarios</link></para></entry>
-            </row>
-            <row rowsep="1">
-                <entry namest="topic"><para><link linkend="ejb-basic">Basic Session EJB</link></para></entry>
                 <entry namest="comment"><para><ulink url="../html/ejb-basic-lab.html">Exercise: Basic EJB Development (Complete)</ulink></para></entry>
             </row>
-
 
 
             <row rowsep="1">
                 <entry namest="session">3</entry>
                 <entry namest="date">Nov26</entry>
+                <entry namest="topic"><para><link linkend="ejb-basic">Basic Session EJB</link></para></entry>
+            </row>
+            <row rowsep="1">
                 <entry namest="topic"><para><link linkend="enc-config">Configuring EJBs using ENC and JNDI</link></para></entry>
                 <entry namest="comment"><para><ulink url="../html/encconfig-lab.html">Exercise: JNDI/ENC Configuration</ulink></para></entry>
-            </row>
-            <row rowsep="1">
-                <entry namest="topic"><para><link linkend="ejb-jpa">EJB/Server-Side JPA Topics</link></para></entry>
-            </row>
-            <row rowsep="1">
-                <entry namest="topic"><para><ulink url="../ppt/javaeeTransactions.ppt">JavaEE Transactions</ulink></para></entry>
             </row>
 
 
             <row rowsep="1">
                 <entry namest="session">4</entry>
                 <entry namest="date">Dec03</entry>
-                <entry namest="topic"><para><link linkend="webtier">Web-Tier Integration with CDI</link></para></entry>
+                <entry namest="topic"><para><link linkend="ejb-jpa">EJB/Server-Side JPA Topics</link></para></entry>
+                <entry namest="comment"><para><ulink url="../html/ejb-jpa-lab.html">Exercise: JPA/EJB Remote Interfaces</ulink></para></entry>
+            </row>
+
+            <row rowsep="1">
+                <entry namest="session">?</entry>
+                <entry namest="topic"><para><ulink url="../ppt/javaeeTransactions.ppt">JavaEE Transactions</ulink></para></entry>
             </row>
             <row rowsep="1">
                 <entry namest="topic"><para><link linkend="cdi-config">CDI Configuration</link></para></entry>
@@ -128,6 +127,12 @@
             </row>
             <row rowsep="1">
                 <entry namest="topic"><para>EJB and JMS</para></entry>
+            </row>
+
+            <row rowsep="1">
+                <entry namest="session">Other</entry>
+                <entry namest="date"></entry>
+                <entry namest="topic"><para><link linkend="webtier">Web-Tier Integration with CDI</link></para></entry>
             </row>
         </tbody>
         </tgroup>

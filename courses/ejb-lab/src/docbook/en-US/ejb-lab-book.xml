@@ -46,6 +46,9 @@
                 <row rowsep="1">
                   <entry namest="topic"><para><link linkend="encconfig-lab">JNDI/ENC Configuration Lab</link></para></entry>
                 </row>
+                <row rowsep="1">
+                  <entry namest="topic"><para><link linkend="ejb-jpa-lab">Basic EJB Development</link></para></entry>
+                </row>
             </tbody>
             </tgroup>
         </table>    
@@ -55,4 +58,5 @@
     <xi:include href="first-simplemodule-ex-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-basic-lab-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="enc-config-lab-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-jpa-lab-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </book>

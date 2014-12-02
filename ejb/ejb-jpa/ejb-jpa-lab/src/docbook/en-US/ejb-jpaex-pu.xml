@@ -1,0 +1,706 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-jpaex-pu">
+    <title>Server-side Persistence Unit</title>
+    <para>
+        In this chapter we will form a persistence unit to be deployed to the 
+        server-side. The data tier has been implemented for you and is located
+        in the "impl" module. We will use the persistence unit from that module 
+        as a starting point.
+    </para>
+    
+    <warning>
+        <para>
+            This exercise relies on an EJB to reset the DB in between IT tests.
+            Something may not be getting closed out because after ~10 re-deploys of 
+            the application, the re-deploy is stalled by a failure to get a DB connection. 
+            When this occurred, the only way I could resolve was to kill the application 
+            server (kill -9 on Linux). It did not occur often -- but enough to place 
+            this warning and work-around here.
+        </para>
+    </warning>
+    
+    <section id="ejb-jpaexex-puejb">
+        <title>EJB Persistence Unit</title>
+        <para>
+            In this section we will deploy a persistence unit within a EAR-based
+            EJB deployment. The exercise starts off with a missing persistence unit
+            in the EJB, an injection of the persistence context into the EJBs commented out, and
+            the test of the EJB @Ignored.
+        </para>
+        
+        
+        <orderedlist spacing="compact">
+            <listitem><para>Remove the @Ignore from the venueEAR() @Test in VenueMgmtIT.java.
+                This will activate the test and request the server-side to create a Venue. 
+            </para>
+
+            <figure>
+                <title>Activate venueEAR() @Test</title>
+<programlisting language=""><![CDATA[jpatickets-labex-test/src/                                                                                                                                                                                        
+`-- test                                                                                                                                                                                                           
+    |-- java                                                                                                                                                                                                       
+    |   `-- org                                                                                                                                                                                                    
+    |       `-- myorg
+    |           `-- jpatickets
+    |               `-- ejbclient
+    |                   `-- VenueMgmtIT.java]]></programlisting>
+<programlisting language="java"><![CDATA[    @Test
+	//@Ignore
+	public void venueEAR() throws NamingException {
+        logger.info("*** venueEAR ***");
+        
+        VenueMgmtRemote venueMgmt=tf.lookup(VenueMgmtRemote.class, VENUE_JNDINAME);
+        Venue venue = tf.makeVenue();
+        venueMgmt.createVenue(venue, 1, 2, 3);
+        
+        assertNotNull("could not locate venue:" + venue.getId(), venueMgmt.getVenue(venue.getId()));
+    }]]></programlisting>                        
+            </figure>
+            
+            </listitem>
+            
+            <listitem><para>Attempt to build the application from the parent pom.</para>
+
+            <figure>
+                <title>Build Application from Parent POM</title>
+<programlisting language=""><![CDATA[jpatickets-labex]$ mvn clean install
+...
+Tests in error: 
+  VenueMgmtIT.venueEAR:33 » EJB error creating venue:java.lang.NullPointerExcept...
+
+Tests run: 10, Failures: 0, Errors: 1, Skipped: 9
+...
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] EJB::JPA Tickets Lab::Exercise ..................... SUCCESS [  0.652 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::Impl ............... SUCCESS [ 11.386 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::EJB ................ SUCCESS [  0.902 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::EAR ................ SUCCESS [  0.561 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::WAR ................ SUCCESS [  0.760 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::IT Test ............ FAILURE [  8.761 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE]]></programlisting>
+            </figure>
+            <para>
+                There is a NullPointerException on the server-side because the 
+                @PersistenceContext is not being injected and the EntityManager 
+                passed to the DAO is null. Please fix this in the next step.
+            </para>
+            </listitem>
+            
+            <listitem><para>Inject a persistence context (i.e., EntityManager) 
+                for the "jpatickets-labex" persistence unit for VenueMgmtEJB.
+                </para>
+                <para>
+                    There are two types of JPA injections that can be done in JavaEE;
+                    @PersistenceUnit and @PersistenceContext. The 
+                    <ulink url="http://docs.oracle.com/javaee/7/api/javax/persistence/PersistenceUnit.html">@PersistenceUnit</ulink>
+                    defines an injection of an EntityManagerFactory and is usually
+                    only done in EJBs using BEAN-managed transactions. The TicketsInitTxEJB
+                    uses that construct. 
+                    <ulink url="http://docs.oracle.com/javaee/7/api/javax/persistence/PersistenceContext.html">@PersistenceContext</ulink> 
+                    defines the injection of an EntityManager. Both express the persistence unit name with the 
+                    "unitName" attribute. The "name" attribute is used for JNDI ENC
+                    injection. We will be defining out injections direct without going
+                    through the indirection of the ENC.
+                </para>
+                <para>
+                    Since VenueMgmtEJB and EventMgmtEJB are both @Stateless EJBs,
+                    the persistence contexts are defined to be transaction-scoped.
+                    That means there will be a single transaction for each sequence 
+                    of interactions with the persistence context. You have no option
+                    to commit and begin a new transaction when it is transaction-scoped.
+                    To do otherwise you would need either a @Stateful or @Singleton EJB.
+                </para>
+                <figure>
+                    <title>Inject @PersistenceContext into EJB</title>
+<programlisting language=""><![CDATA[jpatickets-labex-ejb/src/
+`-- main
+    |-- java
+    |   `-- org
+    |       `-- myorg
+    |           `-- jpatickets
+    |               `-- ejb
+    |                   |-- VenueMgmtEJB.java]]></programlisting>
+                    
+<programlisting language="java"><![CDATA[@Stateless
+public class VenueMgmtEJB implements VenueMgmtRemote {
+    @PersistenceContext(unitName="jpatickets-labex")
+    private EntityManager em;]]></programlisting>
+
+                </figure>
+            </listitem>
+            
+            <listitem><para>Attempt to build and deploy application from parent pom. This will
+                    fail since we do not yet have the persistence unit defined. We have a persistence.xml
+                    file with "a" persistence unit defined, but it is not the one VenueMgmtEJB is trying
+                    to use. 
+                    </para>
+                <figure>
+                    <title>Attempt to Deploy Application without Persistence Unit</title>
+<programlisting language=""><![CDATA[$ mvn clean install
+...
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] EJB::JPA Tickets Lab::Exercise ..................... SUCCESS [  0.632 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::Impl ............... SUCCESS [ 16.222 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::EJB ................ SUCCESS [  1.833 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::EAR ................ SUCCESS [  0.958 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::WAR ................ SUCCESS [  1.715 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::IT Test ............ FAILURE [  5.867 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE]]></programlisting>
+<programlisting language=""><![CDATA[
+2014-11-29 23:45:05,849 ERROR [org.jboss.msc.service.fail] (MSC service thread 1-4) MSC000001: 
+Failed to start service jboss.deployment.subunit."jpatickets-labex-ear-4.0.0-SNAPSHOT.ear"."jpatickets-labex-ejb.jar".INSTALL: 
+org.jboss.msc.service.StartException in service j
+...
+Caused by: org.jboss.as.server.deployment.DeploymentUnitProcessingException: JBAS011047: 
+Component class org.myorg.jpatickets.ejb.VenueMgmtEJB for component VenueMgmtEJB has errors: 
+JBAS011440: Can't find a persistence unit named jpatickets-labex in subdeployment "jpatickets-labex-ejb.jar" 
+of deployment "jpatickets-labex-ear-4.0.0-SNAPSHOT.ear"
+]]></programlisting>
+                </figure>
+            </listitem>
+            
+            <listitem><para>Open the existing META-INF/persistence.xml in the EJB. When you are 
+                done this file will have two (2) persistence units defined. The second
+                one is already defined and is used by TicketsInitTxEJB to reset the database in between IT tests.
+                The first one can be built using parts of the "impl" module (I am choosing to ignore
+                what the schema-gen persistence unit can provide you and focusing on what we can/can't 
+                carry forward from the unit test)</para>
+                <figure>
+                    <title>Starting EJB persistence.xml</title>
+<programlisting language=""><![CDATA[jpatickets-labex-ejb/src/
+`-- main
+    `-- resources
+        `-- META-INF
+            `-- persistence.xml]]></programlisting>
+                    
+<programlisting language="xml"><![CDATA[<persistence ...
+
+<!-- TODO: supply jpatickets-labex persistence unit
+    <persistence-unit name="jpatickets-labex">
+    </persistence-unit>
+ -->
+            
+    <!-- This persistence unit is used exclusively for managing the schema 
+         during IT tests. 
+     -->            
+    <persistence-unit name="jpatickets-schemagen-labex">
+...
+    </persistence-unit>        
+    
+</persistence>
+]]></programlisting>
+                </figure>
+            </listitem>
+            
+            <listitem><para>Open the existing META-INF/persistence.xml in the impl
+                module src/test/resource directory. We will use that as a starting point
+                and discuss the differences. Note that we placed the unit test's 
+                persistence.xml within the src/test tree so that it would be available
+                for unit testing but would not get placed in the JAR and deployed to the server.</para>
+                <figure>
+                    <title></title>
+<programlisting language=""><![CDATA[jpatickets-labex-impl/src/
+`-- test
+    `-- resources
+        `-- META-INF
+            `-- persistence.xml]]></programlisting>
+<programlisting language="xml"><![CDATA[<persistence-unit name="jpatickets-test">
+    <!-- used on the server-side 
+    <jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
+    -->
+    <!-- jarfile shortcut can be used when deploying EJB within EAR 
+    <jar-file>lib/jpatickets-labsol-impl-${project.version}.jar</jar-file>
+    -->
+
+    <!-- classes must be enumerated when deploying outside of EAR -->
+    <class>org.myorg.jpatickets.bo.Venue</class>
+    <class>org.myorg.jpatickets.bo.Address</class>
+    <class>org.myorg.jpatickets.bo.Seat</class>
+    <class>org.myorg.jpatickets.bo.Event</class>
+    <class>org.myorg.jpatickets.bo.Ticket</class>
+    
+    <properties>
+        <!-- this applies to both unit-test and server-side environments -->
+        <property name="hibernate.dialect" value="${hibernate.dialect}"/>
+
+        <!-- these can be helpful in both environments when debugging
+        <property name="hibernate.jdbc.batch_size" value="0"/>
+        <property name="hibernate.show_sql" value="true"/>
+        <property name="hibernate.format_sql" value="true"/>
+         -->            
+        
+        <!-- this applies to only the ***demo***-nature of this example -->
+        <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
+        
+        <!-- these apply only to the unit test environment -->
+        <property name="javax.persistence.jdbc.driver" value="${jdbc.driver}"/>
+        <property name="javax.persistence.jdbc.url" value="${jdbc.url}"/>
+        <property name="javax.persistence.jdbc.user" value="${jdbc.user}"/>
+        <property name="javax.persistence.jdbc.password" value="${jdbc.password}"/>
+    </properties>
+</persistence-unit>]]></programlisting>
+                </figure>
+            </listitem>
+            
+            <listitem><para>Create the outer element of the persistence unit in the EJB.
+                Note that we have picked a different name than the persistence unit
+                used during the unit tests. This helps keep things straight if they
+                ever were deployed to the server.</para>
+                <figure>
+                    <title>Persistence Unit Outer Element</title>
+<programlisting language=""><![CDATA[jpatickets-labex-ejb/src/
+`-- main
+    `-- resources
+        `-- META-INF
+            `-- persistence.xml]]></programlisting>
+<programlisting language="xml"><![CDATA[<persistence-unit name="jpatickets-labex">
+</persistence-unit>]]></programlisting>
+                </figure>
+            </listitem>
+            
+            <listitem><para>Add a jta-data-source for obtaining connections. The jta-data-source
+                    references a JNDI name for a javax.sql.DataSource defined at the application server.
+                    The components will borrow physical connections from the DataSource during transactions,
+                    form lightweight logical connections, close them complete, which frees of the 
+                    physical connection for other clients.
+                </para>
+                <para>
+                    The jta-data-source takes the place of the "javax.persistence.jdbc"
+                    connection properties. These properties are only necessary when creating
+                    direct connections to the database and the server will have already done this
+                    for us. 
+                </para>
+                <figure>
+                    <title>Add jta-data-source to persistence unit in EJB</title>
+<programlisting language=""><![CDATA[jpatickets-labex-ejb/src/
+`-- main
+    `-- resources
+        `-- META-INF
+            `-- persistence.xml]]></programlisting>
+<programlisting language="xml"><![CDATA[<!-- used on the server-side --> 
+<jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>]]></programlisting>
+<programlisting language="xml"><![CDATA[<!-- these apply only to the unit test environment 
+<property name="javax.persistence.jdbc.driver" value="${jdbc.driver}"/>
+<property name="javax.persistence.jdbc.url" value="${jdbc.url}"/>
+<property name="javax.persistence.jdbc.user" value="${jdbc.user}"/>
+<property name="javax.persistence.jdbc.password" value="${jdbc.password}"/>
+-->]]></programlisting>
+                </figure>
+                
+                <para>
+                    The JNDI name from the server's configuration (standalone.xml) must match the JNDI name
+                    of the jta-data-source element of the peristence unit.
+                </para>
+                <figure>
+                    <title>ExampleDS in Wildfly's standalone.xml</title>
+<programlisting language=""><![CDATA[<datasources>
+    <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true">
+...
+</datasources>]]></programlisting>
+                </figure>
+                                
+            </listitem>
+            
+            <listitem><para>Attempt the build, deploy, and test the application with the 
+                    persistence unit defined with only a jta-data-source. The build will
+                    fail because of an unknown entity.</para>
+                <figure>
+                    <title>Build Fails with Unknown Entity</title>
+<programlisting language=""><![CDATA[$ mvn clean install
+...
+00:17:11,110 INFO  (VenueMgmtIT.java:29) -*** venueEAR ***
+Tests run: 3, Failures: 0, Errors: 1, Skipped: 2, Time elapsed: 1.521 sec <<< FAILURE! - 
+in org.myorg.jpatickets.ejbclient.VenueMgmtIT
+venueEAR(org.myorg.jpatickets.ejbclient.VenueMgmtIT)  Time elapsed: 1.197 sec  <<< ERROR!
+javax.ejb.EJBException: error creating venue:java.lang.IllegalArgumentException: 
+Unknown entity: org.myorg.jpatickets.bo.Venue
+]]></programlisting>
+                </figure>
+                <para>
+                    The entity is unknown because the entity class is part of a separate
+                    JAR file and must be brought into the persistence unit using one of 
+                    several techniques.
+                </para>
+            </listitem>
+            
+            <listitem><para>Since the EJB is being deployed to the server using an EAR -
+                    lets take advantage of a shorthand way of referring to every @Entity
+                    in the impl.jar. Notice the impl.jar is in the lib directory of the EAR
+                    so we can reference it there. We can also take advantage of Maven filtering
+                    to take care of the version#.</para>
+                <figure>
+                    <title></title>
+<programlisting language=""><![CDATA[jpatickets-labex-ear/target/jpatickets-labex-ear-4.0.0-SNAPSHOT
+|-- jpatickets-labex-ejb.jar
+|-- lib
+|   `-- jpatickets-labex-impl-4.0.0-SNAPSHOT.jar
+`-- META-INF
+    `-- application.xml]]></programlisting>
+                    
+<programlisting language="xml"><![CDATA[<persistence-unit name="jpatickets-labex">
+    <!-- used on the server-side -->
+    <jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
+    <!-- jarfile shortcut can be used when deploying EJB within EAR -->
+    <jar-file>lib/jpatickets-labex-impl-${project.version}.jar</jar-file>
+</persistence-unit>]]></programlisting>
+                </figure>
+            </listitem>
+            
+            <listitem><para>Add some debug output from the persistence unit.</para>
+                <figure>
+                    <title>Printing SQL Debug From Persistence Unit</title>
+<programlisting language="xml"><![CDATA[<properties>
+    <!-- these can be helpful in both environments when debugging
+    <property name="hibernate.jdbc.batch_size" value="0"/>
+     -->            
+    <property name="hibernate.show_sql" value="true"/>
+    <property name="hibernate.format_sql" value="false"/>
+</properties>]]></programlisting>
+                </figure>
+            
+            </listitem>
+            
+            <listitem><para>Build, deploy, and test the application by building from the 
+                    parent pom. This should be successful. If you look in the server.log
+                    you should see the show_sql we enabled above creating and getting
+                    a venue.</para>
+                <figure>
+                    <title></title>
+<programlisting language=""><![CDATA[$ mvn clean install
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] EJB::JPA Tickets Lab::Exercise ..................... SUCCESS [  1.462 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::Impl ............... SUCCESS [ 12.172 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::EJB ................ SUCCESS [  0.991 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::EAR ................ SUCCESS [  1.831 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::WAR ................ SUCCESS [  1.622 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::IT Test ............ SUCCESS [  8.931 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS]]></programlisting>
+
+<programlisting language=""><![CDATA[
+*** VenueMgmtEJB:init(869033952) ***
+*** VenueMgmtEJB:destroy(869033952) ***
+insert into JPATICKETS_VENUE (CITY, STATE, STREET, POSTAL_CODE, NAME, VENUE_ID) values (?, ?, ?, ?, ?, ?)
+insert into JPATICKET_SEAT (POSTION, ROW, SECTION, VENUE_ID) values (?, ?, ?, ?)
+insert into JPATICKET_SEAT (POSTION, ROW, SECTION, VENUE_ID) values (?, ?, ?, ?)
+...
+*** VenueMgmtEJB:init(477412492) ***
+select venue0_.VENUE_ID as VENUE_ID1_2_0_, venue0_.CITY as CITY2_2_0_, venue0_.STATE as STATE3_2_0_, 
+    venue0_.STREET as STREET4_2_0_, venue0_.POSTAL_CODE as POSTAL_C5_2_0_, venue0_.NAME as NAME6_2_0_ 
+from JPATICKETS_VENUE venue0_ where venue0_.VENUE_ID=?]]>
+*** VenueMgmtEJB:destroy(477412492) ***
+</programlisting>
+                </figure>
+                <para>
+                    Notice with the @Stateless EJB, we get an init/destroy pair for 
+                    every business method call because we have not placed this EJB in a pool.
+                    Notice too that the destroy for the createVenue() is printed prior to the 
+                    database INSERTs. That is because the persistence context was injected 
+                    by the container and the end-of-transaction flush() did not occur until
+                    after the business method exited. The init/destroy pair for the 
+                    getVenue() occur around the SELECT because queries are performed immediately
+                    and do not wait until the end of a transaction (if one is active).
+                </para>
+                
+            </listitem>
+        </orderedlist>
+        <para>
+            You have completed this section of the exercise. You now have an initial 
+            persistence unit defined and deployed to the server. The persistence unit
+            is injected into the EJB and has required entities registered. The EJB is 
+            able to expose business methods that use the persistence unit to create and 
+            get a Venue.
+        </para>
+    </section>
+
+    
+    
+    <section id="ejb-jpaexex-puwar-imported">
+        <title>Imported EJB - WAR Deployment</title>
+        <para>
+            In this section we will deploy the EJB from the previous section using a 
+            WAR instead of an EAR. We will do this to demonstrate that the jar-file
+            shortcut only works for EAR-based deployments. 
+        </para>
+        
+        
+        <orderedlist spacing="compact">
+            <listitem><para>Activate the venueImportedEJB() @Test within 
+                    VenueMgmtIT.java of the test module.</para>
+                <figure>
+                    <title>Activate venueImportedEJB() @Test</title>
+<programlisting language="java"><![CDATA[@Test
+//@Ignore
+public void venueImportedEJB() throws NamingException {
+    logger.info("*** venueImportedEJB ***");
+    
+    VenueMgmtRemote venueMgmt=tf.lookup(VenueMgmtRemote.class, WEBIMPORTED_VENUE_JNDINAME);
+    Venue venue = tf.makeVenue();
+    venueMgmt.createVenue(venue, 1, 2, 3);
+    
+    assertNotNull("could not locate venue:" + venue.getId(), venueMgmt.getVenue(venue.getId()));
+}]]></programlisting>
+                </figure>
+            </listitem>
+            
+            <listitem><para>Attempt to build the application from the root. Notice
+                    the EAR-based EJB test still passes but the imported WAR-based
+                    cannot resolve the entities (like before).</para>
+                <figure>
+                    <title>Build Failure - Unknown Entity (again)</title>
+<programlisting language=""><![CDATA[jpatickets-labex-war/target/jpatickets-labex-war
+`-- WEB-INF
+    `-- lib
+        |-- jpatickets-labex-ejb-4.0.0-SNAPSHOT.jar
+        `-- jpatickets-labex-impl-4.0.0-SNAPSHOT.jar]]></programlisting>
+
+<programlisting language=""><![CDATA[$ mvn clean install
+Tests in error: 
+  VenueMgmtIT.venueImportedEJB:45 » EJB error creating venue:java.lang.IllegalAr...
+
+Tests run: 10, Failures: 0, Errors: 1, Skipped: 8
+...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] EJB::JPA Tickets Lab::Exercise ..................... SUCCESS [  0.538 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::Impl ............... SUCCESS [ 11.080 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::EJB ................ SUCCESS [  1.473 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::EAR ................ SUCCESS [  0.787 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::WAR ................ SUCCESS [  1.368 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::IT Test ............ FAILURE [ 10.664 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE]]></programlisting>
+<programlisting language=""><![CDATA[01:04:47,063 ERROR [org.myorg.jpatickets.ejb.VenueMgmtEJB] (EJB default - 5) error creating venue: 
+java.lang.IllegalArgumentException: Unknown entity: org.myorg.jpatickets.bo.Venue]]></programlisting>
+                </figure>
+                <para>
+                    The jar-file element unfortunately will not resolve a JAR file
+                    within anything besides an EAR - even if we adjusted the path
+                    to match the WAR locations. We will have to use one of the other
+                    techniques to register the entity classes with the persistence unit
+                    that is more portable.
+                </para>
+            </listitem>
+
+            <listitem><para>Register the entity classes using class elements. This 
+                is more verbose but will pull the entities from the classpath formed 
+                by either the EAR or WAR and we will not have to worry about the 
+                location of the impl.jar containing the @Entities. Remove the jar-file reference</para>
+
+            <figure>
+                <title>Entities Registered using class Elements</title>
+<programlisting language=""><![CDATA[jpatickets-labex-ejb/src/
+`-- main
+    `-- resources
+        `-- META-INF
+            `-- persistence.xml]]></programlisting>
+                
+<programlisting language="xml"><![CDATA[<persistence-unit name="jpatickets-labex">
+    <!-- used on the server-side -->
+    <jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
+    <!-- jarfile shortcut can be used when deploying EJB within EAR 
+    <jar-file>lib/jpatickets-labex-impl-${project.version}.jar</jar-file>
+    -->
+    <!-- classes must be enumerated when deploying outside of EAR -->
+    <class>org.myorg.jpatickets.bo.Venue</class>
+    <class>org.myorg.jpatickets.bo.Address</class>
+    <class>org.myorg.jpatickets.bo.Seat</class>
+    <class>org.myorg.jpatickets.bo.Event</class>
+    <class>org.myorg.jpatickets.bo.Ticket</class>
+    <properties>]]></programlisting>               
+            </figure>
+            
+            </listitem>
+            
+            <listitem><para>Build, Deploy, and Re-run the IT test for the WAR-based
+                imported EJB. This should now complete successfully.</para>
+
+            <figure>
+                <title>Success Build of WAR-based Imported EJBs</title>
+<programlisting language=""><![CDATA[$ mvn clean install
+...
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] EJB::JPA Tickets Lab::Exercise ..................... SUCCESS [  0.640 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::Impl ............... SUCCESS [ 19.197 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::EJB ................ SUCCESS [  0.793 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::EAR ................ SUCCESS [  0.543 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::WAR ................ SUCCESS [  0.909 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::IT Test ............ SUCCESS [  9.691 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS]]></programlisting>                        
+            </figure>
+            </listitem>
+        </orderedlist>
+        
+        <para>
+            You have completed two of the three deployment alternatives. The 
+            first and second were actually the same EJB artifact. One was deployed
+            as an EAR-based EJB. The other deployed as a WAR-based EJB. We learned
+            that jar-file references only work in EAR-based deployments but naming
+            each entity using the class element works in both environments.
+        </para>
+    </section>
+    
+    <section id="ejb-jpaexex-puwar-embedded">
+        <title>Embedded EJB - WAR Deployment</title>
+        <para>
+            In this section we will make a simple copy of the VenueMgmtEJB and 
+            implement it as an EJB embedded within the WAR. That means it will not
+            be a part of any EJB.jar, will not be in WEB-INF/lib, but will be located
+            in WEB-INF/classes.
+        </para>
+        
+        <orderedlist spacing="compact">
+            <listitem><para>Activate the venueWAR() @Test within the VenueMgmtIT.java
+                IT test in the test module.</para>
+            <figure>
+                <title>Activate IT test for WAR-based Embedded EJB</title>
+<programlisting language=""><![CDATA[jpatickets-labex-test/src/
+`-- test
+    |-- java
+    |   `-- org
+    |       `-- myorg
+    |           `-- jpatickets
+    |               `-- ejbclient
+    |                   `-- VenueMgmtIT.java]]></programlisting>
+                
+<programlisting language="java"><![CDATA[@Test 
+//@Ignore
+public void venueWAR() throws NamingException {
+    logger.info("*** venueWAR ***");
+    
+    VenueMgmtRemote venueMgmt=tf.lookup(VenueMgmtRemote.class, WEBVENUE_JNDINAME);
+    Venue venue = tf.makeVenue();
+    venueMgmt.createVenue(venue, 1, 2, 3);
+    
+    assertNotNull("could not locate venue:" + venue.getId(), venueMgmt.getVenue(venue.getId()));
+}]]></programlisting>
+            </figure>
+            </listitem>
+            
+            <listitem><para>Attempt the build the application from the parent pom. This
+                should fail for a familiar error -- Unknown entity.</para>
+            <figure>
+                <title>Build, Deploy, and Test WAR-embedded Persistence Unit (fail)</title>
+<programlisting language=""><![CDATA[$ mvn clean install
+...
+Tests run: 3, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 1.748 sec
+... 
+javax.ejb.EJBException: error creating venue:java.lang.IllegalArgumentException: 
+Unknown entity: org.myorg.jpatickets.bo.Venue
+...
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] EJB::JPA Tickets Lab::Exercise ..................... SUCCESS [  0.906 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::Impl ............... SUCCESS [ 25.933 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::EJB ................ SUCCESS [  0.806 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::EAR ................ SUCCESS [  0.470 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::WAR ................ SUCCESS [  0.773 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::IT Test ............ FAILURE [ 10.174 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE]]></programlisting>
+            </figure>
+            
+            <para>
+                Note in this case we have an entirely new persistence.xml. It is 
+                embedded within the WAR and deployed to WEB-INF/classes/META-INF.
+                The source location within the WAR module is src/main/resources.
+            </para>
+            <figure>
+                <title>WAR-based Embedded persistence.xml</title>
+<programlisting language=""><![CDATA[
+jpatickets-labex-war/target/jpatickets-labex-war
+`-- WEB-INF
+    |-- classes
+    |   |-- META-INF
+    |   |   `-- persistence.xml
+    |   `-- org
+    |       `-- myorg
+    |           `-- jpatickets
+    |               `-- webejb
+    |                   `-- WebVenueMgmtEJB.class]]></programlisting>
+
+<programlisting language=""><![CDATA[jpatickets-labex-war/src/
+`-- main
+    |-- resources
+    |   `-- META-INF
+    |       `-- persistence.xml]]></programlisting>
+
+                
+<programlisting language="xml"><![CDATA[<!-- TODO: supply jpatickets-labexsweb persistence unit --> 
+    <persistence-unit name="jpaticketsweb-labex">
+    </persistence-unit>]]></programlisting>                
+            </figure>
+            <para>
+                We are currently missing all of the internals of this persistence unit.
+            </para>
+            
+            </listitem>
+            
+            <listitem><para>Add jta-data-source and entity class references.</para>
+            <figure>
+                <title>WAR-based Embedded Persistence Unit (filled in)</title>
+<programlisting language="xml"><![CDATA[<persistence-unit name="jpaticketsweb-labex">
+    <jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
+    <class>org.myorg.jpatickets.bo.Venue</class>
+    <class>org.myorg.jpatickets.bo.Address</class>
+    <class>org.myorg.jpatickets.bo.Seat</class>
+    <class>org.myorg.jpatickets.bo.Event</class>
+    <class>org.myorg.jpatickets.bo.Ticket</class>
+</persistence-unit>]]></programlisting>
+            </figure>
+            </listitem>
+            
+            <listitem><para>Build, deploy, and test the WAR-based embedded persistence unit.
+                This should now pass and you should notice that three (3) IT tests were actually
+                executed and the rest are still ignored.
+                </para>
+            <figure>
+                <title>Build, Deploy, and Test WAR-embedded Persistence Unit (success)</title>
+<programlisting language=""><![CDATA[Tests run: 10, Failures: 0, Errors: 0, Skipped: 7
+...
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] EJB::JPA Tickets Lab::Exercise ..................... SUCCESS [  0.740 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::Impl ............... SUCCESS [ 10.747 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::EJB ................ SUCCESS [  0.880 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::EAR ................ SUCCESS [  0.566 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::WAR ................ SUCCESS [  0.860 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::IT Test ............ SUCCESS [ 11.401 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS]]></programlisting>
+            </figure>
+            </listitem>
+        </orderedlist>
+            
+        <para>
+            You have finished the third of three(3) different deployment types
+            for a persistence unit. In this last option you deployed a persistence 
+            unit for the explicit use by beans embedded within the WAR. Note the
+            beans in the WAR also had access to the persistence unit within the 
+            imported EJB if they wanted to share a persistence context at runtime
+            (quite likely).
+        </para>
+    </section>    
+
+    <section id="ejb-jpaexex-pu-summary">
+       <title>Summary</title>
+       <para>
+            In this exercise you deployed a persistence unit within a EAR-deployed and 
+            WAR-deployed EJB and embedded a persistence unit within a WAR for use by
+            embedded EJBs and other beans. From this point you should be able to begin
+            layering your implementation around the injected @PersistenceContext/EntityManager
+            and addressing issues that are of concern to the remote access to the EJB.
+        </para>
+    </section>    
+</chapter>
+  

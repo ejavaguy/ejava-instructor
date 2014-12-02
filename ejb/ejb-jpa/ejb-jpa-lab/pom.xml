@@ -3,27 +3,24 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>info.ejava.docs.ejb</groupId>
-        <artifactId>ejb-config</artifactId>
+        <artifactId>ejb-jpa</artifactId>
         <version>4.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>enc-config-lab</artifactId>
+    <artifactId>ejb-jpa-lab</artifactId>
     <packaging>pom</packaging>
 
-    <name>EJB:ENC Config::Exercise</name>
+    <name>EJB::JPA Server-Side::Exercise</name>
     <description>
-        This project provides instructions for configuration
-        of EJB with resources. Without this capability, EJBs
-        would just be a hollow shell with no capability other
-        than what the Java code inside them can provide. With
-        resource injection provided through the Enterprise 
-        Naming Context (ENC), an EJB can provide useful facade 
-        capability.
+        This project provides instructions for performing an
+        exercise for integrating JPA-based solutions into the 
+        EJB tier and issues to be tackled when forming RMI 
+        remote interfaces with server-side implementations.
     </description>
     
     <properties>
-       <doc.base>enc-config-lab-book</doc.base>
-       <content.version>v2014-10-22</content.version>
+       <doc.base>ejb-jpa-lab-book</doc.base>
+       <content.version>v2014-10-30</content.version>
     </properties>
 
     <build>

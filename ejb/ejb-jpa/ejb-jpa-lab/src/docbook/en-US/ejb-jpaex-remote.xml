@@ -1,0 +1,1279 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-jpaex-chapter">
+    <title>Remote Interface Issues</title>
+    <para>
+        In this chapter we are going to focus on identifying issues that occur
+        when interfacing with a JPA-based EJB and especially through a remote 
+        interface. To be fair -- not all of the issues covered in this chapter
+        are unique to JPA but the integration between the Java business
+        objects and database persistence technology is so seamless that it will 
+        definitely come up within this context.  
+    </para>
+
+
+    <section id="ejb-jpaex-remote-serializable">
+        <title>Serializable DTOs</title>
+        <para>
+            A Data Transfer Object (DTO) is anything you pass between the client
+            and server to express information. They could be based on XML or JSON
+            with class representations on either end. They could be simple Serializable
+            Java data structures or business objects (BOs) that are also mapped as 
+            JPA entities. Whatever the approach -- one key requirement is that all
+            Java objects passed through an RMI interface to a remote client must 
+            implement Serializable. Lets demonstrate that in this section. 
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>Activate the eventSerializable() @Test within EventMgmtIT.java</para>
+
+                <figure>
+                    <title>Activate eventSerializable() @Test</title>
+<programlisting language=""><![CDATA[jpatickets-labex-test/src/
+`-- test
+    |-- java
+    |   `-- org
+    |       `-- myorg
+    |           `-- jpatickets
+    |               `-- ejbclient
+    |                   |-- EventMgmtIT.java]]></programlisting>
+                    
+<programlisting language="java"><![CDATA[@Test
+//@Ignore
+public void eventSerializable() throws UnavailableException {
+    logger.info("*** eventSerializable ***");
+    Venue venue = venueMgmt.createVenue(tf.makeVenue(), 1, 2, 2);
+    Event event = eventMgmt.createEvent(tf.makeEvent(), venue);
+    assertNotNull("null tickets for event", event);
+    logger.info("event.tickets.class={}", event.getTickets().getClass());
+}]]></programlisting>                        
+                </figure>
+            </listitem>
+            
+            <listitem><para>Build, Deploy, and Test the application from the parent module</para>
+                <note>
+                    <para>
+                        You can use "mvn clean install -Dit.test=org.myorg.jpatickets.ejbclient.EventMgmtIT#testMethod"
+                        to execute a test against a specific IT test. You can obtain the fully
+                        qualified name of the class/testMethod within Eclipse by selecting the 
+                        method, right-click, and Copy Qualified Name.
+                    </para>
+                </note>
+                <figure>
+                    <title>Build, Deploy, and Test Serialization Problem</title>
+<programlisting language=""><![CDATA[$mvn clean install
+...
+Running org.myorg.jpatickets.ejbclient.EventMgmtIT
+22:12:14,708 INFO  (EventMgmtIT.java:37) -*** eventSerializable ***
+Tests run: 8, Failures: 0, Errors: 1, Skipped: 7, Time elapsed: 0.189 sec <<< FAILURE! - 
+in org.myorg.jpatickets.ejbclient.EventMgmtIT
+eventSerializable(org.myorg.jpatickets.ejbclient.EventMgmtIT)  Time elapsed: 0.155 sec  <<< ERROR!
+java.lang.IllegalStateException: EJBCLIENT000025: No EJB receiver available for handling 
+[appName:jpatickets-labex-ear, moduleName:jpatickets-labex-ejb, distinctName:] 
+combination for invocation context org.jboss.ejb.client.EJBClientInvocationContext@18218b5
+]]></programlisting>                        
+                </figure>
+                <para>
+                    This problem can be hard to solve because there is no pointer to the 
+                    problem. We have a DTO in one of our interface methods that has not
+                    implemented Serializable. I can usually tell that when one or more other
+                    methods work and a specific method does not work and the client simply reports
+                    "No EJB receiver...".
+                </para>
+            </listitem>
+            
+            <listitem><para>Update Event to implement Serializable within Event.java
+                    in the impl module.
+                </para>
+                <para>
+                    Also uncomment the injection of the @PersistenceContext within the 
+                    EventMgmtEJB. We can uncomment this because we successfully deployed
+                    the persistence unit in the previous chapter. If you forget to 
+                    inject the @PersistenceContext -- then you will see the NullPointerException
+                    we encountered before.
+                </para>
+                
+                <figure>
+                    <title>Add implements Serializable to DTO</title>
+<programlisting language=""><![CDATA[jpatickets-labex-impl/src
+|-- main
+|   `-- java
+|       `-- org
+|           `-- myorg
+|               `-- jpatickets
+|                   |-- bo
+|                   |   |-- Event.java]]></programlisting>                        
+<programlisting language="java"><![CDATA[import java.io.Serializable;
+...
+public class Event implements Serializable {]]></programlisting>                        
+
+<programlisting language=""><![CDATA[jpatickets-labex-ejb/src/
+|-- main
+|   |-- java
+|   |   `-- org
+|   |       `-- myorg
+|   |           `-- jpatickets
+|   |               `-- ejb
+|   |                   |-- EventMgmtEJB.java]]></programlisting>
+                        
+<programlisting language="java"><![CDATA[@Stateless
+public class EventMgmtEJB implements EventMgmtRemote {
+    @PersistenceContext(unitName="jpatickets-labex")
+    private EntityManager em;]]></programlisting>
+                </figure>
+                
+            </listitem>
+            
+            <listitem><para>Attempt to build, deploy, and test the application in this state.
+                You will have fixed the previous problem but have uncovered a new problem with
+                a Hibernate class not found.</para>
+                <figure>
+                    <title>Build, Deploy, and Test Provider ClassNotFoundException Problem</title>
+<programlisting language=""><![CDATA[$ mvn clean install
+...
+22:31:28,343 INFO  (EventMgmtIT.java:37) -*** eventSerializable ***
+Tests run: 8, Failures: 0, Errors: 1, Skipped: 7, Time elapsed: 0.285 sec <<< FAILURE! - 
+in org.myorg.jpatickets.ejbclient.EventMgmtIT
+eventSerializable(org.myorg.jpatickets.ejbclient.EventMgmtIT)  Time elapsed: 0.268 sec  <<< ERROR!
+javax.ejb.EJBException: java.lang.ClassNotFoundException: 
+org.hibernate.collection.internal.PersistentBag]]></programlisting>                        
+                </figure>
+            </listitem>
+        </orderedlist>
+        
+        <para>
+            You have finished this section of the exercise where we identified a DTO 
+            passed in the remote interface that did not implement Serializable. We were 
+            able to determine that by possibly by inspecting all DTO classes used by the
+            interface method called because there was no specific error message pointing
+            us to the class in error. In the next section we will address the ClassNotFoundException.
+        </para>
+    </section>
+
+    <section id="ejb-jpaex-remote-classpath">
+        <title>Provider (Hibernate) Proxy Classes</title>
+        <para>
+            The previous section fixed an issue with non-Serializable DTOs, now we are faced 
+            with a result telling us "ClassNotFoundException: org.hibernate.collection.internal.PersistentBag".
+            Depending on our situation, it could have been this or a different Hibernate class.            
+        </para>
+        <para>
+            So where does this this Hibernate class come from? It came from the fact the EJB returned 
+            the result of a JPA query/access that returned a managed entity with proxy class instances
+            attached to watch for changes. These proxy classes were serialized along with the 
+            business object it was watching. The following is a gisting of the code executed on the 
+            server. It has the business logic and DAO layers removed to show the raw JPA call underneath 
+            the layers.
+        </para>
+        <figure>
+            <title>EventMgmtEJB.getEvent() Returns Managed @Entity</title>
+<programlisting language="java"><![CDATA[@Override
+@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+public Event getEvent(int id) {
+    logger.debug("getEvent({})", id);
+    return em.find(Event.class, eventId);
+}]]></programlisting>
+        </figure>
+        
+        <para>
+            We have a choice in how to fix this. We can either add the JAR that contains the missing class
+            to the client's classpath or we can attempt to remove the provider class entirely and pass
+            a pure POJO back to the client. In this section -- we will use the classpath solution.
+            This solution might be appropriate for internal system interfaces and not when you have 
+            clients from external organizations. In that later case -- you likely would not use RMI anyway
+            over other more web-friendly technologies like JAX-RS.
+        </para>
+        
+        
+        <orderedlist spacing="compact">
+            <listitem><para>Add the JAR that contains the missing class as a dependency of the RMI IT Test
+                    module. This is hibernate-core.</para>
+                <figure>
+                    <title>(option) Add hibernate-core Dependency to Resolve ClassNotFoundException</title>
+<programlisting language="xml"><![CDATA[<!-- necessary to supply hibernate classes when marshaling managed entities as DTOs -->
+<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-core</artifactId>
+</dependency>
+]]></programlisting>                        
+                </figure>
+                <para>
+                    Note that the above dependency -- without version# -- depends upon the 
+                    root pom defining a dependencyManagement with the version for implementation
+                    modules to use.
+                </para>
+
+                <figure>
+                    <title>Add Provider Artifact to Client Classpath/Dependencies</title>
+<programlisting language="xml"><![CDATA[<properties>
+    <hibernate-entitymanager.version>4.3.4.Final</hibernate-entitymanager.version>
+</properties>
+<dependencyManagement>
+    <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-core</artifactId>
+        <version>${hibernate-entitymanager.version}</version>
+    </dependency>
+</dependencyManagement>]]></programlisting>                        
+                </figure>
+            </listitem>
+            
+            
+            <listitem><para>Re-test the application. Note that since the changes we 
+                made were only on the client-side, there is no need to re-build or 
+                even re-deploy the entire application. If you are using an IDE you can just 
+                make the IT test code change and re-run the test without re-deploying.
+                </para>
+                <figure>
+                    <title>Successfully Resolve Class with new Client Dependency</title>
+<programlisting language=""><![CDATA[$ mvn clean install
+...
+Running org.myorg.jpatickets.ejbclient.EventMgmtIT
+23:30:58,787 INFO  (EventMgmtIT.java:37) -*** eventSerializable ***
+23:30:59,113 INFO  (EventMgmtIT.java:41) 
+-event.tickets.class=class org.hibernate.collection.internal.PersistentBag
+Tests run: 9, Failures: 0, Errors: 0, Skipped: 8, Time elapsed: 0.395 sec 
+- in org.myorg.jpatickets.ejbclient.EventMgmtIT]]></programlisting>                        
+                </figure>
+                <para>
+                    Note the PersistentBag class is still there. Our client just 
+                    knows what to do with it now.
+                </para>
+            </listitem>
+        </orderedlist>
+        <para>
+            You have finished solving the missing provider class by adding a classpath
+            dependency for the client on our persistence provider JAR. That may be a 
+            suitable answer for an internal client but may not be the solution for 
+            a remote client from a different application. In the next section(s) we
+            will look at alternative approaches. 
+        </para>
+    </section>
+    
+    <section id="ejb-jpaex-remote-touch">
+        <title>Lazy Loading Exception</title>
+        <para>
+            Before we introduce more solutions -- lets introduce another problem with 
+            re-using managed JPA entity classes as DTOs. In this case we are going to 
+            access more than just the initial object and the the reference was never 
+            realized on the server-side before marshaling to the client. Once the client
+            attempts to access the missing data -- it is too late. 
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>Activate the next two @Tests (eventLazy() and eventTouched()). 
+                    They both make calls to getEvent() and then attempt to access
+                    portions of the returned event. eventLazy() catches the exception
+                    and reports success when the anticipated error occurs. eventTouchedSome()
+                    does not attempt to catch the anticipated error and will fail until
+                    corrected.</para>
+
+                <figure>
+                    <title>Enable Lazy Load Tests</title>
+<programlisting language=""><![CDATA[jpatickets-labex-test/src/
+`-- test
+    |-- java
+    |   `-- org
+    |       `-- myorg
+    |           `-- jpatickets
+    |               `-- ejbclient
+    |                   |-- EventMgmtIT.java]]></programlisting>                        
+<programlisting language="java"><![CDATA[@Test
+//@Ignore
+public void eventLazy() throws UnavailableException {
+    logger.info("*** eventLazy ***");
+    Venue venue = venueMgmt.createVenue(tf.makeVenue(), 1, 2, 2);
+    Event event = eventMgmt.createEvent(tf.makeEvent(), venue);
+    
+    event=eventMgmt.getEvent(event.getId());
+    assertNotNull("null tickets for event", event.getTickets());
+    try {
+        assertTrue("no tickets for event", event.getTickets().size() > 0);
+        fail("did not get expected lazy-load exception");
+    } catch (Exception ex) {
+        logger.info("caught expected lazy-load exception:" + ex);
+    }
+}]]></programlisting>                        
+<programlisting language="java"><![CDATA[@Test
+//@Ignore
+public void eventTouchedSome() throws UnavailableException {
+    logger.info("*** eventTouchedSome ***");
+    Venue venue = venueMgmt.createVenue(tf.makeVenue(), 1, 2, 2);
+    Event event = eventMgmt.createEvent(tf.makeEvent(), venue);
+    
+    event=eventMgmt.getEvent(event.getId());
+//    event=eventMgmt.getEventTouchedSome(event.getId());
+    assertNotNull("null tickets for event", event.getTickets());
+    assertTrue("no tickets for event", event.getTickets().size() > 0);
+    for (Ticket t: event.getTickets()) {
+        try {
+            assertNotNull("no ticket price:" + t, t.getPrice());
+            fail("did not get expected lazy-load exception");
+        } catch (Exception ex) {
+            logger.info("caught expected lazy-load exception:" + ex);
+        }
+    }
+}]]></programlisting>                        
+                </figure>
+            </listitem>
+            
+            <listitem><para>Re-test the application with eventLazy() and eventTouchedSome() activated.
+                    The first will pass and the second will fail in their current state.</para> 
+                <figure>
+                    <title>Build, Deploy, and Test Lazy Load Problem</title>
+<programlisting language=""><![CDATA[
+EventMgmtIT.java:48) -*** eventLazy ***
+EventMgmtIT.java:58) -caught expected lazy-load exception:org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role: org.myorg.jpatickets.bo.Event.tickets, could not initialize proxy - no Session
+EventMgmtIT.java:65) -*** eventTouchedSome ***
+Tests run: 9, Failures: 0, Errors: 1, Skipped: 6, Time elapsed: 1.019 sec <<< FAILURE! - in org.myorg.jpatickets.ejbclient.EventMgmtIT
+eventTouchedSome(org.myorg.jpatickets.ejbclient.EventMgmtIT)  Time elapsed: 0.229 sec  <<< ERROR!
+org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role: org.myorg.jpatickets.bo.Event.tickets, could not initialize proxy - no Session
+        at org.hibernate.collection.internal.AbstractPersistentCollection.throwLazyInitializationException(AbstractPersistentCollection.java:572)
+        at org.hibernate.collection.internal.AbstractPersistentCollection.withTemporarySessionIfNeeded(AbstractPersistentCollection.java:212)
+        at org.hibernate.collection.internal.AbstractPersistentCollection.readSize(AbstractPersistentCollection.java:153)
+        at org.hibernate.collection.internal.PersistentBag.size(PersistentBag.java:278)
+        at org.myorg.jpatickets.ejbclient.EventMgmtIT.eventTouchedSome(EventMgmtIT.java:72)
+]]></programlisting>                        
+                </figure>
+            </listitem>
+            
+            <listitem><para>Update eventTouchedSome() to call getEventTouchedSome() instead of getEvent().</para> 
+                <figure>
+                    <title>Correct Lazy Load Problem by Pre-Touching on Server-side</title>
+<programlisting language=""><![CDATA[jpatickets-labex-test/src/
+`-- test
+    |-- java
+    |   `-- org
+    |       `-- myorg
+    |           `-- jpatickets
+    |               `-- ejbclient
+    |                   |-- EventMgmtIT.java]]></programlisting>                        
+<programlisting language="java"><![CDATA[// event=eventMgmt.getEvent(event.getId());
+event=eventMgmt.getEventTouchedSome(event.getId());]]></programlisting>                        
+                </figure>
+
+                <para>
+                    The difference between the two methods is that getEventTouchedSome()
+                    specifically accesses some of the properties of the event in order to 
+                    trigger the lazy-load to occur, in time on the server-side.
+                </para>
+
+                <figure>
+                    <title>Pre-Touching EJB Implementation</title>
+<programlisting language=""><![CDATA[jpatickets-labex-ejb/src/
+|-- main
+|   |-- java
+|   |   `-- org
+|   |       `-- myorg
+|   |           `-- jpatickets
+|   |               `-- ejb
+|   |                   |-- EventMgmtEJB.java]]></programlisting>                        
+<programlisting language="java"><![CDATA[@Override
+public Event getEventTouchedSome(int id) {
+    logger.debug("getEventTouchedSome({})", id);
+    Event event = getEvent(id);
+    //touch the ticket collection to load tickets prior to marshaling back
+    event.getTickets().size();
+    return event;
+}]]></programlisting>                        
+                </figure>
+            </listitem>
+
+            <listitem><para>Re-test the application now that you have updated the 
+                    eventTouchedSome() @Test method. The tests will both pass, but notice 
+                    that there were more lazy-loads to resolve.</para> 
+                <figure>
+                    <title>Build, Deploy, and Test Pre-Touching Solution</title>
+<programlisting language=""><![CDATA[$ mvn clean install
+...
+Running org.myorg.jpatickets.ejbclient.EventMgmtIT
+EventMgmtIT.java:37) -*** eventSerializable ***
+EventMgmtIT.java:41) -event.tickets.class=class org.hibernate.collection.internal.PersistentBag
+EventMgmtIT.java:48) -*** eventLazy ***
+EventMgmtIT.java:58) -caught expected lazy-load exception:org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role: org.myorg.jpatickets.bo.Event.tickets, could not initialize proxy - no Session
+EventMgmtIT.java:65) -*** eventTouchedSome ***
+EventMgmtIT.java:78) -caught expected lazy-load exception:org.hibernate.LazyInitializationException: could not initialize proxy - no Session
+EventMgmtIT.java:78) -caught expected lazy-load exception:org.hibernate.LazyInitializationException: could not initialize proxy - no Session
+...
+Tests run: 9, Failures: 0, Errors: 0, Skipped: 6, Time elapsed: 1.09 sec - in org.myorg.jpatickets.ejbclient.EventMgmtIT]]></programlisting>                        
+                </figure>
+            </listitem>
+            
+            <listitem><para>Activate the eventTouchedMore() @Test method to demonstrate 
+                    a possible solution to completing client access to the necessary data.
+                </para> 
+                <figure>
+                    <title>Activate eventTouchedMore() to Demonstrate Full Load</title>
+<programlisting language=""><![CDATA[
+jpatickets-labex-test/src/
+`-- test
+    |-- java
+    |   `-- org
+    |       `-- myorg
+    |           `-- jpatickets
+    |               `-- ejbclient
+    |                   |-- EventMgmtIT.java
+]]></programlisting>                        
+<programlisting language="java"><![CDATA[@Test
+//@Ignore
+public void eventTouchedMore() throws UnavailableException {
+    logger.info("*** eventTouchedMore ***");
+    Venue venue = venueMgmt.createVenue(tf.makeVenue(), 1, 2, 2);
+    Event event = eventMgmt.createEvent(tf.makeEvent(), venue);
+    
+    event=eventMgmt.getEventTouchedMore(event.getId()); //<===
+    assertNotNull("null tickets for event", event.getTickets());
+    assertTrue("no tickets for event", event.getTickets().size() > 0);
+    for (Ticket t: event.getTickets()) {
+        assertNotNull("no ticket price:" + t, t.getPrice());
+        assertTrue("unexpected ticket price:" + t, t.getPrice().intValue() > 0);
+        Seat s = t.getSeat();
+        assertNotNull("null seat", s);
+    }
+}]]></programlisting>                        
+                </figure>
+                
+                <para>
+                    This solution works because the getEventTouchedMore() method 
+                    on the server-side does a more complete walk of the object graph 
+                    before returning it to the client.
+                </para>
+                <figure>
+                    <title>Deeper Pre-Touch Solution Allowing More Data Returned</title>
+<programlisting language=""><![CDATA[jpatickets-labex-ejb/src/
+|-- main
+|   |-- java
+|   |   `-- org
+|   |       `-- myorg
+|   |           `-- jpatickets
+|   |               |-- dto
+|   |               |   `-- EventDTO.java
+|   |               `-- ejb
+|   |                   |-- EventMgmtEJB.java]]></programlisting>                        
+<programlisting language="java"><![CDATA[@Override
+public Event getEventTouchedMore(int id) {
+    logger.debug("getEventTouchedMore({})", id);
+    Event event = getEvent(id);
+    //touch ticket collection and all seats to load both prior to marshaling back
+    event.getTickets().size();
+    event.getVenue().getName();
+    for (Ticket t: event.getTickets()) {
+        t.getSeat().getPosition();
+    }
+    return event;
+}]]></programlisting>                        
+                </figure>
+            </listitem>
+            
+            <listitem><para>Re-test the application with eventTouchedMore() @Test method 
+                    activated. This will pass because the client is now serialized an 
+                    object that has been fully loaded prior to being marshaled back.</para> 
+                <figure>
+                    <title>Build, Deploy, and Test Deeper Pre-Touch Solution</title>
+<programlisting language=""><![CDATA[$ mvn clean install -Dit.test=org.myorg.jpatickets.ejbclient.EventMgmtIT#eventTouchedMore
+...
+00:50:33,856 INFO  (EventMgmtIT.java:86) -*** eventTouchedMore ***
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.928 sec - in org.myorg.jpatickets.ejbclient.EventMgmtIT
+...
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0]]></programlisting>                        
+                </figure>
+            </listitem>
+        </orderedlist>
+
+        <para>
+            You have completed implementing a solution for lazy-load exceptions on the 
+            client when marshaling back managed entity classes. In this solution the 
+            server-side pre-touched every entity that was required in the response to the
+            client. It functionally worked, but if you were paying attention to the activity
+            on the server-side you should have noticed a lot of extra database activity going
+            one to resolve those lazy-loads. It is inefficient to do it this way and we will
+            look to see how we can improve in a later section of this exercise.
+        </para>        
+        
+            <figure>
+                <title>Excessive Server-side Lazy Loads during Pre-Touching</title>
+<programlisting language=""><![CDATA[
+EventMgmtEJB] (EJB default - 8) *** EventMgmtEJB:init(752888223) ***
+EventMgmtEJB] (EJB default - 8) getEventTouchedMore(182)
+EventMgmtEJB] (EJB default - 8) getEvent(182)
+Hibernate: select event0_.EVENT_ID as EVENT_ID1_0_0_, event0_.EVENT_NAME as EVENT_NA2_0_0_, 
+   event0_.START_TIME as START_TI3_0_0_, event0_.VENUE_ID as VENUE_ID4_0_0_ 
+   from JPATICKETS_EVENT event0_ where event0_.EVENT_ID=?
+Hibernate: select tickets0_.EVENT_ID as EVENT_ID1_0_0_, tickets0_.EVENT_ID as EVENT_ID1_1_0_, 
+   tickets0_.VENUE_ID as VENUE_ID0_1_0_, tickets0_.SECTION as SECTION0_1_0_, tickets0_.ROW as ROW0_1_0_, 
+   tickets0_.POSITION as POSITION0_1_0_, tickets0_.EVENT_ID as EVENT_ID1_1_1_, tickets0_.VENUE_ID as VENUE_ID0_1_1_, 
+   tickets0_.SECTION as SECTION0_1_1_, tickets0_.ROW as ROW0_1_1_, tickets0_.POSITION as POSITION0_1_1_, 
+   tickets0_.VENUE_ID as VENUE_ID4_1_1_, tickets0_.SECTION as SECTION5_1_1_, tickets0_.ROW as ROW6_1_1_, 
+   tickets0_.POSITION as POSITION7_1_1_, tickets0_.PRICE as PRICE2_1_1_, tickets0_.SOLD as SOLD3_1_1_ 
+   from JPATICKETS_TICKET tickets0_ where tickets0_.EVENT_ID=?
+Hibernate: select venue0_.VENUE_ID as VENUE_ID1_2_0_, venue0_.CITY as CITY2_2_0_, venue0_.STATE as STATE3_2_0_, 
+   venue0_.STREET as STREET4_2_0_, venue0_.POSTAL_CODE as POSTAL_C5_2_0_, venue0_.NAME as NAME6_2_0_ 
+   from JPATICKETS_VENUE venue0_ where venue0_.VENUE_ID=?
+Hibernate: select seat0_.POSTION as POSTION1_3_0_, seat0_.ROW as ROW2_3_0_, seat0_.SECTION as SECTION3_3_0_, 
+   seat0_.VENUE_ID as VENUE_ID4_3_0_ from JPATICKET_SEAT seat0_ 
+   where seat0_.POSTION=? and seat0_.ROW=? and seat0_.SECTION=? and seat0_.VENUE_ID=?
+Hibernate: select seat0_.POSTION as POSTION1_3_0_, seat0_.ROW as ROW2_3_0_, seat0_.SECTION as SECTION3_3_0_, 
+   seat0_.VENUE_ID as VENUE_ID4_3_0_ from JPATICKET_SEAT seat0_ 
+   where seat0_.POSTION=? and seat0_.ROW=? and seat0_.SECTION=? and seat0_.VENUE_ID=?
+Hibernate: select seat0_.POSTION as POSTION1_3_0_, seat0_.ROW as ROW2_3_0_, seat0_.SECTION as SECTION3_3_0_, 
+   seat0_.VENUE_ID as VENUE_ID4_3_0_ from JPATICKET_SEAT seat0_ 
+   where seat0_.POSTION=? and seat0_.ROW=? and seat0_.SECTION=? and seat0_.VENUE_ID=?
+Hibernate: select seat0_.POSTION as POSTION1_3_0_, seat0_.ROW as ROW2_3_0_, seat0_.SECTION as SECTION3_3_0_, 
+   seat0_.VENUE_ID as VENUE_ID4_3_0_ from JPATICKET_SEAT seat0_ 
+   where seat0_.POSTION=? and seat0_.ROW=? and seat0_.SECTION=? and seat0_.VENUE_ID=?
+EventMgmtEJB] (EJB default - 8) *** EventMgmtEJB:destroy(752888223) ***
+]]></programlisting>                        
+            </figure>
+        
+    </section>
+    
+
+    <section id="ejb-jpaex-remote-cleansed">
+        <title>Cleansed BO/DTO</title>
+        <para>
+            Lets address a possible solution to two problems; lazy-load and provider classes.
+            In a previous section we added to the client's classpath to resolve the 
+            provider class(es). In this section we will take a different approach 
+            and cleans the managed entity by creating a new instance and copying over the data.
+            This will not only solve our provider class problem -- it will also coincidentally 
+            solve our lazy-load issue because we will be accessing any information we copy
+            into the pure POJOs.             
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>Activate the eventCleansed() @Test. This test will inspect the
+                    class type of the tickets collection returned and fail if the getter()
+                    returns a provider-based class.</para>
+                <figure>
+                    <title>Activate eventCleansed() @Test</title>
+<programlisting language=""><![CDATA[jpatickets-labex-test/src/
+`-- test
+    |-- java
+    |   `-- org
+    |       `-- myorg
+    |           `-- jpatickets
+    |               `-- ejbclient
+    |                   |-- EventMgmtIT.java]]></programlisting>                        
+<programlisting language="java"><![CDATA[@Test
+//@Ignore
+public void eventCleansed() throws UnavailableException {
+    logger.info("*** eventCleansed ***");
+    Venue venue = venueMgmt.createVenue(tf.makeVenue(), 1, 2, 2);
+    Event event = eventMgmt.createEvent(tf.makeEvent(), venue);
+    
+    logger.info("event.tickets.class={}", event.getTickets().getClass());
+    assertTrue("missing provider class", event.getTickets().getClass().getName().contains("org.hibernate"));
+    event=eventMgmt.getEvent(event.getId());
+//    event=eventMgmt.getEventCleansed(event.getId());
+    logger.info("(cleansed)event.tickets.class={}", event.getTickets().getClass());
+    assertFalse("unexpected provider class", event.getTickets().getClass().getName().contains("org.hibernate"));
+}]]></programlisting>                        
+                </figure>
+            </listitem>
+
+            <listitem><para>Re-test the application with the eventCleansed() @Test activated. 
+                    This test will fail because the getter() returned an object instance that
+                    contained a provider class.</para>
+                <figure>
+                    <title>Uncleansed Object Returned</title>
+<programlisting language=""><![CDATA[$ mvn clean install
+EventMgmtIT.java:47) -*** eventCleansed ***
+EventMgmtIT.java:51) -event.tickets.class=class org.hibernate.collection.internal.PersistentBag
+EventMgmtIT.java:55) -(cleansed)event.tickets.class=class org.hibernate.collection.internal.PersistentBag
+Tests run: 9, Failures: 1, Errors: 0, Skipped: 7, Time elapsed: 0.965 sec <<< FAILURE! - in org.myorg.jpatickets.ejbclient.EventMgmtIT
+eventCleansed(org.myorg.jpatickets.ejbclient.EventMgmtIT)  Time elapsed: 0.343 sec  <<< FAILURE!
+java.lang.AssertionError: unexpected provider class
+        at org.junit.Assert.fail(Assert.java:88)
+        at org.junit.Assert.assertTrue(Assert.java:41)
+        at org.junit.Assert.assertFalse(Assert.java:64)
+        at org.myorg.jpatickets.ejbclient.EventMgmtIT.eventCleansed(EventMgmtIT.java:56)
+]]></programlisting>                        
+                </figure>
+            </listitem>
+
+            <listitem><para>Update the implementation of the eventCleansed() @Test method to
+                    call getEventCleansed() instead of getEvent()</para>
+                <figure>
+                    <title>Update @Test to obtain DTO Cleansed of Provider Classes</title>
+<programlisting language=""><![CDATA[jpatickets-labex-test/src/
+`-- test
+    |-- java
+    |   `-- org
+    |       `-- myorg
+    |           `-- jpatickets
+    |               `-- ejbclient
+    |                   |-- EventMgmtIT.java]]></programlisting>                        
+<programlisting language="java"><![CDATA[//    event=eventMgmt.getEvent(event.getId());
+    event=eventMgmt.getEventCleansed(event.getId());]]></programlisting>                        
+                </figure>
+
+                <para>
+                    The new call will call a wrapper method within the EJB that will 
+                    create a new Event POJO and copy over state information from 
+                    the managed Event entity. The chain usually continues (i.e., to Tickets)
+                    until we have created clean POJO clones free of all provider classes. 
+                </para>
+                <figure>
+                    <title>EventMgmtEJB.getCleansedEvent()</title>
+<programlisting language=""><![CDATA[jpatickets-labex-ejb/src/
+|-- main
+|   |-- java
+|   |   `-- org
+|   |       `-- myorg
+|   |           `-- jpatickets
+|   |               `-- ejb
+|   |                   |-- EventMgmtEJB.java]]></programlisting>                        
+<programlisting language="java"><![CDATA[@Override
+public Event getEventCleansed(int id) {
+    logger.debug("getCleansedEvent({})", id);
+    Event event = getEvent(id);
+    return toCleansed(event);
+}
+private Event toCleansed(Event bo) {
+    Event pojo = new Event(bo.getId());
+    pojo.setName(bo.getName());
+    pojo.setStartTime(bo.getStartTime());
+    List<Ticket> tickets = new ArrayList<>(bo.getTickets().size());
+    for (Ticket t: bo.getTickets()) {
+        toCleansed(t, pojo);
+    }
+    pojo.setTickets(tickets);
+    return pojo;
+}
+private Ticket toCleansed(Ticket bo, Event event) {
+    //example cleansing is stopping here for the example
+    Ticket pojo = new Ticket(event, bo.getSeat());
+    pojo.setPrice(bo.getPrice());
+    pojo.setSold(bo.isSold());
+    return pojo;
+}]]></programlisting>                        
+                </figure>
+            </listitem>
+
+            <listitem><para>Re-test the application now that the client has been updated
+                to call getCleansedEvent() to get a POJO that does not contain provider 
+                classes. This test should now pass.</para>
+                <figure>
+                    <title>Build, Deploy, and Test DTO Cleansing Solution</title>
+<programlisting language=""><![CDATA[$ mvn clean install
+...
+Running org.myorg.jpatickets.ejbclient.EventMgmtIT
+...
+00:01:28,198 INFO  (EventMgmtIT.java:47) -*** eventCleansed ***
+00:01:28,265 INFO  (EventMgmtIT.java:51) -event.tickets.class=class org.hibernate.collection.internal.PersistentBag
+00:01:28,293 INFO  (EventMgmtIT.java:55) -(cleansed)event.tickets.class=class java.util.ArrayList
+Tests run: 9, Failures: 0, Errors: 0, Skipped: 7, Time elapsed: 0.516 sec - in org.myorg.jpatickets.ejbclient.EventMgmtIT
+]]></programlisting>                        
+                </figure>
+            </listitem>
+        </orderedlist>
+        
+        <para>
+            You have completed a solution approach where we can create a cleansed POJO
+            to be returned to the client rather than update the client classpath. However, 
+            look at the lazy-load activity we triggered on the client side. This likely 
+            occurred during the previous solution as well but it is easier to spot with the 
+            explicit cloning calls being made within the EJB. We will look to optimize this
+            in a future section of this exercise. Just know for now that this solution is 
+            not 100% perfect. 
+        </para>
+        <figure>
+            <title>BO/DTO Cleansing Triggering Unefficient Lazy Loads</title>
+<programlisting language=""><![CDATA[
+EventMgmtEJB] (EJB default - 6) *** EventMgmtEJB:init(1746126146) ***
+EventMgmtEJB] (EJB default - 6) getCleansedEvent(161)
+EventMgmtEJB] (EJB default - 6) getEvent(161)
+[stdout] (EJB default - 6) Hibernate: select event0_.EVENT_ID as EVENT_ID1_0_0_, event0_.EVENT_NAME as EVENT_NA2_0_0_, 
+   event0_.START_TIME as START_TI3_0_0_, event0_.VENUE_ID as VENUE_ID4_0_0_ 
+   from JPATICKETS_EVENT event0_ where event0_.EVENT_ID=?
+[stdout] (EJB default - 6) Hibernate: select tickets0_.EVENT_ID as EVENT_ID1_0_0_, tickets0_.EVENT_ID as EVENT_ID1_1_0_, 
+   tickets0_.VENUE_ID as VENUE_ID0_1_0_, tickets0_.SECTION as SECTION0_1_0_, tickets0_.ROW as ROW0_1_0_, 
+   tickets0_.POSITION as POSITION0_1_0_, tickets0_.EVENT_ID as EVENT_ID1_1_1_, tickets0_.VENUE_ID as VENUE_ID0_1_1_, 
+   tickets0_.SECTION as SECTION0_1_1_, tickets0_.ROW as ROW0_1_1_, tickets0_.POSITION as POSITION0_1_1_, 
+   tickets0_.VENUE_ID as VENUE_ID4_1_1_, tickets0_.SECTION as SECTION5_1_1_, tickets0_.ROW as ROW6_1_1_, 
+   tickets0_.POSITION as POSITION7_1_1_, tickets0_.PRICE as PRICE2_1_1_, tickets0_.SOLD as SOLD3_1_1_ 
+   from JPATICKETS_TICKET tickets0_ where tickets0_.EVENT_ID=?
+EventMgmtEJB] (EJB default - 6) *** EventMgmtEJB:destroy(1746126146) ***
+]]></programlisting>                        
+        </figure>
+    </section>
+
+
+    <section id="ejb-jpaex-remote-load">
+        <title>Pre-Loaded Entities</title>
+        <para>
+            In this section we will enlist some direct help from the DAO to fetch 
+            data from the database in a manner that is more efficient and tuned for
+            returning information to the caller.
+        </para>
+        
+        <orderedlist spacing="compact">
+            <listitem><para>Activate the eventFetchedSome() @Test method. This implementation
+                    will allow the client to access additional information but not all of the 
+                    event information without additional work.</para>
+
+                <figure>
+                    <title>Activate eventFetchSome() @Test</title>
+<programlisting language=""><![CDATA[jpatickets-labex-test/src/
+`-- test
+    |-- java
+    |   `-- org
+    |       `-- myorg
+    |           `-- jpatickets
+    |               `-- ejbclient
+    |                   |-- EventMgmtIT.java]]></programlisting>                        
+<programlisting language="java"><![CDATA[@Test
+//@Ignore
+public void eventFetchedSome() throws UnavailableException {
+    logger.info("*** eventFetchedSome ***");
+    Venue venue = venueMgmt.createVenue(tf.makeVenue(), 1, 2, 2);
+    Event event = eventMgmt.createEvent(tf.makeEvent(), venue);
+    
+    event=eventMgmt.getEventFetchedSome(event.getId());
+    assertNotNull("null tickets for event", event.getTickets());
+    assertTrue("no tickets for event", event.getTickets().size() > 0);
+    for (Ticket t: event.getTickets()) {
+        try {
+            assertNotNull("no ticket price:" + t, t.getPrice());
+            fail("did not get expected lazy-load exception");
+        } catch (Exception ex) {
+            logger.info("caught expected lazy-load exception:" + ex);
+        }
+    }
+}]]></programlisting>                        
+                </figure>
+                
+                <para>
+                    The above client call will now be calling a JPA-QL query instead of a simple
+                    em.find(). In the figure below I have removed the business logic and 
+                    DAO layers from the call and exposed the raw NamedQuery -- which is defined
+                    in the Event @Entity class. The JPA-QL performs a "join fetch" on the 
+                    tickets to pre-load that collection. That allows the client to call 
+                    event.getTickets().size() without suffering a lazy-load error and it allows
+                    the information to be more efficiently accessed from the database.
+                </para>
+                
+                <figure>
+                    <title>Partial Pre-Fetching Solution</title>
+<programlisting language=""><![CDATA[jpatickets-labex-ejb/src/                                                                                                                                                                                          
+|-- main                                                                                                                                                                                                           
+|   |-- java                                                                                                                                                                                                       
+|   |   `-- org                                                                                                                                                                                                    
+|   |       `-- myorg                                                                                                                                                                                              
+|   |           `-- jpatickets                                                                                                                                                                                     
+|   |               `-- ejb                                                                                                                                                                                        
+|   |                   |-- EventMgmtEJB.java ]]></programlisting>                        
+<programlisting language="java"><![CDATA[@Override
+public Event getEventFetchedSome(int id) {
+    logger.debug("getEventFetchedSome({})", id);
+    List<Event> events = em.createNamedQuery("JPATicketEvent.fetchEventTickets", 
+            Event.class)
+            .setParameter("eventId", id)
+            .getResultList();
+    return events.isEmpty() ? null : events.get(0);
+}]]></programlisting>                 
+       
+<programlisting language=""><![CDATA[jpatickets-labex-impl/src/
+|-- main
+|   `-- java
+|       `-- org
+|           `-- myorg
+|               `-- jpatickets
+|                   |   |-- Event.java]]></programlisting>
+                        
+<programlisting language="java"><![CDATA[@Entity
+@NamedQueries({
+    @NamedQuery(name="JPATicketEvent.fetchEventTickets", 
+        query="select e from Event e "
+                + "join fetch e.tickets "
+                + "where e.id=:eventId")
+})
+public class Event implements Serializable /* */ {]]></programlisting>                        
+                </figure>
+                
+                
+                
+                
+            </listitem>
+            
+            
+            <listitem><para>Test the newly activated eventFetchedSome() @Test method and notice how the 
+                subsequent query for the tickets after getting the event has been replaced by a single, 
+                more complex query -- which should be faster because of the fewer calls.</para>
+                <figure>
+                    <title>Build, Deploy, and Test Partial Pre-Fetching Solution</title>
+<programlisting language=""><![CDATA[$ mvn clean install -Dit.test=org.myorg.jpatickets.ejbclient.EventMgmtIT#eventFetchedSome
+...
+EventMgmtIT.java:121) -*** eventFetchedSome ***
+EventMgmtIT.java:133) -caught expected lazy-load exception:org.hibernate.LazyInitializationException: could not initialize proxy - no Session
+...
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.175 sec - in org.myorg.jpatickets.ejbclient.EventMgmtIT
+01:04:21,380 INFO  (ChannelAssociation.java:458) -EJBCLIENT000016: Channel Channel ID e5553882 (outbound) of Remoting connection 374287a9 to localhost/127.0.0.1:8080 can no longer process messages
+
+Results :
+
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+]]></programlisting>                        
+<programlisting language=""><![CDATA[EventMgmtEJB] (EJB default - 2) *** EventMgmtEJB:init(533059749) ***
+EventMgmtEJB] (EJB default - 2) getEventFetchedSome(183)
+Hibernate: select event0_.EVENT_ID as EVENT_ID1_0_0_, tickets1_.EVENT_ID as EVENT_ID1_1_1_, 
+   tickets1_.VENUE_ID as VENUE_ID0_1_1_, tickets1_.SECTION as SECTION0_1_1_, tickets1_.ROW as ROW0_1_1_, 
+   tickets1_.POSITION as POSITION0_1_1_, event0_.EVENT_NAME as EVENT_NA2_0_0_, event0_.START_TIME as START_TI3_0_0_, 
+   event0_.VENUE_ID as VENUE_ID4_0_0_, tickets1_.VENUE_ID as VENUE_ID4_1_1_, tickets1_.SECTION as SECTION5_1_1_, 
+   tickets1_.ROW as ROW6_1_1_, tickets1_.POSITION as POSITION7_1_1_, tickets1_.PRICE as PRICE2_1_1_, 
+   tickets1_.SOLD as SOLD3_1_1_, tickets1_.EVENT_ID as EVENT_ID1_0_0__, tickets1_.EVENT_ID as EVENT_ID1_1_0__, 
+   tickets1_.VENUE_ID as VENUE_ID0_1_0__, tickets1_.SECTION as SECTION0_1_0__, tickets1_.ROW as ROW0_1_0__, 
+   tickets1_.POSITION as POSITION0_1_0__ from JPATICKETS_EVENT event0_ 
+   inner join JPATICKETS_TICKET tickets1_ on event0_.EVENT_ID=tickets1_.EVENT_ID 
+   where event0_.EVENT_ID=?]]></programlisting>                        
+                </figure>
+            </listitem>
+            
+            <listitem><para>Lets take this a step further and attempt to optimize getting
+                more information from the event. Activate the eventFetchedMore() @Test
+                method.</para>
+                <figure>
+                    <title>Activate eventFetchMore() @Test</title>
+<programlisting language=""><![CDATA[jpatickets-labex-test/src/
+`-- test
+    |-- java
+    |   `-- org
+    |       `-- myorg
+    |           `-- jpatickets
+    |               `-- ejbclient
+    |                   |-- EventMgmtIT.java]]></programlisting>                        
+<programlisting language="java"><![CDATA[@Test
+//@Ignore
+public void eventFetchedMore() throws UnavailableException {
+    logger.info("*** eventFetchedMore ***");
+    Venue venue = venueMgmt.createVenue(tf.makeVenue(), 1, 2, 2);
+    Event event = eventMgmt.createEvent(tf.makeEvent(), venue);
+    
+    event=eventMgmt.getEventFetchedMore(event.getId());
+    assertNotNull("null tickets for event", event.getTickets());
+    assertTrue("no tickets for event", event.getTickets().size() > 0);
+    for (Ticket t: event.getTickets()) {
+        assertNotNull("no ticket price:" + t, t.getPrice());
+        assertTrue("unexpected ticket price:" + t, t.getPrice().intValue() > 0);
+        Seat s = t.getSeat();
+        assertNotNull("null seat", s);
+    }
+}]]></programlisting>                        
+                </figure>
+                
+                <para>
+                    The above call uncovers an impact because the EJB and supporting DAO call
+                    execute a deeper "join fetch" to satisfy a more complex information need.
+                </para>
+                
+                <figure>
+                    <title>Deeper Pre-Fetching Solution</title>
+<programlisting language=""><![CDATA[jpatickets-labex-ejb/src/
+|-- main
+|   |-- java
+|   |   `-- org
+|   |       `-- myorg
+|   |           `-- jpatickets
+|   |               |-- dto
+|   |               |   `-- EventDTO.java
+|   |               `-- ejb
+|   |                   |-- EventMgmtEJB.java]]></programlisting>                        
+<programlisting language="java"><![CDATA[@Override
+public Event getEventFetchedMore(int id) {
+    logger.debug("getEventFetchedMore({})", id);
+    List<Event> events = em.createNamedQuery("JPATicketEvent.fetchEventTicketsSeats", 
+            Event.class)
+            .setParameter("eventId", id)
+            .getResultList();
+    return events.isEmpty() ? null : events.get(0);
+}]]></programlisting>                        
+<programlisting language=""><![CDATA[jpatickets-labex-impl/src/
+|-- main
+|   `-- java
+|       `-- org
+|           `-- myorg
+|               `-- jpatickets
+|                   |   |-- Event.java]]></programlisting>
+<programlisting language="java"><![CDATA[@Entity
+@NamedQueries({
+    @NamedQuery(name="JPATicketEvent.fetchEventTicketsSeats", 
+        query="select e from Event e "
+                + "join fetch e.venue "
+                + "join fetch e.tickets t "
+                + "join fetch t.seat "
+                + "where e.id=:eventId")
+})
+public class Event implements Serializable /* */ {]]></programlisting>                        
+                </figure>
+            </listitem>
+            
+            <listitem><para>Test the newly activated eventFetchedMore() @Test and notice 
+                    how the information was obtained from the database. This query by itself may be
+                    an expensive query but it is going to be faster than the EJB tier going back and
+                    getting information using multiple, separate queries.</para>
+                <figure>
+                    <title>Build, Deploy, and Test Deeper Pre-Fetching Solution</title>
+<programlisting language=""><![CDATA[$ mvn clean install -Dit.test=org.myorg.jpatickets.ejbclient.EventMgmtIT#eventFetchedMore
+...
+01:29:52,688 INFO  (EventMgmtIT.java:141) -*** eventFetchedMore ***
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.812 sec - in org.myorg.jpatickets.ejbclient.EventMgmtIT]]></programlisting>                        
+<programlisting language=""><![CDATA[
+EventMgmtEJB] (EJB default - 6) *** EventMgmtEJB:init(454399101) ***
+EventMgmtEJB] (EJB default - 6) getEventFetchedMore(184)
+Hibernate: select event0_.EVENT_ID as EVENT_ID1_0_0_, venue1_.VENUE_ID as VENUE_ID1_2_1_, tickets2_.EVENT_ID as EVENT_ID1_1_2_, 
+   tickets2_.VENUE_ID as VENUE_ID0_1_2_, tickets2_.SECTION as SECTION0_1_2_, tickets2_.ROW as ROW0_1_2_, 
+   tickets2_.POSITION as POSITION0_1_2_, seat3_.POSTION as POSTION1_3_3_, seat3_.ROW as ROW2_3_3_, 
+   seat3_.SECTION as SECTION3_3_3_, seat3_.VENUE_ID as VENUE_ID4_3_3_, event0_.EVENT_NAME as EVENT_NA2_0_0_, 
+   event0_.START_TIME as START_TI3_0_0_, event0_.VENUE_ID as VENUE_ID4_0_0_, venue1_.CITY as CITY2_2_1_, 
+   venue1_.STATE as STATE3_2_1_, venue1_.STREET as STREET4_2_1_, venue1_.POSTAL_CODE as POSTAL_C5_2_1_, 
+   venue1_.NAME as NAME6_2_1_, tickets2_.VENUE_ID as VENUE_ID4_1_2_, tickets2_.SECTION as SECTION5_1_2_, 
+   tickets2_.ROW as ROW6_1_2_, tickets2_.POSITION as POSITION7_1_2_, tickets2_.PRICE as PRICE2_1_2_, 
+   tickets2_.SOLD as SOLD3_1_2_, tickets2_.EVENT_ID as EVENT_ID1_0_0__, tickets2_.EVENT_ID as EVENT_ID1_1_0__, 
+   tickets2_.VENUE_ID as VENUE_ID0_1_0__, tickets2_.SECTION as SECTION0_1_0__, tickets2_.ROW as ROW0_1_0__, 
+   tickets2_.POSITION as POSITION0_1_0__ from JPATICKETS_EVENT event0_ 
+   inner join JPATICKETS_VENUE venue1_ on event0_.VENUE_ID=venue1_.VENUE_ID 
+   inner join JPATICKETS_TICKET tickets2_ on event0_.EVENT_ID=tickets2_.EVENT_ID 
+   inner join JPATICKET_SEAT seat3_ on tickets2_.VENUE_ID=seat3_.POSTION and 
+      tickets2_.SECTION=seat3_.ROW and 
+      tickets2_.ROW=seat3_.SECTION and 
+      tickets2_.POSITION=seat3_.VENUE_ID 
+   where event0_.EVENT_ID=?
+EventMgmtEJB] (EJB default - 6) *** EventMgmtEJB:destroy(454399101) ***
+]]></programlisting>                        
+                </figure>
+            </listitem>
+        </orderedlist>
+        
+        <para>
+            You have completed a solution for lazy-load that can be more efficient than 
+            simple pre-touching of the managed entities prior to marshalling back to the 
+            client. If there is no other reason for brining up this topic -- it is to 
+            introduce the concept of the DAO supply methods that help support the construction
+            of DTOs that are necessary to express parts of the service/system to remote clients.
+        </para>
+    </section>
+
+    <section id="ejb-jpaex-remote-dto">    
+        <title>Separate DTO Classes</title>
+        <para>
+            In this section we will look at adding an new implementation approach for the DTO
+            pattern player. We will implement the DTO using a separate, Serializable class.
+            This allows the service to separate the database mapping and business implementation
+            concerns of the BO/entity from the information transfer to the remote clients.
+            This allows the service to design client-appropriate views DTOs that is independent
+            of the implementation data tier. 
+        </para>
+        <para>
+            In this section we are going to start with a brute force technique and then look to 
+            add direct DAO support. The brute force technique will look a lot like the cleansed
+            DTO approach except we are using an entirely different class.
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>Activate the eventLazyDTO() @Test method. This method will receive 
+                    a new POJO DTO class instance from the server that summarizes the key
+                    information a client needs to know about an Event.</para>
+                <figure>
+                    <title>Activate Brute Force DTO @Test</title>
+<programlisting language=""><![CDATA[jpatickets-labex-test/src/
+`-- test
+    |-- java
+    |   `-- org
+    |       `-- myorg
+    |           `-- jpatickets
+    |               `-- ejbclient
+    |                   |-- EventMgmtIT.java]]></programlisting>                        
+<programlisting language="java"><![CDATA[@Test
+//@Ignore
+public void eventLazyDTO() throws UnavailableException {
+    logger.info("*** eventLazyDTO ***");
+    Venue venue = venueMgmt.createVenue(tf.makeVenue(), 1, 2, 2);
+    Event event = tf.makeEvent();
+    int eventId = eventMgmt.createEvent(tf.makeEvent(), venue).getId();
+    
+    EventDTO dto=eventMgmt.getEventLazyDTO(eventId);
+    logger.debug("eventDTO={}", dto);
+    assertEquals("unexpected eventName", event.getName(), dto.getEventName());
+    assertEquals("unexpected venueName", venue.getName(), dto.getVenueName());
+    assertEquals("unexpected startTime", event.getStartTime(), dto.getStartTime());
+    assertTrue("no tickets for event", dto.getNumTickets() > 0);
+}]]></programlisting>                        
+                </figure>
+                
+                <para>
+                    The EventDTO removes the need for the Venue entity and just carries
+                    the venueName. It removes the need to carry all the tickets and 
+                    replaces that with just the number of tickets.
+                </para>
+                
+                <figure>
+                    <title>EventDTO Class</title>
+<programlisting language=""><![CDATA[jpatickets-labex-ejb/src/
+|-- main
+|   |-- java
+|   |   `-- org
+|   |       `-- myorg
+|   |           `-- jpatickets
+|   |               |-- dto
+|   |               |   `-- EventDTO.java]]></programlisting>                        
+<programlisting language="java"><![CDATA[public class EventDTO implements Serializable {
+    private int id;
+    private String eventName;
+    private String venueName;
+    private Date startTime;
+    private int numTickets;]]></programlisting>                        
+                </figure>
+
+                <para>
+                    I called this first implementation "brute-force" earlier in the 
+                    introduction. That is because the EJB method simply walks the 
+                    event managed entity and grabs what it needs -- loaded or not.
+                    As you should expect, this will cause a significant number of lazy-loads.
+                    We will improve shortly.
+                </para>
+
+                <figure>
+                    <title>Brute-Force getEventLazyDTO()</title>
+<programlisting language=""><![CDATA[jpatickets-labex-ejb/src/
+|-- main
+|   |-- java
+|   |   `-- org
+|   |       `-- myorg
+|   |           `-- jpatickets
+|   |               |-- dto
+|   |               |   `-- EventDTO.java]]></programlisting>                        
+<programlisting language="java"><![CDATA[@Override
+public EventDTO getEventLazyDTO(int id) {
+    logger.debug("getEventDTO({})", id);
+    Event event = eventMgmt.getEvent(id);
+    return toEventDTO(event);
+}
+
+private EventDTO toEventDTO(Event event) {
+    EventDTO dto = new EventDTO();
+    dto.setId(event.getId());
+    dto.setEventName(event.getName());
+    dto.setVenueName(event.getVenue().getName());
+    dto.setStartTime(event.getStartTime());
+    dto.setNumTickets(event.getTickets().size());
+    return dto;
+}]]></programlisting>                        
+                </figure>
+
+                
+            </listitem>
+            
+            <listitem><para>Run the newly activated eventLazyDTO() @Test method. Notice there was a 
+                    database access for the Event, a second for the Venue (to get the venueName), and a third
+                    for the Tickets (to get the count of tickets).</para>
+                <figure>
+                    <title>Lazy Loads from Brute Force DTO Construction</title>
+<programlisting language=""><![CDATA[$ mvn clean install -Dit.test=org.myorg.jpatickets.ejbclient.EventMgmtIT#eventLazyDTO
+...
+01:54:23,564 INFO  (EventMgmtIT.java:159) -*** eventLazyDTO ***
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.853 sec 
+- in org.myorg.jpatickets.ejbclient.EventMgmtIT]]></programlisting>                        
+<programlisting language=""><![CDATA[
+EventMgmtEJB] (EJB default - 4) *** EventMgmtEJB:init(1695166532) ***
+EventMgmtEJB] (EJB default - 4) getEventDTO(186)
+Hibernate: select event0_.EVENT_ID as EVENT_ID1_0_0_, event0_.EVENT_NAME as EVENT_NA2_0_0_, 
+   event0_.START_TIME as START_TI3_0_0_,  event0_.VENUE_ID as VENUE_ID4_0_0_ 
+   from JPATICKETS_EVENT event0_ where event0_.EVENT_ID=?
+Hibernate: select venue0_.VENUE_ID as VENUE_ID1_2_0_, venue0_.CITY as CITY2_2_0_, venue0_.STATE as STATE3_2_0_, 
+   venue0_.STREET as STREET4_2_0_, venue0_.POSTAL_CODE as POSTAL_C5_2_0_, venue0_.NAME as NAME6_2_0_ 
+   from JPATICKETS_VENUE venue0_ where venue0_.VENUE_ID=?
+Hibernate: select tickets0_.EVENT_ID as EVENT_ID1_0_0_, tickets0_.EVENT_ID as EVENT_ID1_1_0_, 
+   tickets0_.VENUE_ID as VENUE_ID0_1_0_, tickets0_.SECTION as SECTION0_1_0_, tickets0_.ROW as ROW0_1_0_, 
+   tickets0_.POSITION as POSITION0_1_0_, tickets0_.EVENT_ID as EVENT_ID1_1_1_, tickets0_.VENUE_ID as VENUE_ID0_1_1_, 
+   tickets0_.SECTION as SECTION0_1_1_, tickets0_.ROW as ROW0_1_1_, tickets0_.POSITION as POSITION0_1_1_, 
+   tickets0_.VENUE_ID as VENUE_ID4_1_1_, tickets0_.SECTION as SECTION5_1_1_, tickets0_.ROW as ROW6_1_1_, 
+   tickets0_.POSITION as POSITION7_1_1_, tickets0_.PRICE as PRICE2_1_1_, tickets0_.SOLD as SOLD3_1_1_ 
+   from JPATICKETS_TICKET tickets0_ 
+   where tickets0_.EVENT_ID=?
+EventMgmtEJB] (EJB default - 4) *** EventMgmtEJB:destroy(1695166532) ***
+]]></programlisting>                        
+                </figure>
+            </listitem>
+            
+            <listitem><para>Activate the last @Test within EventMgmtIT.java; eventFetchedDTO().
+                    This @Test demonstrates what can be done to add DAO support to build DTO
+                    responses.</para>
+                <figure>
+                    <title>Activate Fetched DTO @Test</title>
+<programlisting language=""><![CDATA[jpatickets-labex-test/src/
+`-- test
+    |-- java
+    |   `-- org
+    |       `-- myorg
+    |           `-- jpatickets
+    |               `-- ejbclient
+    |                   |-- EventMgmtIT.java]]></programlisting>                        
+<programlisting language="java"><![CDATA[@Test
+//@Ignore
+public void eventFetchedDTO() throws UnavailableException {
+    logger.info("*** eventFetchedDTO ***");
+    Venue venue = venueMgmt.createVenue(tf.makeVenue(), 1, 2, 2);
+    Event event = tf.makeEvent();
+    int eventId = eventMgmt.createEvent(tf.makeEvent(), venue).getId();
+    
+    EventDTO dto=eventMgmt.getEventFetchedDTO(eventId);
+    logger.debug("eventDTO={}", dto);
+    assertEquals("unexpected eventName", event.getName(), dto.getEventName());
+    assertEquals("unexpected venueName", venue.getName(), dto.getVenueName());
+    assertEquals("unexpected startTime", event.getStartTime(), dto.getStartTime());
+    assertTrue("no tickets for event", dto.getNumTickets() > 0);
+}]]></programlisting>                        
+                </figure>
+                
+                <para>
+                    The EJB invokes a NamedQuery on the DAO (layers have been removed for clarity)
+                    that is tuned to provide the information required for the EventDTO.
+                    The DAO returns the information (event, venueName, and numTickets) in a Map
+                    since the DTO is located in the EJB module and not accessible to the DAO code
+                    in the Impl module. The EJB uses the information from the map to populate 
+                    the DTO prior to returning it to the client.
+                </para>
+                
+                <figure>
+                    <title>Fetched DTO EJB/DAO Calls</title>
+<programlisting language=""><![CDATA[jpatickets-labex-ejb/src/
+|-- main
+|   |-- java
+|   |   `-- org
+|   |       `-- myorg
+|   |           `-- jpatickets
+|   |               |-- dto
+|   |               |   `-- EventDTO.java
+|   |               `-- ejb
+|   |                   |-- EventMgmtEJB.java]]></programlisting>                        
+<programlisting language="java"><![CDATA[@Override
+public EventDTO getEventFetchedDTO(int eventId) {
+    @SuppressWarnings("unchecked")
+    List<Object[]> rows = em.createNamedQuery("JPATicketEvent.fetchEventDTO")
+            .setParameter("eventId", eventId)
+            .getResultList();
+    
+    Map<String, Object> dtoData = new HashMap<String, Object>();
+    if (!rows.isEmpty()) {
+        Object[] row = rows.get(0);
+        Event event = (Event) row[0];
+        String venueName = (String) row[1];
+        Number numTickets = (Number) row[2];
+        dtoData.put(EVENT, event);
+        dtoData.put(VENUE_NAME, venueName);
+        dtoData.put(NUM_TICKETS, numTickets.intValue());
+    }
+    return toEventDTO(dtoData);
+}
+
+private EventDTO toEventDTO(Map<String, Object> dtoData) {
+    EventDTO dto = new EventDTO();
+    Event event = (Event) dtoData.get(EventMgmtDAO.EVENT);
+    String venueName = (String) dtoData.get(EventMgmtDAO.VENUE_NAME);
+    int numTickets = (Integer) dtoData.get(EventMgmtDAO.NUM_TICKETS);
+    dto.setId(event.getId());
+    dto.setEventName(event.getName());
+    dto.setStartTime(event.getStartTime());
+    dto.setVenueName(venueName);
+    dto.setNumTickets(numTickets);
+    return dto;
+}]]></programlisting>                        
+                </figure>
+                
+                <para>
+                    To complete our exercise, I will also explain the DAO query. The DAO
+                    uses a @NamedNativeQuery with custom native SQL and a @SqlResultSetMapping.
+                    The native SQL is used to obtain an Event entity, the name of the Venue,
+                    and perform an aggregate count() of the tickets within the DB. The @SqlResultSetMapping
+                    is used to realize a managed Event instance, a venueName String, and numTickets Number
+                    from the returned columns. If you look back at the EJB/DAO processing above
+                    you will see the information coming back in three (3) elements of an Object array.  
+                </para>
+
+                <figure>
+                    <title>Fetched DTO JPA Support</title>
+<programlisting language=""><![CDATA[jpatickets-labex-impl/src/
+|-- main
+|   `-- java
+|       `-- org
+|           `-- myorg
+|               `-- jpatickets
+|                   |   |-- Event.java]]></programlisting>                        
+<programlisting language="java"><![CDATA[@Entity
+@Table(name="JPATICKETS_EVENT")
+@NamedNativeQueries({
+    @NamedNativeQuery(name="JPATicketEvent.fetchEventDTO",
+            query="select event.EVENT_ID, event.EVENT_NAME, event.START_TIME, event.VENUE_ID, "
+                    + "venue.NAME venueName, count(ticket.*) numTickets "
+                    + "from JPATICKETS_EVENT event "
+                    + "join JPATICKETS_VENUE venue on venue.VENUE_ID = event.VENUE_ID "
+                    + "join JPATICKETS_TICKET ticket on ticket.EVENT_ID = event.EVENT_ID "
+                    + "where event.EVENT_ID = :eventId "
+                    + "group by event.EVENT_ID, event.EVENT_NAME, event.START_TIME, event.VENUE_ID, venue.NAME",
+            resultSetMapping="JPATicketEvent.EventDTOMapping")
+})
+@SqlResultSetMappings({
+    @SqlResultSetMapping(name="JPATicketEvent.EventDTOMapping",
+            entities={
+                @EntityResult(entityClass=Event.class)
+                },
+            columns={
+                @ColumnResult(name="venueName", type=String.class),
+                @ColumnResult(name="numTickets", type=Number.class)
+                }
+    )
+})
+public class Event implements Serializable /* */ {]]></programlisting>                        
+                </figure>
+            </listitem>
+            
+            <listitem><para>Test the application using the newly activated eventFetchedDTO() @Test method.
+                    This should result in a very efficient and recognizable query issued to the DB for 
+                    exactly the information we need for the DTO.</para>
+                <figure>
+                    <title>Build, Deploy, and Test Fetched DTO Solution</title>
+<programlisting language=""><![CDATA[$ mvn clean install -Dit.test=org.myorg.jpatickets.ejbclient.EventMgmtIT#eventFetchedDTO
+...
+02:03:18,325 INFO  (EventMgmtIT.java:175) -*** eventFetchedDTO ***
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.519 sec 
+- in org.myorg.jpatickets.ejbclient.EventMgmtIT]]></programlisting>                        
+<programlisting language=""><![CDATA[
+EventMgmtEJB] (EJB default - 8) *** EventMgmtEJB:init(793182011) ***
+Hibernate: select event.EVENT_ID, event.EVENT_NAME, event.START_TIME, event.VENUE_ID, 
+       venue.NAME venueName, count(ticket.*) numTickets 
+    from JPATICKETS_EVENT event 
+    join JPATICKETS_VENUE venue on venue.VENUE_ID = event.VENUE_ID 
+    join JPATICKETS_TICKET ticket on ticket.EVENT_ID = event.EVENT_ID 
+    where event.EVENT_ID = ?
+    group by event.EVENT_ID, event.EVENT_NAME, event.START_TIME, event.VENUE_ID, venue.NAME
+EventMgmtEJB] (EJB default - 8) *** EventMgmtEJB:destroy(793182011) ***
+]]></programlisting>                        
+                </figure>
+            </listitem>
+        </orderedlist>
+        
+        <para>
+            You have finished implementing the most aggressive/complete solution for
+            forming DTO instances for return to the client. This approach separated the
+            DTO from the BO/entity class so the remote interface was not tied to providing 
+            the exact representation to remote clients that it used internally. We implemented
+            the mapping first using brute-force information transfer at the remote facade level
+            and then improved the implementation by creating a DAO query that was tuned to 
+            specific responses.  
+        </para>
+    </section>
+
+    <section id="ejb-jpaex-remote-summary">
+       <title>Summary</title>
+       <para>
+            You have finished coverage of various remote interface issues to address when 
+            designing remote interfaces for EJBs -- and specifically EJBs that make use
+            of JPA. In our coverage you discovered and implemented solutions for:
+        </para>
+        <itemizedlist spacing="compact">
+            <listitem><para>Provider classes missing</para></listitem>
+            <listitem><para>Lazy-load exceptions on the client</para></listitem>
+            <listitem><para>More efficient fetchs of DTO information</para></listitem>
+            <listitem><para>Separating the DTO and BO/entity implementations into separate classes</para></listitem>
+        </itemizedlist>
+        
+    </section>    
+</chapter>
+  

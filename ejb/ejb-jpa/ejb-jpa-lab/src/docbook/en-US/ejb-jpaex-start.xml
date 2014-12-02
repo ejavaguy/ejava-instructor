@@ -1,0 +1,322 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-jpaex-start">
+    <title>Getting Started</title>
+    <para>
+        In this section of the lab we will be getting the environment ready and 
+        getting you familiar with the modules you will be working with.
+    </para>
+
+
+    
+    <section id="ejb-jpaex-start-jboss">
+        <title>Start the Application Server</title>
+        <orderedlist spacing="compact">
+            <listitem><para>Start the application server either at the command line or within IDE</para>
+
+            <figure>
+                <title>Start the Application Server (command line)</title>
+<programlisting language=""><![CDATA[$ ./bin/standalone.sh
+...
+22:48:07,175 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015874: WildFly 8.1.0.Final "Kenny" started in 56096ms - 
+Started 630 of 694 services (131 services are lazy, passive or on-demand)       
+]]></programlisting>                        
+            </figure>
+            </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="ejb-jpaex-start-solution">
+        <title>Build Solution</title>
+        <para>
+            Start off by building the solution to verify the environment os setup correctly.
+        </para>
+        
+        <orderedlist spacing="compact">
+            <listitem><para>Change directory to the <code>jpatickets-labsol</code> directory             
+                </para></listitem>
+                
+            <listitem><para>Build, deploy, and test the solution</para>             
+                <figure>
+                    <title>Build, Deploy, and Test Solution</title>
+<programlisting language=""><![CDATA[$ mvn clean install
+...
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] EJB::JPA Tickets Lab::Solution ..................... SUCCESS [  0.556 s]
+[INFO] EJB::JPA Tickets Lab::Solution::Impl ............... SUCCESS [ 11.543 s]
+[INFO] EJB::JPA Tickets Lab::Solution::EJB ................ SUCCESS [  0.948 s]
+[INFO] EJB::JPA Tickets Lab::Solution::EAR ................ SUCCESS [  0.730 s]
+[INFO] EJB::JPA Tickets Lab::Solution::WAR ................ SUCCESS [  1.280 s]
+[INFO] EJB::JPA Tickets Lab::Solution::IT Test ............ SUCCESS [ 16.556 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS]]></programlisting>                        
+                </figure>
+            </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="ejb-jpaex-start-exercise">
+        <title>Build Exercise</title>
+        <para>
+            Now build the starting point for the exercise. Many things have been turned off
+            but it should build successfully.
+        </para>
+        
+        <orderedlist spacing="compact">
+            <listitem><para>Change directory to the <code>jpatickets-labex</code> directory             
+                </para></listitem>
+                
+            <listitem><para>Build initial state of exercise. Notice all the tests have been skipped</para>             
+                <figure>
+                    <title>Build Initial Exercise State</title>
+<programlisting language=""><![CDATA[$ mvn clean install
+...
+Tests run: 10, Failures: 0, Errors: 0, Skipped: 10
+...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] EJB::JPA Tickets Lab::Exercise ..................... SUCCESS [  0.690 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::Impl ............... SUCCESS [ 11.621 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::EJB ................ SUCCESS [  1.021 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::EAR ................ SUCCESS [  0.747 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::WAR ................ SUCCESS [  0.846 s]
+[INFO] EJB::JPA Tickets Lab::Exercise::IT Test ............ SUCCESS [  7.229 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS]]></programlisting>                        
+                </figure>                
+            </listitem>
+        </orderedlist>
+    </section>
+    
+    <section id="ejb-jpaex-start-exercise-ide">
+        <title>Import Exercise into IDE</title>
+        <para>
+            Import the <code>jpatickets-labex</code> module and its children into your
+            IDE to begin the changes to the exercise. The following shows the source 
+            trees for the modules you will be working with.
+        </para>
+        
+        <para>
+            The overall project is a six (6) module project with one(1) parent 
+            and five (5) child modules; impl, ejb, ear, war, and test. 
+        </para>
+        <figure>
+            <title>Exercise Modules</title>
+<programlisting language=""><![CDATA[jpatickets-labex
+                                                                                                                                                                                          
+|-- jpatickets-labex-impl                                                                                                                                                                                          
+|   |-- pom.xml                                                                                                                                                                                                    
+|   `-- src                                                                                                                                                                                                        
+|       |-- main                                                                                                                                                                                                   
+|       |   `-- java                                                                                                                                                                                               
+|       `-- test                                                                                                                                                                                                   
+|           |-- java                                                                                                                                                                                               
+|           `-- resources
+                                                                                                                                                                                                   
+|-- jpatickets-labex-ejb                                                                                                                                                                                           
+|   |-- pom.xml                                                                                                                                                                                                    
+|   `-- src                                                                                                                                                                                                        
+|       `-- main                                                                                                                                                                                                   
+|           |-- java                                                                                                                                                                                               
+|           `-- resources
+                                                                                                                                                                                          
+|-- jpatickets-labex-ear                                                                                                                                                                                           
+|   `-- pom.xml
+                                                                                                                                                                                                    
+|-- jpatickets-labex-war
+|   |-- pom.xml
+|   `-- src
+|       `-- main
+|           |-- java
+|           |-- resources
+|           `-- webapp-filtered
+
+|-- jpatickets-labex-test
+|   |-- pom.xml
+|   `-- src
+|       `-- test
+|           |-- java
+|           `-- resources
+
+`-- pom.xml]]></programlisting>
+        </figure>
+
+        <para>
+            The Impl module provides the business objects (BOs), data access objects (DAOs),
+            and business logic for the application. The BOs are mapped to the database using
+            JPA, the DAOs implement the details of accessing the BOs in the database. The
+            business logic handles any logic issues above the data tier (minimal in this case).
+            The impl module contains a JPA persistence unit and test infrastructure that we 
+            will want to use for reference when deploying one to the server-side. There are two main interfaces
+            to the business logic; VenueMgmt and EventMgmt. The EJB tier simply needs to instantiate
+            this logic, inject the objects with required resource dependencies (i.e., a persistence 
+            context/EntityManager), provide remote and local access, and define transaction semantics
+            to the container. You will not need to modify this module during the exercise but may be
+            asked to look through it.
+        </para>
+        <figure>
+            <title>Impl Module Source Tree</title>
+<programlisting language=""><![CDATA[jpatickets-labex/jpatickets-labex-impl/
+|-- pom.xml
+`-- src
+    |-- main
+    |   `-- java
+    |       `-- org
+    |           `-- myorg
+    |               `-- jpatickets
+    |                   |-- bl
+    |                   |   |-- EventMgmtImpl.java
+    |                   |   |-- EventMgmt.java
+    |                   |   |-- UnavailableException.java
+    |                   |   |-- VenueMgmtImpl.java
+    |                   |   `-- VenueMgmt.java
+    |                   |-- bo
+    |                   |   |-- Address.java
+    |                   |   |-- Event.java
+    |                   |   |-- Seat.java
+    |                   |   |-- SeatPK.java
+    |                   |   |-- Ticket.java
+    |                   |   |-- TicketPK.java
+    |                   |   `-- Venue.java
+    |                   `-- dao
+    |                       |-- EventMgmtDAOImpl.java
+    |                       |-- EventMgmtDAO.java
+    |                       |-- VenueDAOImpl.java
+    |                       `-- VenueDAO.java
+    `-- test
+        |-- java
+        |   `-- org
+        |       `-- myorg
+        |           `-- jpatickets
+        |               `-- bl
+        |                   |-- TicketsFactory.java
+        |                   `-- TicketsTest.java
+        `-- resources
+            |-- log4j.properties
+            `-- META-INF
+                `-- persistence.xml]]></programlisting>
+        </figure>
+
+        <para>
+            The EJB contains two primary EJBs for the exercise (VenueMgmtEJB and EventMgmtEJB)
+            and a third/fourth EJB we will not address (TicketsInitEJB and TicketsInitTxEJB).
+            I refer to it as a third/fourth EJB because logically "TickitInit" is one logical
+            EJB that has been split into two physical EJBs.  TicketInitEJB is the remote facade
+            for IT clients to initiate a DB reset. TicketInitTxEJB is an EJB that wraps drop()
+            and create() schema into separate transactions. It happens to use BEAN managed transactions
+            for those actions. You will primarily be working with the VenueMgmt and EventMgmt EJBs
+            and the persistence unit that will be defined in META-INF/persistence.xml
+        </para>
+        <figure>
+            <title>EJB Module Source Tree</title>
+<programlisting language=""><![CDATA[jpatickets-labex/jpatickets-labex-ejb/
+|-- pom.xml
+`-- src
+    `-- main
+        |-- java
+        |   `-- org
+        |       `-- myorg
+        |           `-- jpatickets
+        |               |-- dto
+        |               |   `-- EventDTO.java
+        |               `-- ejb
+        |                   |-- EventMgmtEJB.java
+        |                   |-- EventMgmtRemote.java
+        |                   |-- TicketsInitEJB.java
+        |                   |-- TicketsInitRemote.java
+        |                   |-- TicketsInitTxEJB.java
+        |                   |-- VenueMgmtEJB.java
+        |                   `-- VenueMgmtRemote.java
+        `-- resources
+            `-- META-INF
+                `-- persistence.xml]]></programlisting>
+            
+        </figure>
+
+        <para>
+            The EAR module contains no source other than a pom.xml. It is exclusively
+            used to deploy the EJB to the server with its Impl module dependency. 
+            When identifying the entity classes in the EAR-deployed EJB persistence.xml
+            as a "jar-file", it will be important to know the path of the Impl module
+            within the EAR.           
+        </para>        
+        <figure>
+            <title>EAR Module Source and Deployable Artifact Tree</title>
+<programlisting language=""><![CDATA[jpatickets-labex/jpatickets-labex-ear/
+`-- pom.xml]]></programlisting>
+<programlisting language=""><![CDATA[jpatickets-labex/jpatickets-labex-ear/target/jpatickets-labex-ear-4.0.0-SNAPSHOT
+|-- jpatickets-labex-ejb.jar
+|-- lib
+|   `-- jpatickets-labex-impl-4.0.0-SNAPSHOT.jar
+`-- META-INF
+    `-- application.xml]]></programlisting>
+        </figure>
+
+        <para>
+            The WAR module is provide to demonstrate persistent unit deployment 
+            through an imported EJB and an embedded persistence.xml. It is strictly
+            being used as a deployment platform and does not container a user 
+            interface.
+        </para>                
+       <figure>
+           <title>WAR Module Source Tree</title>
+<programlisting language=""><![CDATA[jpatickets-labex-war/src/
+`-- main
+    |-- java                                                                                                                                                                                                       
+    |   `-- org                                                                                                                                                                                                    
+    |       `-- myorg                                                                                                                                                                                              
+    |           `-- jpatickets                                                                                                                                                                                     
+    |               `-- webejb                                                                                                                                                                                     
+    |                   `-- WebVenueMgmtEJB.java                                                                                                                                                                   
+    |-- resources                                                                                                                                                                                                  
+    |   `-- META-INF                                                                                                                                                                                               
+    |       `-- persistence.xml                                                                                                                                                                                    
+    `-- webapp-filtered                                                                                                                                                                                            
+        `-- WEB-INF                                                                                                                                                                                                
+            `-- jboss-web.xml]]></programlisting>
+        </figure>
+   
+        <para>
+            The RMI IT Test module is used to deploy the EAR and WAR and initiate 
+            tests within the exercise. When you start the exercise most/all of the 
+            @Tests have been deactivated with an @Ignore. You will turn them on to
+            expose issues with the implementation and then implement a fix. At the
+            end of the exercise all @Tests should be enabled and passing.
+        </para>
+        <figure>
+            <title>RMI IT Test Module Source Tree</title>
+<programlisting language=""><![CDATA[jpatickets-labex-test/src/                                                                                                                                                                                        
+`-- test                                                                                                                                                                                                           
+    |-- java                                                                                                                                                                                                       
+    |   `-- org                                                                                                                                                                                                    
+    |       `-- myorg
+    |           `-- jpatickets
+    |               `-- ejbclient
+    |                   |-- EventMgmtIT.java
+    |                   |-- TicketsITFactory.java
+    |                   `-- VenueMgmtIT.java
+    `-- resources
+        |-- jboss-ejb-client.properties
+        |-- jndi.properties
+        `-- log4j.xml]]></programlisting>
+   </figure>
+    </section>
+    
+    <section id="ejb-jpaex-start-summary">
+       <title>Summary</title>
+       <para>
+            During this setup you started you
+        </para>
+        <itemizedlist spacing="compact">
+            <listitem><para>Started you application server so applications could be deployed to it</para></listitem>
+            <listitem><para>Built, deployed, and tested the solution to verify your environment is correct</para></listitem>
+            <listitem><para>Built the starting state of the exercise to verify it could build in its initial state</para></listitem>
+            <listitem><para>Imported the exercise into your IDE to begin making changes to the exercise copy</para></listitem>
+        </itemizedlist>
+
+    </section>    
+</chapter>
+  

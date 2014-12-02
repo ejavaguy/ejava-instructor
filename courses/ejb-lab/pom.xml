@@ -17,7 +17,7 @@
     
     <properties>
        <doc.base>ejb-lab-book</doc.base>
-       <content.version>v2014-11-03</content.version>
+       <content.version>v2014-11-30</content.version>
 
        <docProfile>ejb-style</docProfile>
        <copyright.holder>jim stafford (ejavaguy@gmail.com)</copyright.holder>
@@ -46,6 +46,12 @@
         <dependency>
             <groupId>info.ejava.docs.ejb</groupId>
             <artifactId>enc-config-lab</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+        <dependency>
+            <groupId>info.ejava.docs.ejb</groupId>
+            <artifactId>ejb-jpa-lab</artifactId>
             <version>${project.version}</version>
             <classifier>docsrc</classifier>
         </dependency>

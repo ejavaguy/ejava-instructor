@@ -228,7 +228,7 @@ jboss.naming.client.ejb.context=true
 ]]></programlisting>
            </figure>
            <itemizedlist spacing="compact">
-               <listitem><para>Just definiing version here</para></listitem>
+               <listitem><para>Just defining version here</para></listitem>
            </itemizedlist>
 
            <figure>
