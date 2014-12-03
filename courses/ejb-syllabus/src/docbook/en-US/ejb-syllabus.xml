@@ -94,13 +94,14 @@
                 <entry namest="topic"><para><link linkend="ejb-jpa">EJB/Server-Side JPA Topics</link></para></entry>
                 <entry namest="comment"><para><ulink url="../html/ejb-jpa-lab.html">Exercise: JPA/EJB Remote Interfaces</ulink></para></entry>
             </row>
-
-            <row rowsep="1">
-                <entry namest="session">?</entry>
-                <entry namest="topic"><para><ulink url="../ppt/javaeeTransactions.ppt">JavaEE Transactions</ulink></para></entry>
-            </row>
             <row rowsep="1">
                 <entry namest="topic"><para><link linkend="cdi-config">CDI Configuration</link></para></entry>
+            </row>
+
+            <row rowsep="1">
+                <entry namest="session">5</entry>
+                <entry namest="date">Dec10</entry>
+                <entry namest="topic"><para><ulink url="../ppt/javaeeTransactions.ppt">JavaEE Transactions</ulink></para></entry>
             </row>
             <row rowsep="1">
                 <entry namest="topic"><para><link linkend="ejb-jaxrs">Web-enabled EJBs with JAX-RS</link></para></entry>
@@ -108,8 +109,8 @@
 
 
             <row rowsep="1">
-                <entry namest="session">5</entry>
-                <entry namest="date">Dec10</entry>
+                <entry namest="session">6</entry>
+                <entry namest="date">Dec17</entry>
                 <entry namest="topic"><para><link linkend="javaee-security">JavaEE Security</link></para></entry>
             </row>
             <row rowsep="1">
@@ -118,8 +119,10 @@
 
 
             <row rowsep="1">
-                <entry namest="session">6</entry>
-                <entry namest="date">Dec17</entry>
+                <entry namest="session">???</entry>
+                <entry namest="topic"><para><link linkend="webtier">Web-Tier Integration with CDI</link></para></entry>
+            </row>
+            <row rowsep="1">
                 <entry namest="topic"><para>Asynchronous Methods</para></entry>
             </row>
             <row rowsep="1">
@@ -129,11 +132,6 @@
                 <entry namest="topic"><para>EJB and JMS</para></entry>
             </row>
 
-            <row rowsep="1">
-                <entry namest="session">Other</entry>
-                <entry namest="date"></entry>
-                <entry namest="topic"><para><link linkend="webtier">Web-Tier Integration with CDI</link></para></entry>
-            </row>
         </tbody>
         </tgroup>
     </table>    
