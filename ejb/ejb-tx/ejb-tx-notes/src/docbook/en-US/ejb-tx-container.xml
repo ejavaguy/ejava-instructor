@@ -1,0 +1,334 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejbtx-container">
+    <title>Container-Managed Transactions</title>
+    <itemizedlist spacing="compact">
+        <listitem><para>Declarative interface to transactions</para></listitem>
+        <listitem><para>Declarative attributes tell container to execute a method</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>within a transaction (MADATORY, REQUIRED, REQUIRES_NEW, SUPPORTS)</para></listitem>
+                <listitem><para>without a transaction (SUPPORTS, UNSUPPORTED, NEVER)</para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+        </listitem>
+        <listitem><para></para></listitem>
+    </itemizedlist>
+
+    <section id="ejbtx-container-scope">
+        <title>Transaction Scope</title>
+
+        <section id="ejbtx-container-scope-notsupported">
+            <title>Transaction Not Supported</title>
+            <para></para>
+            
+            <figure>
+                <title>Transaction Not Supported</title>
+                <graphic scalefit="1" fileref="images/ejbtx-container-scope-notsupported.png"/>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Called with transaction active</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Caller transaction suspended during call</para></listitem>
+                        <listitem><para>Caller transaction resumed after call</para></listitem>
+                        <listitem><para>Caller transaction is not impacted by resource managers used during call</para></listitem>
+                        <listitem><para>Caller transaction not passed to anything this method calls</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+                            
+        </section>
+        
+
+        <section id="ejbtx-container-scope-required">
+            <title>Transaction Required</title>
+            <para>Container must invoke method with transaction active</para>
+            
+            <figure>
+                <title>Transaction Required</title>
+                <graphic scalefit="1" fileref="images/ejbtx-container-scope-required.png"/>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+            </figure>                
+            <itemizedlist spacing="compact">
+                <listitem><para>Called with transaction active</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Caller transaction context passed to method (unless @Asynchronous)</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>Called without transaction active</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>New transaction started</para></listitem>
+                        <listitem><para>Transaction committed after method returns</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>Caller transaction context passed to anything this method calls</para></listitem>
+                <listitem><para>Resource manager(s) called by method are enlisted in caller's transaction context</para></listitem>
+            </itemizedlist>
+        </section>
+
+
+        <section id="ejbtx-container-scope-supports">
+            <title>Transaction Supports</title>
+            <para>Container can invoke method with transaction either active or inactive</para>
+            
+            <figure>
+                <title>Transaction Supports</title>
+                <graphic scalefit="1" fileref="images/ejbtx-container-scope-supports.png"/>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+            </figure>                
+            <itemizedlist spacing="compact">
+                <listitem><para>Called with transaction active</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Caller transaction context passed to method</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>Called without transaction active</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>No transaction started</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+        
+
+        <section id="ejbtx-container-scope-reqnew">
+            <title>Transaction Requires New</title>
+            <para>Container must invoke method with new transaction active</para>
+            
+            <figure>
+                <title></title>
+                <graphic scalefit="1" fileref="images/.png"/>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+            </figure>                
+            <itemizedlist spacing="compact">
+                <listitem><para>New transaction started</para></listitem>
+                <listitem><para>Transaction committed after method returns and prior to returning result to client</para></listitem>
+                <listitem><para>Called with transaction active</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Caller transaction suspended during call</para></listitem>
+                        <listitem><para>Caller transaction resumed after call</para></listitem>
+                        <listitem><para>Caller transaction is not impacted by resource managers used during call</para></listitem>
+                        <listitem><para>Caller transaction not passed to anything this method calls</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejbtx-container-scope-mandatory">
+            <title>Transaction Mandatory</title>
+            <para>Caller must already have transaction active</para>
+            
+            <figure>
+                <title>Transaction Mandatory</title>
+                <graphic scalefit="1" fileref="ejbtx-container-scope-mandatory.png"/>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+            </figure>                
+            <itemizedlist spacing="compact">
+                <listitem><para>Called with transaction active</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Caller transaction context passed to method</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>Called without transaction active</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para><code>javax.ejb.EJBTransactionRequiredException</code></para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejbtx-container-scope-never">
+            <title>Transaction Never</title>
+            <para>Caller must never invoke method with transaction active</para>
+            
+            <figure>
+                <title>Transaction Never</title>
+                <graphic scalefit="1" fileref="images/ejbtx-container-scope-never.png"/>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+            </figure>       
+            <itemizedlist spacing="compact">
+                <listitem><para>Called with transaction active</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para><code>javax.ejb.EJBException</code></para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>Called without transaction active</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Called method continues without transaction</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+    </section>
+    
+    <section id="ejbtx-container-async">
+        <title>@Asynchronous Methods and Transactions</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>EJB transactions cannot propogate across @Asynchronous methods</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Use of REQUIRED in @Asynchronous method will act like REQUIRES_NEW</para></listitem>
+                </itemizedlist>
+            </listitem>
+
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>
+    
+    <section id="ejbtx-container-lifecyclemethods">
+        <title>EJB Lifecycle Methods</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Methods</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>@PostConstruct</para></listitem>
+                    <listitem><para>@PreDestroy</para></listitem>
+                    <listitem><para>@PrePassivate (Stateful)</para></listitem>
+                    <listitem><para>@PostActivate (Stateful)</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Operate by default in an undefined transaction context</para></listitem>
+            <listitem><para>May be defined with REQUIRES_NEW or NOT_SUPPORTED</para></listitem>
+            <listitem><para>Any transactions created during a lifecycle method will not be a part of the client's transaction</para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>
+    
+    <section id="ejbtx-container-singleton">
+        <title>Singleton</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>@PostConstruct may be defined with REQUIRES or REQUIRES_NEW</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>A REQUIRES_NEW is performed in all cases</para></listitem>
+                    <listitem><para>@PostConstruct does not inherit transaction context of any bean's transaction that triggered initialization</para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>
+    
+    <section id="ejbtx-container-mdb">
+        <title>Message Driven Callback</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Must be either</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>REQUIRED</para></listitem>
+                    <listitem><para>NOT_SUPPORTED</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>
+    
+    <section id="ejbtx-container-timer">
+        <title>Timer Callbacks</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Must be either</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>REQUIRES_NEW</para></listitem>
+                    <listitem><para>REQUIRED</para></listitem>
+                    <listitem><para>NOT_SUPPORTED</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>
+    
+    <section id="ejbtx-container-remote">
+        <title>Marshaling Remote Return Objects</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Container must complete transaction protocol prior to marshalling return objects</para></listitem>
+        </itemizedlist>
+    </section>
+    
+    <section id="ejbtx-container-exceptions">
+        <title>Exceptions</title>
+        <itemizedlist spacing="compact">
+            <listitem><para></para>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>
+    
+    <section id="ejbtx-container-ejbctx">
+        <title>EJBContext</title>
+        <figure>
+            <title>EJBContext</title>
+<programlisting language="java"><![CDATA[
+public interface javax.ejb.EJBContext {
+...
+  javax.transaction.UserTransaction getUserTransaction() throws java.lang.IllegalStateException;
+  void setRollbackOnly() throws java.lang.IllegalStateException;
+  boolean getRollbackOnly() throws java.lang.IllegalStateException;
+...
+}
+]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>getUserTransaction()</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Returned instance can use used to demarcate transactions</para></listitem>
+                    <listitem><para>Restricted to EJBs using bean-managed transactions</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>getRollbackOnly()</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Tests whether current transaction is going to be rolled back at the end</para></listitem>
+                    <listitem><para>Restricted to EJBs using container-managed transactions</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>setRollbackOnly()</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Allows EJBs to trigger the current transaction to be rolled back at the end</para></listitem>
+                    <listitem><para>Restricted to EJBs using container-managed transactions</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>
+    
+    <section id="ejbtx-container-">
+        <title></title>
+        <itemizedlist spacing="compact">
+            <listitem><para></para>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="ejbtx-container-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>
+
+</chapter>
+  

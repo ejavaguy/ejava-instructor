@@ -1,0 +1,336 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejbtx-intro">
+    <title>Transactions</title>
+    
+    <para>Unit of work that accesses one more more resources (usually databases)</para>
+    <itemizedlist spacing="compact">
+        <listitem><para>set of one or more activities related to each other</para></listitem>
+        <listitem><para>must be completed together or not at all</para></listitem>
+    </itemizedlist>
+    
+    <section id="ejbtx-intro-examples">
+        <title>Transaction Examples</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>ATM</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Withdraw from one source</para></listitem>
+                    <listitem><para>Deposit to another</para></listitem>
+                </itemizedlist>            
+            </listitem>
+            <listitem><para>Order System</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Locate item</para></listitem>
+                    <listitem><para>Charge account</para></listitem>
+                    <listitem><para>Schedule shipment</para></listitem>
+                </itemizedlist>            
+            </listitem>
+            <listitem><para>Medical System</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Identify medical state</para></listitem>
+                    <listitem><para>dispense prescription</para></listitem>
+                </itemizedlist>            
+            </listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="ejbtx-intro-">
+        <title>Transaction ACID Properties</title>
+        <variablelist spacing="compact">
+            <varlistentry>
+                <term><filename>Atomic</filename></term>
+                <listitem><para>All parts of the transaction must complete or nothing at all</para></listitem>
+            </varlistentry>
+            
+            <varlistentry>
+                <term><filename>Consistent</filename></term>
+                <listitem><para>Resource (e.g., data in database) is in consistent state upon completion</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>State "makes sense"</para></listitem>
+                        <listitem><para>Database constraints (primary keys, foreign keys, etc.) are satisfied</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </varlistentry>
+            
+            <varlistentry>
+                <term><filename>Isolated</filename></term>
+                <listitem><para>Transaction executes without interference from outside the scope of the transaction</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Can the transaction read state not yet committed by another transaction?</para></listitem>
+                        <listitem><para>Can the transaction read state that did not exist prior to it starting?</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </varlistentry>
+            
+            <varlistentry>
+                <term><filename>Durable</filename></term>
+                <listitem><para>Committed changes are not lost if system crashes after the commit completes</para></listitem>
+            </varlistentry>
+        </variablelist>
+    </section>
+
+    <section id="ejbtx-intro-scenarios">
+        <title>EJB Transaction Scenarios</title>
+
+        <section id="ejbtx-intro-scenario-multiupdates">
+            <title>Scenario: Multiple DB Updates</title>
+            <figure>
+                <title>Scenario: Multiple DB Updates</title>
+                <graphic scalefit="1" fileref="images/ejbtx-intro-scenario-multiupdates.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Rather than autocommit each command, a set of commands are executed within larger transaction</para></listitem>
+                <listitem><para>A failure of any of these commands or failure to commit -- will rollback all commands</para></listitem>
+                <listitem><para>Container will coordinate transaction with resource manager for database</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejbtx-intro-scenario-multidb">
+            <title>Scenario: Update Multiple Databases</title>
+            <figure>
+                <title>Scenario: Update Multiple Databases</title>
+                <graphic scalefit="1" fileref="images/ejbtx-intro-scenario-multidb.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Same as before except commands spread across multiple databases</para></listitem>
+                <listitem><para>Container will coordinate transaction with resource managers for all databases involved</para></listitem>
+                <listitem><para>Requires a distributed transaction -- transparent to commands executed</para></listitem>
+            </itemizedlist>
+            
+            <note>
+                <title>Avoid Distributed Transactions where Possible</title>
+                <para>
+                    Even though JTA transactions allow for the forming of a distributed 
+                    transaction across multiple resources -- that does not mean you should 
+                    design for that goal. Local transactions (single resource) are much faster 
+                    than distributed transactions (multiple resources) and should be the primary
+                    goal in transaction design.
+                </para>
+            </note>
+        </section>
+
+        <section id="ejbtx-intro-scenario-jmsdb">
+            <title>Scenario: Coordinate JMS with Database Transaction</title>
+            <para></para>
+            <figure>
+                <title>Scenario: Coordinate JMS with Database Transaction</title>
+                <graphic scalefit="1" fileref="images/ejbtx-intro-scenario-jmsdb.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Same as before except commands issued to different types of resources</para></listitem>
+                <listitem><para>Message taken off queue only if overall transaction succeeds</para></listitem>
+                <listitem><para>Changes occur to database only if overall transaction succeeds</para></listitem>
+                <listitem><para>Message added to topic only if overall transaction succeeds</para></listitem>
+            </itemizedlist>
+            <note>
+                <title>How Could You Avoid Distributed Transactions Here?</title>
+                <para>
+                    Many possibilities...
+                </para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Design JMS interfaces to handle duplicate messages if work has to be repeated</para></listitem>
+                    <listitem><para>Design database interaction to detect repeated work</para></listitem>
+                    <listitem><para>Form a local transaction with the JMS Server limited to receipt and send of message</para></listitem>
+                    <listitem><para>Form a new/separate local transaction with database commands</para></listitem>
+                    <listitem><para>Leverage the completion status of the database to commit the JMS transaction</para></listitem>
+                </itemizedlist>
+            </note>
+        </section>
+    </section>
+    
+    <section id="ejbtx-intro-terms">
+        <title>Transaction Terms</title>
+        
+        <variablelist spacing="compact">
+            <varlistentry>
+                <term><filename>Resource</filename></term>
+                <listitem><para>The actual (e.g., database) target of a command with the transaction</para></listitem>
+            </varlistentry>
+            
+            <varlistentry>
+                <term><filename>Local Transaction</filename></term>
+                <listitem><para>A transaction involving only a single resource</para></listitem>
+            </varlistentry>
+            
+            <varlistentry>
+                <term><filename>Distributed Transaction</filename></term>
+                <listitem><para>A transaction involving two or more resources</para></listitem>
+            </varlistentry>
+            
+            <varlistentry>
+                <term><filename>Two-Phase Commit</filename></term>
+                <listitem><para>A protocol used to implement a distributed transaction</para></listitem>
+            </varlistentry>
+            
+            <varlistentry>
+                <term><filename>Long-lived Transactions</filename></term>
+                <listitem><para>Transaction-like construct that spans long lengths of time and usually uses compensating transactions for rollback</para></listitem>
+            </varlistentry>
+            
+            <varlistentry>
+                <term><filename>Compensating Transaction</filename></term>
+                <listitem><para>A set of follow-up actions performed outside of the resource to return to a prior state when transaction rollback not available</para></listitem>
+            </varlistentry>
+            
+            <varlistentry>
+                <term><filename>Transaction Context Propagation</filename></term>
+                <listitem><para>Sharing of the same transaction context across components</para></listitem>
+            </varlistentry>
+            
+            <varlistentry>
+                <term><filename>Deadlock</filename></term>
+                <listitem><para>When two or more threads own locks within a resource that the other thread requires to complete their transaction</para></listitem>
+            </varlistentry>
+        </variablelist>
+    </section>
+    
+    <section id="ejbtx-intro-jtajts">
+        <title>JTA and JTS Specifications</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>EJB requires support of the JTA APIs</para></listitem>
+        </itemizedlist>
+
+        <section id="ejbtx-intro-jta">
+            <title>Java Transaction API (JTA)</title>
+            <para>Interface specification between participants in a transaction</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>applications</para></listitem>
+                <listitem><para>resource managers</para></listitem>
+                <listitem><para>application server</para></listitem>
+            </itemizedlist>
+        </section>
+        
+        <section id="ejbtx-intro-jts">
+            <title>Java Transaction API (JTA) and Java Transaction Service (JTS)</title>
+            <para>Java binding of the CORBA Object Transaction Service (OTS)</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>EJB vendors might implement the JTA using a JTS service implementation</para></listitem>
+            </itemizedlist>
+        </section>
+    </section>
+    
+    <section id="ejbtx-intro-ejbtx">
+        <title>EJB Transactions</title>
+        <para>EJB is primarily a transaction framework/platform for application code</para>
+        <itemizedlist spacing="compact">
+            <listitem><para>Two styles of transaction demarcation</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Container-Managed Transactions (declarative)</para></listitem>
+                    <listitem><para>Bean Managed Transactions (programmatic)</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Container and server handle all interaction with resources -- regardless of demarcation style</para></listitem>
+            <listitem><para>EJB transactions are flat -- not nested</para></listitem>
+        </itemizedlist>
+
+        <section id="ejbtx-intro-container">
+            <title>Container-Managed Transactions</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Declarative interface to transactions</para></listitem>
+                <listitem><para>Declarative attributes tell container to execute a method</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>within a transaction (MANDATORY, REQUIRED, REQUIRES_NEW, SUPPORTS)</para></listitem>
+                        <listitem><para>without a transaction (SUPPORTS, UNSUPPORTED, NEVER)</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+
+            <figure>
+                <title>Container-Managed Transactions</title>
+               <graphic scalefit="1" fileref="images/ejbtx-intro-container.png"/>
+<programlisting language="java"><![CDATA[@Stateless
+@TransactionManagement(TransactionManagementType.CONTAINER)
+public class HotelMgmtEJB implements HotelMgmtRemote, HotelMgmtLocal {
+...
+    @PersistenceContext(unitName="ejbjpa-hotel")
+    private EntityManager em;
+    private HotelDAO dao;                                                                                                                                                                                                                                                                                                                                   
+    private HotelMgmt hotelMgmt;
+     
+    @PostConstruct
+    public void init() {
+        dao = new JPAHotelDAO();
+        ((JPAHotelDAO)dao).setEntityManager(em);
+        hotelMgmt = new HotelMgmtImpl();
+        ((HotelMgmtImpl)hotelMgmt).setHotelDao(dao);
+    }
+
+    @Override
+    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+    public Room getRoom(int number) {
+        return hotelMgmt.getRoom(number);
+    }
+    
+    @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)    
+    public Guest checkIn(Guest guest, Room room) throws RoomUnavailableExcepton {
+        return hotelMgmt.checkIn(guest, room);
+    }]]></programlisting>
+            </figure>
+        </section>
+
+        <section id="ejbtx-intro-bean">
+            <title>Bean-Managed Transactions</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Programmatic interface to transactions</para></listitem>
+                <listitem><para>Interactions through <code>javax.transaction.UserTransaction</code> interface</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Everything between utx.begin() and utx.commit() is within a single transaction</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        
+            <figure>
+                <title></title>
+                   <graphic scalefit="1" fileref="images/ejbtx-intro-bean.png"/>
+<programlisting language="java"><![CDATA[
+@Singleton
+@Startup
+@TransactionManagement(TransactionManagementType.BEAN)
+public class HotelInitEJB implements HotelInitRemote {
+    @PersistenceUnit(unitName="ejbjpa-hotel")
+    private EntityManagerFactory emf;
+    
+    @Resource
+    private UserTransaction tx;
+    
+    @Override
+    public void clearAll() {
+        EntityManager em=emf.createEntityManager();
+        try {
+            JPAHotelDAO dao = new JPAHotelDAO();
+            dao.setEntityManager(em);
+            tx.begin();
+            em.joinTransaction(); //tells the EM to join the JTA UTx we are managing
+            dao.clearAll();
+            tx.commit();
+        } catch (Exception ex) {
+            try {
+                tx.rollback();
+            } catch (Exception ex2) {
+                throw new EJBException(ex2);
+            }
+        } finally {
+            if (em!=null) { em.close(); }
+        }
+    }]]></programlisting>
+            </figure>
+        </section>
+    
+    </section>
+
+
+
+    <section id="ejbtx-intro-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>ACID Properties</para></listitem>
+            <listitem><para>JTA/JTS</para></listitem>
+            <listitem><para>Container-Managed Transactions</para></listitem>
+            <listitem><para>Bean-Managed Transactions</para></listitem>
+        </itemizedlist>
+    </section>
+
+</chapter>
+  

@@ -1,0 +1,91 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejbtx-sync">
+    <title>Stateful Session Synchronization</title>
+    <itemizedlist spacing="compact">
+        <listitem><para>Stateful session EJBs using container-managed transactions can receive transaction events</para></listitem>
+        <listitem><para>EJBs using bean-managed transactions are in control of their transaction and do not need events</para></listitem>
+        <listitem><para></para></listitem>
+    </itemizedlist>
+    
+    <section id="ejbtx-sync-events">
+        <title>Stateful Session Synchronization Events</title>
+        
+        <itemizedlist spacing="compact">
+            <listitem><para>Implement a <code>javax.ejb.SessionSynchronization</code> callback interface or use annotations</para></listitem>
+            <listitem><para>Annotate methods -- no more than once per annotation</para>
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>afterBegin()/@AfterBegin</filename></term>
+                        <listitem><para>Executed within the transaction, prior to first business method</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>beforeCompletion()/@BeforeCompletion</filename></term>
+                        <listitem><para>Executed after last business method complete -- chance to rollback</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>afterCompletions(boolean)/@AfterCompletion</filename></term>
+                        <listitem><para>Executed after transaction complete with a boolean <code>complete</code> providing status</para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </listitem>
+            <listitem><para>Cannot be final or static</para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+        
+        <figure>
+            <title></title>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+        </figure>
+        
+    </section>
+
+    <section id="ejbtx-sync-">
+        <title></title>
+        <para></para>
+        <figure>
+            <title></title>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+        </figure>
+        
+    </section>
+
+
+    <section id="ejbtx-sync-xxx">
+        <title></title>
+        <para></para>
+        <itemizedlist spacing="compact">
+            <listitem><para>A stateful session EJB may participate in only a single transaction at a time</para></listitem>
+            <listitem><para>A stateful session EJB will not be passivated while in an active transaction</para></listitem>
+            <listitem><para>A stafeful session EJB's conversational state is not transactional</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>i.e., it is not automatically rolled back</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+        
+    </section>
+
+    <section id="ejbtx-sync-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>
+
+</chapter>
+  
