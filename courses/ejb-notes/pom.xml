@@ -17,7 +17,7 @@
     
     <properties>
        <doc.base>ejb-notes-book</doc.base>
-       <content.version>v2014-11-30</content.version>
+       <content.version>v2014-12-10</content.version>
 
        <docProfile>ejb-style</docProfile>
        <copyright.holder>jim stafford (ejavaguy@gmail.com)</copyright.holder>
@@ -64,6 +64,12 @@
         <dependency>
             <groupId>info.ejava.docs.ejb</groupId>
             <artifactId>ejb-jpa-notes</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+        <dependency>
+            <groupId>info.ejava.docs.ejb</groupId>
+            <artifactId>ejb-tx-notes</artifactId>
             <version>${project.version}</version>
             <classifier>docsrc</classifier>
         </dependency>

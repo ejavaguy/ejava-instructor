@@ -101,7 +101,7 @@
             <row rowsep="1">
                 <entry namest="session">5</entry>
                 <entry namest="date">Dec10</entry>
-                <entry namest="topic"><para><ulink url="../ppt/javaeeTransactions.ppt">JavaEE Transactions</ulink></para></entry>
+                <entry namest="topic"><para><link linkend="ejb-tx">EJB Transactions</link> <ulink url="../ppt/javaeeTransactions.ppt">slides</ulink></para></entry>
             </row>
             <row rowsep="1">
                 <entry namest="topic"><para><link linkend="ejb-jaxrs">Web-enabled EJBs with JAX-RS</link></para></entry>
