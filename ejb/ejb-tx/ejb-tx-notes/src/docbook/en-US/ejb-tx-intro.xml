@@ -77,7 +77,7 @@
             <title>Scenario: Multiple DB Updates</title>
             <figure>
                 <title>Scenario: Multiple DB Updates</title>
-                <graphic scalefit="1" fileref="images/ejbtx-intro-scenario-multiupdates.png"/>
+                <graphic scale="100" fileref="images/ejbtx-intro-scenario-multiupdates.png"/>
             </figure>
             <itemizedlist spacing="compact">
                 <listitem><para>Rather than autocommit each command, a set of commands are executed within larger transaction</para></listitem>
@@ -90,7 +90,7 @@
             <title>Scenario: Update Multiple Databases</title>
             <figure>
                 <title>Scenario: Update Multiple Databases</title>
-                <graphic scalefit="1" fileref="images/ejbtx-intro-scenario-multidb.png"/>
+                <graphic scale="100" fileref="images/ejbtx-intro-scenario-multidb.png"/>
             </figure>
             <itemizedlist spacing="compact">
                 <listitem><para>Same as before except commands spread across multiple databases</para></listitem>
@@ -115,7 +115,7 @@
             <para></para>
             <figure>
                 <title>Scenario: Coordinate JMS with Database Transaction</title>
-                <graphic scalefit="1" fileref="images/ejbtx-intro-scenario-jmsdb.png"/>
+                <graphic scale="100" fileref="images/ejbtx-intro-scenario-jmsdb.png"/>
             </figure>
             <itemizedlist spacing="compact">
                 <listitem><para>Same as before except commands issued to different types of resources</para></listitem>
@@ -238,7 +238,7 @@
 
             <figure>
                 <title>Container-Managed Transactions</title>
-               <graphic scalefit="1" fileref="images/ejbtx-intro-container.png"/>
+               <graphic scale="100" fileref="images/ejbtx-intro-container.png"/>
 <programlisting language="java"><![CDATA[@Stateless
 @TransactionManagement(TransactionManagementType.CONTAINER)
 public class HotelMgmtEJB implements HotelMgmtRemote, HotelMgmtLocal {
@@ -283,7 +283,7 @@ public class HotelMgmtEJB implements HotelMgmtRemote, HotelMgmtLocal {
         
             <figure>
                 <title></title>
-                   <graphic scalefit="1" fileref="images/ejbtx-intro-bean.png"/>
+                   <graphic scale="100" fileref="images/ejbtx-intro-bean.png"/>
 <programlisting language="java"><![CDATA[
 @Singleton
 @Startup
