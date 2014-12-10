@@ -1,0 +1,534 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejbtx-container">
+    <title>Container-Managed Transactions</title>
+    <itemizedlist spacing="compact">
+        <listitem><para>Declarative interface to transactions</para></listitem>
+        <listitem><para>Declarative attributes tell container to execute a method</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>within a transaction (MADATORY, REQUIRED, REQUIRES_NEW, SUPPORTS)</para></listitem>
+                <listitem><para>without a transaction (SUPPORTS, UNSUPPORTED, NEVER)</para></listitem>
+            </itemizedlist>
+        </listitem>
+        <listitem><para>Container completes transaction protocol prior to marshaling return objects</para></listitem>
+    </itemizedlist>
+
+    <section id="ejbtx-container-scope">
+        <title>Transaction Scope</title>
+
+        <section id="ejbtx-container-scope-notsupported">
+            <title>Transaction Not Supported</title>
+            <para>Container must suspend any active transaction</para>
+            
+            <figure>
+                <title>Transaction Not Supported</title>
+                <graphic scale="100" fileref="images/ejbtx-container-scope-notsupported.png"/>
+<programlisting language="java"><![CDATA[@Override
+@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+public Product createProductAndShipments_NotSupported(Product product, List<Shipment> shipments) 
+    throws UnexpectedState {]]></programlisting>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>When called with transaction active:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Caller transaction suspended during call</para></listitem>
+                        <listitem><para>Caller transaction resumed after call</para></listitem>
+                        <listitem><para>Caller transaction is not impacted by resource managers used during call</para></listitem>
+                        <listitem><para>Caller transaction not passed to anything this method calls</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+                            
+        </section>
+        
+
+        <section id="ejbtx-container-scope-required">
+            <title>Transaction Required</title>
+            <para>Container must invoke method with transaction active</para>
+            
+            <figure>
+                <title>Transaction Required</title>
+                <graphic scale="100" fileref="images/ejbtx-container-scope-required.png"/>
+<programlisting language="java"><![CDATA[@TransactionAttribute(TransactionAttributeType.REQUIRED)
+public Product createProduct(Product product) {]]></programlisting>
+            </figure>                
+            <itemizedlist spacing="compact">
+                <listitem><para>When called with transaction active:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Caller transaction context passed to method (unless @Asynchronous)</para></listitem>
+                        <listitem><para>Caller transaction context passed to anything this method calls</para></listitem>
+                        <listitem><para>Resource manager(s) called by method are enlisted in caller's transaction context</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>When called without transaction active:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>New transaction started</para></listitem>
+                        <listitem><para>Transaction committed after method returns</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+
+
+        <section id="ejbtx-container-scope-supports">
+            <title>Transaction Supports</title>
+            <para>Container can invoke method with transaction either active or inactive</para>
+            
+            <figure>
+                <title>Transaction Supports</title>
+                <graphic scale="100" fileref="images/ejbtx-container-scope-supports.png"/>
+<programlisting language="java"><![CDATA[@TransactionAttribute(TransactionAttributeType.SUPPORTS) 
+public int getShipmentCount(int productId) {]]></programlisting>
+            </figure>                
+            <itemizedlist spacing="compact">
+                <listitem><para>When called with transaction active:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Caller transaction context passed to method (unless @Asynchronous)</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>When called without transaction active:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>No transaction started</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+        
+
+        <section id="ejbtx-container-scope-reqnew">
+            <title>Transaction Requires New</title>
+            <para>Container must invoke method with new transaction active</para>
+            
+            <figure>
+                <title></title>
+                <graphic scale="100" fileref="images/ejbtx-container-scope-reqnew.png"/>
+<programlisting language="java"><![CDATA[@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW) 
+public Shipment createShipment_RequiresNew(Shipment shipment) {]]></programlisting>
+            </figure>                
+            <itemizedlist spacing="compact">
+                <listitem><para>New transaction started</para></listitem>
+                <listitem><para>Transaction committed after method returns and prior to returning result to client</para></listitem>
+                <listitem><para>When called with transaction active:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Caller transaction suspended during call</para></listitem>
+                        <listitem><para>Caller transaction resumed after call</para></listitem>
+                        <listitem><para>Caller transaction is not impacted by resource managers used during call</para></listitem>
+                        <listitem><para>Caller transaction not passed to anything this method calls</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejbtx-container-scope-mandatory">
+            <title>Transaction Mandatory</title>
+            <para>Caller must already have transaction active</para>
+            
+            <figure>
+                <title>Transaction Mandatory</title>
+                <graphic scale="100" fileref="images/ejbtx-container-scope-mandatory.png"/>
+            </figure>                
+            <itemizedlist spacing="compact">
+                <listitem><para>When called with transaction active:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Caller transaction context passed to method</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>When called without transaction active:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para><code>javax.ejb.EJBTransactionRequiredException</code></para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejbtx-container-scope-never">
+            <title>Transaction Never</title>
+            <para>Caller must never invoke method with transaction active</para>
+            
+            <figure>
+                <title>Transaction Never</title>
+                <graphic scale="100" fileref="images/ejbtx-container-scope-never.png"/>
+            </figure>       
+            <itemizedlist spacing="compact">
+                <listitem><para>When called with transaction active:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para><code>javax.ejb.EJBException</code></para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>When called without transaction active:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Called method continues without transaction</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+        
+        <section id="ejbtx-container-scope-all">
+            <title>All Transaction Scopes</title>
+        
+            <figure>
+                <title>All Transaction Scopes</title>
+                <graphic scalefit="1" fileref="images/ejbtx-container-scope.png"/>
+            </figure>
+        </section>
+    </section>
+    
+    <section id="ejbtx-container-async">
+        <title>@Asynchronous Methods and Transactions</title>
+
+        <figure>
+            <title>@Asynchronous Method with REQUIRED</title>
+<programlisting language="java"><![CDATA[@Asynchronous
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+public void addQuantity(int productId, int quantity) {]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>EJB transactions cannot propagate across @Asynchronous methods</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Use of REQUIRED in @Asynchronous method will act like REQUIRES_NEW</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>
+    
+    <section id="ejbtx-container-lifecyclemethods">
+        <title>EJB Lifecycle Methods</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Methods</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>@PostConstruct</para></listitem>
+                    <listitem><para>@PreDestroy</para></listitem>
+                    <listitem><para>@PrePassivate (Stateful)</para></listitem>
+                    <listitem><para>@PostActivate (Stateful)</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Operate by default in an undefined transaction context</para></listitem>
+            <listitem><para>May be defined with REQUIRES_NEW or NOT_SUPPORTED</para></listitem>
+            <listitem><para>Any transactions created during a lifecycle method will not be a part of the client's transaction</para></listitem>
+        </itemizedlist>
+        
+       <figure>
+           <title>EJB Lifecycle Methods with Container-Managed Transactions</title>
+<programlisting language="java"><![CDATA[@Stateless
+@TransactionManagement(TransactionManagementType.CONTAINER)
+public class WarehouseTxEJB {
+
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@PostConstruct
+public void init() {
+    logger.debug("*** {}:init({}) ***", getClass().getSimpleName(), super.hashCode());
+    updateBeanCount(1);
+}
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@PreDestroy
+public void destroy() {
+    logger.debug("*** {}:destroy({}) ***", getClass().getSimpleName(), super.hashCode());
+    updateBeanCount(-1);
+}]]></programlisting>
+
+<programlisting language="java"><![CDATA[private void updateBeanCount(int value) {
+    String beanName = getClass().getSimpleName();
+    BeanCount count=em.find(BeanCount.class, 
+            beanName, 
+            LockModeType.PESSIMISTIC_WRITE);
+    if (count!=null) {
+        count.setCount(count.getCount()+value);
+    } else {
+        count = new BeanCount(beanName);
+        count.setCount(value);
+        em.persist(count);
+    }
+    logger.debug("updatedBeanCount({}) to {}", count.getName(), count.getCount());
+}]]></programlisting>
+        </figure>
+        
+    </section>
+    
+    <section id="ejbtx-container-callbacks">
+        <title>Callback Methods</title>
+        
+        <section id="ejbtx-container-callbacks-mdb">
+            <title>Message Driven Callback</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Must be either</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>REQUIRED - message receipt integrated with JTA transaction</para></listitem>
+                        <listitem><para>NOT_SUPPORTED - message receipt not part of JTA transaction</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+        
+        <section id="ejbtx-container-callbacks-timer">
+            <title>Timer Callbacks @Asynchronous</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Must be either</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>REQUIRES_NEW</para></listitem>
+                        <listitem><para>REQUIRED</para></listitem>
+                        <listitem><para>NOT_SUPPORTED</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+    </section>
+
+    <section id="ejbtx-container-control">
+        <title>EJB Control of Container-Managed Transactions</title>
+        <itemizedlist spacing="compact">
+             <listitem><para>EJB cannot access transaction</para></listitem>
+             <listitem><para>EJB has no means to commit transaction -- commit managed by container</para></listitem>
+             <listitem><para>EJB can only mark the transaction for rollback -- rollback managed by container</para></listitem>
+             <listitem><para>Unchecked exceptions automatically mark the transaction for rollback</para></listitem>
+        </itemizedlist>
+
+        
+        <section id="ejbtx-container-control-ejbctx">
+            <title>EJBContext</title>
+            <figure>
+                <title>EJBContext</title>
+<programlisting language="java"><![CDATA[public interface javax.ejb.EJBContext {
+...
+  javax.transaction.UserTransaction getUserTransaction() throws java.lang.IllegalStateException;
+  void setRollbackOnly() throws java.lang.IllegalStateException;
+  boolean getRollbackOnly() throws java.lang.IllegalStateException;
+...
+}]]></programlisting>
+<programlisting language="java"><![CDATA[@Resource
+SessionContext ctx;
+...
+        ctx.setRollbackOnly();
+...]]></programlisting>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>getUserTransaction()</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Returned instance can use used to demarcate transactions</para></listitem>
+                        <listitem><para>Restricted to EJBs using bean-managed transactions</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>getRollbackOnly()</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Tests whether current transaction is going to be rolled back at the end</para></listitem>
+                        <listitem><para>Restricted to EJBs using container-managed transactions</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>setRollbackOnly()</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Allows EJBs to trigger the current transaction to be rolled back at the end</para></listitem>
+                        <listitem><para>Restricted to EJBs using container-managed transactions</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+            
+           <figure>
+               <title>Example: Explicit Rollback thru EJB/SessionContext</title>
+<programlisting language="java"><![CDATA[@Resource
+private SessionContext ctx;
+
+@Override
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+public Product createProductAndRollback(Product product) {
+    //create a product in the database
+    Product p=beanA.createProduct(product);
+    beanA.flush(); //here just to highlight the impact of the rollback
+
+    ctx.setRollbackOnly();
+    return p; //return the product even thow we are going to roll it back
+}]]></programlisting>
+           </figure>
+           <para>
+                Resources created/modified within the transaction -- 
+                including resources operated on by called EJBs -- will be rolled back.
+           </para>
+            
+           <figure>
+               <title>Example: IT Client Triggers Rollback</title>
+<programlisting language="java"><![CDATA[Product product = warehouse.createProductAndRollback(new Product("thing", 6));
+//since we did not throw an exception -- we get a normal return object
+assertEquals("unexpected quantity for product", 6, product.getQuantity());
+
+//since we setRollbackOnly() prior to the return -- our product will not be there
+Product p2 = warehouse.getProduct(product.getId());
+assertNull("unexpected/rolled back product found", p2);]]></programlisting>
+           </figure>
+           <para>
+                Even though the application did not throw an exception and gracefully returned
+                a result -- the IT test shows the entity was not stored during the callback
+           </para>
+           
+        </section>
+    </section>
+    
+    <section id="ejbtx-container-exceptions">
+        <title>Exceptions</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Two types</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Checked/Application</para></listitem>
+                    <listitem><para>Unchecked/Runtime</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Checked/Application exceptions, by default, do not rollback the transaction when throw</para></listitem>
+            <listitem><para>Unchecked/Runtime exceptions do rollback the transaction when thrown</para></listitem>
+        </itemizedlist>
+        
+        <section id="ejbtx-container-exceptions-checked">
+            <title>Checked/Application Exceptions</title>
+            <para>No automatic rollback by default</para>
+
+            <figure>
+                <title>Example: Checked/Business Exception</title>
+<programlisting language="java"><![CDATA[public class MyCheckedProductException extends Exception {
+    private Product product;
+    
+    public MyCheckedProductException(Product product, String message) {
+        super(message);
+        this.product = product;
+    }]]></programlisting>
+            </figure>
+            <para>
+                Checked exceptions, but default, do not trigger rollbacks
+            </para>
+            
+            <figure>
+                <title>Example: EJB Method Commits Data, Throws Checked Exception</title>
+<programlisting language="java"><![CDATA[@Override
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+public Product createProductAndThrowChecked(Product product) 
+    throws MyCheckedProductException {
+    //create a product in the database
+    Product p=beanA.createProduct(product);
+
+    //throw a checked exception -- the product will still be committed
+    throw new MyCheckedProductException(p, "planned checked exception");
+}]]></programlisting>
+            </figure>
+            <para>
+                An error in processing can be reported with an exception without rollback
+            </para>
+            
+            <figure>
+                <title>Example: Client Triggers Exception and Verifies Data Committed</title>
+<programlisting language="java"><![CDATA[
+Product product = null;
+try {
+    warehouse.createProductAndThrowChecked(new Product("thing", 6));
+    fail("planned exception not thrown");
+} catch (MyCheckedProductException ex) {
+    //the *checked* exception contains the product in the exception 
+    product = ex.getProduct();
+    assertEquals("unexpected quantity for product", 6, product.getQuantity());
+} 
+//our product should exist
+Product p2 = warehouse.getProduct(product.getId());
+assertEquals("product not updated async", 6, p2.getQuantity());]]></programlisting>
+            </figure>
+            <para>
+                IT test verifies entity thrown with the exception was persisted
+            </para>
+        </section>
+        
+        <section id="ejbtx-container-exceptions-checked-rollback">
+            <title>Checked/Application Exception Rollback</title>
+            <para>Checked/Application exceptions can be configured to trigger a rollback</para>
+
+            <figure>
+                <title>Example: Checked/Business Exception</title>
+<programlisting language="java"><![CDATA[import javax.ejb.ApplicationException;
+
+@ApplicationException(rollback=true)
+public class MyCheckedRollbackProductException extends Exception {]]></programlisting>
+            </figure>
+            <para>
+                Annotation tells container to automatically rollback transaction if thrown
+            </para>
+            
+            <figure>
+                <title>Example: EJB Method Throws Checked Exception to Automatically Rollback</title>
+<programlisting language="java"><![CDATA[@Override
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+public Product createProductAndThrowCheckedRollback(Product product) throws MyCheckedRollbackProductException  {
+    //create a product in the database
+    Product p=beanA.createProduct(product);
+    beanA.flush(); //here just to highlight the impact of the rollback
+
+    //throw a checked exception marked for rollback -- the product will *NOT* be committed
+    throw new MyCheckedRollbackProductException(p, "planned checked exception");
+}]]></programlisting>
+            </figure>
+            <para>
+                An error in processing can be reported with an exception without rollback
+            </para>
+            
+            <figure>
+                <title>Example: Client Triggers Exception and Verifies Data Committed</title>
+<programlisting language="java"><![CDATA[Product product = null;
+try {
+    warehouse.createProductAndThrowCheckedRollback(new Product("thing", 6));
+    fail("planned exception not thrown");
+} catch (MyCheckedRollbackProductException ex) {
+    //the *checked* exception contains the product in the exception 
+    product = ex.getProduct();
+    assertEquals("unexpected quantity for product", 6, product.getQuantity());
+} 
+//since we used a rollback=true checked exception -- our product will not be there
+Product p2 = warehouse.getProduct(product.getId());
+assertNull("unexpected/rolled back product found", p2);]]></programlisting>
+            </figure>
+            <para>
+                IT test verifies entity thrown with the exception was persisted
+            </para>
+        </section>
+        
+    </section>
+    
+    
+    <section id="ejbtx-container-pc-propagation">
+        <title>Persistence Context Propagation</title>
+        <figure>
+            <title>Persistence and Transaction Context Propagation</title>
+            <graphic scale="100" fileref="images/ejb-jpa-propagation.png"/>
+        </figure>
+        
+        <itemizedlist spacing="compact">
+            <listitem><para>Persistence contexts can also get propagated</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Stateless EJB can propagate its tx-scope persistence context to a called EJB</para></listitem>
+                    <listitem><para>Stateful EJB can propagate its tx-scoped or extended persistence context to a called EJB</para></listitem>
+                    <listitem><para>Stateless EJB can work with extended persistence context provided by upstream Stateful client</para></listitem>
+                    <listitem><para>Stateful EJB cannot transform propagated tx-scope persistence context into an extended</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>EJB Facade can act as sharing point for common persistence context</para></listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="ejbtx-container-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Transaction Scope</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Primarily</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Requires (default)</para></listitem>
+                            <listitem><para>Supports</para></listitem>
+                            <listitem><para>RequiresNew</para></listitem>
+                            <listitem><para>Mandatory</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                    <listitem><para>Also</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>NotSupported</para></listitem>
+                            <listitem><para>Never</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Transaction Control (rollback)</para></listitem>
+        </itemizedlist>
+    </section>
+
+</chapter>
+  

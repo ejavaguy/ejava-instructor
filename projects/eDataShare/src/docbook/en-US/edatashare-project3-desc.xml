@@ -218,7 +218,7 @@
         <para>
             Some actions are open to any users; authenticated or not.
             Authentication will be performed using a JNDI login.  All users
-            will have a password of "password".
+            will have a password of "password1!".
         </para>
 
         <para>

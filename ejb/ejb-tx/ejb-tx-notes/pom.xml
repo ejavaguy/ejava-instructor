@@ -1,0 +1,44 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>info.ejava.docs.ejb</groupId>
+        <artifactId>ejb-tx</artifactId>
+        <version>4.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>ejb-tx-notes</artifactId>
+    <packaging>pom</packaging>
+
+    <name>EJB::Transaction Notes</name>
+    <description>
+        This project contains documentation for forming transactions and 
+        concurrency coordination on the server-side.
+    </description>
+    
+    <properties>
+       <doc.base>ejb-tx-book</doc.base>
+       <content.version>v2014-12-06</content.version>
+
+       <dependency.includes>
+            images/ejb-jpa-propagation.png,
+       </dependency.includes>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ejb-jpa-notes</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jboss.maven.plugins</groupId>
+                <artifactId>maven-jdocbook-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

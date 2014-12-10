@@ -1,0 +1,102 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejbtx-bean">
+    <title>Bean-Managed Transactions</title>
+    <itemizedlist spacing="compact">
+        <listitem><para>Programmatic interface to transactions</para></listitem>
+        <listitem><para>Interactions through <code>javax.transaction.UserTransaction</code> interface</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Everything between utx.begin() and utx.commit() is within a single transaction</para></listitem>
+                <listitem><para>Bean is in control</para></listitem>
+            </itemizedlist>
+        </listitem>
+    </itemizedlist>
+
+    <figure>
+        <title>Example: EJB with Bean-Managed Transactions</title>
+<programlisting language="java"><![CDATA[@Stateless
+@TransactionManagement(TransactionManagementType.BEAN)
+public class BmtCreateEJB {
+    @PersistenceContext(unitName="ejbtx-warehouse")
+    private EntityManager em;
+    
+    @Resource
+    private UserTransaction utx;
+
+    public Product createProduct(Product product) {
+        try {
+            txWatcher.watchTransaction(getClass(), super.hashCode());
+            utx.begin();         //<=== manually start Tx
+            em.joinTransaction();
+            em.persist(product);
+            utx.commit();        //<=== manually end Tx
+            logger.debug("createProduct()={}", product);
+            return product;
+        } catch (Exception ex) {
+            try { utx.rollback(); } 
+            catch (Exception ex2) { ... }
+            throw new EJBException("error managing transaction", ex);
+        }
+    }]]></programlisting>
+    </figure>
+    <itemizedlist spacing="compact">
+        <listitem><para>Can inject @PersistenceContext/EntityManager or @PersistenceUnit/EntityManagerFactory</para></listitem>
+    </itemizedlist>
+    
+    
+
+    <section id="ejbtx-bean-utx">
+        <title>UserTransaction</title>
+        <figure>
+            <title>UserTransaction</title>
+<programlisting language="java"><![CDATA[
+public interface javax.transaction.UserTransaction {
+                                                                                                                                          
+  void begin() throws javax.transaction.NotSupportedException, 
+        javax.transaction.SystemException;        
+                                                                             
+  void commit() throws javax.transaction.RollbackException, 
+        javax.transaction.HeuristicMixedException, 
+        javax.transaction.HeuristicRollbackException, 
+        java.lang.SecurityException, 
+        java.lang.IllegalStateException, 
+        javax.transaction.SystemException;
+        
+  void rollback() throws java.lang.IllegalStateException, 
+        java.lang.SecurityException, 
+        javax.transaction.SystemException;
+        
+  void setRollbackOnly() throws java.lang.IllegalStateException, 
+        javax.transaction.SystemException;
+        
+  int getStatus() throws javax.transaction.SystemException;
+  
+  void setTransactionTimeout(int) throws javax.transaction.SystemException;
+}]]></programlisting>
+        </figure>
+    </section>
+
+
+    <section id="ejbtx-bean-mdb">
+        <title>Message-Driven Callbacks and Bean-Managed Transactions</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Current message being processed cannot be made to join current UserTransaction</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Must use Container-Managed REQUIRED scope</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="ejbtx-bean-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Puts EJB code in control of transaction</para></listitem>
+            <listitem><para>Adds a lot of plumbing and error handling to EJB in even the simplest cases</para></listitem>
+        </itemizedlist>
+    </section>
+
+</chapter>
+  

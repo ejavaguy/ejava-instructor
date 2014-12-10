@@ -66,6 +66,7 @@
     <xi:include href="ejb-dev-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="enc-config-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-jpa-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-tx-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="webtier-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="cdi-config-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-jaxrs-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />

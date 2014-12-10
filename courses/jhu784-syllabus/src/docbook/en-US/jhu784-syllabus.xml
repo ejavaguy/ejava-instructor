@@ -174,7 +174,7 @@
                 <entry namest="comment"><para><ulink url="../html/ejb-jpa-lab.html">Exercise: JPA/EJB Remote Interfaces</ulink></para></entry>
             </row>
             <row rowsep="1">
-                <entry namest="topic"><para><ulink url="../ppt/javaeeTransactions.ppt">JavaEE Transactions</ulink></para></entry>
+                <entry namest="topic"><para><link linkend="ejb-tx">EJB Transactions</link> <ulink url="../ppt/javaeeTransactions.ppt">slides</ulink></para></entry>
                 <entry namest="comment"><para>Rubinger &amp; Burke: Ch 17</para></entry>
             </row>
             <!--

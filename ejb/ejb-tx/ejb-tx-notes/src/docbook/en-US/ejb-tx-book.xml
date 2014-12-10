@@ -1,0 +1,74 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="ejb-tx">
+    <bookinfo>
+        <title>EJB Transactions and Concurrency</title>
+        <subtitle></subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>This presentation contains topics for forming transactions on the server-side
+                within EJBs and leveraging different concurrency techniques.
+            </para>
+        </abstract>
+    </bookinfo>
+    <preface id="ejb-tx-purpose">
+        <title>Purpose</title>
+
+        <section id="ejb-tx-goals">
+            <title>Goals</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Understand the purpose of a transaction</para></listitem>
+                <listitem><para>Local Transactions</para></listitem>
+                <listitem><para>JTA Transactions</para></listitem>
+                <listitem><para>XA Transactions</para></listitem>
+                <listitem><para>Manage transaction scope</para></listitem>
+                <listitem><para>Manage transaction state</para></listitem>
+                <listitem><para>Monitor transactions</para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejb-tx-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>have more understanding of:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Transaction Management</para>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>Container Managed</para></listitem>
+                                <listitem><para>Bean Managed</para></listitem>
+                                <listitem><para></para></listitem>
+                            </itemizedlist>
+                        </listitem>
+                        <listitem><para></para></listitem>
+                        <listitem><para></para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>be able to:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para></para></listitem>
+                        <listitem><para></para></listitem>
+                        <listitem><para></para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+    </preface>
+
+    <toc/>
+
+    <xi:include href="ejb-tx-intro.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-tx-container.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-tx-bean.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-tx-sync.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <!-- 
+     -->
+</book>

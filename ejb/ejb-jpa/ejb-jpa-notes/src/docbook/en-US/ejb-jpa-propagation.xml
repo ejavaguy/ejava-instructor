@@ -3,6 +3,10 @@
 
 <chapter id="ejb-jpa-propagation">
     <title>Persistence Context Propagation</title>
+    <figure>
+        <title>Persistence and Transaction Context Propagation</title>
+        <graphic scale="100" fileref="images/ejb-jpa-propagation.png"/>
+    </figure>
     <itemizedlist spacing="compact">
         <listitem><para>EJB will instantiate persistence context if does not yet exist</para></listitem>
         <listitem><para>Stateless EJBs may only have transaction-scope persistence contexts</para></listitem>

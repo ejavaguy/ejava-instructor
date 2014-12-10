@@ -1,0 +1,103 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejbtx-sync">
+    <title>Stateful Session Synchronization</title>
+    <itemizedlist spacing="compact">
+        <listitem><para>Stateful session EJBs using container-managed transactions can receive transaction events</para></listitem>
+        <listitem><para>EJBs using bean-managed transactions are in control of their transaction and do not need events</para></listitem>
+    </itemizedlist>
+    <figure>
+        <title>Example: Stateful EJB with Transaction Callbacks</title>
+<programlisting language=""><![CDATA[@Stateful
+public class TxWatcherEJB {
+...
+    /**
+     * By calling this (or any other business method, the sessionEJB will be created
+     * and enlisted in the current transaction
+     */
+    public void watchTransaction(Class<?> clazz, int hashCode) {
+        String txName = clazz.getSimpleName() + ":" + hashCode;
+        if (this.txName==null || !this.txName.equals(txName)) {
+            logger = LoggerFactory.getLogger(clazz);
+            logger.debug("watcher EJB {} enlisted in transaction for {}", beanName, txName);
+            this.txName = txName;
+        } else {
+            logger.debug("transaction continued for {}", this.txName);
+        }
+    }
+
+    @AfterBegin
+    public void afterBegin() {
+        logger.debug("transaction for {} has started", beanName);
+    }
+    
+    @BeforeCompletion
+    public void beforeCompletion() {
+        logger.debug("transaction for {} is committing", beanName);
+    }
+    
+    @AfterCompletion
+    public void afterCompletion(boolean committed) {
+        logger.debug("transaction committed for {}, commited={}", beanName, committed);
+    }]]></programlisting>
+    </figure>
+    
+    
+    
+    <section id="ejbtx-sync-events">
+        <title>Stateful Session Synchronization Events</title>
+        
+        <itemizedlist spacing="compact">
+            <listitem><para>Implement a <code>javax.ejb.SessionSynchronization</code> callback interface or use annotations</para></listitem>
+            <listitem><para>Annotate methods -- no more than once per annotation</para>
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>afterBegin()/@AfterBegin</filename></term>
+                        <listitem><para>Executed within the transaction, prior to first business method</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>beforeCompletion()/@BeforeCompletion</filename></term>
+                        <listitem><para>Executed after last business method complete -- chance to rollback</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>afterCompletions(boolean)/@AfterCompletion</filename></term>
+                        <listitem><para>Executed after transaction complete with a boolean <code>complete</code> providing status</para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </listitem>
+            <listitem><para>Cannot be final or static</para></listitem>
+        </itemizedlist>
+    </section>
+
+
+    <section id="ejbtx-sync-stateful">
+        <title>Additional Stateful Rules</title>
+        <para></para>
+        <itemizedlist spacing="compact">
+            <listitem><para>A stateful session EJB may participate in only a single transaction at a time</para></listitem>
+            <listitem><para>A stateful session EJB will not be passivated while in an active transaction</para></listitem>
+            <listitem><para>A stateful session EJB's conversational state is not transactional</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>i.e., it is not automatically rolled back</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>        
+    </section>
+
+    <section id="ejbtx-sync-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Listen to Container-Managed Transaction Callbacks</para></listitem>
+            <listitem><para>Session Sychchronization Callbacks</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>afterBegin</para></listitem>
+                    <listitem><para>beforeCompletion</para></listitem>
+                    <listitem><para>afterCompletion</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>
+
+</chapter>
+  
