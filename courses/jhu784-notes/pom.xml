@@ -17,7 +17,7 @@
     
     <properties>
        <doc.base>jhu784-notes-book</doc.base>
-       <content.version>v2014-11-11</content.version>
+       <content.version>v2014-12-10</content.version>
     </properties>
 
     <dependencies>
@@ -121,6 +121,12 @@
         <dependency>
             <groupId>info.ejava.docs.ejb</groupId>
             <artifactId>ejb-jpa-notes</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+        <dependency>
+            <groupId>info.ejava.docs.ejb</groupId>
+            <artifactId>ejb-tx-notes</artifactId>
             <version>${project.version}</version>
             <classifier>docsrc</classifier>
         </dependency>
