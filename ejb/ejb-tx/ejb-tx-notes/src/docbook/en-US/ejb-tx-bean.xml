@@ -8,77 +8,79 @@
         <listitem><para>Interactions through <code>javax.transaction.UserTransaction</code> interface</para>
             <itemizedlist spacing="compact">
                 <listitem><para>Everything between utx.begin() and utx.commit() is within a single transaction</para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Bean is in control</para></listitem>
             </itemizedlist>
         </listitem>
-        <listitem><para></para></listitem>
     </itemizedlist>
 
+    <figure>
+        <title>Example: EJB with Bean-Managed Transactions</title>
+<programlisting language="java"><![CDATA[@Stateless
+@TransactionManagement(TransactionManagementType.BEAN)
+public class BmtCreateEJB {
+    @PersistenceContext(unitName="ejbtx-warehouse")
+    private EntityManager em;
+    
+    @Resource
+    private UserTransaction utx;
+
+    public Product createProduct(Product product) {
+        try {
+            txWatcher.watchTransaction(getClass(), super.hashCode());
+            utx.begin();         //<=== manually start Tx
+            em.joinTransaction();
+            em.persist(product);
+            utx.commit();        //<=== manually end Tx
+            logger.debug("createProduct()={}", product);
+            return product;
+        } catch (Exception ex) {
+            try { utx.rollback(); } 
+            catch (Exception ex2) { ... }
+            throw new EJBException("error managing transaction", ex);
+        }
+    }]]></programlisting>
+    </figure>
+    <itemizedlist spacing="compact">
+        <listitem><para>Can inject @PersistenceContext/EntityManager or @PersistenceUnit/EntityManagerFactory</para></listitem>
+    </itemizedlist>
+    
+    
+
     <section id="ejbtx-bean-utx">
-        <title></title>
-        <para></para>
-        <itemizedlist spacing="compact">
-            <listitem><para></para>
-                <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                </itemizedlist>
-            </listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>
-        
-        <itemizedlist spacing="compact">
-            <listitem><para>getUserTransaction()</para>
-                <itemizedlist spacing="compact">
-                    <listitem><para>Returned instance can use used to demarcate transactions</para></listitem>
-                    <listitem><para>Restricted to EJBs using bean-managed transactions</para></listitem>
-                </itemizedlist>
-            </listitem>
-        </itemizedlist>
-        
-        
+        <title>UserTransaction</title>
         <figure>
             <title>UserTransaction</title>
 <programlisting language="java"><![CDATA[
-public interface javax.transaction.UserTransaction {                                                                                                                                          
+public interface javax.transaction.UserTransaction {
+                                                                                                                                          
   void begin() throws javax.transaction.NotSupportedException, 
-        javax.transaction.SystemException;                                                                             
+        javax.transaction.SystemException;        
+                                                                             
   void commit() throws javax.transaction.RollbackException, 
         javax.transaction.HeuristicMixedException, 
         javax.transaction.HeuristicRollbackException, 
         java.lang.SecurityException, 
         java.lang.IllegalStateException, 
         javax.transaction.SystemException;
+        
   void rollback() throws java.lang.IllegalStateException, 
         java.lang.SecurityException, 
         javax.transaction.SystemException;
+        
   void setRollbackOnly() throws java.lang.IllegalStateException, 
         javax.transaction.SystemException;
+        
   int getStatus() throws javax.transaction.SystemException;
+  
   void setTransactionTimeout(int) throws javax.transaction.SystemException;
-}
-]]></programlisting>
+}]]></programlisting>
         </figure>
-        
-        
-        
     </section>
 
 
     <section id="ejbtx-bean-mdb">
-        <title>Message-Driven Callbacks</title>
-        <para></para>
+        <title>Message-Driven Callbacks and Bean-Managed Transactions</title>
         <itemizedlist spacing="compact">
-            <listitem><para></para>
-                <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                </itemizedlist>
-            </listitem>
             <listitem><para>Current message being processed cannot be made to join current UserTransaction</para>
                 <itemizedlist spacing="compact">
                     <listitem><para>Must use Container-Managed REQUIRED scope</para></listitem>
@@ -86,31 +88,13 @@ public interface javax.transaction.UserTransaction {
             </listitem>
             <listitem><para></para></listitem>
         </itemizedlist>
-        
-    </section>
-
-    <section id="ejbtx-bean-">
-        <title></title>
-        <para></para>
-        <itemizedlist spacing="compact">
-            <listitem><para></para>
-                <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                </itemizedlist>
-            </listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>
     </section>
 
     <section id="ejbtx-bean-summary">
         <title>Summary</title>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Puts EJB code in control of transaction</para></listitem>
+            <listitem><para>Adds a lot of plumbing and error handling to EJB in even the simplest cases</para></listitem>
         </itemizedlist>
     </section>
 
