@@ -114,7 +114,7 @@
                 <entry namest="topic"><para><link linkend="javaee-security">JavaEE Security</link></para></entry>
             </row>
             <row rowsep="1">
-                <entry namest="topic"><para>JavaEE Interceptors</para></entry>
+                <entry namest="topic"><para><link linkend="javaee-interceptors">JavaEE Interceptors</link></para></entry>
             </row>
 
 
