@@ -1,0 +1,158 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-interceptor">
+    <title>EJB Interceptors</title>
+    <itemizedlist spacing="compact">
+        <listitem><para>Interpose on EJB business and lifecycle methods</para></listitem>
+        <listitem><para>Interceptor lifecycle is same as the bean it interposes on (i.e., Stateless/Stateful)</para></listitem>
+        <listitem><para></para></listitem>
+    </itemizedlist>
+    
+    <section id="ejb-interceptor-invocationctx">    
+        <title>InvocationContext</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Information about the call intercepted</para></listitem>
+            <listitem><para>Methods to allow interceptors to control behavior of invocation chain</para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+        
+        <figure>
+            <title></title>
+            <graphic scalefit="1" fileref="images/.png"/>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>
+
+
+    <section id="ejb-interceptor-lifecycle">
+        <title>Lifecycle Callbacks</title>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+
+        <itemizedlist spacing="compact">
+            <listitem><para>All EJB Interceptors may define standard lifecycle callbacks</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para><code>AroundConstruct</code></para></listitem>
+                    <listitem><para><code>PostConstruct</code></para></listitem>
+                    <listitem><para><code>PreDestory</code></para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para></para></listitem>
+            <listitem><para>Stateful EJB Interceptors</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>may define state callbacks</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para><code>PrePassivate</code></para></listitem>
+                            <listitem><para><code>PostActivate</code></para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                    <listitem><para>may use an extended persistence context</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+        
+        
+        <figure>
+            <title></title>
+            <graphic scalefit="1" fileref="images/.png"/>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>
+    
+    <section id="ejb-interceptor-business">
+        <title>Business Method Callbacks</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>EJB Interceptors may define <code>AroundInvokeCallbacks</code> for</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>business methods</para></listitem>
+                    <listitem><para>MDB onMessage()</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>May throw runtime and application exceptions declared by business method</para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title></title>
+            <graphic scalefit="1" fileref="images/.png"/>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+        </figure>
+    </section>
+
+    <section id="ejb-interceptor-timer">
+        <title>Timer Callbacks</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>EJB Interceptors may define <code>AroundTimeout</code> for timer methods</para></listitem>
+            <listitem><para>May call <code>InvocationContext.getTimer()</code> to get timed out timer</para></listitem>
+            <listitem><para>May not throw application exceptions</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title></title>
+            <graphic scalefit="1" fileref="images/.png"/>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+        </figure>
+    </section>
+
+    <section id="ejb-interceptor-other">
+        <title>Other Rules</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>JTA Transactional interceptors are not allowed for EJBs</para></listitem>
+            <listitem><para>Interceptors may rollback the current transaction by</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>throwing a <code>RuntimeException</code></para></listitem>
+                    <listitem><para>calling <code>setRollbackOnly()</code> on the <code>EJBContext</code></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>
+    
+
+    <section id="ejb-interceptor-">
+        <title></title>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title></title>
+            <graphic scalefit="1" fileref="images/.png"/>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+        </figure>
+    </section>
+    
+    <section id="ejb-interceptor-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>
+
+</chapter>
+  
