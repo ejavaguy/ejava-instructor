@@ -1,0 +1,58 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="javaee-interceptors">
+    <bookinfo>
+        <title>JavaEE Interceptors</title>
+        <subtitle></subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>This presentation contains topics for creating interceptors for calls to/from
+                JavaEE components including EJBs and CDI beans.
+            </para>
+        </abstract>
+    </bookinfo>
+    <preface id="javaee-interceptors-purpose">
+        <title>Purpose</title>
+
+        <section id="javaee-interceptors-goals">
+            <title>Goals</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>JavaEE Interceptors</para></listitem>
+                <listitem><para>CDI Interceptors</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="javaee-interceptors-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>have more understanding of:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Interpose on business and lifecycle methods</para></listitem>
+                        <listitem><para></para></listitem>
+                        <listitem><para></para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>be able to:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para></para></listitem>
+                        <listitem><para></para></listitem>
+                        <listitem><para></para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+    </preface>
+
+    <toc/>
+
+    <xi:include href="javaee-interceptor-intro.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-interceptor.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="cdi-interceptor.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>

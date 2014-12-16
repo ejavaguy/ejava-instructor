@@ -1,27 +1,24 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>info.ejava.docs.courses</groupId>
-        <artifactId>courses</artifactId>
+        <groupId>info.ejava.docs.ejb</groupId>
+        <artifactId>ejb-interceptor</artifactId>
         <version>4.0.0-SNAPSHOT</version>
     </parent>
+    <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>jhu784-syllabus</artifactId>
+    <artifactId>javaee-interceptor-notes</artifactId>
     <packaging>pom</packaging>
 
-    <name>Courses::JHU 605.784 Course Syllabus</name>
+    <name>EJB::Interceptor Notes</name>
     <description>
-        This project contains the course syllabus
+        This project contains basic documentation for creating interceptors
+        for EJBs and CDI beans.
     </description>
     
     <properties>
-       <doc.base>jhu784-syllabus-book</doc.base>
-       <content.version>v2014-12-16</content.version>
+       <doc.base>javaee-interceptors-book</doc.base>
+       <content.version>v2014-12-15</content.version>
     </properties>
-
-    <dependencies>
-    </dependencies>
 
     <build>
         <plugins>

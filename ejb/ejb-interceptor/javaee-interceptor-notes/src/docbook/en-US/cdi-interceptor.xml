@@ -1,0 +1,29 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="cdi-interceptor">
+    <title>CDI Interceptors</title>
+    <itemizedlist spacing="compact">
+        <listitem><para></para></listitem>
+        <listitem><para></para></listitem>
+        <listitem><para></para></listitem>
+    </itemizedlist>
+
+    <section id="cdi-interceptor-">
+        <title></title>
+        <para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+    </section>
+
+    <section id="cdi-interceptor-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>
+
+</chapter>
+  
