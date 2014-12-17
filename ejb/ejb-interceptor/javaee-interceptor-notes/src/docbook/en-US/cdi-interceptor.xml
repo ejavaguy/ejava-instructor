@@ -4,24 +4,103 @@
 <chapter id="cdi-interceptor">
     <title>CDI Interceptors</title>
     <itemizedlist spacing="compact">
-        <listitem><para></para></listitem>
-        <listitem><para></para></listitem>
-        <listitem><para></para></listitem>
+        <listitem><para>Extends Java Interceptors specified in EJB Spec</para></listitem>
+        <listitem><para>Not specific to EJBs -- any POJO</para></listitem>
     </itemizedlist>
 
-    <section id="cdi-interceptor-">
-        <title></title>
-        <para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>
+    <section id="cdi-interceptor-interceptorbinding">
+        <title>@InterceptorBinding Annotation</title>
+        <para>Annotation to identify type of interceptor required (e.g., @Transactional)</para>
+
+        <figure>
+            <title>@InterceptorBinding Annotation</title>
+<programlisting language="java"><![CDATA[
+package info.ejava.examples.ejb.interceptor.interceptors;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import javax.interceptor.InterceptorBinding;
+
+@Inherited
+@InterceptorBinding
+@Target({ElementType.TYPE, ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Validation {
+}]]></programlisting>
+        </figure>
+        <para>
+            The above @InterceptorBinding annotation will be used to designate the type of
+            interceptor required/offered by/to a bean
+        </para>
+    </section>
+
+    <section id="cdi-interceptor-interceptor">
+        <title>Interceptor Class</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Same as with EJB</para></listitem>
+            <listitem><para>Annotated with @javax.interceptor.Interceptor</para></listitem>
+            <listitem><para>Annotated with @InterceptorBinding annotation</para></listitem>
+            <listitem><para>Not activate by default</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Interceptor Class</title>
+<programlisting language="java"><![CDATA[import javax.interceptor.Interceptor;
+
+@Validation
+@Interceptor
+public class ContactsNormalizerInterceptor {
+    @AroundInvoke
+    public Object invoke(InvocationContext ctx) throws Exception {]]></programlisting>
+        </figure>
+    </section>
+
+    <section id="cdi-interceptor-pojo">
+        <title>CDI Bean Class</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Can be an EJB</para></listitem>
+            <listitem><para>Annotated with @InterceptorBinding annotation</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>CDI Bean Class</title>
+<programlisting language="java"><![CDATA[@Stateless
+@Validation
+public class ContactsEJB implements ContactsRemote {
+    @Override
+    public Contact createContact(Contact contact) throws InvalidParam {]]></programlisting>
+        </figure>
+    </section>
+
+    <section id="cdi-interceptor-activation">
+        <title>CDI Descriptor (beans.xml) Activation</title>
+
+        <figure>
+            <title>CDI Descriptor (beans.xml) Activation</title>
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<beans ...
+     
+     <interceptors>
+        <class>info.ejava.examples.ejb.interceptor.interceptors.PreNormizedInterceptor</class>
+        <class>info.ejava.examples.ejb.interceptor.interceptors.ContactsNormalizerInterceptor</class>
+        <class>info.ejava.examples.ejb.interceptor.interceptors.PostNormizedInterceptor</class>
+     </interceptors>
+</beans>]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Activates Interceptor classes</para></listitem>
+            <listitem><para>Controls order applied</para></listitem>
+        </itemizedlist>
     </section>
 
     <section id="cdi-interceptor-summary">
         <title>Summary</title>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>CDI/EJB Interceptors consistent</para></listitem>
+            <listitem><para>CDI Interceptors can be applied to any CDI bean (i.e., POJO)</para></listitem>
         </itemizedlist>
     </section>
 

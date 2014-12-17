@@ -17,7 +17,7 @@
     
     <properties>
        <doc.base>javaee-interceptors-book</doc.base>
-       <content.version>v2014-12-15</content.version>
+       <content.version>v2014-12-17</content.version>
     </properties>
 
     <build>
