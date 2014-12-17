@@ -4,41 +4,97 @@
 <chapter id="ejb-interceptor">
     <title>EJB Interceptors</title>
     <itemizedlist spacing="compact">
-        <listitem><para>Interpose on EJB business and lifecycle methods</para></listitem>
+        <listitem><para>Interpose on contructor, EJB business and lifecycle methods</para></listitem>
         <listitem><para>Interceptor lifecycle is same as the bean it interposes on (i.e., Stateless/Stateful)</para></listitem>
-        <listitem><para></para></listitem>
     </itemizedlist>
     
+    <section id="ejb-interceptor-business">
+        <title>Business Method Callbacks</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>EJB Interceptors may define <code>AroundInvoke</code> callbacks for</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>business methods</para></listitem>
+                    <listitem><para>MDB onMessage()</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>May throw runtime and application exceptions declared by business method</para></listitem>
+            <listitem><para>Interceptors may rollback the current transaction by</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>throwing a <code>RuntimeException</code></para></listitem>
+                    <listitem><para>calling <code>setRollbackOnly()</code> on the <code>EJBContext</code></para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Sample Business Method being Intercepted</title>
+<programlisting language="java"><![CDATA[@Stateless
+public class ContactsEJB implements ContactsRemote {
+    @PersistenceContext(unitName="ejbinterceptor-contacts")
+    private EntityManager em;
+    
+    @Override
+    public Contact createContact(Contact contact) throws InvalidParam {
+        logger.debug("createContact({})", contact);
+        em.persist(contact);
+        return contact;
+    }]]></programlisting>
+        </figure>
+
+        <figure>
+            <title>Sample Business Method Interceptor</title>
+<programlisting language="java"><![CDATA[import javax.interceptor.AroundConstruct;
+
+public class LifecycleInterceptor {
+    @Resource
+    private EJBContext ejbCtx;
+    
+    @AroundInvoke
+    public Object invoke(InvocationContext ctx) throws Exception {
+        logger.debug("*** Business Method: {}, caller={}", ctx.getMethod(), ejbCtx.getCallerPrincipal().getName());
+        Object response = ctx.proceed();
+        logger.debug("*** Response Object: {}", response);
+        return response;
+    }]]></programlisting>
+        </figure>
+
+        <figure>
+            <title>Sample Output</title>
+<programlisting language=""><![CDATA[
+LifecycleInterceptor] (EJB default - 4) *** Business Method: public info.ejava.examples.ejb.interceptor.bo.Contact 
+    info.ejava.examples.ejb.interceptor.ejb.ContactsEJB.createContact(info.ejava.examples.ejb.interceptor.bo.Contact) 
+    throws info.ejava.examples.ejb.interceptor.ejb.InvalidParam, 
+    caller=anonymous
+ContactsEJB] (EJB default - 4) createContact(Contact [id=0, name=John Doe, normalizedName=null])
+LifecycleInterceptor] (EJB default - 4) *** Response Object: Contact [id=1, name=John Doe, normalizedName=john doe]]]></programlisting>
+        </figure>
+    </section>
+
     <section id="ejb-interceptor-invocationctx">    
         <title>InvocationContext</title>
         <itemizedlist spacing="compact">
             <listitem><para>Information about the call intercepted</para></listitem>
-            <listitem><para>Methods to allow interceptors to control behavior of invocation chain</para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Methods to control behavior of invocation chain</para></listitem>
         </itemizedlist>
         
         <figure>
-            <title></title>
-            <graphic scalefit="1" fileref="images/.png"/>
-<programlisting language=""><![CDATA[
-]]></programlisting>
+            <title>InvocationContext Interface</title>
+<programlisting language="java"><![CDATA[public interface javax.interceptor.InvocationContext {
+  public abstract java.lang.Object getTarget();
+  public abstract java.lang.Object getTimer();
+  public abstract java.lang.reflect.Method getMethod();
+  public abstract java.lang.reflect.Constructor<?> getConstructor();
+  public abstract java.lang.Object[] getParameters();
+  public abstract void setParameters(java.lang.Object[]);
+  public abstract java.util.Map<java.lang.String, java.lang.Object> getContextData();
+  public abstract java.lang.Object proceed() throws java.lang.Exception;
+}]]></programlisting>
         </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>
     </section>
 
 
     <section id="ejb-interceptor-lifecycle">
         <title>Lifecycle Callbacks</title>
-        <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>
-
         <itemizedlist spacing="compact">
             <listitem><para>All EJB Interceptors may define standard lifecycle callbacks</para>
                 <itemizedlist spacing="compact">
@@ -59,43 +115,33 @@
                     <listitem><para>may use an extended persistence context</para></listitem>
                 </itemizedlist>
             </listitem>
-            <listitem><para></para></listitem>
         </itemizedlist>
         
         
         <figure>
-            <title></title>
-            <graphic scalefit="1" fileref="images/.png"/>
-<programlisting language=""><![CDATA[
-]]></programlisting>
+            <title>Lifecycle Callbacks</title>
+<programlisting language="java"><![CDATA[
+public class LifecycleInterceptor {
+    @AroundConstruct
+    public void ctor(InvocationContext ctx) {
+       ...
+    }
+
+    @PostConstruct
+    public void init(InvocationContext ctx) {
+       ...
+    }
+    
+    @PreDestroy
+    public void destory(InvocationContext ctx) {
+    ...
+    }]]></programlisting>
         </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>
     </section>
     
-    <section id="ejb-interceptor-business">
-        <title>Business Method Callbacks</title>
-        <itemizedlist spacing="compact">
-            <listitem><para>EJB Interceptors may define <code>AroundInvokeCallbacks</code> for</para>
-                <itemizedlist spacing="compact">
-                    <listitem><para>business methods</para></listitem>
-                    <listitem><para>MDB onMessage()</para></listitem>
-                </itemizedlist>
-            </listitem>
-            <listitem><para>May throw runtime and application exceptions declared by business method</para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>
 
-        <figure>
-            <title></title>
-            <graphic scalefit="1" fileref="images/.png"/>
-<programlisting language=""><![CDATA[
-]]></programlisting>
-        </figure>
-    </section>
+    
+    
 
     <section id="ejb-interceptor-timer">
         <title>Timer Callbacks</title>
@@ -107,50 +153,85 @@
 
         <figure>
             <title></title>
-            <graphic scalefit="1" fileref="images/.png"/>
-<programlisting language=""><![CDATA[
-]]></programlisting>
+<programlisting language="java"><![CDATA[
+public class LifecycleInterceptor {
+    @AroundTimeout
+    public Object timeout(InvocationContext ctx) throws Exception {
+        logger.debug("*** Timeout: {}", ctx.getTimer());
+        Object response = ctx.proceed();
+        return response;
+    }]]></programlisting>
         </figure>
     </section>
 
-    <section id="ejb-interceptor-other">
-        <title>Other Rules</title>
+    <section id="ejb-interceptor-activation">
+        <title>Activating Interceptors</title>
         <itemizedlist spacing="compact">
-            <listitem><para>JTA Transactional interceptors are not allowed for EJBs</para></listitem>
-            <listitem><para>Interceptors may rollback the current transaction by</para>
-                <itemizedlist spacing="compact">
-                    <listitem><para>throwing a <code>RuntimeException</code></para></listitem>
-                    <listitem><para>calling <code>setRollbackOnly()</code> on the <code>EJBContext</code></para></listitem>
-                    <listitem><para></para></listitem>
-                </itemizedlist>
-            </listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>
-    </section>
-    
-
-    <section id="ejb-interceptor-">
-        <title></title>
-        <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>EJB Deployment descriptor (ejb-jar.xml)</para></listitem>
+            <listitem><para>@Interceptors annotation</para></listitem>
+            <listitem><para>CDI Deployment descriptor (beans.xml)</para></listitem>
         </itemizedlist>
 
         <figure>
-            <title></title>
-            <graphic scalefit="1" fileref="images/.png"/>
-<programlisting language=""><![CDATA[
+            <title>EJB Descriptor (ejb-jar.xml) Activation</title>
+<programlisting language="xml"><![CDATA[<?xml version="1.0"?>
+<ejb-jar ...
+    
+    <assembly-descriptor>
+        <interceptor-binding>
+            <ejb-name>ContactsEJB</ejb-name>
+            <interceptor-class>info.ejava.examples.ejb.interceptor.interceptors.LifecycleInterceptor</interceptor-class>
+        </interceptor-binding>
+    </assembly-descriptor>   
+</ejb-jar>]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Decouples EJB and Interceptor classes</para></listitem>
+            <listitem><para>Assign to specific EJBs or globally</para></listitem>
+            <listitem><para>Assign to specific EJB methods or global to class</para></listitem>
+            <listitem><para>Can control order applied</para></listitem>
+        </itemizedlist>
+
+
+        <figure>
+            <title>@Interceptor(s) Annotation Activation</title>
+<programlisting language="java"><![CDATA[//way 1 - class level
+@Stateless
+@Interceptors({ //global to EJB class
+    PreNormizedInterceptor.class,
+    ContactsNormalizerInterceptor.class,
+    PostNormizedInterceptor.class,
+})
+public class ContactsEJB implements ContactsRemote {]]></programlisting>
+
+<programlisting language="java"><![CDATA[//way 2 - method level
+@Stateless
+public class ContactsEJB implements ContactsRemote {
+    @Override
+	@Interceptors({ //specific to individual EJB method
+	    PreNormizedInterceptor.class,
+	    ContactsNormalizerInterceptor.class,
+	    PostNormizedInterceptor.class,
+	})
+    public Contact createContact(Contact contact) throws InvalidParam {
 ]]></programlisting>
         </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>@Annotation near-equivalent to EJB deployment descriptor</para></listitem>
+            <listitem><para>Couples EJB class to Interceptor class</para></listitem>
+            <listitem><para>Cannot assign globally to all EJBs</para></listitem>
+            <listitem><para>Can assign to specific EJB methods or global to class</para></listitem>
+            <listitem><para>Can control order applied</para></listitem>
+        </itemizedlist>
     </section>
+    
+    
     
     <section id="ejb-interceptor-summary">
         <title>Summary</title>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Intercept any call/callback to an EJB</para></listitem>
+            <listitem><para>Alternate means to register interceptor with EJB</para></listitem>
         </itemizedlist>
     </section>
 

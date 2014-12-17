@@ -23,8 +23,9 @@
         <section id="javaee-interceptors-goals">
             <title>Goals</title>
             <itemizedlist spacing="compact">
-                <listitem><para>JavaEE Interceptors</para></listitem>
-                <listitem><para>CDI Interceptors</para></listitem>
+                <listitem><para>Implement custom method interpose</para></listitem>
+                <listitem><para>Java/EJB Interceptors</para></listitem>
+                <listitem><para>CDI Activation</para></listitem>
             </itemizedlist>
         </section>
 
@@ -34,16 +35,15 @@
             <itemizedlist spacing="compact">
                 <listitem><para>have more understanding of:</para>
                     <itemizedlist spacing="compact">
-                        <listitem><para>Interpose on business and lifecycle methods</para></listitem>
-                        <listitem><para></para></listitem>
-                        <listitem><para></para></listitem>
+                        <listitem><para>Decouple implementation concerns using interceptors</para></listitem>
+                        <listitem><para>Implement method interpose thru interceptors</para></listitem>
                     </itemizedlist>
                 </listitem>
                 <listitem><para>be able to:</para>
                     <itemizedlist spacing="compact">
-                        <listitem><para></para></listitem>
-                        <listitem><para></para></listitem>
-                        <listitem><para></para></listitem>
+                        <listitem><para>Implement an interceptor</para></listitem>
+                        <listitem><para>Register/activate interceptor using EJB techniques</para></listitem>
+                        <listitem><para>Register/activate interceptor using CDI techniques</para></listitem>
                     </itemizedlist>
                 </listitem>
             </itemizedlist>
@@ -52,7 +52,7 @@
 
     <toc/>
 
-    <xi:include href="javaee-interceptor-intro.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-interceptor.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="cdi-interceptor.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="javaee-interceptor-example.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </book>

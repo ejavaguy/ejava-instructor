@@ -1,0 +1,355 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="javaee-interceptor-example">
+    <title>Interceptor Example: Input Normalization and Validation</title>
+    <itemizedlist spacing="compact">
+        <listitem><para>EJB Bean Class</para></listitem>
+        <listitem><para>Business method(s)</para></listitem>
+        <listitem><para>Normalization and validation concerns</para></listitem>
+        <listitem><para>Decouple data manipulation/validation from business/DAO logic</para></listitem>
+    </itemizedlist>
+
+    <section id="javaee-interceptor-example-ejbmethod">
+        <title>EJB Method Creates Contact</title>
+
+        <figure>
+            <title>EJB Bean with Business Method</title>
+<programlisting language="java"><![CDATA[@Stateless
+@Validation
+public class ContactsEJB implements ContactsRemote {
+    @Override
+    public Contact createContact(Contact contact) throws InvalidParam {
+        logger.debug("createContact({})", contact);
+        em.persist(contact);
+        return contact;
+    }
+]]></programlisting>
+        </figure>
+    </section>
+
+    <section id="javaee-interceptor-example-callerdata">
+        <title>Non-normalized Caller Data</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Must correct prior to processing</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Name Not Capitalized</title>
+<programlisting language=""><![CDATA[Contact [id=0, name=john doe]]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Callers can provide names using different normalization</para></listitem>
+            <listitem><para>Name could be missing entirely</para></listitem>
+        </itemizedlist>
+        
+    </section>
+
+    <section id="javaee-interceptor-example-validation">
+        <title>Partial Solution: Validation API</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Declarative API to define validation rules</para></listitem>
+            <listitem><para>JPA validates <code>Default.class</code> group by default on @PrePersist and @PreUpdate</para></listitem>
+            <listitem><para>Can define other custom lifecycle groups</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Validation API</title>
+<programlisting language="java"><![CDATA[@Entity
+public class Contact implements Serializable {
+    @Id @GeneratedValue
+    @Column(name="CONTACT_ID")
+    private int id;
+    
+    @NotNull(groups={PreNormalizedCheck.class, PrePersistCheck.class})
+    @Size(min=1, max=32, groups={PostNormalizedCheck.class, PrePersistCheck.class})
+    @Pattern.List({
+        @Pattern(regexp="^[A-Za-z0-9-\\ ]+$", groups=PreNormalizedCheck.class),
+        @Pattern(regexp="^([A-Z][a-z0-9-]+\\ *)+$", groups=PostNormalizedCheck.class)
+    })
+    @Column(name="CONTACT_NAME", length=32, nullable=false)
+    private String name;
+    
+    @Valid
+    @OneToMany(fetch=FetchType.LAZY, mappedBy="contact", orphanRemoval=true, 
+        cascade={CascadeType.PERSIST, CascadeType.REMOVE})
+    private List<ContactInfo> contactInfo;]]></programlisting>
+        </figure>
+
+        <figure>
+            <title>Custom Validation Groups</title>
+<programlisting language="java"><![CDATA[public interface PreNormalizedCheck {}
+public interface PrePersistCheck {}
+public interface PostNormalizedCheck {}]]></programlisting>
+        </figure>
+    </section>
+
+
+    <section id="javaee-interceptor-example-jpa">
+        <title>PrePersistCheck</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>JPA will validate <code>Default</code> group for pre-persist and pre-update by default when activated</para></listitem>
+            <listitem><para>Can override/specify pre-persist, pre-update, and pre-remove validation</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Activate JPA Validation with Custom Group</title>
+<programlisting language="java"><![CDATA[@NotNull(groups={PrePersistCheck.class})
+@Size(min=1, max=32, groups={PrePersistCheck.class})
+@Column(name="CONTACT_NAME", length=32, nullable=false)
+private String name;]]></programlisting>
+
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<persistence ...
+    <persistence-unit name="ejbinterceptor-contacts">
+        <jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
+
+        <validation-mode>CALLBACK</validation-mode>
+        <properties>
+            <property name="javax.persistence.validation.group.pre-persist" 
+                      value="info.ejava.examples.ejb.interceptor.bo.PrePersistCheck"/>
+            <property name="javax.persistence.validation.group.pre-update" 
+                      value="info.ejava.examples.ejb.interceptor.bo.PrePersistCheck"/>
+        </properties>
+    </persistence-unit>            
+</persistence>]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Activating validation within JPA lifecycle</para></listitem>
+            <listitem><para>Overriding/specifying pre-persist and pre-update to use custom PrePersistCheck</para></listitem>
+        </itemizedlist>
+
+    </section>
+
+    <section id="javaee-interceptor-example-postnorm">
+        <title>PostNormalizedCheck</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Custom group to defining validation after normalization and prior to JPA</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>PostNormalizedCheck</title>
+<programlisting language="java"><![CDATA[
+@Size(min=1, max=32, groups={PostNormalizedCheck.class, PrePersistCheck.class})
+@Pattern(regexp="^([A-Z][a-z0-9-]+\\ *)+$", groups=PostNormalizedCheck.class)
+private String name;]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>We apply detailed validation checks during PostNormalizationCheck</para></listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="javaee-interceptor-example-prenorm">
+        <title>PreNormalizedCheck</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Custom group to defining validation prior to normalization</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>PreNormalizedCheck</title>
+<programlisting language="java"><![CDATA[@NotNull(groups={PreNormalizedCheck.class, PrePersistCheck.class})
+@Size(min=1, max=32, groups={PostNormalizedCheck.class, PrePersistCheck.class})
+@Pattern.List({
+    @Pattern(regexp="^[A-Za-z0-9-\\ ]+$", groups=PreNormalizedCheck.class),
+    @Pattern(regexp="^([A-Z][a-z0-9-]+\\ *)+$", groups=PostNormalizedCheck.class)
+})
+@Column(name="CONTACT_NAME", length=32, nullable=false)
+private String name;
+]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>We apply brief sanity check validation prior to normalization</para></listitem>
+        </itemizedlist>
+    </section>
+
+
+    <section id="javaee-interceptor-example-validator">
+        <title>Validator Interceptors</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Handle validating Validation API-marked POJOs as Interceptor</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Validator Base Class</title>
+<programlisting language="java"><![CDATA[public class ValidatorInterceptor {
+    @Inject
+    private Validator validator;
+    private Class<?>[] groups;
+    
+    protected ValidatorInterceptor() {}
+    public ValidatorInterceptor(Class<?>[] groups) { this.groups = groups; }
+    
+    @AroundInvoke
+    public Object invoke(InvocationContext ctx) throws Exception {
+        logger.debug("validating method: {}, groups: {}", ctx.getMethod(), Arrays.toString(groups));
+        //validate each parameter
+        for (Object param: ctx.getParameters()) {
+            logger.debug("validating param: {}, groups: {}", param, Arrays.toString(groups));
+            Set<ConstraintViolation<Object>> violations = validator.validate(param, groups);
+            if (!violations.isEmpty()) {
+                Exception ex = new InvalidParam(param.toString(), getErrors(violations));
+                logger.debug("aborting call, found error: {}", ex.getMessage());
+                throw ex;
+            }
+        }
+        return ctx.proceed();
+    }
+    
+    private List<String> getErrors(Set<ConstraintViolation<Object>> violations) {
+        List<String> errors = new ArrayList<String>(violations.size());
+        for (ConstraintViolation<Object> v: violations) {
+            errors.add(v.toString());
+        }
+        return errors;
+    }
+}]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Grabs parameters from InvocationContext</para></listitem>
+            <listitem><para>Validates each of them against assigned validation group</para></listitem>
+        </itemizedlist>
+        
+        
+        <figure>
+            <title>Pre/PostNormalized Concrete Interceptors</title>
+<programlisting language="java"><![CDATA[@Validation
+@Interceptor
+public class PreNormizedInterceptor extends ValidatorInterceptor {
+    public PreNormizedInterceptor() {super(new Class<?>[]{PreNormalizedCheck.class});}
+}]]></programlisting>
+<programlisting language="java"><![CDATA[@Validation
+@Interceptor
+public class PostNormizedInterceptor extends ValidatorInterceptor {
+    public PostNormizedInterceptor() { super(new Class<?>[]{PostNormalizedCheck.class}); }
+}]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Define @InterceptorBinding (@Validation) and @Interceptor role for CDI</para></listitem>
+            <listitem><para>Define validation group(s) for base class</para></listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="javaee-interceptor-example-normalization">
+        <title>Normalization Interceptor</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Intercepts parameters going into business methods</para></listitem>
+            <listitem><para>Applies normalization rules to parameter values</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>ContactsNormalizerInterceptor</title>
+<programlisting language="java"><![CDATA[@Validation
+@Interceptor
+public class ContactsNormalizerInterceptor {
+    @AroundInvoke
+    public Object invoke(InvocationContext ctx) throws Exception {
+        logger.debug("intercepting: {}", ctx.getMethod());
+        for (Object param: ctx.getParameters()) {
+            if (param instanceof Contact) {
+                logger.debug("normalizing: {}", param);
+                contactNormalizer.normalize((Contact) param);
+                logger.debug("normalized: {}", param);
+            } else if (param instanceof PostalInfo) {
+                logger.debug("normalizing: {}", param);
+                contactNormalizer.normalize((PostalInfo) param);
+                logger.debug("normalized: {}", param);
+            } else if (param instanceof PhoneInfo) {
+                logger.debug("normalizing: {}", param);
+                contactNormalizer.normalize((PhoneInfo) param);
+                logger.debug("normalized: {}", param);
+            }
+        }
+        return ctx.proceed();
+   }]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Defines @InterceptorBinding (@Validator) and @Interceptor role</para></listitem>
+            <listitem><para>Defines @AroundInvoke for business method</para></listitem>
+            <listitem><para>Subjects each parameter to normalization rules</para></listitem>
+            <listitem><para>Details of normalization omitted (initial caps for each name/word)</para></listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="javaee-interceptor-example-bean">
+        <title>Bean Class</title>
+
+        <figure>
+            <title>Bean Class</title>
+<programlisting language="java"><![CDATA[@Stateless
+@Validation
+public class ContactsEJB implements ContactsRemote {
+    @Override
+    public Contact createContact(Contact contact) throws InvalidParam {
+        logger.debug("createContact({})", contact);
+        em.persist(contact);
+        return contact;
+    }]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Applies @interceptorBinding annotation (@Validation)</para></listitem>
+            <listitem><para>Supplies business method</para></listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="javaee-interceptor-example-beanxml">
+        <title>CDI Activation (bean.xml)</title>
+        <para>One of several techniques possible</para>
+
+        <figure>
+            <title>CDI Activation (bean.xml)</title>
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<beans ...
+     
+     <interceptors>
+        <class>info.ejava.examples.ejb.interceptor.interceptors.PreNormizedInterceptor</class>
+        <class>info.ejava.examples.ejb.interceptor.interceptors.ContactsNormalizerInterceptor</class>
+        <class>info.ejava.examples.ejb.interceptor.interceptors.PostNormizedInterceptor</class>
+     </interceptors>
+</beans>]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Control ordering of interceptors</para></listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="javaee-interceptor-example-output">
+        <title>Example Output</title>
+        <para></para>
+
+        <figure>
+            <title>Example Output</title>
+<programlisting language=""><![CDATA[
+ValidatorInterceptor]          validating param: Contact [id=0, name=john Doe], 
+    groups: [interface info.ejava.examples.ejb.interceptor.bo.PreNormalizedCheck]
+ContactsNormalizerInterceptor] normalizing: Contact [id=0, name=john Doe]
+ContactsNormalizerInterceptor] normalized: Contact [id=0, name=John Doe]
+ValidatorInterceptor]          validating param: Contact [id=0, name=John Doe], 
+    groups: [interface info.ejava.examples.ejb.interceptor.bo.PostNormalizedCheck]
+ContactsEJB]                   createContact(Contact [id=0, name=John Doe])
+call next value for hibernate_sequence
+insert into EJBINTERCEPTOR_CONTACT (CONTACT_NAME, NORMALIZED_NAME, CONTACT_ID) values (?, ?, ?)
+]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Input hand a correctable, but invalid name</para></listitem>
+            <listitem><para>Name passed initial pre-normalization validation</para></listitem>
+            <listitem><para>Name corrected by normalization</para></listitem>
+            <listitem><para>Name passed post-normalization validation</para></listitem>
+            <listitem><para>Name passed pre-persist validation</para></listitem>
+            <listitem><para>Contac persisted</para></listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="javaee-interceptor-example-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Interceptors</para></listitem>
+            <listitem><para>EJB Bean</para></listitem>
+            <listitem><para>CDI Activation</para></listitem>
+            <listitem><para>Interceptor Ordering</para></listitem>
+            <listitem><para>Decoupling normalization, validation, and business method concerns</para></listitem>
+        </itemizedlist>
+    </section>
+
+</chapter>
+  
