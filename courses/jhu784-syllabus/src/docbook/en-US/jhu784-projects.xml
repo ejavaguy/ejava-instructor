@@ -213,10 +213,10 @@
         </itemizedlist>
 
         <para>
-            Your submission will include source zip, README (could be in source
-            zip), and built project artifact(s) (e.g., jar, war, ear, etc.). The
-            easiest way to do this is to zip up the project from the root after
-            completing a build.
+            Your submission will include source zip and README (could
+            be in source zip). You may also include pre-built artifacts if it 
+            does not add a huge size burden. The easiest way to do this is to zip up
+            the project from the root after completing a build.
         </para>
 
         <para>
@@ -234,11 +234,6 @@
             Submission e-mails (<ulink url="mailto:jim.stafford@jhu.edu">mail to all</ulink>):
         </para>
         <itemizedlist spacing="compact">
-            <!--
-            <listitem><para>
-                Mark - mdsholund@gmail.com
-                </para></listitem>
-                -->
             <listitem><para>
                 Jim - jim.stafford@jhu.edu
                 </para></listitem>

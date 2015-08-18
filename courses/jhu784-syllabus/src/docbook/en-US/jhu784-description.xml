@@ -44,10 +44,9 @@
             presented.
         </para>
         <para>
-            The material currently covers standards adopted as of 
-            JavaEE 6 (JPA 2.0, EJB 3.1, and JMS 1.1) and is being actively updated with information
-            from JavaEE 7 (JPA 2.1, EJB 3.2, and JMS 2.0). The development environment used in class
-            is JavaSE 7 and JavaEE 7-compliant.
+            The course is being actively updated to JavaEE 7 (JPA 2.1, EJB 3.2, and JMS 2.0)
+            but a few JavaEE 6 APIs remain (JMS 1.1). The development environment used in class
+            is JavaSE 8 and JavaEE 7-compliant.
         </para>
         <para>
             Using modern development tools, commercial persistence providers, and application servers, students will
@@ -106,8 +105,8 @@
             This course will make heavy use of development tools
             (Git, Maven 3, JUnit, Log4j, and Eclipse), a database 
             (H2 Database Engine), persistence provider
-            (Hibernate), and application server (JBoss/Wildfly 8). 
-            Students are strongly encouraged to establish a local
+            (Hibernate), and application server (JBoss/Wildfly 9). 
+            Students are required to establish a local
             development environment. Detailed instructions for setup are
             part of the first exercise (Development Environment Setup).
         </para>
@@ -116,7 +115,7 @@
     <section id="jhu784-references">
         <title>References</title>
         <para>
-            The core of the EJB 3.1 content is covered in the primary text for 
+            The core of the EJB 3.2 content is covered in the primary text for 
             the course (and competing texts as well as online). Associated 
             topics (database schema, JDBC, Web Tier, JMS, and tools) are not 
             covered in the course text, but documentation will be provided 
@@ -222,10 +221,13 @@
             </listitem>
             <listitem>
                 <para>
-                    Projects must be submitted via e-mail to the instructor and grader(s) with source code 
-                    in a zip file with a README. Top level, pre-built artifacts (e.g., EARs) must also be 
-                    included in the submission. All source code must be written to portably compile in the 
-                    grader's environment using Maven 3. This will be clearly spelled out during the course.
+                    Projects must be submitted via e-mail to the
+                    instructor and grader(s) with source code in a zip
+                    file with a README.  All source code must be written
+                    to portably compile in the grader's environment
+                    using Maven 3. This will be clearly spelled out
+                    during the course and you will have plenty of opportinuties 
+                    to test the process prior to submitting a project for grade.
                 </para>
             </listitem>
             <listitem>
@@ -258,7 +260,7 @@
             answered via <ulink url="mailto:jim.stafford@jhu.edu">e-mail</ulink>. 
             I usually have all questions posted by 9pm answered by 
             COB that evening. Students needing further assistance are also welcome 
-            make other arrangements during the week.        
+            make other arrangements during the week or schedule a web meeting using Adobe Connect.
         </para>
     </section>
 </chapter>
