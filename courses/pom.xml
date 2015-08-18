@@ -4,7 +4,7 @@
     <parent>
         <groupId>info.ejava.docs</groupId>
         <artifactId>docs-root</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
     </parent>
 
     <groupId>info.ejava.docs.courses</groupId>
@@ -17,11 +17,9 @@
     </description>
 
     <modules>
-    <!--
         <module>jhu784-syllabus</module>
         <module>jhu784-notes</module>
         <module>jhu784-lab</module>
-        -->
 
         <module>ejb-syllabus</module>
         <module>ejb-notes</module>
