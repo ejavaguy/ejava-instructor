@@ -5,9 +5,11 @@
 <chapter id="devenv-eclipse-setup">
     <title>Eclipse Setup</title>
     <para>
-        The most current version of Eclipse is Luna. I have only been using
-        it for a few days for class. The prior version (Kepler) was fine for
-        use as well.
+        The most current version of Eclipse is Mars. However, August/September is the 
+        worst time to switch to the newest Eclipse platform since they normally release
+        in the summer and the previous release from last year has had a chance to receive bug fixes and 
+        performance patches. I am going to follow my own advice this year and go 
+        with Luna. You may use Mars or another IDE entirely.
     </para>
 
     <section id="devenv-eclipse-install">
@@ -16,6 +18,8 @@
             <listitem>
                 <para>
                     Download Eclipse IDE for JavaEE Developers 
+                    <ulink url="https://eclipse.org/downloads/packages/release/Luna/R">https://eclipse.org/downloads/packages/release/Luna/R</ulink>
+                    or latest from
                     <ulink url="http://eclipse.org/downloads">http://eclipse.org/downloads</ulink>
                 </para>
             </listitem>
@@ -55,7 +59,7 @@ epl-v10.html  features  icon.xpm  notice.html  p2  plugins  readme
         
         <note>
             <title>M2E is now part of Eclipse JavaEE</title>
-            <para>m2e was pre-installed in my download of Kepler and Luna. Nothing more 
+            <para>m2e was pre-installed in my download of Kepler, Luna, and Mars. Nothing more 
                 needs to be done to install it. The rest of these instructions
                 are concerned with using it and demonstrating it.</para>
         </note>
@@ -194,8 +198,8 @@ openFile
                     <listitem><para>Open the JavaEE Perspective</para></listitem>
                     <listitem><para>Select "new server wizard..." in the Servers panel</para></listitem>
                     <listitem><para>Select Wildfly 8.x under the 
-                        JBoss Community folder</para></listitem>
-                    <listitem><para>Set HOME to your wildfly-8.1.0.Final directory
+                        JBoss Community folder (works with Wildfly 9.x as well)</para></listitem>
+                    <listitem><para>Set HOME to your wildfly-9.0.1.Final directory
                        using the Browse button on the next panel</para></listitem>
                     <listitem><para>Name the server "standalone" and leave the 
                        to match the default "standalone.xml" configuration file.</para></listitem>
