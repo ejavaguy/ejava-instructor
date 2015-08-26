@@ -1216,7 +1216,7 @@ private EventDTO toEventDTO(Map<String, Object> dtoData) {
                 },
             columns={
                 @ColumnResult(name="venueName", type=String.class),
-                @ColumnResult(name="numTickets", type=Number.class)
+                @ColumnResult(name="numTickets", type=Long.class)
                 }
     )
 })
