@@ -20,7 +20,7 @@
                     Unzip the contents into a directory with no spaces in its path.
                 </para>
                 <programlisting><![CDATA[
-$ ls apache-maven-3.2.3/
+$ ls apache-maven-3.3.3/
 bin  boot  conf  lib  LICENSE.txt  NOTICE.txt  README.txt
 ]]></programlisting>
             </listitem>
@@ -31,34 +31,27 @@ bin  boot  conf  lib  LICENSE.txt  NOTICE.txt  README.txt
                 </para>
                 <programlisting><![CDATA[
 //my linux system -- should be done in .bashrc
-export MAVEN_HOME=/opt/apache-maven-3.2.3
+export MAVEN_HOME=/opt/apache-maven-3.3.3
 export PATH=$MAVEN_HOME/bin:$PATH
 
 //my windows system -- should be done in Advanced System Settings->Environment Variables
-set MAVEN_HOME=/apps/apache-maven-3.2.3
+set MAVEN_HOME=/apps/apache-maven-3.3.3
 set PATH=%MAVEN_HOME%\bin;%PATH%
 ]]></programlisting>
             </listitem>
             <listitem>
                 <para>Verify maven is installed and in the path</para>
-                <programlisting><![CDATA[
-//my fedora system
+                <programlisting><![CDATA[//my fedora system
 $ mvn --version
-Apache Maven 3.1.0 (893ca28a1da9d5f51ac03827af98bb730128f9f2; 2013-06-27 22:15:32-0400)
-Maven home: /opt/apache-maven-3.1.0
-Java version: 1.7.0_25, vendor: Oracle Corporation
-Java home: /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.25.x86_64/jre
+Apache Maven 3.3.3 (7994120775791599e205a5524ec3e0dfe41d4a06; 2015-04-22T07:57:37-04:00)
+Maven home: /opt/apache-maven-3.3.3
+Java version: 1.8.0_40, vendor: Oracle Corporation
+Java home: /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.40-21.b25.fc21.x86_64/jre
 Default locale: en_US, platform encoding: UTF-8
-OS name: "linux", version: "3.8.13-100.fc17.x86_64", arch: "amd64", family: "unix"
+OS name: "linux", version: "3.19.2-201.fc21.x86_64", arch: "amd64", family: "unix"
 
 //my windows xp system
 > mvn --version
-Apache Maven 3.2.3 (33f8c3e1027c3ddde99d3cdebad2656a31e8fdf4; 2014-08-11T16:58:10-04:00)
-Maven home: C:\apps\apache-maven-3.2.3\bin\..
-Java version: 1.7.0_67, vendor: Oracle Corporation
-Java home: C:\apps\Java\jdk1.7.0_67\jre
-Default locale: en_US, platform encoding: Cp1252
-OS name: "windows xp", version: "5.1", arch: "x86", family: "windows"
 ]]></programlisting>
             </listitem>
         </orderedlist>
@@ -165,9 +158,11 @@ $ mvn clean
                     <programlisting><![CDATA[
 $ ls
 README.md  async  build  common  coursedocs  ejb  javase  jpa  pom.xml  projects  src
-$ git pull
-Already up-to-date.
-]]></programlisting>
+$ git checkout master
+$ git pull origin master
+From github-ejavaguy:jhu-ep-coursera/fullstack-course1-module3
+ * branch            master     -> FETCH_HEAD
+Already up-to-date.]]></programlisting>
              </listitem>
              <listitem><para>Test your configuration using </para>
                 <programlisting><![CDATA[

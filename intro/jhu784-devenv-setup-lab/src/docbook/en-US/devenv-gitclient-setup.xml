@@ -14,11 +14,7 @@
         <title>Verifying if Git is Installed</title>
 <programlisting><![CDATA[//my fedora system
 $ git --version
-git version 1.7.11.7
-
-//my win8/msysGit system
-$ git --version
-git version 1.9.4.msysgit.1
+git version 2.1.0
 ]]></programlisting>
     </figure>
 
@@ -28,7 +24,15 @@ git version 1.9.4.msysgit.1
             based on on your platform. Your basic options include command
             line or using an Eclipse plugin
         </para>
+
         <itemizedlist spacing="compact">
+            <listitem>
+                <para>
+                    Eclipse GUI Users: There is a git plugin for
+                    Eclipse available called EGit. It automatically comes with
+                    Eclipse these days, so no extra installation is required.
+                </para>
+            </listitem>
             <listitem>
                 <para>
                     Linux Command-Line Users: Use your package 
@@ -46,8 +50,17 @@ git version 1.9.4.msysgit.1
                     Windows Command-Line Users: Git comes in a core
                     layer and then OS-layer add-ons. The core layer is
                     sufficient for class and can be found at
-                    <ulink url="http://msysgit.github.io/">http://msysgit.github.io/</ulink>
+                    <ulink url="http://msysgit.github.io/">http://msysgit.github.io/</ulink>                    
                 </para>
+                <note>
+                    <title>There are othe sources of Git for Windows</title>
+                    <itemizedlist spacing="compact">
+                        <listitem><para><ulink url="https://git-scm.com/">git-scm.com</ulink></para></listitem>
+                        <listitem><para><ulink url="https://code.google.com/p/tortoisegit/">TortoiseGit</ulink></para></listitem>
+                        <listitem><para><ulink url="http://git-for-windows.github.io/">git-for-windows.github.io</ulink></para></listitem>
+                    </itemizedlist>
+
+                </note>
                 <orderedlist spacing="compact">
                     <listitem>
                         <para>
@@ -77,13 +90,6 @@ git version 1.9.4.msysgit.1
                         </para>
                     </listitem>
                 </orderedlist>
-            </listitem>
-            <listitem>
-                <para>
-                    Eclipse GUI Users: There is a git plugin for
-                    Eclipse available called EGit. It automatically comes with
-                    Eclipse these days, so no extra installation is required.
-                </para>
             </listitem>
         </itemizedlist>
     </section>
@@ -165,10 +171,10 @@ Already up-to-date.
                         in a new branch at any time using the following git commands.
                     </para>
                         <programlisting><![CDATA[
-$ git checkout -b new-branch master  //creates new branch from master 
-                                     //and switches to that branch
-$ git commit -a -m "saving my stuff" //commits all dirty files to new branch
-$ git checkout master                //switches back to the master branch 
+$ git checkout -b new-branch       #creates new branch from current branch 
+                                   #and switches to that branch
+$ git commit -am "saving my stuff" #commits all dirty files to new branch
+$ git checkout master              #switches back to the master branch 
 ]]></programlisting>
                     <para>
                         If you simply want to throw away any changes you made, you 

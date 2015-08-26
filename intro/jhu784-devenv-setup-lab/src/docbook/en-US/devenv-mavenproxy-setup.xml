@@ -185,6 +185,12 @@ wrapper | The nexus-webapp service is not installed - The specified service does
                             <entry><ulink url="https://repository.jboss.org/nexus/content/repositories/releases/">https://repository.jboss.org/nexus/content/repositories/releases/</ulink></entry>
                         </row>
                         <row>
+                            <entry>apache-repo</entry>
+                            <entry>Apache Repo</entry>
+                            <entry>Release</entry>
+                            <entry><ulink url="https://repo.maven.apache.org/maven2/">https://repo.maven.apache.org/maven2/</ulink></entry>
+                        </row>
+                        <row>
                             <entry>exoplatform</entry>
                             <entry>Exoplatform</entry>
                             <entry>Release</entry>
@@ -234,6 +240,15 @@ Starting Nexus OSS...
 Started Nexus OSS.
 ]]></programlisting>                        
                 </note>
+                <note>
+                    <title>SSL Errors?  java.security.NoSuchAlgorithmException</title>
+                    <para>It seems that Nexus has some SSL errors with Java8 and OpenJDK
+                        that did not exist with earlier versions of the JDK. See
+                        the following and either switch to Oracle's JDK or switch to
+                        HTTP (non-HTTPS) URLs.
+                    <ulink url="https://issues.sonatype.org/browse/NEXUS-7999">https://issues.sonatype.org/browse/NEXUS-7999</ulink>
+                    </para>
+                </note>
             </listitem>
             <listitem><para>Add the created repositories to the Public Repositories</para>
                 <orderedlist spacing="compact">
@@ -244,8 +259,11 @@ Started Nexus OSS.
                     in the following order</para>
                     <orderedlist spacing="compact">
                         <listitem><para>JBoss Nexus</para></listitem>
+                        <listitem><para>Apache Repo</para></listitem>                        
                         <listitem><para>Exoplatform</para></listitem>
+                        <!-- 
                         <listitem><para>Ejava Nexus</para></listitem>
+                         -->
                         <listitem><para>Webdev Snapshots</para></listitem>
                         <listitem><para>Webdev Releases</para></listitem>
                     </orderedlist>
@@ -255,7 +273,6 @@ Started Nexus OSS.
             </listitem>
         </orderedlist>
      </section>
-             
              
              
      <section id="devenv-mavenproxy-settings.xml">

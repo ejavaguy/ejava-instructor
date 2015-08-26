@@ -4,7 +4,7 @@
 <chapter id="devenv-jdk-setup">
     <title>Java JDK Setup</title>
     <para>
-        You will need a copy of Java 7 SDK installed. 
+        You will need a copy of Java 8 SDK installed. 
     </para>
     <note>
         <title>Keep 32/64-bit choices consistent</title>
@@ -19,22 +19,34 @@
         <itemizedlist spacing="compact">
             <listitem>
                 <para>
-                    Linux Users: The alternate JDKs (e.g., OpenJDK) available 
-                    from your package manager will work fine for class.
+                    Linux Users: I normally would say OpenJDK will work fine
+                    for class but I have found that OpenJDK 8 is still lagging
+                    begind in some SSL/encryption support that makes communicating
+                    with remote servers using HTTPS an issue. Do yourself a favor
+                    and go with Oracle JDK 8 (latest) by downloading the rpm from their
+                    site and installing.
+                    <ulink url="http://www.oracle.com/technetwork/java/javase/downloads/index.html">http://www.oracle.com/technetwork/java/javase/downloads/index.html</ulink>
+<programlisting language=""><![CDATA[$ rpm -ih jdk-8u60-linux-x64.rpm
+$ alternatives --config java
+  Selection    Command
+-----------------------------------------------
+  1           /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.40-21.b25.fc21.x86_64/jre/bin/java
+  2           /usr/java/jdk1.8.0_60/jre/bin/java
+
+Enter to keep the current selection[+], or type selection number: 2 
+]]></programlisting>
                 </para>
             </listitem>
             <listitem>
                 <para>
-                    Windows Users: Install the Java 7 JDK from Sun/Oracle
+                    Windows Users: Install the Java 8 JDK from Sun/Oracle
                 </para>
                 <orderedlist spacing="compact">
                     <listitem>
                         <para>
-                            Download a copy of the Java 7 JDK
-                            <ulink
-    url="http://www.oracle.com/technetwork/java/javase/downloads/index.html">http://www.oracle.com/technetwork/java/javase/downloads/index.html
-                            </ulink>.
-                            Choose Java SE 7 Update (latest) JDK. We will only be using the
+                            Download a copy of the Java 8 JDK
+                            <ulink url="http://www.oracle.com/technetwork/java/javase/downloads/index.html">http://www.oracle.com/technetwork/java/javase/downloads/index.html</ulink>.
+                            Choose Java SE 8 (latest) JDK. We will only be using the
                             JDK portion in class so avoid the alternate downloads that add in the
                             Glassfish JavaEE Application Server and NetBeans. We will be
                             using JBoss and Eclipse.
@@ -73,27 +85,22 @@
             the JDK to your PATH</para></listitem>
         <listitem><figure>
             <title>Fedora Example</title>
- <programlisting language=""><![CDATA[$ java -version
-java version "1.7.0_25"
-OpenJDK Runtime Environment (fedora-2.3.10.3.fc17-x86_64)
-OpenJDK 64-Bit Server VM (build 23.7-b01, mixed mode)
-
+<programlisting language=""><![CDATA[$ java -version
+java version "1.8.0_60"
+Java(TM) SE Runtime Environment (build 1.8.0_60-b27)
+Java HotSpot(TM) 64-Bit Server VM (build 25.60-b23, mixed mode)
+ 
+ 
 $ javac -version
-javac 1.7.0_25
-]]></programlisting>
+javac 1.8.0_40]]></programlisting>
             </figure>
 
         </listitem>        
         <listitem><figure>
-            <title>Windows XP Example</title>
+            <title>Windows XP Example (TODO: Update Example)</title>
  <programlisting language=""><![CDATA[> java -version
-java version "1.7.0_67"
-Java(TM) SE Runtime Environment (build 1.7.0_67-b01)
-Java HotSpot(TM) Client VM (build 24.65-b04, mixed mode, sharing)
 
->javac -version
-javac 1.7.0_67
-]]></programlisting>
+>javac -version]]></programlisting>
             </figure>
 
         </listitem>        
