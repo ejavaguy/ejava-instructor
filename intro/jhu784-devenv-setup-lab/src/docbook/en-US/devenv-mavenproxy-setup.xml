@@ -182,7 +182,7 @@ wrapper | The nexus-webapp service is not installed - The specified service does
                             <entry>jboss-nexus</entry>
                             <entry>JBoss Nexus</entry>
                             <entry>Release</entry>
-                            <entry><ulink url="https://repository.jboss.org/nexus/content/repositories/releases/">https://repository.jboss.org/nexus/content/repositories/releases/</ulink></entry>
+                            <entry><ulink url="https://repository.jboss.org/nexus/content/groups/public-jboss/">https://repository.jboss.org/nexus/content/groups/public-jboss/</ulink></entry>
                         </row>
                         <row>
                             <entry>apache-repo</entry>
