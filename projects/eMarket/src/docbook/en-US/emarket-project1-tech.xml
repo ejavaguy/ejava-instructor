@@ -992,7 +992,7 @@
 
         <figure>
             <title>eSales Ingest and DAO</title>
-            <graphic scalefit="1" fileref="images/esales_ingest_dao.jpg"/>
+            <graphic scalefit="1" fileref="images/esales-ingest-dao.jpg"/>
         </figure>
         <note>
             <para>
@@ -1021,7 +1021,7 @@
             <title>eSales DAOs</title>
             <figure>
                 <title>eSales Candidate JPA DAOs</title>
-                <graphic scalefit="1" fileref="images/esales_daos.jpg"/>
+                <graphic scalefit="1" fileref="images/esales-daos.jpg"/>
             </figure>
             <variablelist spacing="compact">
                 <varlistentry>
@@ -1050,10 +1050,10 @@
         </section>
 
         <section id="emarket-project1-tech-biddao">
-            <title>Mayberry DAOs</title>
+            <title>Bidbot DAOs</title>
             <note>
                 <para>
-                    Please remember the option to keep it simple for Mayberry.
+                    Please remember the option to keep it simple for Bidbot.
                     You have the option of implementing the DAO as part of 
                     the business logic in this application if you wish.
                 </para>
@@ -1093,7 +1093,7 @@
 
             <figure>
                 <title>eSales Business Logic</title>
-                <graphic scalefit="1" fileref="images/esales_business_logic.jpg"/>
+                <graphic scalefit="1" fileref="images/esales-business-logic.jpg"/>
             </figure>
             <variablelist spacing="compact">
                 <varlistentry>
@@ -1215,7 +1215,7 @@
 
             <figure>
                 <title>eBidbot Business Logic</title>
-                <graphic scalefit="1" fileref="images/ebidbot_business_logic.jpg"/>
+                <graphic scalefit="1" fileref="images/ebidbot-business-logic.jpg"/>
             </figure>
             <variablelist spacing="compact">
                 <varlistentry>

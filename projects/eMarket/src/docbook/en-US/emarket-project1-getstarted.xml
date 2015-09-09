@@ -71,7 +71,7 @@ eMarket
 |   |   `-- src
 |   |       |-- main
 |   |       |   |-- java
-|   |       |   |   `-- emayberry
+|   |       |   |   `-- ebidbot
 |   |       |   |       |-- bo
 |   |       |   |       |-- dao
 |   |       |   |       |-- bl
@@ -81,7 +81,7 @@ eMarket
 |   |       |           `-- eBidbot-drop.ddl
 |   |       `-- test
 |   |           |-- java
-|   |           |   `-- emayberry
+|   |           |   `-- ebidbot
 |   |           |       |-- bo
 |   |           |       |-- dao
 |   |           |       |-- bl

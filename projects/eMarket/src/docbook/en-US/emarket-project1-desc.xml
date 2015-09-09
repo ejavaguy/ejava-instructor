@@ -4,7 +4,9 @@
 <chapter id="emarket-project1-desc">
     <title>eMarket Project 1 Description</title>
     <subtitle>Data Access Tier and Initial Business Logic</subtitle>
-    <para>Updated: 2014-09-06</para>
+    <!--
+    <para>Updated: 2015-09-09</para>
+    -->
 
     <section id="emarket-project1-purpose">
         <title>Purpose</title>
@@ -258,7 +260,7 @@
             be done by replacing the "e" in eMarket, eSales, and eBidbot with a
             unique name that corresponds to your newsgroup or college login
             (ex.  jcsMarket, jcsSales, jcsBidbot). You should also use this same pattern for
-            java packages (ex. jcs.dmv, jcs.mayberry), DB tables (e.g., JCS_), etc.
+            java packages (ex. jcs.sales, jcs.bitbot), DB tables (e.g., JCS_), etc.
         </para>
   
         <para>
