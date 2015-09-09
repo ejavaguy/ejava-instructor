@@ -106,8 +106,8 @@ Listening for transport dt_socket at address: 8787
                 you cloned and built from github earlier.</para>
 <programlisting language=""><![CDATA[
 $ cd wildfly-9.0.1.Final
-wildfly-9.0.1.Final]$ unzip -l .../ejava-student/servers/ejava-wildfly810/target/ejava-wildfly810-4.0.0-SNAPSHOT-server.zip 
-Archive:  .../ejava-student/servers/ejava-wildfly810/target/ejava-wildfly810-4.0.0-SNAPSHOT-server.zip
+wildfly-9.0.1.Final]$ unzip -l .../ejava-student/servers/ejava-wildfly901/target/ejava-wildfly901-4.0.0-SNAPSHOT-server.zip 
+Archive:  .../ejava-student/servers/ejava-wildfly901/target/ejava-wildfly901-4.0.0-SNAPSHOT-server.zip
   Length      Date    Time    Name
 ---------  ---------- -----   ----
         0  09-02-2014 21:48   standalone/
@@ -123,8 +123,8 @@ Archive:  .../ejava-student/servers/ejava-wildfly810/target/ejava-wildfly810-4.0
      2402  09-02-2014 21:48   domain/configuration/application-users.properties
 ---------                     -------
     41269                     11 files
-$ unzip /home/jcstaff/workspaces/ejava-class/ejava-student/servers/ejava-wildfly810/target/ejava-wildfly810-4.0.0-SNAPSHOT-server.zip 
-Archive:  /home/jcstaff/workspaces/ejava-class/ejava-student/servers/ejava-wildfly810/target/ejava-wildfly810-4.0.0-SNAPSHOT-server.zip
+$ unzip /home/jcstaff/workspaces/ejava-class/ejava-student/servers/ejava-wildfly901/target/ejava-wildfly901-4.0.0-SNAPSHOT-server.zip 
+Archive:  /home/jcstaff/workspaces/ejava-class/ejava-student/servers/ejava-wildfly901/target/ejava-wildfly901-4.0.0-SNAPSHOT-server.zip
   inflating: standalone/configuration/server.cer  
 replace standalone/configuration/application-roles.properties? [y]es, [n]o, [A]ll, [N]one, [r]ename: y
   inflating: standalone/configuration/application-roles.properties  
