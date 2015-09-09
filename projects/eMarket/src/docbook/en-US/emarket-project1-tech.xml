@@ -1,0 +1,1265 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="emarket-project1-tech">
+    <title>Project 1 Technical Details</title>
+    <note>
+        There are a lot of technical details presented with this 
+        specification. This is done to provide clarity and a starting point for
+        design discussion. However, it is not done so to specify specific class
+        or method naming, project layout, or order of work. You are free to
+        make many technical adjustments to the ideas presented.
+    </note>
+
+    <section id="emarket-project1-tech-dbschema">
+        <title>Database Schema</title>
+        <para>
+            Design 2 sets of database schema that account for the following
+            information. Although we will deploy the 2 database schemas to
+            the same database for the project, they should be designed to be
+            independently deployed to separate databases. eSales and eBidbot are
+            two independent applications. This will primarily affect your attempt
+            re-use tables or to make primary key assumptions between the two.
+        </para>
+
+        <section id="emarket-project1-tech-salesdb">
+            <title>eSales Candidate Database Schema</title>
+
+            <figure>
+                <title>eSales Candidate Database Schema</title>
+                <graphic scalefit="1" fileref="images/esales-db-schema.jpg"/>
+            </figure>
+      
+            <section id="emarket-project1-tech-salesdb-account">
+                <title>ESALES_ACCT</title>
+                <para>
+                    This table stores singleton account information that will not be shared with external users
+                </para>
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>USER_ID</filename></term>
+                        <listitem><para>
+                            The user login for the account must be
+                            maintained by the database so that we can associate the
+                            account with a specific user after they login. This
+                            information is unique and cannot be changed, so it can also
+                            be used as a primary key field.
+                         </para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>FIRST_NAME</filename></term>
+                        <listitem><para>text field to hold a person's first name</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>MIDDLE_NAME</filename></term>
+                        <listitem><para>text field to hold a person's middle name</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>LAST_NAME</filename></term>
+                        <listitem><para>text field to hold a person's last name</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>START_DATE</filename></term>
+                        <listitem><para>date when user started with eSales</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>END_DATE</filename></term>
+                        <listitem><para>date when user closed account with eSales</para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </section>
+
+
+            <section id="emarket-project1-tech-salesdb-poc">
+                <title>ESALES_POC</title>
+                <para>
+                  since we want to protect personal information, the
+                  public contact information can be placed in a separate
+                  table so it can be more freely shared. This has a 1:1
+                  relationship with ESALES_ACCT and could be done as a
+                  primary key join.
+                </para>
+
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>USER_ID</filename></term>
+                        <listitem><para>
+                          (1:1 relationship with ESALES_ACCT)
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>EMAIL</filename></term>
+                        <listitem><para>
+                          valid e-mail address to contact user. This field
+                          should be unique.
+                         </para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </section>
+
+            <section id="emarket-project1-tech-salesdb-address">
+                <title>ESALES_ADDRESS</title>
+                <para>
+                  users can provide various types of
+                  addresses for use at the site. Each will have a name that
+                  defines its purpose. Since billing is not a part of the
+                  initial project, the only address we are concerned with is a
+                  shipping address. Items are also shipped to addresses. Note
+                  that an address for a shipped item may need a way to keep a
+                  user's change-of-address from modifying the historical fact
+                  of where it was shipped. This may mean that address fields
+                  cannot be changed, changes once referenced, or copied for
+                  use by the shipping side of the application.
+                </para>
+
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>ID</filename></term>
+                        <listitem><para>
+                          there is no single natural field within address that 
+                          forms a primary key, so a generate value can be used.
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>NAME</filename></term>
+                        <listitem><para>
+                          identifies the type of address (e.g., "SHIPPING")
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>TO</filename></term>
+                        <listitem><para>
+                          identifies the recipient at the address.
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>STREET</filename></term>
+                        <listitem><para>
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>CITY</filename></term>
+                        <listitem><para>
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>STATE</filename></term>
+                        <listitem><para>
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>ZIP</filename></term>
+                        <listitem><para>
+                         </para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </section>
+
+            <section id="emarket-project1-tech-salesdb-account-address">
+                <title>ESALES_ACCT_ADDRESS_LINK</title>
+                <para>
+                  There is a 1:N relationship
+                  between accounts and addresses. If we want addresses to stay
+                  independent of the private account information, we can form a
+                  foreign key relationship through a secondary link table. Since
+                  this is a 1:N relationship, the foreign key pair can be
+                  constrained to be unique by the database. Otherwise, we can simply 
+                  put a foreign key in the address table.
+                </para>
+
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>USER_ID</filename></term>
+                        <listitem><para>
+                          (N:1 relation to ESALES_ACCT)
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>ADDRESS_ID</filename></term>
+                        <listitem><para>
+                          (1:1 relation to ESALES_ADDRESS)
+                         </para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </section>
+
+            <section id="emarket-project1-tech-salesdb-auctionitem">
+                <title>ESALES_AUCTIONITEM</title>
+                <para>
+                  This will anchor the information
+                  associated with an auction. Auctions will progress from bidding
+                  to sale. Once the bidding is over, the winning bid information
+                  can be retained within this table and the incremental bid
+                  history purged. Be sure to design in an easy way to determine 
+                  if an auction item is expired or officially over; even if it 
+                  did not sell or ship yet. Note that end-of-auction processing
+                  will be looking for auctions that have expired, but not 
+                  officially closed.  Buyers and bidders will be looking for 
+                  auctions that have not closed. You may have to adjust the
+                  schema suggested below to accommodate.
+                </para>
+
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>ID</filename></term>
+                        <listitem><para>
+                          there is no natural field for forming a primary
+                          key value within this table.
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>TITLE</filename></term>
+                        <listitem><para>
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>CATEGORY</filename></term>
+                        <listitem><para>
+                          just a text name for now. There will be no
+                          defined set of categories.
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>DESCRIPTION</filename></term>
+                        <listitem><para>
+                          this will be a straight text narrative.
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>START_TIME</filename></term>
+                        <listitem><para>
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>END_TIME</filename></term>
+                        <listitem><para>
+                          this is a date in the future when the auction
+                          is taking place. 
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>ASKING_PRICE</filename></term>
+                        <listitem><para>
+                          this forms a minimum bid value.
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>PURCHASE_PRICE</filename></term>
+                        <listitem><para>
+                          this comes from the AMOUNT of the
+                          winning ESALES_BID before it is purged.
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>BUYER_ID</filename></term>
+                        <listitem><para>
+                          (N:1 relation to ESALES_USER) this comes
+                          from the BIDDER_ID of the winning ESALES_BID before it
+                          is purged.
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>SELLER_ID</filename></term>
+                        <listitem><para>
+                          (N:1 relation to ESALES_USER)
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>SHIPTO_ID</filename></term>
+                        <listitem><para>
+                          (1:1 or N:1 relation to ADDRESS) We should
+                          probably copy the buyer's shipping address since a later
+                          update of the user's shipping address should not modify
+                          a historical record of where this item was shipped to. No
+                          bid deal during this overall project.
+                         </para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </section>
+
+            <section id="emarket-project1-tech-salesdb-bid">
+                <title>ESALES_BID</title>
+                <para>
+                  bids for an active auction should be
+                  retained for viewing. Once the bidding is over, however, the
+                  loosing bid information is no longer needed. The winning bid
+                  can be kept around or copied into the auction as part of a sale
+                  record.
+                </para>
+
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>ID</filename></term>
+                        <listitem><para>
+                          there is no natural field that represents a primary key 
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>BIDTIME</filename></term>
+                        <listitem><para>
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>AMOUNT</filename></term>
+                        <listitem><para>
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>ITEM_ID</filename></term>
+                        <listitem><para>
+                          (N:1 relation with ESALES_AUCTIONITEM)
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>BIDDER_ID</filename></term>
+                        <listitem><para>
+                          (N:1 relation with ESALES_USER)
+                         </para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </section>
+
+
+            <section id="emarket-project1-tech-salesdb-image">
+                <title>ESALES_IMAGE</title>
+                <para>
+                  auctions can have 0..N images associated with them. 
+                </para>
+
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>ID</filename></term>
+                        <listitem><para>
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>IMAGE</filename></term>
+                        <listitem><para>
+                         </para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </section>
+
+            <section id="emarket-project1-tech-salesdb-item-image">
+                <title>ESALES_ITEM_IMAGE_LINK</title>
+                <para>
+                  this could be optionally
+                  expressed as a foreign key within the image table.
+                </para>
+
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>ITEM_ID</filename></term>
+                        <listitem><para>
+                          (N:1 relation to ESALES_AUCTION)
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>IMAGE_ID</filename></term>
+                        <listitem><para>
+                          (1:1 relation to ESALES_IMAGE)
+                         </para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </section>
+        </section>
+
+
+
+        <section id="emarket-project1-tech-biddb">
+            <title>eBidbot Candidate Database Schema</title>
+
+            <figure>
+                <title>eBidbot Candidate Database Schema</title>
+                <graphic scalefit="1" fileref="images/ebidbot-db-schema.jpg"/>
+            </figure>
+      
+            <section id="emarket-project1-tech-biddb-account">
+                <title>ESALES_BIDACCT</title>
+                <para>
+                  design a table to store eBidbot user
+                  account information. No need for names here, we just want a
+                  userId of some sort and their eSales credentials (they trust
+                  us). For simplicity, make the eBidbot SALES_ACCOUNT column 
+                  have an equal value to the USER_ID column and rely on the fact 
+                  that their userIds will be the same. eBidbot will be a trusted
+                  user of eSales, but we have no way (within the scope of the 
+                  project) to verify the eSales account ID provided by the user
+                  unless it is the same as the eBidbot login.
+                </para>
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>USER_ID</filename></term>
+                        <listitem><para>
+                          this user's login will be used as a primary key.
+                         </para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>SALES_ACCOUNT</filename></term>
+                        <listitem><para>
+                          bidder's login name for eSales
+                         </para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </section>
+            
+            <section id="emarket-project1-tech-biddb-order">
+                <title>EBIDBOT_ORDER</title>
+                <para>
+                  design a table to hold eBidbot
+                  information associated with an order. This application will use
+                  the information to know the specific auction, bid parameters,
+                  and final results (cached from eSales result).
+                </para>
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>ID</filename></term>
+                        <listitem><para>
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>AUCTION_ID</filename></term>
+                        <listitem><para>
+                            logically, this is a N:1 relationship to 
+                            ESALES_AUCTIONTIME. However, there should be no physical
+                            database references between the two applications. All
+                            integration will come at the higher application levels.
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>START_BID</filename></term>
+                        <listitem><para>
+                            whether we jump in with this bid or wait
+                            until it reaches this value is up to you.
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>MAX_BID</filename></term>
+                        <listitem><para>
+                          don't bid any more that this amount.
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>COMPLETE</filename></term>
+                        <listitem><para>
+                          know if auction is complete for order.
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>RESULT</filename></term>
+                        <listitem><para>
+                          know if we won or not.
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>FINAL_BID</filename></term>
+                        <listitem><para>
+                          know purchase price for winner. The buyer
+                          will owe this amount if the result says he won.
+                         </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>USER_ID</filename></term>
+                        <listitem><para>
+                          (N:1 relation to EBIDBOT_BIDACCT)
+                         </para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </section>
+        </section>
+    </section>
+
+
+    <section id="emarket-project1-tech-bo">
+        <title>Business Objects</title>
+
+        <section id="emarket-project1-tech-salesbo">
+            <title>eSales Candidate Business Objects</title>
+            <figure>
+                <title>eSales Candidate Business Objects</title>
+                <graphic scalefit="1" fileref="images/esales-business-objects.jpg"/>
+            </figure>
+
+            <section id="emarket-project1-tech-salesbo-account">
+                <title>Account</title>
+                <para>
+                  design a class that encapsulates the singleton
+                  private information for a user. This class will reference other
+                  objects in the system, but will not be referenced by others.
+                </para>
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>userId:String</filename></term>
+                        <listitem><para>
+                          use login name. This could be optionally
+                          dropped in favor of using the identical property within the 
+                          referenced POC object.
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>firstName:String</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>middleName:String</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>lastName:String</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>startDate:Date</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>endDate:Date</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>addresses:Map&lt;String, Address&gt;</filename></term>
+                        <listitem><para>
+                          addresses can be keyed by their name.
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>poc:POC</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </section>
+
+            <section id="emarket-project1-tech-salesbo-address">
+                <title>Address</title>
+                <para>
+                  design a class that holds addressing
+                  information. This will primarily be used as a shipping address.
+                </para>
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>id:long</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>name:String</filename></term>
+                        <listitem><para>
+                          indicates type of address. This should be unique per account.
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>to:String</filename></term>
+                        <listitem><para>
+                          the recipient at the address
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>street:String</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>city:String</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>state:String</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>zip:String</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </section>
+
+            <section id="emarket-project1-tech-salesbo-poc">
+                <title>POC</title>
+                <para>
+                  design a way for public point of contact information to be exposed for a user.
+                </para>
+                <variablelist spacing="compact">
+
+                    <varlistentry>
+                        <term><filename>userId:String</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>email:String</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>auctions:Collection&lt;AuctionItem&gt;</filename></term>
+                        <listitem><para>
+                          provides direct
+                          navigation to auctions the user was a seller. This property
+                          could be dropped in favor of a uni-directional mapping from 
+                          the AuctionItem side.
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>bids:Collection&lt;Bid&gt;</filename></term>
+                        <listitem><para>
+                          provides direct navigation to bids
+                          the user has placed on open auctions. This property could
+                          be dropped in favor of a uni-directional mapping from
+                          Bid.
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>purchases:Collection&lt;AuctionItem&gt;</filename></term>
+                        <listitem><para>
+                          provides direct
+                          navigation to auctions the user has won. This property
+                          could be dropped in favor of a uni-directional mapping from
+                          AuctionItem.
+                        </para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </section>
+
+            <section id="emarket-project1-tech-salesbo-bid">
+                <title>Bid</title>
+                <para>
+                  design a way to record bid information while an
+                  auction is still open.
+                </para>
+                <variablelist spacing="compact">
+
+                    <varlistentry>
+                        <term><filename>id:long</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>amount:double</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>timestamp:Date</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>bidder:POC</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>auction:AuctionItem</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </section>
+
+            <section id="emarket-project1-tech-salesbo-auctionitem">
+                <title>AuctionItem</title>
+                <para>
+                  design a class to encapsulate the
+                  information for an auction. AuctionItems will need to know
+                  if they are still open, expired but not yet completed, or
+                  closed. When searching for an auction to bid on, you should
+                  only see items that are still officially open.
+                </para>
+                <variablelist spacing="compact">
+
+                    <varlistentry>
+                        <term><filename>id:long</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>title:String</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>category:Enum</filename></term>
+                        <listitem><para>
+                          the full list of categories is still TBD,
+                          but a candidate set will be provided with the test data.
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>description:String</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>startTime:Date</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>endTime:Date</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>askingPrice:double</filename></term>
+                        <listitem><para>
+                          no bid should be allowed below this value.
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>purchasePrice:double</filename></term>
+                        <listitem><para>
+                          filled in from winning bid when auction is complete.
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>bids:List&lt;Collection&gt;</filename></term>
+                        <listitem><para>
+                          bids are retained as long as the
+                          auction is active. They can be maintained in an ordered
+                          list sorted by bid amount to make locating the highest bid 
+                          easier to find.
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>buyer:POC</filename></term>
+                        <listitem><para>
+                          filled in when auction is complete from
+                          from winning bid when auction is complete.
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>shipTo:Address</filename></term>
+                        <listitem><para>
+                          address item is to be shipped to. This
+                          is filled in with the shipping address of the user when
+                          the auction is complete.
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>seller:POC</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>images:List&lt;Image&gt;</filename></term>
+                        <listitem><para>
+                          auctions can have zero or more images associated with them.
+                        </para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </section>
+
+            <section id="emarket-project1-tech-salesbo-image">
+                <title>Image</title>
+                <para>
+                  design a class to house the binary image for an auction item.
+                </para>
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>id:long</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>image:byte[]</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </section>
+        </section>
+
+
+        <section id="emarket-project1-tech-bidbo">
+            <title>eBidbot Candidate Business Objects</title>
+            <figure>
+                <title>eBidbot Candidate Business Objects</title>
+                <graphic scalefit="1" fileref="images/ebidbot-business-objects.jpg"/>
+            </figure>
+
+            <section id="emarket-project1-tech-bidbo-account">
+                <title>BidAccount</title>
+                <para>
+                  design a class that encapsulates the bidder
+                  information for automated bidding.
+                </para>
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>userId:String</filename></term>
+                        <listitem><para>
+                          account login for eBidbot
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>salesAccount:String</filename></term>
+                        <listitem><para>
+                          account login for eSales
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>salesPassword:String</filename></term>
+                        <listitem><para>
+                          account password for eSales
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>orders:Collection&lt;Order&gt;</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </section>
+
+            <section id="emarket-project1-tech-bidbo-order">
+                <title>BidOrder</title>
+                <para>
+                  design a class that defines the parameters
+                  for making a bid against a specific auction and its results.
+                </para>
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>auctionId:long</filename></term>
+                        <listitem><para>
+                          eSales auction Id
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>startBid:double</filename></term>
+                        <listitem><para>
+                          starting bid for user. You can
+                          determine when they should start with this value; right
+                          away or wait.
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>maxBid:double</filename></term>
+                        <listitem><para>
+                          no bids should be made above this value.
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>complete</filename></term>
+                        <listitem><para>
+                          cache the active/complete state of the auction 
+                          to help limit activity for application and cache results.
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>result</filename></term>
+                        <listitem><para>
+                          provide information that indicates whether the
+                          bidder won or not.
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>finalBid</filename></term>
+                        <listitem><para>
+                          cache the winning bid amount from eSales.
+                        </para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </section>
+        </section>
+    </section>
+
+    <section id="emarket-project1-tech-validation">
+        <title>Validation API</title>
+        <para>
+            Add validation API declarations to your business objects as appropriate. 
+            This need not be extensive or exhaustive. Just do enough to show use of
+            declarative validation as a part of your application. 
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Determine the validation groups you wish to use in 
+                your application (suggest business logic interface and persistence tier).
+                </para> </listitem>
+            <listitem><para>
+                Add validation annotations to your business objects and assign them
+                to your designed groups as appropriate.
+                </para> </listitem>
+            <listitem><para>
+                Manually invoke validation from the your junit test and integrate
+                the validation into your persistence unit.
+                </para> </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="emarket-project1-tech-ingest">
+        <title>Sales Ingest</title>
+        <para>
+            Design and implement a mechanism to ingest a starting state for
+            eSales based on a provided data file and parser.  You will implement
+            two primary sets of classes to support this requirement; the
+            DAO(s) and an Ingestor. 
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Design and implement a set of DAOs that can be used
+                to ingest eSales business data into the database using 
+                the database schema you designed as a part of a
+                separate requirement. These DAOs can optionally be tuned for 
+                ingest or simply reused from your CRUD-style requirements.
+                </para> </listitem>
+            <listitem><para>
+                Design and implement an Ingestor that will use an externally
+                provided parser to obtain business data for eSales and use the 
+                Ingest DAO to populate the database. 
+                </para> </listitem>
+        </orderedlist>
+
+        <figure>
+            <title>eSales Ingest and DAO</title>
+            <graphic scalefit="1" fileref="images/esales_ingest_dao.jpg"/>
+        </figure>
+        <note>
+            <para>
+                Please ignore references in the diagrams that call out use of 
+                JDBC. All DAOs can be implemented exclusively with JPA for this assignment.
+            </para>
+        </note>
+    </section>
+
+    <section id="emarket-project1-tech-dao">
+        <title>DAOs</title>
+        <para>
+            Design and implement a DAO layer that will map the business
+            objects between the object model and the database using the Java
+            Persistence API (JPA). These DAOs will support all standard CRUD
+            operations and can optionally implement the same interface as other
+            potential DAO implementations. The implementation can make liberal use
+            of JPA @Annotations, descriptor files, or a combination of both. Your 
+            interface should encapsulate the fact that an EntityManager is being
+            used and the same EntityManager should be shared among other DAOs in
+            the same Thread. Your DAOs should not attempt to control the transaction 
+            or they will <emphasis>NOT</emphasis> be portable to the EJB tier.
+        </para>
+
+        <section id="emarket-project1-tech-salesdao">
+            <title>eSales DAOs</title>
+            <figure>
+                <title>eSales Candidate JPA DAOs</title>
+                <graphic scalefit="1" fileref="images/esales_daos.jpg"/>
+            </figure>
+            <variablelist spacing="compact">
+                <varlistentry>
+                    <term><filename>AccountDAO/JPAAccountDAO</filename></term>
+                    <listitem><para>
+                        encapsulates the use of JPA when mapping account and closely
+                        associated business objects to/from the database.
+                        </para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>AuctionDAO/JPAAuctionDAO</filename></term>
+                    <listitem><para>
+                      encapsulates the use of JPA when mapping auction and closely
+                      associated business objects to/from the database.
+                        </para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>BidAccountDAO/JPABidAccountDAO</filename></term>
+                    <listitem><para>
+                      encapsulates the use of
+                      JPA when mapping BidAccount and closely associated business objects
+                      to/from the database.
+                        </para></listitem>
+                </varlistentry>
+            </variablelist>
+        </section>
+
+        <section id="emarket-project1-tech-biddao">
+            <title>Mayberry DAOs</title>
+            <note>
+                <para>
+                    Please remember the option to keep it simple for Mayberry.
+                    You have the option of implementing the DAO as part of 
+                    the business logic in this application if you wish.
+                </para>
+            </note>
+        </section>
+    </section>
+
+    <section id="emarket-project1-tech-sqltuning">
+        <title>SQL Tuning (Indexes)</title>
+        <para>
+            Add tuning to your database schema by augmenting the DDL files with 
+            indexes for foreign keys, joins, and where clauses. This need not be extensive 
+            or exhaustive. Just do enough to show that proper data model and database tuning 
+            is part of the overall enterprise development process.
+        </para>
+    </section>
+
+    <section id="emarket-project1-tech-bl">
+        <title>Business Logic</title>
+        <para>
+            Design an initial business interface and business logic for
+            the applications. The core O/R mapping work will be done
+            by the DAOs.  However, it is the ultimate responsibility of these
+            business logic implementations that either it or the business objects
+            enforce the business rules of the application. The DAOs only perform
+            O/R mapping and do not enforce such things as a minimum bid.  The
+            business logic is assumed to work within the context of a single,
+            externally controlled transaction. Do not attempt to control the
+            transaction of the EntityManager within these objects or you will
+            <emphasis>NOT</emphasis> be portable to the EJB tier. You need only implement the behavior
+            required to implement the end-to-end use case listed in the testing
+            section. Some of the anticipated methods are listed below.
+        </para>
+
+        <section id="emarket-project1-tech-salesbl">
+            <title>eSales Business Logic</title>
+
+            <figure>
+                <title>eSales Business Logic</title>
+                <graphic scalefit="1" fileref="images/esales_business_logic.jpg"/>
+            </figure>
+            <variablelist spacing="compact">
+                <varlistentry>
+                    <term><filename>AccountMgmt/AccountMgmtImpl</filename></term>
+                    <listitem><para>
+                          encapsulates the actions required to create, get, update and close an account.
+                        </para>
+                        <orderedlist spacing="compact">
+                            <listitem><para>
+                                  createaccount - you will need to at least create a seller and
+                                  two or more buyer accounts. 
+                                </para> </listitem>
+                        </orderedlist>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term><filename>SellerMgmt/SellerMgmtImpl</filename></term>
+                    <listitem><para>
+                          encapsulates the actions required to create and get auctions for a seller.
+                        </para>
+                        <orderedlist spacing="compact">
+                            <listitem><para>
+                                  createAuction  - creates a new auction for a seller. All
+                                  dates and properties of the auction need to be of consistent
+                                  and legal values.
+                                </para> </listitem>
+                            <listitem><para>
+                                  getUserAuctions - returns a collection of auctions associated
+                                  with a seller. This can be used to determine if the auction has
+                                  been added.
+                                </para> </listitem>
+                            <listitem><para>
+                                  getAuction - returns a specific auction by ID. This can
+                                  be used to track the state of a specific auction for a seller.
+                                </para> </listitem>
+                        </orderedlist>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term><filename>BuyerMgmt/BuyerMgmtImpl</filename></term>
+                    <listitem><para>
+                          encapsulates the actions required to get and bid on auctions. 
+                        </para>
+                        <orderedlist spacing="compact">
+                            <listitem><para>
+                                  getOpenAuctions - returns a collection of auctions that 
+                                  have not ended. This can be used to pick a specific auction
+                                  to bid on.
+                                </para> </listitem>
+                            <listitem><para>
+                                  placeBid - creates a bid for a specific user and auction. The
+                                  auction must be open, the user must exist, and the bid amount 
+                                  must be greater than any pre-existing bid.
+                                </para> </listitem>
+                            <listitem><para>
+                                  getAuction - returns a specific auction by ID. This can be
+                                  used to track the state of a specific auction for a buyer.
+                                </para> </listitem>
+                        </orderedlist>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term><filename>TestSupport/TestSupport</filename></term>
+                    <listitem><para>
+                          a useful tool during testing that
+                          encapsulates how to get the application back into a known state
+                          prior to running a test or to inspect values not normally exposed
+                          through the normal business interfaces.
+                        </para>
+                        <orderedlist spacing="compact">
+                            <listitem><para>
+                                  getAccounts - get all accounts in the system.
+                                </para> </listitem>
+                            <listitem><para>
+                                  removeAccount - sanely remove an account from the system.
+                                  This may require removing the account from any current bids,
+                                  etc. in order to satisfy referential integrity.
+                                </para> </listitem>
+                            <listitem><para>
+                                  getAuctions - get all auctions in the system.
+                                </para> </listitem>
+                            <listitem><para>
+                                  removeAuction - sanely remove an auction from the system.
+                                  This may require removing bids, images, and other objects that
+                                  may have references to this object.
+                                </para> </listitem>
+                            <listitem><para>
+                                  clearAll -  sanely take the state of the system down to a coldstart.
+                                </para> </listitem>
+                        </orderedlist>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term><filename>Ingestor</filename></term>
+                    <listitem><para>
+                          the Ingestor written as a part of a separate
+                          requirement is also logically considered part of this tier.
+                        </para>
+
+                        <orderedlist spacing="compact">
+                            <listitem><para>
+                                ingest - point an externally provided parser at a set of test 
+                                data and use the DAOs to populate the system to a known state.
+                                </para> </listitem>
+                        </orderedlist>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </section>
+
+
+
+        <section id="emarket-project1-tech-bidbl">
+            <title>eBidbot Business Logic</title>
+
+            <figure>
+                <title>eBidbot Business Logic</title>
+                <graphic scalefit="1" fileref="images/ebidbot_business_logic.jpg"/>
+            </figure>
+            <variablelist spacing="compact">
+                <varlistentry>
+                    <term><filename>OrderMgmt/OrderMgmtImpl</filename></term>
+                    <listitem><para>
+                        </para>
+                        <orderedlist spacing="compact">
+                            <listitem><para>
+                                  createOrder - create a record
+                                  within bidbot that indicates the sale and maximum bid.
+                                  This may require some stubbing in project 1.
+                                </para> </listitem>
+                            <listitem><para>
+                                  placeBid - place a bid
+                                  that is higher than the current bid for an open
+                                  auction but less than the order maximum. This will
+                                  require some stubbing for project1.
+                                </para> </listitem>
+                            <listitem><para>
+                                  endOrder - complete order
+                                  processing once auction has closed and note if won.
+                                  This will require some stubbing in project1.
+                                </para> </listitem>
+                            <listitem><para>
+                                  getOrderStatus - did user win or not.
+                                </para> </listitem>
+                        </orderedlist>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term><filename>BidbotTestUtil/BidbotTestUtilImpl</filename></term>
+                    <listitem><para>
+                        </para>
+                        <orderedlist spacing="compact">
+                            <listitem><para>
+                                  reset - reset the bidbot database to an initial 
+                                      starting state.
+                                </para> </listitem>
+                        </orderedlist>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </section>
+    </section>
+</chapter>
+  

@@ -25,5 +25,6 @@
 
     <modules>
         <module>eDataShare</module>
+        <module>eMarket</module>
     </modules>
 </project>

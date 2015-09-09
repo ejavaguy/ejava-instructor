@@ -1,0 +1,83 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="emarket-project2-testing">
+    <title>Project 2 Testing</title>
+
+    <note>
+        <para>
+            The end-to-end scenario will test your end-to-end application in a 
+            "happy path" scenario. Any white-box or black-box testing of alternate
+            and error paths would be appropriate to put in the separate unit and IT tests.
+        </para>
+    </note>
+
+    <orderedlist spacing="compact">
+        <listitem><para>
+            Provide JUnit tests that verify the EJB functionality of
+            eDmv accessed through its remote interface. This will also test the
+            DTOs. These tests should be packaged in the eDmv RMI Test project.
+            </para> </listitem>
+        <listitem><para>
+            Provide JUnit tests that verify the extra business logic
+            functionality of eMayberry interfacing with eDmv. These tests may
+            be placed either with the business logic project or where you 
+            test the remote interfaces.
+            </para> </listitem>
+        <listitem><para>
+            Provide JUnit tests that verify the EJB functionality of
+            eMayberry accessed through its remote interface. This will also test
+            its use of DTOs. Theses tests should be packaged in the eMayberry
+            WAR (or optional RMI Test) project.
+            </para> </listitem>
+        <listitem><para>
+            Perform an end-to-end use case to do the following. This must be 
+            demonstrated in an automated JUnit test and then be manually
+            implementable using the Web UI.
+            </para>
+            <orderedlist spacing="compact">
+                <listitem><para>
+                    Reset all eDmv and eMayberry tables (using the DmvTestUtilEJB and MayberryTestUtilEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    Populate the eDmv tables (using the DmvIngestor)
+                    </para> </listitem>
+                <listitem><para>
+                    Create a new Driver in eDmv (using the DriverMgmtEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    List Drivers, including the newly added Driver in eDmv (using
+                    the DriverMgmtEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    Move Residence for a Driver in eDmv (using DriverMgmtEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    Add a Vehicle Registration in eDmv (using VehcileMgmtEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    List Vehicle Registrations, including the newly created
+                    Vehicle Registration, in eDmv (using DriverMgmtEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    Create a Person of Interest in eMayberry that matches
+                    someone in eDmv (using PoiMgmtEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    Add an Activity for the Person of Interest in eMayberry
+                    (using PoiMgmtEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    Search for the Person of Interest in eDmv (using
+                    PersonMgmtEJB). Optionally associate the identity of the
+                    correct information in eMayberry (using PoiMgmtEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    Add a dangerous Activity for the Person of Interest in
+                    eMayberry (using PoiMgmtEJB)
+                    </para> </listitem>
+            </orderedlist>
+        </listitem>
+    </orderedlist>
+</chapter>
+  

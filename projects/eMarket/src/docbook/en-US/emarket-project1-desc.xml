@@ -1,0 +1,273 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="emarket-project1-desc">
+    <title>eMarket Project 1 Description</title>
+    <subtitle>Data Access Tier and Initial Business Logic</subtitle>
+    <para>Updated: 2014-09-06</para>
+
+    <section id="emarket-project1-purpose">
+        <title>Purpose</title>
+
+        <section id="emarket-project1-goals">
+            <title>Goals</title>
+            <para></para>
+      
+            <itemizedlist spacing="compact">
+                <listitem><para>
+                    Gain experience designing and testing project implementations around
+                    layered boundaries.
+                    </para> </listitem>
+                <listitem><para>
+                    Build the data access tier and initial business logic for an application.
+                    </para> </listitem>
+                <listitem><para>
+                    Gain experience with database schema and Java Persistence API technologies.
+                    </para> </listitem>
+            </itemizedlist>
+            <para></para>
+        </section>
+        <section id="emarket-project1-objectives">
+            <title>Objectives</title>
+            <para></para>
+            <itemizedlist spacing="compact">
+                <listitem><para>
+                    Design and implement a set of business logic interfaces that address 
+                    the functional requirements of the external users.
+                    </para> </listitem>
+                <listitem><para>
+                    Design and implement a set of business objects to represent the 
+                    data requirements in the system.
+                    </para> </listitem>
+                <listitem><para>
+                    Design and implement a relational database schema that will store the 
+                    state of the business objects.
+                    </para> </listitem>
+                <listitem><para>
+                    Design and implement a data access tier that will handle mapping the 
+                    business objects to the database using the Java Persistence API.
+                    </para> </listitem>
+                <listitem><para>
+                    Design and implement the business logic classes that realize the 
+                    business logic interfaces and leverage the data access objects to 
+                    implement the scenario logic. 
+                    </para> </listitem>
+                <listitem><para>
+                    Unit test the different levels of the architecture.
+                    </para> </listitem>
+                <listitem><para>
+                    Integration test the end-to-end solution according to a defined
+                    scenario.
+                    </para> </listitem>
+            </itemizedlist>
+            <para></para>
+        </section>
+    </section>
+
+
+    <section id="emarket-project1-businessdesc">
+        <title>Business Description</title>
+        <para>
+            eSales is planning an on-line auction site to allow sellers to auction
+            items and buyers to place bids and ultimately purchase products. At the
+            same time, eBidbot is planning an on-line automated bidding site that
+            will help bidders make bids with eSales. 
+        </para>
+  
+        <para>
+            Sellers can start an auction using the eSales on-line auction site.
+            They specify a title, category, description, asking price, start/stop
+            time, and any images.  Using the eSales buyer interface, buyers can
+            manually bid on auctions until they close.
+        </para>
+  
+        <para>
+            With eBidbot, buyers also have the option of using an independent
+            site to place their bids. Buyers place orders with eBidbot, providing
+            them the auction and min/max bidding parameters. eBidbot will become 
+            a trusted client of eSales and be able to make bids on behalf of the 
+            actual buyer.
+        </para>
+  
+        <para>
+            Both eSales and eBidbot have come to you to develop the initial phase
+            of their applications.  You are tasked with implementing a low-cost
+            prototype, based on current standards, to automate much of this
+            activity. At this point in the project we are primarily looking to
+            build the data access tiers for both the eSales and eBidbot (two
+            separate systems). We will also add a minor amount of business
+            logic to coordinate the data access between the individual data
+            access objects.
+        </para>
+
+
+        <para>
+            For eSales, the system is initialized with a starting set of
+            information pertaining to auctions, accounts, and addresses.
+            New information can be added and updated.
+        </para>
+
+        <para>
+            For eBidbot, the system is initialized with an empty database that
+            is designed to hold bids. The bids will be for auctions in eSales,
+            an associated account, and maximum bid price. The eBidbot site will
+            make bids for the account until the auction is closed or bidding 
+            has exceeded the defined maximum. Information about the ietm being
+            auctioned will be obtained through an interface with eSales implemented
+            later.
+        </para>
+    </section>
+
+
+    <section id="emarket-project1-techoverview">
+        <title>Technical Overview</title>
+        <para>
+            The work done during this project focuses on the business objects
+            (BOs), the data access objects (DAOs) of the data access tier,
+            and some initial business logic interfaces (BL) and business
+            logic implementations (BLImpl). The DAOs will be based on the 
+            Java Persistence API (JPA). How you partition the implementations
+            of your projects is up to you. A suggested starting point is provided
+            at the end of this project description.
+        </para>
+        <note>
+            <para>
+                There will be many choices while creating your solution to the two 
+                applications. It is intended that you always approach the eSales application
+                as "it is hard" and requires extra formal layers. To provide contrast,
+                it is intended that you always approach the eBidbot application as 
+                "it is simple" and target as many simplification and shortcuts in the 
+                architectural layers as you can find. The point of this is for you to gain
+                experience with the different approaches and to not make Bidbot a 
+                tedious clone of approaches as eSales. The spec will describe both in a 
+                similar manner, but you should apply more of a "right approach" based 
+                on what was just stated.
+            </para>
+        </note>
+
+        <para>
+            The business objects encapsulate the core business data and rules
+            of the application. You will design the business objects and then
+            map them to the database.  You are required to implement required 
+            CRUD (Create, Read, Update, and Delete) capability with JPA but 
+            you only need to implement the CRUD methods that are necessary to 
+            complete the provided end-to-end scenario. 
+            You will be required to encapsulate
+            all object to relational (O/R) mapping within the DAOs, descriptor
+            files, and/or class metadata annotations.  You will be given a set of
+            <ulink url="https://raw.github.com/ejavaguy/ejava-student/master/projects/eMarket/eMarketData/eSalesTestUtil/src/main/resources/xml/eSales-all.xml">
+            test data</ulink>
+            to initially populate your applications and be the source
+            of data for the ingest requirement. To use the data, you will ingest 
+            using a parser supplied by the instructor. There is a sample thread
+            in the projects/eMarket/eSales directory that shows how to use the 
+            parser as well as other aspects technology within the project.  
+        </para>
+  
+        <para>
+            The database will have a functional schema and indexes to provide 
+            query performance. Business objects will be validated in the database
+            using schema constraints and within the JVM using the Validation API.
+        </para>
+  
+        <para>
+            The business logic will provide a set of classes with concise methods
+            that map easily to the provided end-to-end scenario. The business logic will ensure proper
+            use of the overall application, delegating some business logic
+            functionality to the business objects and full O/R responsibility
+            to the DAOs. eSales will have an ingest requirement as well as the
+            requirement to manipulate and add to what was ingested. eBidbot will
+            start fresh and obtain all data from users and coordinate with eSales. 
+            However, for project 1, eBidbot will be unable to fully implement 
+            data exchange with eSales because remote interfaces will not be
+            implemented until project2.  Some of that must be stubbed at this point. 
+            You are only required to implement enough business logic methods
+            that it takes to implement the end-to-end scenarios specified later
+            within this specification.
+        </para>
+
+        <para>
+            The test acceptance for the first project will be the unit tests and
+            an integration test that takes the business logic, data access
+            tier, and business objects through a provided end-to-end scenario
+            that will never change during the semester. You are required to 
+            supply the following tests:
+        </para>
+        <itemizedlist spacing="compact">
+            <listitem><para>A unit test that implements the steps of the provided eSales end-to-end scenario</para> </listitem>
+            <listitem><para>A unit test that implements the steps of the provided Bidbot end-to-end scenario</para> </listitem>
+            <listitem><para>At least one unit test per architectural layer (BO, DAO, BL) that demonstrates 
+                your ability to test at that level.</para> </listitem>
+        </itemizedlist>
+
+        <tip>
+            <para>
+                The amount of work that you can implement within the
+                bounds of this project spec could be endless if you
+                attempted to account for everything/anything. It is
+                very important that you limit your work to only what
+                is necessary to implement (and test) the functionality
+                required for the end-to-end scenario. That means you may
+                have entities that are designed to be created but never
+                modified while having other entities that go through
+                a full lifecycle. When deciding to add or skip certain
+                capabilities -- always ask yourself "does the business
+                logic need this behavior to implement the end-to-end
+                scenario".
+            </para>
+        </tip>
+    </section>
+
+
+    <section id="emarket-project1-assembly">
+        <title>Assembly Overview</title>
+        <para>
+            Since the work is for separate applications, we will need to establish
+            two separate application projects for this work; eSales and eBidbot.
+            The development can physically share resources (e.g., same database
+            and application server), but should be easily separated. It is
+            suggested that you form a root for the overall eMarket work to
+            coordinate integration testing, and then group the lower-level
+            work under two child projects; eSales and eBidbot.  See some
+            suggested project layouts at the bottom of this specification.  A
+            <ulink url="https://github.com/ejavaguy/ejava-student/tree/master/projects/eMarket">
+            sample set of projects</ulink> that implement a thin eSales thread has
+            been made available. Please ignore the TestData sub-project when
+            using the example to craft your source tree. You will depend on
+            projects within that tree -- not re-implement them and not copy
+            them.  See the Getting Started section towards the end of this 
+            specification for a more detailed sample project layout.
+        </para>
+
+        <note>
+            <para>
+                You will likely copy significant portions of the thin thread
+                example and other class examples into your project. Be aware that
+                the thin thread and other example pom.xml files inherit from 
+                the class root project that provides dependencyManagement and 
+                pluginManagement duties. You will either need to also inherit from
+                the dependencies/pom.xml or compensate by re-defining the management
+                sections in the root pom.xml of your project.
+            </para>
+        </note>
+  
+        <para>
+            Since students in the class will be producing parallel implementations for
+            the applications and submitting them for evaluation, it is asked
+            that you come up with unique names for your artifacts. This could
+            be done by replacing the "e" in eMarket, eSales, and eBidbot with a
+            unique name that corresponds to your newsgroup or college login
+            (ex.  jcsMarket, jcsSales, jcsBidbot). You should also use this same pattern for
+            java packages (ex. jcs.dmv, jcs.mayberry), DB tables (e.g., JCS_), etc.
+        </para>
+  
+        <para>
+            There should be no use of System.out.println() in the code and all
+            implementations must use a logging API with log4j as the logging provider.  
+            You may leave debug in your code, but this 
+            should be able to be turned on/off with the proper logging priority
+            changes in the log4j.xml configuration.
+        </para>
+    </section>
+</chapter>
+  

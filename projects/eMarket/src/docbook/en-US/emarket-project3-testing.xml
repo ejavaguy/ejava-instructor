@@ -1,0 +1,137 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="emarket-project3-testing">
+    <title>Project 3 Testing</title>
+
+    <note>
+        <para>
+            The end-to-end scenario will test your end-to-end application in a 
+            "happy path" scenario. Any white-box or black-box testing of alternate
+            and error paths would be appropriate to put in the separate unit and IT tests.
+        </para>
+    </note>
+
+    <orderedlist spacing="compact">
+        <listitem><para>
+            Provide JUnit tests that verify the EJB functionality of 
+            eDmv accessed through its remote interface using new
+            access control restrictions.
+            </para> </listitem>
+        <listitem><para>
+            Provide JUnit tests that verify the EJB functionality of 
+            eMayberry using its new access control restrictions and ability
+            to authenticate with eDmv.
+            </para> </listitem>
+        <listitem><para>
+            Implement the scripted use case below as an automated JUnit test and
+            manually accessed script through the Web UI. All command
+            line implementations must be wrapped in an Ant runtime script to
+            encapsulate the classpath details in a portable manner (see the
+            class jmsNotifier project for an example of using an Ant runtime script).
+            The full JSE subscriber need not be part of the automated end-to-end
+            JUnit test. The JUnit test/module must be delivered in a state that can 
+            be executed in a debugger -- whether directly within Eclipse or using a 
+            remote debugging session.
+            </para>
+            <itemizedlist spacing="compact">
+                <listitem><para>admin1=dmv-admin,mayberry-admin</para> </listitem>
+                <listitem><para>known=(no roles)</para> </listitem>
+                <listitem><para>kathy=dmv-tactical</para> </listitem>
+                <listitem><para>sherri=dmv-tactical</para> </listitem>
+                <listitem><para>sysRaleigh=dmv-tactical</para> </listitem>
+                <listitem><para>sysMayberry=dmv-federated,mayberry-tactical,mayberry-analytical</para> </listitem>
+                <listitem><para>andy=mayberry-tactical,mayberry-analytical</para> </listitem>
+                <listitem><para>barney=mayberry-tactical</para> </listitem>
+                <listitem><para>gomer=mayberry-analytical</para> </listitem>
+            </itemizedlist>
+            <orderedlist spacing="compact">
+                <listitem><para>
+                    eMayberry initializes the EJB Timer
+                    </para> </listitem>
+                <listitem><para>
+                    admin1 resets all eDmv tables (using the DmvTestUtilEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    admin1 populates the eDmv tables (using the DmvIngestor)
+                    </para> </listitem>
+                <listitem><para>
+                    admin1 resets the eMayberry tables (using the
+                    MayberryTestUtilEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    admin1 populates the eMayberry tables (using the
+                    MayberryTestUtilEJB) if necessary
+                    </para> </listitem>
+                <listitem><para>
+                    andy adds a person of interest in eMayberry that matches one
+                    of the original drivers or vehicle owners ingested.
+                    </para> </listitem>
+                <listitem><para>
+                    a new person of interest JMS message is published from
+                    eMayberry.
+                    </para> </listitem>
+                <listitem><para>
+                    andy adds a non-dangerous activity for the person of interest
+                    in eMayberry.
+                    </para> </listitem>
+                <listitem><para>
+                    an updated person of interest JMS message is published from
+                    eMayberry.
+                    </para> </listitem>
+                <listitem><para>
+                    andy searches for information on the person of interest in
+                    eDmv using the eMayberry interface. 
+                    </para> </listitem>
+                <listitem><para>
+                    kathy creates a new driver in eDmv. 
+                    </para> </listitem>
+                <listitem><para>
+                    an updated person JMS message is published from
+                    eDmv. This does not trigger eMayberry to do anything since it 
+                    does not match a person of interest.
+                    </para> </listitem>
+                <listitem><para>
+                    kathy lists all drivers, including the new one created in
+                    eDmv
+                    </para> </listitem>
+                <listitem><para>
+                    kathy reports that a driver has moved in eDmv. Make this 
+                    a driver that matches a person of interest.
+                    </para> </listitem>
+                <listitem><para>
+                    an updated person JMS message is published from
+                    eDmv.
+                    </para> </listitem>
+                <listitem><para>
+                    eMayberry sees the change, determines there is a match with
+                    one of its persons of interest, and publishes its own updated
+                    person of interest.
+                    </para> </listitem>
+                <listitem><para>
+                    andy adds a dangerous activity to the person of interest in
+                    eMayberry.
+                    </para> </listitem>
+                <listitem><para>
+                    an updated person of interest JMS message is published from
+                    eMayberry. This time, with a property indicating the person is
+                    dangerous.
+                    </para> </listitem>
+                <listitem><para>
+                    gomer sees the Java SE subscriber report activity for a
+                    dangerous person of interest and accesses address information for
+                    the individual in eMayberry.
+                    </para> </listitem>
+                <listitem><para>
+                    gomer sees re-caps of the persons of interest being printed
+                    out by the Java SE subscriber.
+                    </para> </listitem>
+            </orderedlist>
+        </listitem>
+    </orderedlist>
+    <figure>
+        <title>eDataShare Full Sequence</title>
+        <graphic scalefit="1" fileref="images/emarket-async-auction.jpg"/>
+    </figure>
+</chapter>
+  

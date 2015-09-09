@@ -1,0 +1,55 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="emarket-project">
+    <bookinfo>
+        <title>EMarket Semester Projects</title>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>This document contains project specifications for the eMarket project.
+                There are three projects associated with eMarket; data tier and business logic,
+                server-side deployment, and security plus asynchronous actions. Each will be part
+                of the follow-on project.
+            </para>
+            <para>
+                Please follow the 
+                <ulink url="../html/jhu784-course-projects.html#jhu784-course-projects-submission">
+                project submission guidelines</ulink>
+                posted in the course overview.
+            </para>
+        </abstract>
+    </bookinfo>
+
+    <toc/>
+
+    <part id="emarket-project1-part">
+        <title>Project 1</title>
+        <xi:include href="emarket-project1-desc.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+        <xi:include href="emarket-project1-tech.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+        <xi:include href="emarket-project1-getstarted.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+        <xi:include href="emarket-project1-testing.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+        <xi:include href="emarket-project1-grading.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    </part>
+    <!--
+    <part id="emarket-project2-part">
+        <title>Project 2</title>
+        <xi:include href="emarket-project2-desc.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+        <xi:include href="emarket-project2-tech.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+        <xi:include href="emarket-project2-getstarted.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+        <xi:include href="emarket-project2-testing.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+        <xi:include href="emarket-project2-grading.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    </part>
+    <part id="emarket-project3-part">
+        <title>Project 3</title>
+        <xi:include href="emarket-project3-desc.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+        <xi:include href="emarket-project3-tech.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+        <xi:include href="emarket-project3-testing.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+        <xi:include href="emarket-project3-grading.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    </part>
+    -->
+</book>
