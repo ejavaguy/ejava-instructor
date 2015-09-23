@@ -58,7 +58,7 @@ CREATE TABLE EM_AUTO (
 )
 
 # src/main/resources/ddl/emauto_delete.ddl
-DELETE * FROM EM_AUTO;
+DELETE FROM EM_AUTO;
 
 # src/main/resources/ddl/emauto_drop.ddl
 DROP TABLE EM_AUTO if EXISTS;]]></programlisting>
