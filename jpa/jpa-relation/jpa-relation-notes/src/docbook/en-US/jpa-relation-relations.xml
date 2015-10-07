@@ -26,6 +26,9 @@
                             <itemizedlist spacing="compact">
                                 <listitem><para>Can result in better performance when all child data is needed</para></listitem>
                                 <listitem><para>Can result in poor performance when no child data or limited child data is needed</para></listitem>
+                                <listitem><para>Can result in poor performance when parent has multiple collections and equivalent
+                                    of an "EAGER LAZY load" is performed before returning control back to the caller
+                                </para></listitem>
                                 <listitem><para>Should never result in a lazy load exception</para></listitem>
                                 <listitem><para>Can be simulated, on-demand, using "join fetch" queries with JPA-QL</para></listitem>
                             </itemizedlist>

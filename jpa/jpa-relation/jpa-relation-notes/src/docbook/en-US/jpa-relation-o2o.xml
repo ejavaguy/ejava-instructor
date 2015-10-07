@@ -167,7 +167,7 @@ Hibernate:
        <title>@OneToOne Annotation</title>
         <variablelist spacing="compact">
             <varlistentry>
-                <term><filename>optional:boolean (default=false)</filename></term>
+                <term><filename>optional:boolean (default=true)</filename></term>
                 <listitem><para>Designates whether relation is required. Default is true.</para></listitem>
             </varlistentry>
             <varlistentry>
