@@ -35,7 +35,6 @@
         <xi:include href="emarket-project1-testing.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
         <xi:include href="emarket-project1-grading.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     </part>
-    <!--
     <part id="emarket-project2-part">
         <title>Project 2</title>
         <xi:include href="emarket-project2-desc.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
@@ -44,6 +43,7 @@
         <xi:include href="emarket-project2-testing.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
         <xi:include href="emarket-project2-grading.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     </part>
+    <!--
     <part id="emarket-project3-part">
         <title>Project 3</title>
         <xi:include href="emarket-project3-desc.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />

@@ -8,30 +8,25 @@
         point for your overall application. It assumes you already have either
         a consolidated Impl -or- a BO, DAO, and BLImpl set of projects in
         place from Project 1. You will not have the option of consolidating
-        the EJB, WAR, EAR, and RMI Test into a single project for DMV. They must be
+        the EJB, WAR, EAR, and RMI Test into a single project for eSales. They must be
         implemented as separate projects with proper dependencies between
         them declared. You *do* have the option of merging all modules
-        into a single WAR module for Mayberry or many of the alternatives
-        as long as Mayberry is deployed as a WAR.
-        Note that all "e"DataShare, "e"Dmv, and "e"Mayberry names
-        should be changed to your specific name mangler. The same type of
-        modification needs to occur for the java package names.
+        into a single WAR module for eBidbit or many of the alternatives
+        as long as eBidbit is deployed as a WAR.
     </para>
 
     <figure>
         <title>Candidate Source Module Structure</title>
 <programlisting language=""><![CDATA[
-`-- eDataShare
-    |-- eDmv
-    |   |-- eDmvBO
-    |   |-- eDmvDAO
-    |   |-- eDmvBLImpl
-    |   |-- eDmvEJB
+`-- eMarket
+    |-- eSales
+    |   |-- eSales (module(s) from project1)
+    |   |-- eSalesEJB
     |   |   |-- pom.xml
     |   |   `-- src
     |   |       `-- main
     |   |           |-- java
-    |   |           |   `-- emdv
+    |   |           |   `-- esales
     |   |           |       `-- ejb
     |   |           `-- resources
     |   |               `-- META-INF
@@ -39,12 +34,12 @@
     |   |                   |-- persistence.xml
     |   |                   |-- (ejb-jar.xml)
     |   |                   `-- (jboss-ejb3.xml)
-    |   |-- eDmvWAR
+    |   |-- eSalesWAR
     |   |   |-- pom.xml
     |   |   `-- src
     |   |       `-- main
     |   |           |-- java
-    |   |           |   `-- emdv
+    |   |           |   `-- esales
     |   |           |       `-- web
     |   |           |-- resources
     |   |           `-- webapp
@@ -54,28 +49,28 @@
     |   |               |   |-- (jboss-web.xml)
     |   |               |   `-- content
     |   |               `-- index.jsp
-    |   |-- eDmvEAR
+    |   |-- eSalesEAR
     |   |   `-- pom.xml
-    |   |-- eDmvTest
+    |   |-- eSalesTest
     |   |   |-- pom.xml
     |   |   `-- src
     |   |       `-- test
     |   |           |-- java
-    |   |           |   `-- emdv
+    |   |           |   `-- esales
     |   |           |       `-- ejbclient
     |   |           `-- resources
     |   |               `-- jndi.properties
     |   `-- pom.xml
-    |-- eMayberry (many options)
-    |   |-- (eMayberryImpl -- should be merged with EJB or WAR)
-    |   |-- (eMayberryEJB -- could be separate from WAR)
-    |   |-- (eMayberryTest -- could be separate from WAR)
-    |   |-- eMayberryWAR
+    |-- eBidbot (many options)
+    |   |-- (eBidbotImpl -- should be merged with EJB or WAR)
+    |   |-- (eBidbotEJB -- could be separate from WAR)
+    |   |-- (eBidbotTest -- could be separate from WAR)
+    |   |-- eBidbotWAR
     |   |   |-- pom.xml
     |   |   `-- src
     |   |       +-- main
     |   |       |   |-- java
-    |   |       |   |   `-- emayberry
+    |   |       |   |   `-- ebidbot
     |   |       |   |       +-- ejb
     |   |       |   |       `-- web
     |   |       |   |-- resources
@@ -92,7 +87,7 @@
     |   |       |       `-- index.jsp
     |   |       `-- test
     |   |           |-- java
-    |   |           |   `-- emayberry
+    |   |           |   `-- ebidbot
     |   |           |       `-- ejbclient (*IT.java)
     |   |           `-- resources
     |   |               `-- jndi.properties

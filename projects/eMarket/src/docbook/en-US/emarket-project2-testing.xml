@@ -15,19 +15,19 @@
     <orderedlist spacing="compact">
         <listitem><para>
             Provide JUnit tests that verify the EJB functionality of
-            eDmv accessed through its remote interface. This will also test the
-            DTOs. These tests should be packaged in the eDmv RMI Test project.
+            eSales accessed through its remote interface. This will also test the
+            DTOs. These tests should be packaged in the eSales RMI Test project.
             </para> </listitem>
         <listitem><para>
             Provide JUnit tests that verify the extra business logic
-            functionality of eMayberry interfacing with eDmv. These tests may
+            functionality of eBidbot interfacing with eSales. These tests may
             be placed either with the business logic project or where you 
             test the remote interfaces.
             </para> </listitem>
         <listitem><para>
             Provide JUnit tests that verify the EJB functionality of
-            eMayberry accessed through its remote interface. This will also test
-            its use of DTOs. Theses tests should be packaged in the eMayberry
+            eBidbot accessed through its remote interface. This will also test
+            its use of DTOs. Theses tests should be packaged in the eBidbot
             WAR (or optional RMI Test) project.
             </para> </listitem>
         <listitem><para>
@@ -37,44 +37,40 @@
             </para>
             <orderedlist spacing="compact">
                 <listitem><para>
-                    Reset all eDmv and eMayberry tables (using the DmvTestUtilEJB and MayberryTestUtilEJB)
+                    Reset all eSales and eBidbot tables (using the SalesTestUtilEJB and BidbotTestUtilEJB)
                     </para> </listitem>
                 <listitem><para>
-                    Populate the eDmv tables (using the DmvIngestor)
+                    Populate the eSales tables (using the Ingestor)
                     </para> </listitem>
                 <listitem><para>
-                    Create a new Driver in eDmv (using the DriverMgmtEJB)
+                    Create account for seller, buyer1, and buyer2 in eSales
                     </para> </listitem>
                 <listitem><para>
-                    List Drivers, including the newly added Driver in eDmv (using
-                    the DriverMgmtEJB)
+                    Create account for buyer2 in eBidbot
                     </para> </listitem>
                 <listitem><para>
-                    Move Residence for a Driver in eDmv (using DriverMgmtEJB)
+                    Create auction for seller
                     </para> </listitem>
                 <listitem><para>
-                    Add a Vehicle Registration in eDmv (using VehcileMgmtEJB)
+                    Get auctions for seller
                     </para> </listitem>
                 <listitem><para>
-                    List Vehicle Registrations, including the newly created
-                    Vehicle Registration, in eDmv (using DriverMgmtEJB)
+                    Get auction for the one created in earlier step
                     </para> </listitem>
                 <listitem><para>
-                    Create a Person of Interest in eMayberry that matches
-                    someone in eDmv (using PoiMgmtEJB)
+                    Get open auctions
                     </para> </listitem>
                 <listitem><para>
-                    Add an Activity for the Person of Interest in eMayberry
-                    (using PoiMgmtEJB)
+                    Place bid for buyer1
                     </para> </listitem>
                 <listitem><para>
-                    Search for the Person of Interest in eDmv (using
-                    PersonMgmtEJB). Optionally associate the identity of the
-                    correct information in eMayberry (using PoiMgmtEJB)
+                    Get auctions for buyer1
                     </para> </listitem>
                 <listitem><para>
-                    Add a dangerous Activity for the Person of Interest in
-                    eMayberry (using PoiMgmtEJB)
+                    Place order for buyer2 in eBidbot (stimulate a bid)
+                    </para> </listitem>
+                <listitem><para>
+                    Get auction to verify bids were placed for buyer1 and buyer2
                     </para> </listitem>
             </orderedlist>
         </listitem>

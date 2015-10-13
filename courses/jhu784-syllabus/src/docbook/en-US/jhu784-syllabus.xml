@@ -197,9 +197,9 @@
             </row>
             <row rowsep="1">
                 <!-- 
-              <entry namest="comment"><link linkend="emarket-project2-part">Project 2</link> due by Sun, 8am Nov15</entry>
-                 -->
               <entry namest="comment">Project 2 - due by Sun, 8am Nov15</entry>
+                 -->
+              <entry namest="comment"><link linkend="emarket-project2-part">Project 2</link> due by Sun, 8am Nov15</entry>
             </row>
         </tbody>
         </tgroup>

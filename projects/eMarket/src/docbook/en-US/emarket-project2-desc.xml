@@ -2,9 +2,8 @@
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
 <chapter id="emarket-project2-desc">
-    <title>eDataShare Project 2 Description</title>
+    <title>eMarket Project 2 Description</title>
     <subtitle>N-Tier Application</subtitle>
-    <para>Updated: 2014-09-20</para>
 
     <section id="emarket-project2-purpose">
         <title>Purpose</title>
@@ -39,13 +38,13 @@
             <itemizedlist spacing="compact">
                 <listitem><para>
                     Expand the current project development architecture to include EJB,
-                    WAR, EAR, and remote Test sub-projects for eDmv. For eDmv you will have 
+                    WAR, EAR, and remote Test sub-projects for eSales. For eSales you will have 
                     separate EJB, WAR, EAR, and RMI Test modules. This is being done to 
                     simulate a complex project option.
                     </para></listitem>
                 <listitem><para>
                     Expand the current project development architecture to include EJB,
-                    WAR, and remote Tests for eMayberry. For eMayberry you will have a
+                    WAR, and remote Tests for eBidbot. For eBidbot you will have a
                     single WAR for deployment. You may merge all architectural levels
                     into a single WAR module (or a few other options). This is being 
                     done to simulate a simple project option.
@@ -56,8 +55,8 @@
                     </para></listitem>
                 <listitem><para>
                     Design the data transfer objects (DTOs) to be used to communicate
-                    with clients using the remote interface. For DMV you will design 
-                    a set of DTO classes separate from your BO classes. For Mayberry
+                    with clients using the remote interface. For eSales you will design 
+                    a set of DTO classes separate from your BO classes. For eBidbot
                     you will reuse your BO classes as DTOs.
                     </para></listitem>
                 <listitem><para>
@@ -91,37 +90,37 @@
         </note>
         <note>
             <para>
-                We are continuing a theme that DMV is complex and requires all 
-                levels of architecture and that Mayberry is simple and can leverage
+                We are continuing a theme that eSales is complex and requires all 
+                levels of architecture and that eBidbot is simple and can leverage
                 various shortcuts. The intent it to show how JavaEE can be used 
                 for projects of different sizes and demands. To inially meet satisfy
                 this requirement, you must ... 
             </para>
             <orderedlist>
                 <listitem><para>
-                    Deploy DMV as an EAR and Mayberry as a WAR
+                    Deploy eSales as an EAR and eBidbot as a WAR
                     </para></listitem>
                 <listitem><para>
-                    Implement separate DTOs for DMV and re-use BOs as DTOs for Mayberry
+                    Implement separate DTOs for eSales and re-use BOs as DTOs for eBidbot
                     </para></listitem>
                 <listitem><para>
-                    Implement separate Impl and EJB modules for DMV and combine
-                    Impl and EJB into a single module for Mayberry. The combined 
-                    module may be also combined with the Mayberry WAR.
+                    Implement separate Impl and EJB modules for eSales and combine
+                    Impl and EJB into a single module for eBidbot. The combined 
+                    module may be also combined with the eBidbot WAR.
                     </para></listitem>
             </orderedlist>
         </note>
 
         <para>
-            The project will continue along two parallel paths; eDmv and eMayberry.
+            The project will continue along two parallel paths; eSales and eBidbot.
             However, this time we will add several new project types; EJB, EAR,
-            WAR, and Test. We will add all new project types to eDmv. We will add
-            (or migrate to) the WAR type to eMayberry. 
+            WAR, and Test. We will add all new project types to eSales. We will add
+            (or migrate to) the WAR type to eBidbot. 
             These new sub-projects will become siblings to your
-            existing Dmv Impl -or- BO, DAO, and BLImpl sub-projects. 
-            For eMayberry, you have the option of making the WAR a sibling project
-            or migrating the existing Impl project to be a WAR project (and remain with
-            a single module for eMayberry).    
+            existing eSales Impl -or- BO, DAO, and BLImpl sub-modules. 
+            For eBidbot, you have the option of making the WAR a sibling module,
+            the only module, or migrating the existing Impl project to be a WAR project (
+            and remain with a single module for eBidbot).    
             The new projects will depend on your legacy work. The remote interface of the EJB
             will also require specific design of what gets externalized to the
             client. The remote clients do not share the same address space we had
@@ -131,7 +130,7 @@
         </para>
 
         <para>
-            You have finished a significant amount of eDmv during Project 1; the
+            You have finished a significant amount of eSales during Project 1; the
             O/R mapping and core business logic of a non-trivial business model.
             You will now host the data access tier and business logic within an
             EJB component.  This EJB component will supply the EntityManager,
@@ -139,13 +138,13 @@
             Web Tier, and a RMI interface for remote clients. Security will be
             addressed in the next project. To limit the scope of the project, the
             Web UI requirements will be constrained to a limited number of
-            use cases. You are to deploy eDmv using an EAR and eMayberry using
+            use cases. You are to deploy eSales using an EAR and eBidbot using
             only a WAR. 
         </para>
 
         <para>
-            eMayberry will require additional work as well. With a remote interface
-            for eDmv in hand and the ability to either simulate or operate with a
+            eBidbot will require additional work as well. With a remote interface
+            for eSales in hand and the ability to either simulate or operate with a
             live instance, we can now complete the rest of the the business logic
             that will also be hosted within an EJB tier. We'll try to keep the Web-UI
             minimal. 
@@ -154,13 +153,13 @@
         <para>
             You may develop your Web tier in an alternate environment, such as
             Jetty. However, it must be submitted as part of the application that
-            runs within JBoss.
+            runs within JBoss/Wildfly.
         </para>
             
         <note>
             <para>
-                As with the previous project, the use of the name eDataShare,
-                eDmv, and eMayberry within the project specification are to be taken as
+                As with the previous project, the use of the name eMarket,
+                eSales, and eBidbot within the project specification are to be taken as
                 placeholders. Please make an effort to uniquely name your directories,
                 components, Java packages, JNDI names, etc. to help logically separate
                 the parallel project implementations.

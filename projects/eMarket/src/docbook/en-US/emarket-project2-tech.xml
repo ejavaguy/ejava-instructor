@@ -19,10 +19,10 @@
     <section id="emarket-project2-tech-ejb">
         <title>EJB Tier</title>
 
-        <section id="emarket-project2-tech-dmvejb">
-            <title>eDMV EJB Tier</title>
+        <section id="emarket-project2-tech-salesejb">
+            <title>eSales EJB Tier</title>
             <para>
-                Create an EJB tier to host your eDmv business logic and
+                Create an EJB tier to host your eSales business logic and
                 data access tiers. Each of the EJBs provided will supply the
                 necessary dependency injection and initialization for the business
                 objects. Transaction scope will be added as a part of a separate
@@ -33,7 +33,7 @@
                 (DTOs).
             </para>
             <figure>
-                <title>eDmv Candidate EJB Tier</title>
+                <title>eSales Candidate EJB Tier</title>
                 <graphic scalefit="1" fileref="images/esales_ejbtier.jpg"/>
             </figure>
 
@@ -43,34 +43,35 @@
             </para>
             <variablelist spacing="compact">
                 <varlistentry>
-                    <term><filename>DriverMgmtEJB</filename></term>
+                    <term><filename>AccountMgmtEJB</filename></term>
                     <listitem><para>
-                        This EJB will primarily host the 
-                        DriverMgmtImpl business logic. A remote interface 
-                        and bean implementation will need to be designed for this EJB.
+                        This EJB will primarily host the AccountMgmtImpl
+                        business logic. A remote interface and bean
+                        implementation will need to be designed for
+                        this EJB.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
-                    <term><filename>VehicleMgmtEJB</filename></term>
+                    <term><filename>SellerMgmtEJB</filename></term>
                     <listitem><para>
                         This EJB will primarily host the 
-                        VehicleMgmtImpl business logic. A remote interface and
+                        SellerMgmtImpl business logic. A remote interface and
                         bean implementation will need to be designed for this EJB.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
-                    <term><filename>PersonMgmtEJB</filename></term>
+                    <term><filename>BuyerMgmtEJB</filename></term>
                     <listitem><para>
                         This EJB will primarily host the 
-                        PersonMgmtImpl business logic. A remote interface and bean 
+                        BuyerMgmtImpl business logic. A remote interface and bean 
                         implementation will need to be designed for this EJB.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
-                    <term><filename>DmvTestUtilEJB</filename></term>
+                    <term><filename>SalesTestUtilEJB</filename></term>
                     <listitem><para>
                         This support EJB will primarily
-                        host the DmvTestUtilImpl business logic to support
+                        host the TestUtilImpl business logic to support
                         remote testing requirements. A remote interface and bean
                         implementation will need to be designed for this EJB.
                         </para></listitem>
@@ -78,15 +79,15 @@
             </variablelist>
         </section>
 
-        <section id="emarket-project2-tech-dmvdto">
-            <title>eDMV DTOs</title>
+        <section id="emarket-project2-tech-salesdto">
+            <title>eSales DTOs</title>
             <para>
                 Create a set of Data Transfer Objects (DTOs) to serialize the state of the
                 business objects between the EJB and client when using the remote
                 interface. 
             </para>
             <figure>
-                <title>eDmv Candidate DTOs</title>
+                <title>eSales Candidate DTOs</title>
                 <graphic scalefit="1" fileref="images/esales_dtos.jpg"/>
             </figure>
 
@@ -99,49 +100,52 @@
             </para>
             <variablelist spacing="compact">
                 <varlistentry>
-                    <term><filename>PersonDTO</filename></term>
+                    <term><filename>AccountDTO</filename></term>
                     <listitem><para>
-                        This class is meant to hold the name
-                        of the Person. It will also have optional references to
-                        physical details and residence information. Note that the DTO
-                        might want to be limited to only the current residence as
-                        an example of how DTO and BO classes are different.
+                        This class is meant to primarily be an aggregation
+                        of the state found in the Account and related
+                        POC business objects.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
-                    <term><filename>ResidenceDTO</filename></term>
+                    <term><filename>AddressDTO</filename></term>
                     <listitem><para>
-                        This class is meant to hold start/end
-                        date and addressing information for a person.
+                        This class is meant to be a representation
+                        of the state found in the Address business
+                        object. Depending on how the Address business
+                        object is designed, there may not be a need for
+                        this stand-in.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
-                    <term><filename>PhysicalDetailsDTO</filename></term>
+                    <term><filename>AuctionDTO</filename></term>
                     <listitem><para>
-                        This class contains the physical description for a person.
+                        This class is meant to be a representation
+                        of the state found in the AuctionItem and POC
+                        business objects.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
-                    <term><filename>VehicleRegistrationDTO</filename></term>
+                    <term><filename>BidDTO</filename></term>
                     <listitem><para>
-                        This class is meant to hold a
-                        vehicle registration information, including vehicle
-                        and owner information.
+                        This class is meant to be a representation
+                        of the state found in the Bid and related POC
+                        business objects.
                         </para></listitem>
                 </varlistentry>
             </variablelist>
         </section>
 
-        <section id="emarket-project2-tech-dmvear">
-            <title>eDMV EAR Deployment</title>
+        <section id="emarket-project2-tech-salesear">
+            <title>eSales EAR Deployment</title>
             <para>
-                Create an EAR to host the eDmv server-side
+                Create an EAR to host the eSales server-side
                 components; including the EJB component just developed.
             </para>
         </section>
 
-        <section id="emarket-project2-tech-dmvrmitest">
-            <title>eDMV RMI Test</title>
+        <section id="emarket-project2-tech-salesrmitest">
+            <title>eSales RMI Test</title>
             <para>
                 Create a Test project that will deploy the EAR to the
                 application server and run through a set of JUnit test using the
@@ -150,50 +154,53 @@
         </section>
 
 
-        <section id="emarket-project2-tech-maybl">
-            <title>eMayberry/eDMV Business Logic Integration</title>
+        <section id="emarket-project2-tech-bidbl">
+            <title>eBidbot/eSales Business Logic Integration</title>
             <para>
-                Complete and test the eMayberry business logic using the remote
-                interface of eDmv. The diagram below shows the business logic within
+                Complete and test the eBidbot business logic using the remote
+                interface of eSales. The diagram below shows the business logic within
                 the context of the EJB Tier implemented as a part of a separate
                 requirement.
             </para>
 
             <figure>
-                <title>eMayberry Candidate Business Logic and EJB Tiers</title>
+                <title>eBidbot Candidate Business Logic and EJB Tiers</title>
                 <graphic scalefit="1" fileref="images/ebidbot_ejbtier.jpg"/>
             </figure>
 
             <variablelist spacing="compact">
                 <varlistentry>
-                    <term><filename>PoiMgmt/PoiMgmtImpl</filename></term>
+                    <term><filename>OrderMgmt/OrderMgmtImpl</filename></term>
                     <listitem><para>
-                        Update this business logic
-                        interface and implementation to be able to obtain person
-                        description and residence information for persons of interest.
-                        This implementation may return the eDmv DTO classes if desired.
+                        Encapsulates the functionality required to
+                        create an automated bidding account, place an
+                        order, and check the status of that order. You
+                        should be able to test this component using the
+                        running eSales application or implement a stub
+                        that implements the BuyerMgmtRemote interface.
+                        This implementation may return the eSales DTO classes if desired.
                         </para></listitem>
                 </varlistentry>
             </variablelist>
         </section>
 
-        <section id="emarket-project2-tech-maywar">
-            <title>eMayberry WAR Deployment</title>
+        <section id="emarket-project2-tech-bidwar">
+            <title>eBidbot WAR Deployment</title>
             <para>
-                Create a WAR module to host the eMayberry server-side
+                Create a WAR module to host the eBidbot server-side
                 components and the remote tests for the WAR/EJB components.
             </para>
         </section>
 
-        <section id="emarket-project2-tech-mayejb">
-            <title>eMayberry EJB Tier</title>
+        <section id="emarket-project2-tech-bidejb">
+            <title>eBidbot EJB Tier</title>
             <para>
-                Create an EJB tier to host your eMayberry business logic and
+                Create an EJB tier to host your eBidbot business logic and
                 data access tiers. To provide practice in alternative deployments,
                 it is a requirement that this EJB either be implemented as part 
                 of the implementation module, as part of the WAR module, or 
                 part of a combined implementation/EJB/WAR module. Either way, the
-                Mayberry EJBs must ultimately be deployed using a WAR.
+                eBidbot EJBs must ultimately be deployed using a WAR.
                 The EJB(s) provided will have the
                 necessary dependency injection and initialization for the business
                 objects. Transaction scope will be added as a part of a separate
@@ -204,19 +211,19 @@
 
             <variablelist spacing="compact">
                 <varlistentry>
-                    <term><filename>PoiMgmtEJB</filename></term>
+                    <term><filename>OrderMgmtEJB</filename></term>
                     <listitem><para>
                         This EJB will primarily host the
-                        PoiMgmtImpl business logic. A remote interface, local
+                        OrderMgmtImpl business logic. A remote interface, local
                         interface and bean implementation will need to be designed
                         for this EJB.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
-                    <term><filename>MayberryTestUtilEJB</filename></term>
+                    <term><filename>BidbotTestUtilEJB</filename></term>
                     <listitem><para>
                         This support EJB will primarily
-                        host the MayberryTestUtilImpl business logic to support remote
+                        host the TestUtilImpl business logic to support remote
                         testing requirements. A remote interface, local interface
                         and bean implementation will need to be designed for this EJB.
                         </para></listitem>
@@ -224,8 +231,8 @@
             </variablelist>
         </section>
 
-        <section id="emarket-project2-tech-maydto">
-            <title>eMayberry DTOs</title>
+        <section id="emarket-project2-tech-biddto">
+            <title>eBidbot DTOs</title>
             <para>
                 The DTOs are be used to serialize the state of the
                 business objects between the EJB and client when using the remote
@@ -260,68 +267,66 @@
            </para> 
         </tip>
         
-        <section id="emarket-project2-tech-dmvweb">
-            <title>eDMV Web UI</title>
+        <section id="emarket-project2-tech-salesweb">
+            <title>eSales Web UI</title>
             <para>
-                Add a Web UI to the eDmv application. This may use EJB local
+                Add a Web UI to the eSales application. This may use EJB local
                 or remote interfaces. The WAR for the Web UI must be deployed
-                as part of the eDmv EAR. The Web UI must have the following
+                as part of the eSales EAR. The Web UI must have the following
                 functionality. 
             </para>
 
             <itemizedlist spacing="compact">
+                <listitem><para>Anonymous User</para>
+                    <orderedlist spacing="compact">
+                        <listitem><para>
+                            List open auctions
+                            </para></listitem>
+                        <listitem><para>
+                            Get details for specific auction
+                            </para></listitem>
+                        <listitem><para>
+                            createAccount (using AccountMgmtEJB)
+                            </para></listitem>
+                    </orderedlist>
+                    </listitem>
                 <listitem><para>Test Admin</para>
                     <orderedlist spacing="compact">
                         <listitem><para>
                             reset All tables
                             </para></listitem>
                         <listitem><para>
-                            populate tables
+                            populate tables (using Ingestor)
                             </para></listitem>
                     </orderedlist>
                     </listitem>
-                <listitem><para>DMV Tactical</para>
+                <listitem><para>Seller</para>
                     <orderedlist spacing="compact">
                         <listitem><para>
-                            add Driver
+                            createAction (using SellerMgmtEJB)
                             </para></listitem>
                         <listitem><para>
-                            get Driver
+                            getUserActions (using SellerMgmtEJB)
                             </para></listitem>
                         <listitem><para>
-                            move Residence
-                            </para></listitem>
-                        <listitem><para>
-                            add Vehicle Registration
-                            </para></listitem>
-                        <listitem><para>
-                            get Vehicle Registration
+                            getAuction (using SellerMgmtEJB)
                             </para></listitem>
                     </orderedlist>
                     </listitem>
-                <listitem><para>DMV Federated</para>
+                <listitem><para>Buyer</para>
                     <orderedlist spacing="compact">
                         <listitem><para>
-                            get Driver By ID
-                            </para></listitem>
-                        <listitem><para>
-                            get Driver By Name
-                            </para></listitem>
-                        <listitem><para>
-                            get Vehicle Registration By Make/Model
-                            </para></listitem>
-                        <listitem><para>
-                            get Vehicle Registration By Owner
+                            Place bid (using BuyerMgmtEJB)
                             </para></listitem>
                     </orderedlist>
                     </listitem>
             </itemizedlist>
         </section>
 
-        <section id="emarket-project2-tech-maywebui">
-            <title>eMayberry WEB UI Tier</title>
+        <section id="emarket-project2-tech-bidwebui">
+            <title>eBidbot WEB UI Tier</title>
             <para>
-                Add a Web UI to the eMayberry application (i.e., to the WAR you
+                Add a Web UI to the eBidbot application (i.e., to the WAR you
                 have already created for the EJBs). This may use the EJB local or
                 remote interfaces. The WAR for the Web UI must be deployed solo --
                 containing the EJBs and Impls. The Web UI must have the following
@@ -334,34 +339,19 @@
                         <listitem><para>
                             reset All tables
                             </para></listitem>
+                    </orderedlist>
+                    </listitem>
+                <listitem><para>Admin</para>
+                    <orderedlist spacing="compact">
                         <listitem><para>
-                            populate tables
+                            createAccount (using OrderMgmtEJB)
                             </para></listitem>
                     </orderedlist>
                     </listitem>
-                <listitem><para>Mayberry Tactical</para>
+                <listitem><para>Bidder</para>
                     <orderedlist spacing="compact">
                         <listitem><para>
-                            create Person of Interest
-                            </para></listitem>
-                        <listitem><para>
-                            add Activity
-                            </para></listitem>
-                        <listitem><para>
-                            get Person of Interest Information
-                            </para></listitem>
-                        <listitem><para>
-                            check if Person of Interest is Dangerous
-                            </para></listitem>
-                    </orderedlist>
-                    </listitem>
-                <listitem><para>Mayberry Analytical</para>
-                    <orderedlist spacing="compact">
-                        <listitem><para>
-                            get Person of Interest Information
-                            </para></listitem>
-                        <listitem><para>
-                            check if Person of Interest is Dangerous
+                            placeOrder (using OrderMgmtEJB)
                             </para></listitem>
                     </orderedlist>
                     </listitem>
