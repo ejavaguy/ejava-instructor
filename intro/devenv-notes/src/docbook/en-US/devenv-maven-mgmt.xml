@@ -111,7 +111,7 @@
             </plugins>
         </pluginManagement>
     </build>]]></programlisting>
-                <para>Parent defines version for compiler plugin and configures for Java 7</para>
+                <para>Parent defines version for compiler plugin and configures for Java 8</para>
                 
         <programlisting language="xml"><![CDATA[<parent>
     <groupId>ejava</groupId>

@@ -149,8 +149,8 @@ $ cat ../ejb-parent/pom.xml
                 this parent pom.
                 </para>
 <programlisting language="xml"><![CDATA[    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <java.source.version>1.7</java.source.version>
-    <java.target.version>1.7</java.target.version>
+    <java.source.version>1.8</java.source.version>
+    <java.target.version>1.8</java.target.version>
 
     <junit.version>4.11</junit.version>
     <log4j.version>1.2.13</log4j.version>
