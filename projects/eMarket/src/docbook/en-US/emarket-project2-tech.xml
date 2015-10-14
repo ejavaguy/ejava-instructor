@@ -34,7 +34,7 @@
             </para>
             <figure>
                 <title>eSales Candidate EJB Tier</title>
-                <graphic scalefit="1" fileref="images/esales_ejbtier.jpg"/>
+                <graphic scalefit="1" fileref="images/esales-ejbtier.jpg"/>
             </figure>
 
             <para>
@@ -88,7 +88,7 @@
             </para>
             <figure>
                 <title>eSales Candidate DTOs</title>
-                <graphic scalefit="1" fileref="images/esales_dtos.jpg"/>
+                <graphic scalefit="1" fileref="images/esales-dtos.jpg"/>
             </figure>
 
             <para>
@@ -165,7 +165,7 @@
 
             <figure>
                 <title>eBidbot Candidate Business Logic and EJB Tiers</title>
-                <graphic scalefit="1" fileref="images/ebidbot_ejbtier.jpg"/>
+                <graphic scalefit="1" fileref="images/ebidbot-ejbtier.jpg"/>
             </figure>
 
             <variablelist spacing="compact">
