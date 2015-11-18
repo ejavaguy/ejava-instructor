@@ -36,7 +36,10 @@
             EJB MDB Subscriber: 5pts
             </para></listitem>
         <listitem><para>
-            Java SE JMS Listener: 10pts
+            Java SE JMS Listener: 5pts
+            </para></listitem>
+        <listitem><para>
+            JavaEE Interceptors/Validator: 5pts
             </para></listitem>
         <listitem><para>
             EJB Timers: 10pts

@@ -14,14 +14,18 @@
 
     <orderedlist spacing="compact">
         <listitem><para>
-            Provide JUnit tests that verify the EJB functionality of 
-            eDmv accessed through its remote interface using new
+            Provide JUnit IT tests that verify the EJB functionality of 
+            eSales accessed through its remote interface using new
             access control restrictions.
             </para> </listitem>
         <listitem><para>
-            Provide JUnit tests that verify the EJB functionality of 
-            eMayberry using its new access control restrictions and ability
-            to authenticate with eDmv.
+            Provide JUnit IT tests that verify the EJB functionality of 
+            eBidbot using its new access control restrictions and ability
+            to authenticate with eSales.
+            </para> </listitem>
+        <listitem><para>
+            Provide a JUnit IT tests that demonstrates the functionality of the 
+            JavaEE interceptor/validator.
             </para> </listitem>
         <listitem><para>
             Implement the scripted use case below as an automated JUnit test and
@@ -34,103 +38,81 @@
             be executed in a debugger -- whether directly within Eclipse or using a 
             remote debugging session.
             </para>
-            <itemizedlist spacing="compact">
-                <listitem><para>admin1=dmv-admin,mayberry-admin</para> </listitem>
-                <listitem><para>known=(no roles)</para> </listitem>
-                <listitem><para>kathy=dmv-tactical</para> </listitem>
-                <listitem><para>sherri=dmv-tactical</para> </listitem>
-                <listitem><para>sysRaleigh=dmv-tactical</para> </listitem>
-                <listitem><para>sysMayberry=dmv-federated,mayberry-tactical,mayberry-analytical</para> </listitem>
-                <listitem><para>andy=mayberry-tactical,mayberry-analytical</para> </listitem>
-                <listitem><para>barney=mayberry-tactical</para> </listitem>
-                <listitem><para>gomer=mayberry-analytical</para> </listitem>
-            </itemizedlist>
             <orderedlist spacing="compact">
                 <listitem><para>
-                    eMayberry initializes the EJB Timer
+                    eSales initializes the EJB Timer to check for expired auctions
                     </para> </listitem>
                 <listitem><para>
-                    admin1 resets all eDmv tables (using the DmvTestUtilEJB)
+                    eBidbot initializes the EJB Timer to check auctions associated with its bids.
                     </para> </listitem>
                 <listitem><para>
-                    admin1 populates the eDmv tables (using the DmvIngestor)
+                    admin1 resets all eSales tables (using the eSalesTestUtilEJB)
                     </para> </listitem>
                 <listitem><para>
-                    admin1 resets the eMayberry tables (using the
-                    MayberryTestUtilEJB)
+                    admin1 populates the eSales tables (using the ESalesIngestor)
                     </para> </listitem>
                 <listitem><para>
-                    admin1 populates the eMayberry tables (using the
-                    MayberryTestUtilEJB) if necessary
+                    admin2 resets the eBidbot tables (using the EBidbotTestUtilEJB)
                     </para> </listitem>
                 <listitem><para>
-                    andy adds a person of interest in eMayberry that matches one
-                    of the original drivers or vehicle owners ingested.
+                    admin2 populates the eBidbot tables (using the EBidTestUtilEJB) if necessary. Suggest adding account for user3 at this point.
                     </para> </listitem>
                 <listitem><para>
-                    a new person of interest JMS message is published from
-                    eMayberry.
+                    user1 creates auction
                     </para> </listitem>
                 <listitem><para>
-                    andy adds a non-dangerous activity for the person of interest
-                    in eMayberry.
+                    user2 gets a list of open auctions
                     </para> </listitem>
                 <listitem><para>
-                    an updated person of interest JMS message is published from
-                    eMayberry.
+                    user2 places bid on an auction
                     </para> </listitem>
                 <listitem><para>
-                    andy searches for information on the person of interest in
-                    eDmv using the eMayberry interface. 
+                    user2 views the current status of the auction they are bidding on
                     </para> </listitem>
                 <listitem><para>
-                    kathy creates a new driver in eDmv. 
+                    user3 gets a list of open auctions
                     </para> </listitem>
                 <listitem><para>
-                    an updated person JMS message is published from
-                    eDmv. This does not trigger eMayberry to do anything since it 
-                    does not match a person of interest.
+                    user3 views the current status of the auction that was bid by user2
                     </para> </listitem>
                 <listitem><para>
-                    kathy lists all drivers, including the new one created in
-                    eDmv
+                    user3 places order with eBidbot
                     </para> </listitem>
                 <listitem><para>
-                    kathy reports that a driver has moved in eDmv. Make this 
-                    a driver that matches a person of interest.
+                    eBidbot EJB wakes up from an EJB Timer
                     </para> </listitem>
                 <listitem><para>
-                    an updated person JMS message is published from
-                    eDmv.
+                    eBidbot EJB places bid for user3
                     </para> </listitem>
                 <listitem><para>
-                    eMayberry sees the change, determines there is a match with
-                    one of its persons of interest, and publishes its own updated
-                    person of interest.
+                    user2 places another bid on auction
                     </para> </listitem>
                 <listitem><para>
-                    andy adds a dangerous activity to the person of interest in
-                    eMayberry.
+                    eBidbot EJB wakes up again from an EJBTimer
                     </para> </listitem>
                 <listitem><para>
-                    an updated person of interest JMS message is published from
-                    eMayberry. This time, with a property indicating the person is
-                    dangerous.
+                    eBidbot EJB sees they have been raised and places another bid for user3
                     </para> </listitem>
                 <listitem><para>
-                    gomer sees the Java SE subscriber report activity for a
-                    dangerous person of interest and accesses address information for
-                    the individual in eMayberry.
+                    eSales EJB wakes up from an EJBTimer and closes the auction
                     </para> </listitem>
                 <listitem><para>
-                    gomer sees re-caps of the persons of interest being printed
-                    out by the Java SE subscriber.
+                    eSales EJB publishes a message to the topic that informs everyone of the closing and that user3 has win.
+                    </para> </listitem>
+                <listitem><para>
+                    The eBidbot MDB receives the message and updates the order.
+                    </para> </listitem>
+                <listitem><para>
+                    The stand-alone client recieves the message if it matches their JMS selector for a specific category.
+                    </para> </listitem>
+                <listitem><para>
+                    user3 checks their order with eBidbot and finds out they won
                     </para> </listitem>
             </orderedlist>
         </listitem>
     </orderedlist>
     <figure>
-        <title>eDataShare Full Sequence</title>
+        <title>eMarket Full Sequence</title>
         <graphic scalefit="1" fileref="images/emarket-async-auction.jpg"/>
     </figure>
 </chapter>

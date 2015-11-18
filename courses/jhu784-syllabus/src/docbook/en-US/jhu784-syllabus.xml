@@ -266,9 +266,9 @@
                 <entry namest="date">Dec09</entry>
                 <entry namest="topic">Complete Final Project (no class)</entry>
                 <!--
-              <entry namest="comment"><link linkend="emarket-project3-part">Project 3</link> due by Wed evening/midnight, Dec09</entry>
-              -->
               <entry namest="comment">Project 3 - due by Wed evening/midnight, Dec09</entry>
+              -->
+              <entry namest="comment"><link linkend="emarket-project3-part">Project 3</link> due by Wed evening/midnight, Dec09</entry>
             </row>
         </tbody>
         </tgroup>

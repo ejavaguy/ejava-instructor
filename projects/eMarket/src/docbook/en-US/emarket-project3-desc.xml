@@ -2,9 +2,8 @@
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
 <chapter id="emarket-project3-desc">
-    <title>eDataShare Project 3 Description</title>
+    <title>eMarket Project 3 Description</title>
     <subtitle>Secure and Asynchronous N-Tier Application</subtitle>
-    <para>Updated: 2014-09-27</para>
 
     <section id="emarket-project3-purpose">
         <title>Purpose</title>
@@ -14,6 +13,9 @@
             <itemizedlist spacing="compact">
                 <listitem><para>
                     Secure access to EJB and Web applications
+                    </para> </listitem>
+                <listitem><para>
+                    Decouple business logic from common tasks 
                     </para> </listitem>
                 <listitem><para>
                     Provide for asynchronous processing.
@@ -26,14 +28,17 @@
             <title>Objectives</title>
             <itemizedlist spacing="compact">
                 <listitem><para>
-                    Re-use the eDmv and eMayberry implementations from projects 1 and 2.
+                    Re-use the eSales and eBidbot implementations from projects 1 and 2.
                     </para></listitem>
                 <listitem><para>
                     Define access controls and implement authentication mechanisms for 
                     applications.
                     </para></listitem>
                 <listitem><para>
-                    Implement a publish/subscribe capability between the eMayberry
+                    Implement DTO validation using interceptors
+                    </para></listitem>
+                <listitem><para>
+                    Implement a publish/subscribe capability between the eBidbot
                     and stand-alone client applications.
                     </para></listitem>
                 <listitem><para>
@@ -62,7 +67,7 @@
             We will use the simple, default/"other" security-domain defined
             within the standard JBoss installation. This uses the RealmUsersRoles
             login-module -- which is powered by two property files supplied and
-            pre-populated by the class server files from ejava-wildfly810.
+            pre-populated by the class server files from ejava-wildfly901.
         </para>
 
 
@@ -118,39 +123,46 @@
             </thead>
             <tbody>
                 <row rowsep="1">
-                   <entry namest="role">dmv-admin</entry>
+                   <entry namest="role">anonymous</entry>
                    <entry namest="desc">
-                        these users can reset and populate the eDmv database
+                        these users can view auctions and create an account
                         </entry>
                 </row>
                 <row rowsep="1">
-                   <entry namest="role">dmv-tactical</entry>
+                   <entry namest="role">esales-admin</entry>
                    <entry namest="desc">
-                        these users can read/write information in eDmv
+                        these users can reset and populate the eSales database
                         </entry>
                 </row>
                 <row rowsep="1">
-                   <entry namest="role">dmv-federated</entry>
+                   <entry namest="role">esales-user</entry>
                    <entry namest="desc">
-                        these users can only read information from eDmv.
+                        these users can create and auction, and bid on auctions. 
+                        This role is also required to subscribe to JMS auction events.
                         </entry>
                 </row>
                 <row rowsep="1">
-                   <entry namest="role">mayberry-admin</entry>
+                   <entry namest="role">esales-sys</entry>
                    <entry namest="desc">
-                        these users can reset and populate the eMayberry database
+                        role required to perform internal auction actions like JMS publishing
                         </entry>
                 </row>
                 <row rowsep="1">
-                   <entry namest="role">mayberry-tactical</entry>
+                   <entry namest="role">esales-trusted</entry>
                    <entry namest="desc">
-                        these users can read/write information in eMayberry (and read information from eDmv through eMayberry).
+                        these users can bid on auctions on behalf of a specified user
                         </entry>
                 </row>
                 <row rowsep="1">
-                   <entry namest="role">mayberry-analytical</entry>
+                   <entry namest="role">ebidbot-admin</entry>
                    <entry namest="desc">
-                        these users can only read information from mayberry (and eDmv through eMayberry)
+                        these users will be able to perform management and test functions on eBidbot
+                        </entry>
+                </row>
+                <row rowsep="1">
+                   <entry namest="role">ebidbot-user</entry>
+                   <entry namest="desc">
+                        these users can and manage their orders
                         </entry>
                 </row>
             </tbody>
@@ -159,8 +171,8 @@
 
         <para>
             If a user has a login for one application, they will use the same
-            account to access the other application (e.g., user1 might have
-            both dmv-federated and mayberry-tactical roles).
+            account to access the other application (e.g., user3 might have
+            both esales-user and ebidbot-user roles).
         </para>
 
         <table>
@@ -176,44 +188,54 @@
             </thead>
             <tbody>
                 <row rowsep="1">
-                   <entry namest="user">admin1</entry>
-                   <entry namest="roles">dmv-admin,mayberry-admin</entry>
-                </row>
-                <row rowsep="1">
                    <entry namest="user">known</entry>
                    <entry namest="roles">(no roles)</entry>
                 </row>
                 <row rowsep="1">
-                   <entry namest="user">kathy</entry>
-                   <entry namest="roles">dmv-tactical</entry>
+                   <entry namest="user">admin1</entry>
+                   <entry namest="roles">esales-admin</entry>
                 </row>
                 <row rowsep="1">
-                   <entry namest="user">sherri</entry>
-                   <entry namest="roles">dmv-tactical</entry>
+                   <entry namest="user">admin2</entry>
+                   <entry namest="roles">ebidbot-admin</entry>
                 </row>
                 <row rowsep="1">
-                   <entry namest="user">sysRaleigh</entry>
-                   <entry namest="roles">dmv-tactical</entry>
+                   <entry namest="user">syssales1</entry>
+                   <entry namest="roles">esales-sys</entry>
                 </row>
                 <row rowsep="1">
-                   <entry namest="user">sysMayberry</entry>
-                   <entry namest="roles">dmv-federated,mayberry-tactical,mayberry-analytical</entry>
+                   <entry namest="user">sysbidbot1</entry>
+                   <entry namest="roles">esales-trusted</entry>
                 </row>
                 <row rowsep="1">
-                   <entry namest="user">andy</entry>
-                   <entry namest="roles">mayberry-tactical,mayberry-analytical</entry>
+                   <entry namest="user">user1</entry>
+                   <entry namest="roles">esales-user</entry>
                 </row>
                 <row rowsep="1">
-                   <entry namest="user">barney</entry>
-                   <entry namest="roles">mayberry-tactical</entry>
+                   <entry namest="user">user2</entry>
+                   <entry namest="roles">esales-user</entry>
                 </row>
                 <row rowsep="1">
-                   <entry namest="user">gomer</entry>
-                   <entry namest="roles">mayberry-analytical</entry>
+                   <entry namest="user">user3</entry>
+                   <entry namest="roles">esales-user,bidbot-user</entry>
                 </row>
             </tbody>
             </tgroup>
         </table>    
+
+        <note>
+            <para>
+            To clarify, your application will have a static set of
+            logins and will ingest a set of accounts. A user with a
+            login and no account can login, but won't be able to do
+            anything meaningful. A user with an account and no login
+            won't be able to access the system. Normally the login would
+            be created at the same time as the account. Except for your
+            JBoss configuration and your "Create Account" logic, no other
+            part of your project should be aware of this tradeoff made
+            for class project simplicity.
+            </para>
+        </note>
 
         <para>
             Some actions are open to any users; authenticated or not.
@@ -222,19 +244,26 @@
         </para>
 
         <para>
-            For some asynchronous activity, we will implement a Topic within
-            eDmv that will be used to provide updates to any of the driver or
-            owner information. eMayberry will listen to this topic with a 
-            Message Driven Bean to keep up to date on POIs. We will also
-            implement a separate Topic where eMayberry will publish messages
-            related to persons of interest when they change.  These topics
-            will be pre-defined in your application server along with the users
-            and roles.  However, you will have to design the type, structure,
-            and payload of the messages sent on the topics.
+            eBidbot will run-as an esales-trusted user and pass the userId 
+            for the eSales bidder with the placed bid.
         </para>
 
         <para>
-            eMayberry will use EJB Timers to send out person of interest re-caps.
+            For some asynchronous activity, we will implement an Auction
+            Topic with eSales that will be used to provide updates to auction
+            information. eBidbot will listen to this topic using a Message
+            Driven Bean to keep orders up to date and to specifically know
+            when they are closed. A stand-alone client will also be used to
+            subscribe to auction events. The topic(s) will be pre-defined
+            in your application server along with users and roles. However,
+            you will have to design the type, structure, and payload of the
+            messages on the topic(s).
+        </para>
+
+        <para>
+            eSales and eBidbot will use EJB Timers to help perform
+            periodic business logic, like checking for completed auctions
+            or making bids.
         </para>
             
     </section>
