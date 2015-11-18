@@ -16,7 +16,7 @@
     
     <properties>
        <doc.base>emarket-project-book</doc.base>
-       <content.version>v2015-10-14</content.version>
+       <content.version>v2015-10-17</content.version>
     </properties>
 
     <build>
