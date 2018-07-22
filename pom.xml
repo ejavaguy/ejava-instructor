@@ -1,12 +1,10 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>info.ejava.docs</groupId>
     <artifactId>docs-root</artifactId>
-    <version>4.1.0-SNAPSHOT</version>
+    <version>5.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Docs Root</name>
@@ -409,20 +407,20 @@
                                              part of this book -->
                                         <copy todir="${basedir}/target/resources/ejava/docs" verbose="true">
                                             <fileset dir="${basedir}/target/resources/ejava/docs">
-                                                <include name="**/*-book.xml"/>
+                                                <include name="**/*-book.xml" />
                                             </fileset>
-                                            <globmapper from="*-book.xml" to="*-part.xml"/>
+                                            <globmapper from="*-book.xml" to="*-part.xml" />
                                             <filterset begintoken="&lt;" endtoken="id">
-                                                <filter token="book " value="&lt;part id"/>
+                                                <filter token="book " value="&lt;part id" />
                                             </filterset>
                                             <filterset begintoken="&lt;/" endtoken="&gt;">
-                                                <filter token="book" value="&lt;/part&gt;"/>
+                                                <filter token="book" value="&lt;/part&gt;" />
                                             </filterset>
                                             <filterset begintoken="&lt;" endtoken="&gt;">
-                                                <filter token="bookinfo" value="&lt;partinfo&gt;"/>
+                                                <filter token="bookinfo" value="&lt;partinfo&gt;" />
                                             </filterset>
                                             <filterset begintoken="&lt;/" endtoken="&gt;">
-                                                <filter token="bookinfo" value="&lt;/partinfo&gt;"/>
+                                                <filter token="bookinfo" value="&lt;/partinfo&gt;" />
                                             </filterset>
                                         </copy>
                                     </target>
