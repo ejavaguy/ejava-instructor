@@ -16,42 +16,47 @@
     <section id="jhu784-description">
         <title>Description</title>
         <para>
-            This course covers enterprise
-            computing technologies using Java Enterprise Edition
-            (Java EE). The course describes how to build multitier
-            distributed applications, specifically addressing web
-            access, business logic, data access, and applications
-            supporting enterprise service technologies. For the web
-            access tier, the focus will be on integrating the web
-            tier with enterprise applications. For the business logic
-            tier, session beans for synchronous business processing
-            and message-driven beans and timers for asynchronous
-            business processing will be described. The data access
-            tier discussion will focus on data access patterns and the
-            Java Persistence API. Finally, enterprise services will
-            be discussed, including the 
-            Bean Validation API, 
-            Java Naming and Directory Interface (JNDI), 
-            Dependency Injection for Java (JSR-330), 
-            Context and Dependency Injection for JavaEE (CDI; JSR-299), 
-            remote method invocation (RMI), 
-            Java API for XML Binding (JAXB), and 
-            Java API for RESTful Wed Services (JAX-RS),
-            Java Transaction API (JTA), 
-            Java EE security, 
-            and Java Message Service (JMS).
-            Students will build applications using the technologies
-            presented.
+            This comprehensive course explores a variety of modern Java 
+            frameworks and technologies that can be used for developing mission-critical 
+            complex enterprise applications. The emphasis is on use of the latest Java EE platform, 
+            its set of underlying specifications, designing and developing server-side application components.                         
+            Students will learn thru having hands-on experience in building multi-tier distributed 
+            enterprise applications, comparing and using variety of Java EE design patterns, 
+            rich set of server-side components and technologies, and web-enabled by modern design 
+            practices and communication protocols.
+
+            Students will learn to:
+       </para>
+        <itemizedlist spacing="compact">
+            <listitem><para>
+            Implement a data access tier to a relational database using Java Persistence API (JPA), 
+            Java Database Connectivity (JDBC) API, and variety of data modeling and access patterns.</para></listitem>
+
+            <listitem><para>
+            Implement synchronous and asynchronous server-side business logic using stateless and stateful session EJBs, 
+            message-driven EJBs and the EJB Timer service.</para></listitem>
+            
+            <listitem><para>
+            Integrate server-side logic with the web-tier components using legacy server-side and more 
+            modern RESTful API approaches that include JSON and XML.
+            </para></listitem>
+        </itemizedlist>
+       
+       <para>
+            Other critical Java EE infrastructure services will be discussed, including the 
+            Java Naming and Directory Interface (JNDI), the Java Message Service (JMS), the Java Transaction (JTA) API, 
+            and Java EE security.
+
+            Using modern development tools, commercial persistence providers, and application servers, students will 
+            design and implement several significant programming projects using the above-mentioned technologies and 
+            deploy them to a Java EE environment that they will manage.        
         </para>
+
         <para>
-            The course is being actively updated to JavaEE 7 (JPA 2.1, EJB 3.2, and JMS 2.0)
-            but a few JavaEE 6 APIs remain (JMS 1.1). The development environment used in class
-            is JavaSE 8 and JavaEE 7-compliant.
-        </para>
-        <para>
-            Using modern development tools, commercial persistence providers, and application servers, students will
-            design and implement several significant programming projects using the above mentioned technologies and
-            deploy them to a Java EE environment that they will manage.
+            The course is being actively updated to JavaEE 8 (JPA 2.2, EJB 3.2, JAX-RS 2.1, and JMS 2.0)
+            but a few order APIs and legacy examples remain. The development environment used in class
+            is based on the Wildfly application server and is JavaSE 8 and JavaEE 7-compliant with the ability to 
+            preview some JavaEE 8-specific features.
         </para>
     </section>
 
@@ -66,33 +71,33 @@
     <section id="jhu784-student-commitment">
         <title>Student Commitment</title>
         <itemizedlist spacing="compact">
-            <listitem><para>Students should be prepared to spend between 10-16 hours a week outside of class.</para></listitem>
+            <listitem><para>Students should be prepared to spend between 10-16 hours a week outside of class.
+            Time spent can be made efficient by proactively keeping up with class topics and actively 
+            collaborating with the instructor and other students in the course.</para></listitem>
         </itemizedlist>
     </section>
 
-    <section id="jhu784-texts">
+    <section id="jhu784-texts-optional">
         <title>Course Text(s)</title>
         <section id="jhu784-texts-recommended">
-            <title>Recommended Text(s)</title>
+            <title>Optional Text(s)</title>
+            <para>The following is a list of optional texts that are pertinent to the course material but 
+            are not necessary for you to own. The course examples, notes, and free Internet resources
+            for this course are plentiful.</para>
             <itemizedlist spacing="compact">
 	            <listitem><para>
 	            <ulink url="http://oreilly.com/catalog/9780596158033/preview#preview"><emphasis>"Enterprise Java Beans 3.1, 6th Edition"</emphasis></ulink>, 
 	            Andrew Lee Rubinger and Bill Burke, 2010, O'Reilly, ISBN-10: 0596158025; ISBN-13: 978-0596158026 
 	            </para>
-	            </listitem>
-            </itemizedlist>
-        </section>
+                </listitem>
 
-        <section id="jhu784-texts-optional">
-            <title>Optional Text(s)</title>
-            <itemizedlist spacing="compact">
-                <listitem><para>A Servlet/JSP Text</para>
+               <listitem><para>A Servlet/JSP Text</para>
                     <itemizedlist spacing="compact">
-		                <listitem><para>
-		                <ulink url="http://pdf.coreservlets.com/"><emphasis>"Core Servlets and JavaServer Pages (JSP)"</emphasis></ulink>, 
-		                Marty Hall and Larry Brown, 2003, Prentice Hall PTR; ISBN 0130092290 
-		                </para>
-		                </listitem>
+                        <listitem><para>
+                        <ulink url="http://pdf.coreservlets.com/"><emphasis>"Core Servlets and JavaServer Pages (JSP)"</emphasis></ulink>, 
+                        Marty Hall and Larry Brown, 2003, Prentice Hall PTR; ISBN 0130092290 
+                        </para>
+                        </listitem>
                     </itemizedlist>
                 </listitem>
             </itemizedlist>
@@ -103,9 +108,9 @@
         <title>Required Software</title>
         <para>
             This course will make heavy use of development tools
-            (Git, Maven 3, JUnit, Log4j, and Eclipse), a database 
-            (H2 Database Engine), persistence provider
-            (Hibernate), and application server (JBoss/Wildfly 9). 
+            (Git, Maven 3, JUnit, SLF/Log4j, and Eclipse), a database 
+            (H2 Database Engine), JPA persistence provider
+            (Hibernate), and application server (JBoss/Wildfly 13). 
             Students are required to establish a local
             development environment. Detailed instructions for setup are
             part of the first exercise (Development Environment Setup).
@@ -115,7 +120,7 @@
     <section id="jhu784-references">
         <title>References</title>
         <para>
-            The core of the EJB 3.2 content is covered in the primary text for 
+            The core of the EJB 3.2 content is covered in the EJB text for 
             the course (and competing texts as well as online). Associated 
             topics (database schema, JDBC, Web Tier, JMS, and tools) are not 
             covered in the course text, but documentation will be provided 
@@ -223,7 +228,8 @@
                 <para>
                     Projects must be submitted via e-mail to the
                     instructor and grader(s) with source code in a zip
-                    file with a README.  All source code must be written
+                    file with a README (links to archives on cloud storage acceptable as well).  
+                    All source code must be written
                     to portably compile in the grader's environment
                     using Maven 3. This will be clearly spelled out
                     during the course and you will have plenty of opportinuties 
@@ -248,6 +254,9 @@
             There is a difference between sharing ideas/code snippets and turning in someone 
             else's work as your own. When in doubt, document your sources.
         </para>
+        <para>
+            Do not host your course project in a *public* Internet repository.
+        </para>
     </section>
 
     <section id="jhu784-instructor-availability">
@@ -258,8 +267,9 @@
             through the <ulink url="http://groups.yahoo.com/group/ejava_class">course newsgroup</ulink>. 
             You can get individual, non-technical questions 
             answered via <ulink url="mailto:jim.stafford@jhu.edu">e-mail</ulink>. 
-            I usually have all questions posted by 9pm answered by 
-            COB that evening. Students needing further assistance are also welcome 
+            It is very common for me to ask for a copy of your broken project so that I can provide
+            more analysis and precise feedback.
+            Students needing further assistance are also welcome 
             make other arrangements during the week or schedule a web meeting using Adobe Connect.
         </para>
     </section>

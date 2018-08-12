@@ -81,11 +81,14 @@
     <section id="jhu784-course-projects-project2">
         <title>Project 2: N-Tier Application</title>
         <para>
-            Project 2 deploys the business logic and data tier to the server-side.
+            Project 2 deploys the business logic and data tier to the server-side
             to be hosted in an EJB tier; providing resource management (e.g., threads), 
-            transactions, security (added in project 3), and remote access. The user 
-            interface will be supplied through the use of Servlets and JSPs integrated
+            transactions, security (added in project 3), and remote access. A minimal
+            user interface will be supplied through the use of Servlets and JSPs integrated
             with the EJBs. A remote client will also be developed for the unit tests.
+            Students familiar with other UI frameworks make use alternative techniques
+            but no additional credit will be gained with additional UI complexity 
+            or functionality.
         </para>
         <para>
             Specific Goals:
@@ -98,10 +101,10 @@
                 Configure applications using JNDI and CDI.
                 </para></listitem>
             <listitem><para>
-                Integrate application with JTA
+                Implement HTTP remote access to services using JAX-RS, JSON, and XML.
                 </para></listitem>
             <listitem><para>
-                Access EJB business logic using remote interfaces
+                Integrate application with JTA
                 </para></listitem>
             <listitem><para>
                 Integrate business logic with a Web tier
@@ -115,7 +118,7 @@
             Project 3 enacts security for Project 2 and adds publish/subscribe
             topics and timers.  An application server is
             used to host the application logic and JMS components. A stand-alone
-            client is also developed to interface with the appication through
+            client is also developed to interface with the application through
             JMS messages.
         </para>
         <para>
@@ -159,7 +162,7 @@
                 </para></listitem>
             <listitem><para>
                 Test Cases must be written using JUnit or another unit test frameworks that
-                will run within a Maven surefire and failsafe environment.
+                will run within a Maven surefire and failsafe environments.
                 </para></listitem>
             <listitem><para>
                 Projects must be supplied with a README that points out how project
@@ -213,8 +216,8 @@
         </itemizedlist>
 
         <para>
-            Your submission will include source zip and README (could
-            be in source zip). You may also include pre-built artifacts if it 
+            Your submission will include source zip (link to cloud storage is acceptable) 
+            and README (could be in source zip). You may also include pre-built artifacts if it 
             does not add a huge size burden. The easiest way to do this is to zip up
             the project from the root after completing a build.
         </para>
