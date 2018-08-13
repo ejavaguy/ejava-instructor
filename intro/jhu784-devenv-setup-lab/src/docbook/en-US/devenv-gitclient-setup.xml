@@ -148,8 +148,8 @@ $ git branch -a    //list all branches -- local and remote
                     updates.
                 </para>
                 <programlisting><![CDATA[
-$ git checkout master //switches to master branch
-$ git pull            //downloads changes and attempts merge
+$ git checkout master #switches to master branch
+$ git pull            #downloads changes and attempts merge
 Already up-to-date.
 ]]></programlisting>
                 <note>
@@ -183,8 +183,8 @@ $ git checkout master              #switches back to the master branch
                     </para>
                         <programlisting><![CDATA[
 $ git reset --hard master
-$ git clean -rn  //shows you what it would delete without deleting 
-$ git clean -rf  //deletes files not managed or specifically ignored by git
+$ git clean -rn  #shows you what it would delete without deleting 
+$ git clean -rf  #deletes files not managed or specifically ignored by git
 ]]></programlisting>
                 </note>
             </listitem>

@@ -45,7 +45,7 @@
                 It is never a good idea to install software in a directory with
                 spaces in the fully qualified path name if the software contains
                 jar files that will eventually be part of a classpath. I strongly
-                recommend your working directory, the JDK, JBoss, and all 
+                recommend your working directory, the JDK, Wildfly, and all 
                 repository locations comply with this critical guideline or 
                 you may suffer classpath issues at some point.  
             </para>
@@ -57,7 +57,9 @@
     <xi:include href="devenv-jdk-setup.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="devenv-gitclient-setup.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="devenv-maven-setup.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <!-- 
     <xi:include href="devenv-mavenproxy-setup.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+     -->
     <xi:include href="devenv-jboss-setup.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="devenv-h2-setup.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="devenv-eclipse-setup.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />

@@ -5,11 +5,11 @@
 <chapter id="devenv-eclipse-setup">
     <title>Eclipse Setup</title>
     <para>
-        The most current version of Eclipse is Mars. However, August/September is the 
+        The most current version of Eclipse is Photon. However, August/September is the 
         worst time to switch to the newest Eclipse platform since they normally release
         in the summer and the previous release from last year has had a chance to receive bug fixes and 
-        performance patches. I am going to follow my own advice this year and go 
-        with Luna. You may use Mars or another IDE entirely.
+        performance patches. I am going to follow my own advice and stick last year's
+        model (Oxygen) -- which has had some time to mature. You may use Photon or another IDE entirely.
     </para>
 
     <section id="devenv-eclipse-install">
@@ -18,18 +18,18 @@
             <listitem>
                 <para>
                     Download Eclipse IDE for JavaEE Developers 
-                    <ulink url="https://eclipse.org/downloads/packages/release/Luna/R">https://eclipse.org/downloads/packages/release/Luna/R</ulink>
+                    <ulink url="https://www.eclipse.org/downloads/packages/release/oxygen/3a/eclipse-ide-java-ee-developers">https://www.eclipse.org/downloads/packages/release/oxygen/3a/eclipse-ide-java-ee-developers</ulink>
                     or latest from
+                    <ulink url="https://www.eclipse.org/downloads/packages/release/oxygen">https://www.eclipse.org/downloads/packages/release/oxygen</ulink>
+                    or 
                     <ulink url="http://eclipse.org/downloads">http://eclipse.org/downloads</ulink>
                 </para>
             </listitem>
             <listitem><para>Unzip the downloaded archive.</para>
-<programlisting><![CDATA[
-$ tar xzf ~/Downloads/eclipse-jee-xxxx-R-linux-gtk-x86_64.tar.gz
+<programlisting><![CDATA[$ tar xzf ~/Downloads/eclipse-jee-xxxx-xx-linux-gtk-x86_64.tar.gz
 
 $ ls eclipse
-about_files  about.html  artifacts.xml  configuration  dropins  eclipse  eclipse.ini  
-epl-v10.html  features  icon.xpm  notice.html  p2  plugins  readme
+artifacts.xml  configuration  dropins  eclipse  eclipse.ini  features  icon.xpm  p2  plugins  readme
 ]]></programlisting>                        
             </listitem>
             <listitem><para>Create a shortcut for starting Eclipse</para></listitem>
@@ -47,6 +47,14 @@ epl-v10.html  features  icon.xpm  notice.html  p2  plugins  readme
             <listitem><para>press Add..-&gt;Standard VM and reference the JDK instance you installed earlier</para></listitem>
             <listitem><para>Make the new JDK VM your default</para></listitem>
         </orderedlist>
+        
+        <note>
+            <title>Enable Java Assertions</title>
+            <para>It is a good idea to use assertions (<code>assert foo!=null : "hey!";</code>) 
+            in your code and enable assertions within your development environment
+            (by adding <code>-ea</code> to the "Default VM Arguments" setting within
+            the JRE Definition).</para>
+        </note>
     </section>
     
     <section id="devenv-eclipse-setup-m2e">
@@ -58,8 +66,8 @@ epl-v10.html  features  icon.xpm  notice.html  p2  plugins  readme
         Eclipse will not be seen by the command-line build.</para>
         
         <note>
-            <title>M2E is now part of Eclipse JavaEE</title>
-            <para>m2e was pre-installed in my download of Kepler, Luna, and Mars. Nothing more 
+            <title>m2e is now part of Eclipse JavaEE</title>
+            <para>m2e was pre-installed in the download. Nothing more 
                 needs to be done to install it. The rest of these instructions
                 are concerned with using it and demonstrating it.</para>
         </note>
@@ -69,8 +77,7 @@ epl-v10.html  features  icon.xpm  notice.html  p2  plugins  readme
                     I find this easier to work with than the Project 
                     Explorer used by default in the JavaEE perspective.</para>
                 <orderedlist spacing="compact">
-                    <listitem><para>Select Window-&gt;Show View-&gt;Other-&gt;Java-&gt;Package Explorer.</para></listitem>
-                    <listitem><para>Drag the Package Explorer to the panel with the Project Explorer</para></listitem>
+                    <listitem><para>Select Window-&gt;Open Perspective-&gt;Other-&gt;Java</para></listitem>
                     <listitem><para>Select Top Level Elements-&gt;Working Sets from the down-facing triangle in the top-right corner of the Package Explorer.</para></listitem>
                     <listitem><para>Create a New Java Working Set and call it "class-examples"</para></listitem>
                     <listitem><para>Press OK</para></listitem>
@@ -102,25 +109,19 @@ epl-v10.html  features  icon.xpm  notice.html  p2  plugins  readme
                        </para>
                        <note>
                             <para>If you receive the following error</para>
-<programlisting language=""><![CDATA[
-[ERROR] No compiler is provided in this environment. Perhaps you are running on a JRE rather than a JDK?
+<programlisting language=""><![CDATA[[ERROR] No compiler is provided in this environment. Perhaps you are running on a JRE rather than a JDK?
 ]]></programlisting>          
                             <para>
                                 add the following '-vm' option to your eclipse.ini file -- pointing to your
                                 javaw executable in the JDK directory, restart Eclipse, and retry.
                             </para>
-<programlisting language=""><![CDATA[
--vm C:\apps\Java\jdk1.7.0_11/bin/javaw.exe
+<programlisting language=""><![CDATA[-vm C:\apps\Java\jdk1.8.0_181/bin/javaw.exe
 ]]></programlisting>                        
-<programlisting language=""><![CDATA[
---launcher.defaultAction
+<programlisting language=""><![CDATA[--launcher.defaultAction
 openFile
--vm C:\apps\Java\jdk1.7.0_11/bin/javaw.exe
+-vm C:\apps\Java\jdk1.8.0_181/bin/javaw.exe
 -vmargs
--Dosgi.requiredJavaVersion=1.5
--Dhelp.lucene.tokenizer=standard
--Xms40m
--Xmx512m
+...
 ]]></programlisting>                        
                        </note>
                     </listitem>
@@ -136,41 +137,34 @@ openFile
     
     
     <section id="devenv-eclipse-setup-egit">
-        <title>Setup EGit Eclipse Team Provider</title>
+        <title>Setup Git Eclipse Team Provider</title>
         <para>You can use the command line Git to functionally clone the 
             remote repository and update your local copy. However, having
             Git integrated into Eclipse allows the plugin to make Eclipse
             transition easier between one checked out branch to another or 
-            correctly react to an updated branch. To do this -- install the 
-            EGit plugin.</para>
-            
+            correctly react to an updated branch.</para>
         
         <note>
-            <title>Git and EGit is now part of Eclipse JavaEE</title>
-            <para>Git and EGit was pre-installed in my download of Kepler and Luna. Nothing more 
-                needs to be done to install it. The rest of these instructions
-                are concerned with using it and demonstrating it.</para>
+            <title>Git is now part of Eclipse JavaEE</title>
+            <para>Git is pre-installed in the download. Nothing more 
+                needs to be done to install it (yay!).</para>
         </note>
-            
-            <orderedlist spacing="compact">
-                <listitem><para>Right click on the <code>ejavase5Enhancements</code>
-                   project imported earlier and select 
-                   <code>Team-&gt;Share Project...-&gt;Git-&gt;Use of create repository in parent folder of project-&gt;Finish</code></para></listitem>
-                <listitem><para><code>[(branch-name)]</code> should now be displayed 
-                    to the right of the project name</para></listitem>
-            </orderedlist>
     </section>
     
     <section id="devenv-eclipse-setup-jbosstools">
         <title>Setup JBoss Eclipse Integration</title>
-        <para>Add the following repository to your Eclipse instance and
-           install the plugin</para>
+        <para>JBoss maintains a set of Eclipse plugins to help with development
+        and use of their products. There are too many to describe -- let alone
+        understand in total. However, we can make use of a few. The primary 
+        one is to optionally run/manage Wildfly within Eclipse versus the 
+        command line. Follow these steps if you want to enable a few additional
+        productivity JBoss Tools plugins.</para>
         <orderedlist spacing="compact">
             <listitem><para>Open the Eclipse Marketplace panel using 
                 <code>Help-&gt;Eclipse Marketplace</code></para>
             </listitem>
-            <listitem><para>Type JBoss into the seach field and press Go</para></listitem>
-            <listitem><para>Click Install for the <code>JBoss Tools (Luna)</code></para></listitem>
+            <listitem><para>Type <code>Wildfly</code> into the seach field and press Go</para></listitem>
+            <listitem><para>Click Install for the <code>JBoss Tools</code></para></listitem>
             <listitem><para>Complete the installation steps for JBoss Tools. There
                 are many tools in the repository. Not all of them are
                 needed for class or obvious how to use them without more investigation. 
@@ -178,9 +172,8 @@ openFile
                 <itemizedlist spacing="compact">
                     <listitem><para>Context and Dependency Injection Tools</para></listitem>
                     <listitem><para>Hibernate Tools</para></listitem>
+                    <listitem><para>JBoss AS, Wildfly, &amp; EAP Tools</para></listitem>
                     <listitem><para>JBoss JAX-RS Tools</para></listitem>
-                    <listitem><para>JBoss AS Tools</para></listitem>
-                    <listitem><para>JBoss WebServices Tools</para></listitem>
                 </itemizedlist>
                 <note>
                     <para>You will receive a warning about the content within the 
@@ -197,9 +190,9 @@ openFile
                 <orderedlist spacing="compact">
                     <listitem><para>Open the JavaEE Perspective</para></listitem>
                     <listitem><para>Select "new server wizard..." in the Servers panel</para></listitem>
-                    <listitem><para>Select Wildfly 8.x under the 
-                        JBoss Community folder (works with Wildfly 9.x as well)</para></listitem>
-                    <listitem><para>Set HOME to your wildfly-9.0.1.Final directory
+                    <listitem><para>Select Wildfly 12 under the 
+                        JBoss Community folder (works with Wildfly 13.x as well)</para></listitem>
+                    <listitem><para>Set HOME to your wildfly installation directory
                        using the Browse button on the next panel</para></listitem>
                     <listitem><para>Name the server "standalone" and leave the 
                        to match the default "standalone.xml" configuration file.</para></listitem>
@@ -210,7 +203,10 @@ openFile
                         pros and cons to both methods and I will start you with
                         internally launched here.</para></listitem>
                     <listitem><para>Start the server by right clicking on it
-                        and selecting Start</para></listitem>
+                        and selecting Start. You should see some server log activity in the 
+                        Eclipse console. This will conflict with but play nice with
+                        the externally-managed mode. We will look at this closer
+                        once we get to server-side development.</para></listitem>
                 </orderedlist>
             </listitem>
         </orderedlist>

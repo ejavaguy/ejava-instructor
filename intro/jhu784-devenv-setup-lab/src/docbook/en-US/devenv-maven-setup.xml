@@ -19,36 +19,32 @@
                 <para>
                     Unzip the contents into a directory with no spaces in its path.
                 </para>
-                <programlisting><![CDATA[
-$ ls apache-maven-3.3.3/
-bin  boot  conf  lib  LICENSE.txt  NOTICE.txt  README.txt
-]]></programlisting>
+                <programlisting><![CDATA[$ ls apache-maven-3.5.4
+bin  boot  conf  lib  LICENSE  NOTICE  README.txt]]></programlisting>
             </listitem>
             <listitem>
                 <para>
                     Add an environment variable for MAVEN_HOME and
                     add MAVEN_HOME/bin to your PATH
                 </para>
-                <programlisting><![CDATA[
-//my linux system -- should be done in .bashrc
-export MAVEN_HOME=/opt/apache-maven-3.3.3
+                <programlisting><![CDATA[# my linux system -- should be done in .bashrc
+export MAVEN_HOME=/opt/apache-maven-3.5.4
 export PATH=$MAVEN_HOME/bin:$PATH
 
-//my windows system -- should be done in Advanced System Settings->Environment Variables
-set MAVEN_HOME=/apps/apache-maven-3.3.3
+# my windows system -- should be done in Advanced System Settings->Environment Variables
+set MAVEN_HOME=/apps/apache-maven-3.5.4
 set PATH=%MAVEN_HOME%\bin;%PATH%
 ]]></programlisting>
             </listitem>
             <listitem>
                 <para>Verify maven is installed and in the path</para>
                 <programlisting><![CDATA[//my fedora system
-$ mvn --version
-Apache Maven 3.3.3 (7994120775791599e205a5524ec3e0dfe41d4a06; 2015-04-22T07:57:37-04:00)
-Maven home: /opt/apache-maven-3.3.3
-Java version: 1.8.0_40, vendor: Oracle Corporation
-Java home: /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.40-21.b25.fc21.x86_64/jre
+$ mvn -version
+Apache Maven 3.5.4 (1edded0938998edf8bf061f1ceb3cfdeccf443fe; 2018-06-17T14:33:14-04:00)
+Maven home: /opt/apache-maven-3.5.4
+Java version: 1.8.0_181, vendor: Oracle Corporation, runtime: /usr/java/jdk1.8.0_181-amd64/jre
 Default locale: en_US, platform encoding: UTF-8
-OS name: "linux", version: "3.19.2-201.fc21.x86_64", arch: "amd64", family: "unix"
+OS name: "linux", version: "4.1.13-100.fc21.x86_64", arch: "amd64", family: "unix"
 
 //my windows xp system
 > mvn --version
@@ -72,8 +68,7 @@ OS name: "linux", version: "3.19.2-201.fc21.x86_64", arch: "amd64", family: "uni
                             Add the following to the<code>.m2/settings.xml</code>
                             file in your HOME directory.
                         </para>
-                        <programlisting language="xml"><![CDATA[
-<?xml version="1.0"?>
+                        <programlisting language="xml"><![CDATA[<?xml version="1.0"?>
 <settings xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
@@ -95,8 +90,7 @@ OS name: "linux", version: "3.19.2-201.fc21.x86_64", arch: "amd64", family: "uni
                             next Maven build command fails with a parsing
                             error.
                         </para>
-                        <programlisting><![CDATA[
-$ mvn clean
+                        <programlisting><![CDATA[$ mvn clean
 [ERROR] Error executing Maven.
 [ERROR] 1 problem was encountered while building the effective settings
 [FATAL] Non-parseable settings /home/user/.m2/settings.xml: only whitespace content allowed before start tag and not s (position: START_DOCUMENT seen <?xml version="1.0"?>\ns... @2:2)  @ /home/user/.m2/settings.xml, line 2, column 2
@@ -155,18 +149,16 @@ $ mvn clean
                     Change your current directory to the root of the cloned 
                     repository and make sure you have a current copy. 
                 </para>
-                    <programlisting><![CDATA[
-$ ls
+                    <programlisting><![CDATA[$ ls
 README.md  async  build  common  coursedocs  ejb  javase  jpa  pom.xml  projects  src
 $ git checkout master
 $ git pull origin master
-From github-ejavaguy:jhu-ep-coursera/fullstack-course1-module3
+From https://github.com/ejavaguy/ejava-student
  * branch            master     -> FETCH_HEAD
 Already up-to-date.]]></programlisting>
              </listitem>
              <listitem><para>Test your configuration using </para>
-                <programlisting><![CDATA[
-$ mvn clean install
+                <programlisting><![CDATA[$ mvn clean install
 [INFO] Scanning for projects...
 ...
 ]]></programlisting>                        
@@ -182,16 +174,14 @@ $ mvn clean install
             <para>
                 You can set this in the current shell using one of the following commands
             </para>
-<programlisting><![CDATA[
-bash> export MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=256m"
+<programlisting><![CDATA[bash> export MAVEN_OPTS="-Xmx512m"
 
-windows> set MAVEN_OPTS=-Xmx512m -XX:MaxPermSize=256m
+windows> set MAVEN_OPTS=-Xmx512m
 ]]></programlisting>                        
             <para>
                 You can optionally set these properties in one of the shell-specific environment scripts.
             </para>
-<programlisting><![CDATA[
-bash> $HOME/.mavenrc
+<programlisting><![CDATA[bash> $HOME/.mavenrc
 
 windows> %HOME%\mavenrc_pre.bat
 ]]></programlisting>                        
@@ -221,8 +211,8 @@ was cached in the local repository, resolution will not be reattempted until the
         </para>
         <note>
             <para>
-                This is only an example. You are not required to download if the Oracle database driver for
-                class if you do not wish. You can create a dummy file (touch dummy.jar) and register it using
+                This is only an example. You are *not* required to download if the Oracle database driver for
+                class. You can create a dummy file ($ touch dummy.jar) and register it using
                 a dummy groupId, artifactId, and version if you wish.
             </para>
         </note>
@@ -244,22 +234,6 @@ $ mvn install:install-file -Dfile=/home/jcstaff/Downloads/ojdbc6.jar -DgroupId=c
 ]]></programlisting>                        
             </listitem>
        </orderedlist>
-
-        <note>
-            <title>Artifacts are Best Placed in Network Repositories</title>
-            <para>This artifact would ideally be placed within a network cache/repository (i.e., Nexus)
-                and not into individual localRepositories. In the next chapter you will be shown
-                how could could setup a Maven Nexus for team use. If you go that route -- it would
-                be better to upload the file to that archive.</para>
-        </note>
-        <note>
-            <title>Rogue Internet Repositories</title>
-            <para>Probably violating license restrictions, but the following 
-                <ulink url="https://code.lds.org/nexus/content/groups/main-repo/">network repository</ulink>
-                 does contain the missing Oracle driver. One could add that as an upstream repository
-                 in their Nexus or define it as an artifact repository in the pom to avoid having to
-                 manually import the artifact.</para>
-        </note>
     </section>
 
     <section id="devenv-maven-localsite">
@@ -269,30 +243,24 @@ $ mvn install:install-file -Dfile=/home/jcstaff/Downloads/ojdbc6.jar -DgroupId=c
             However, you may wish to have a local version and can do so by 
             performing the following.
         </para>
-<programlisting language=""><![CDATA[
-$ mvn clean verify site -DskipTests
-$ mvn site:stage
-//the output will be in target/staging
+<programlisting language=""><![CDATA[$ mvn clean verify site -DskipTests
+$ mvn site:stage       # the output will be in target/staging
 ]]></programlisting>                        
 
         <para>
             If you have more time and wish to generate more detailed reports,
             execute the following.
         </para>
-<programlisting language=""><![CDATA[
-$ mvn clean verify site -Preports -Pcobertura
-$ mvn site:stage
-//the output will be in target/staging
+<programlisting language=""><![CDATA[$ mvn clean verify site -Preports
+$ mvn site:stage        # the output will be in target/staging
 ]]></programlisting>                        
 
         <para>
             If you have less time and are looking only to get up-to-date 
-            documents, execute the followng from the coursedocs directory.
+            documents, execute the following from the coursedocs directory.
         </para>
-<programlisting language=""><![CDATA[
-$ cd coursedocs
-$ mvn site:stage
-//the output will be in target/site
+<programlisting language=""><![CDATA[$ cd coursedocs
+$ mvn site:stage        # the output will be in target/site
 ]]></programlisting>                        
     </section>
 </chapter>
