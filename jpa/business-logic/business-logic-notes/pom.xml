@@ -17,7 +17,7 @@
     
     <properties>
        <doc.base>business-logic-book</doc.base>
-       <content.version>v2013-09-09</content.version>
+       <content.version>v2018-08-14</content.version>
     </properties>
 
     <build>

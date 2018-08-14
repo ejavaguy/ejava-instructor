@@ -16,7 +16,7 @@ public interface Purchasing {
      * @param email
      * @param firstName
      * @param lastName
-     * @return
+     * @return the Account created with primary key assigned
      */
     Account createAccount(String email, String firstName, String lastName);
 
@@ -27,7 +27,7 @@ public interface Purchasing {
      * Note that this capability is not yet fully defined.
      * @param email
      * @param password
-     * @return
+     * @return amount charged as part of this checkout
      */
     double checkout(String email, String password);
 }]]></programlisting>
@@ -41,7 +41,7 @@ public interface Catalog {
      * Returns a list of products in the catalog chunked into page sizes.
      * @param offset
      * @param limit
-     * @return
+     * @return list of products matching the paging criteria
      */
     List<Product> getProducts(int offset, int limit);
 
@@ -50,6 +50,7 @@ public interface Catalog {
      * the count of items.
      * @param id
      * @param validEmail
+     * @return number of items in cart
      */
     int addToCart(int id, String validEmail);
 }]]></programlisting>
@@ -107,6 +108,16 @@ public class Cart {
     @ManyToMany
     private List<Product> products = new ArrayList<Product>();
 ...]]></programlisting>
+
+    <tip>
+        <title>Details come in waves</title>
+        <para>Start with simple empty class and then added details over time.
+        Just the fact that we have the concept of a Product is valuable. 
+        The fact that it can be described using a single name is an extra detail. 
+        The fact that name description should be required is additional detail. 
+        These details come over time and should not be a barrier for proposing
+        the data concept and moving forward with the early design.</para>
+    </tip>
     </section>
 
 
