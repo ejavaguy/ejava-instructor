@@ -17,7 +17,7 @@
     <orderedlist>
         <listitem><para>
            Change the System.out() calls in App and AppTest from
-           Part A to use SLF logging API. The slf-api 
+           Part A to use SLF logging API. The slf4j-api 
            <ulink url="https://www.slf4j.org/apidocs/org/slf4j/package-summary.html">Javadoc</ulink>
            and 
            <ulink url="https://www.slf4j.org/manual.html">manual</ulink>
@@ -127,8 +127,8 @@ public class AppTest {
         </listitem>
 
         <listitem><para>
-           Add the slf-api.jar to the compile classpaths and the
-           slf-api.jar, slf-log4j.jar, and log4j.jar to the runtime classpath used
+           Add the slf4j-api.jar to the compile classpaths and the
+           slf4j-api.jar, slf4j-log4j.jar, and log4j.jar to the runtime classpath used
            during tests. Also 
            add an additional task to copy the log4j.xml file into
            target/test-classes so that it is seen by the classloader as a 
@@ -139,15 +139,15 @@ public class AppTest {
 junit.classpath=${M2_REPO}/junit/junit/4.12/junit-4.12.jar:\
 ${M2_REPO}/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar
 
-slf-api.classpath=${M2_REPO}/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar
-slf-log4j.classpath=${M2_REPO}/org/slf4j/slf4j-log4j12/1.7.25/slf4j-log4j12-1.7.25.jar
+slf4j-api.classpath=${M2_REPO}/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar
+slf4j-log4j.classpath=${M2_REPO}/org/slf4j/slf4j-log4j12/1.7.25/slf4j-log4j12-1.7.25.jar
 log4j.classpath=${M2_REPO}/log4j/log4j/1.2.17/log4j-1.2.17.jar
 ]]></programlisting>
 
 <programlisting language="xml"><![CDATA[    <target name="echo">
         ...
-        <echo>slf-api.classpath=${slf-api.classpath}</echo>
-        <echo>slf-log4j.classpath=${slf-log4j.classpath}</echo>
+        <echo>slf4j-api.classpath=${slf4j-api.classpath}</echo>
+        <echo>slf4j-log4j.classpath=${slf4j-log4j.classpath}</echo>
         <echo>log4j.classpath=${log4j.classpath}</echo>
     </target>]]></programlisting>
 
@@ -158,7 +158,7 @@ log4j.classpath=${M2_REPO}/log4j/log4j/1.2.17/log4j-1.2.17.jar
                target="1.8"
                includeantruntime="false">
                <classpath>
-                   <pathelement path="${slf-api.classpath}"/>
+                   <pathelement path="${slf4j-api.classpath}"/>
                </classpath>
         </javac>]]></programlisting>
 
@@ -171,7 +171,7 @@ log4j.classpath=${M2_REPO}/log4j/log4j/1.2.17/log4j-1.2.17.jar
                <classpath>
                    <pathelement location="${build.dir}/${artifactId}.jar"/>
                    <pathelement path="${junit.classpath}"/>
-                   <pathelement path="${slf-api.classpath}"/>
+                   <pathelement path="${slf4j-api.classpath}"/>
                </classpath>
         </javac>
 
@@ -289,9 +289,9 @@ DEBUG 26-08 23:07:04,809 [myorg.mypackage.ex1.App] (App.java:returnOne:11)  -Her
             In this chapter we added some sophistication to the production
             class and its unit test which required additional compile-time
             and runtime resources. Please note that we added only a dependency
-            on slf-api to the javac compiler task because log4j was
+            on slf4j-api to the javac compiler task because log4j was
             never directly referenced in the source code. We added a runtime
-            dependency on log4j (and the slf-log4j adapter) in order to configure 
+            dependency on log4j (and the slf4j-log4j adapter) in order to configure 
             a logger implementation
             during the execution of tests. The distinction of resources required
             for compile-time, test, and runtime required will become even more
