@@ -6,20 +6,19 @@
 
     <section id="jpa-dao-sql-create">
         <title>Create/INSERT</title>
-<programlisting language=""><![CDATA[insert 
+<programlisting language="java"><![CDATA[insert 
 into
     JPADAO_BOOK
     (ID, DESCRIPTION, PAGES, TITLE) 
 values
     (null, 'this and that', 1037, 'gww')]]></programlisting>
         <para>Get the generated primary key value</para>                            
-<programlisting language=""><![CDATA[call IDENTITY()]]></programlisting>                        
+<programlisting language="java"><![CDATA[call IDENTITY()]]></programlisting>                        
     </section>
 
     <section id="jpa-dao-sql-select">
         <title>Read/SELECT</title>
-<programlisting language=""><![CDATA[
-select
+<programlisting language="java"><![CDATA[select
     book.ID,
     book.DESCRIPTION,
     book.PAGES,
@@ -31,8 +30,7 @@ from
 
     <section id="jpa-dao-sql-update">
         <title>Update/UPDATE</title>
-<programlisting language=""><![CDATA[
-update
+<programlisting language="java"><![CDATA[update
     JPADAO_BOOK 
 set
     DESCRIPTION='this, that, and the other thing'
@@ -43,8 +41,7 @@ where
 
     <section id="jpa-dao-sql-delete">
         <title>Delete/DELETE</title>
-<programlisting language=""><![CDATA[
-delete 
+<programlisting language="java"><![CDATA[delete 
 from
     JPADAO_BOOK 
 where

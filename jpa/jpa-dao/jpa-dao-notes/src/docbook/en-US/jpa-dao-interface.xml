@@ -18,6 +18,8 @@
         </itemizedlist>
         
 <programlisting language="java"><![CDATA[...
+import javax.persistence.PersistenceException;
+
 public interface BookDAO {
     Book create(Book book) throws PersistenceException;
     Book update(Book book) throws PersistenceException;
@@ -49,7 +51,7 @@ public interface BookDAO {
                 <term><filename>Checked Exceptions</filename></term>
                 <listitem><para></para>
                     <itemizedlist spacing="compact">
-                        <listitem><para>Used to report anticipated errors mostly have to do with input</para></listitem>
+                        <listitem><para>Used to report anticipated errors mostly having to do with input</para></listitem>
                         <listitem><para>Extends java.lang.Exception</para></listitem>
                     </itemizedlist>
                 </listitem>

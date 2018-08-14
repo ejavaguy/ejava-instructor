@@ -59,7 +59,7 @@
                 <listitem>
                     <itemizedlist spacing="compact">
                         <listitem><para>Object within the business domain that needs access to data (e.g., session bean)</para></listitem>
-                        <listitem><para>Knows when/why data is needed, but not how</para></listitem>
+                        <listitem><para>Knows when/why data is needed, but not where or how to access it</para></listitem>
                     </itemizedlist>
                 </listitem>
             </varlistentry>
@@ -68,7 +68,7 @@
                 <listitem>
                     <itemizedlist spacing="compact">
                         <listitem><para>Abstracts the access details from the business object</para></listitem>
-                        <listitem><para>Knows where/how data is accessed, but not when/why</para></listitem>
+                        <listitem><para>Knows where/how data is accessed, but not when or why to access it</para></listitem>
                     </itemizedlist>
                 </listitem>
             </varlistentry>
@@ -142,7 +142,7 @@
                     <listitem><para>No details, such as SQL, in business logic</para></listitem>
                 </itemizedlist>
             </listitem>
-            <listitem><para>Harder to abstract with EJB2.x Container Managed Persistence (CMP) frameworks</para></listitem>
+            <listitem><para>Was hard to abstract with EJB 2.x Container Managed Persistence (CMP) frameworks</para></listitem>
             <listitem><para>EJB3 Java Persistence API provides a significant amount of abstraction</para></listitem>
         </itemizedlist>
     </section>    
