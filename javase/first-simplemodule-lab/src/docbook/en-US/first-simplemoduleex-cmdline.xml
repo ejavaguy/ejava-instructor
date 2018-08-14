@@ -27,24 +27,26 @@
             downloaded for you when you built the class examples and can
             be located in $M2_REPO/junit/junit/(version)/. Where M2_REPO
             is HOME/.m2/repository or the location you have specified
-            in the localRepository element of HOME/.m2/settings.xml.
+            in the localRepository element of $HOME/.m2/settings.xml.
         </para>
     </note>
 
         <orderedlist>
             <listitem><para>
-               Set a few logical variables to represent root directories. For the 
-               purposes of the follow-on steps, PROJECT_BASEDIR is the root directory
+               Set a few shell variables to represent root directories. For the 
+               purposes of the follow-on steps, <code>PROJECT_BASEDIR</code> is the root directory
                for this exercise. In the example below, the user has chosen a directory of
-               $HOME/proj/784/exercises to be the root directory for all class
+               <code>$HOME/proj/784/exercises</code> to be the root directory for all class
                exercises and named the root directory for this project "ex1". An
-               alternative for CLASS_HOME might be c:/jhu/784.
+               alternative for <code>CLASS_HOME</code> might be <code>c:/jhu/784</code>. <code>M2_REPO</code> 
+               is the path to your Maven repository.
                 </para>
-<programlisting language=""><![CDATA[
-export CLASS_HOME=$HOME/proj/784
+<programlisting language=""><![CDATA[export CLASS_HOME=$HOME/proj/784
 export PROJECT_BASEDIR=$CLASS_HOME/exercises/ex1
 mkdir -p $PROJECT_BASEDIR
-cd $PROJECT_BASEDIR]]></programlisting>
+cd $PROJECT_BASEDIR
+export M2_REPO=$HOME/.m2/repository
+]]></programlisting>
             </listitem>
 
             <listitem><para>
@@ -53,22 +55,37 @@ cd $PROJECT_BASEDIR]]></programlisting>
                 </para>
 
 <programlisting language=""><![CDATA[$PROJECT_BASEDIR
-    +---/src/main/java/myorg/mypackage/ex1
-    +---/src/test/java/myorg/mypackage/ex1
-    +---/target/classes
-    +---/target/test-classes
-    +---/target/test-reports]]></programlisting>
+|-- src
+|   |-- main
+|   |   `-- java
+|   |       `-- myorg
+|   |           `-- mypackage
+|   |               `-- ex1
+|   `-- test
+|       |-- resources
+|       `-- java
+|           `-- myorg
+|               `-- mypackage
+|                   `-- ex1
+`-- target
+    |-- classes
+    |-- test-classes
+    `-- test-reports
+    
+]]></programlisting>
 
 <programlisting language=""><![CDATA[mkdir -p src/main/java/myorg/mypackage/ex1
 mkdir -p src/test/java/myorg/mypackage/ex1
+mkdir -p src/test/resources
 mkdir -p target/classes
+mkdir -p src/test/java/myorg/mypackage/ex1
 mkdir -p target/test-classes
 mkdir -p target/test-reports]]></programlisting>
             </listitem>
 
 <listitem><para>
                Add the following Java implementation class to
-               PROJECT_BASEDIR/src/main/java/myorg/mypackage/ex1/App.java
+               $PROJECT_BASEDIR/src/main/java/myorg/mypackage/ex1/App.java
                 </para>
 <programlisting language="java"><![CDATA[package myorg.mypackage.ex1;
 
@@ -86,7 +103,7 @@ public class App {
 
             <listitem><para>
                Add the following Java test class to 
-               PROJECT_BASEDIR/src/test/java/myorg/mypackage/ex1/AppTest.java
+               $PROJECT_BASEDIR/src/test/java/myorg/mypackage/ex1/AppTest.java
                 </para>
 <programlisting language="java"><![CDATA[package myorg.mypackage.ex1;
 
@@ -142,39 +159,50 @@ myorg/mypackage/ex1/App.class]]></programlisting>
                 Compile the JUnit test and place the compiled tests in 
                 target/test-classes. 
                 </para>
-<programlisting language=""><![CDATA[export JUNIT_JAR="$HOME/.m2/repository/junit/junit/4.10/junit-4.10.jar"
-javac -classpath "target/ex1.jar:$JUNIT_JAR" src/test/java/myorg/mypackage/ex1/AppTest.java -d target/test-classes]]></programlisting>
+<programlisting language=""><![CDATA[export JUNIT_JARS="$M2_REPO/junit/junit/4.12/junit-4.12.jar:$M2_REPO/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar"
+javac -classpath "target/ex1.jar:$JUNIT_JARS" src/test/java/myorg/mypackage/ex1/AppTest.java -d target/test-classes]]></programlisting>
             </listitem>
 
             <listitem><para>
-                Verify you have your "production" class from src/main compiled into target/classes,
-                your unit test class from src/test compiled into target/test-classes, and the
-                Java archive with thr production class in target directory.
+                Verify you have your "production" class from src/main compiled into target/classes
+                directory, your unit test class from src/test compiled into target/test-classes
+                directory, and the Java archive with the production class is in target directory.
                 </para>
-<programlisting language=""><![CDATA[target/
-    +---classes/myorg/mypackage/ex1/App.class
-    +---test-classes/myorg/mypackage/ex1/AppTest.class
-    +---test-reports
-    +---ex1.jar]]></programlisting>
+<programlisting language=""><![CDATA[target
+|-- classes
+|   `-- myorg
+|       `-- mypackage
+|           `-- ex1
+|               `-- App.class
+|-- ex1.jar
+|-- test-classes
+|   `-- myorg
+|       `-- mypackage
+|           `-- ex1
+|               `-- AppTest.class
+`-- test-reports
+]]></programlisting>
 
             </listitem>
 
             <listitem><para>
                 Run the JUnit test framework.
                 </para>
-<programlisting language=""><![CDATA[java -classpath "target/ex1.jar:$JUNIT_JAR:target/test-classes" org.junit.runner.JUnitCore myorg.mypackage.ex1.AppTest]]></programlisting>
+<programlisting language=""><![CDATA[java -classpath "target/ex1.jar:$JUNIT_JARS:target/test-classes" org.junit.runner.JUnitCore myorg.mypackage.ex1.AppTest
+]]></programlisting>
 
-<programlisting language=""><![CDATA[JUnit version 4.10
+<programlisting language=""><![CDATA[JUnit version 4.12
 .testApp
 Here's One!
 
-Time: 0.005
+Time: 0.003
 
-OK (1 test)]]></programlisting>
+OK (1 test)
+]]></programlisting>
             </listitem>
 
             <listitem><para>
-                Change add/remove a test that will fail, re-compile the test class
+                Change add/remove a test that will fail, re-compile the test class,
                 and re-run.
                 </para>
 <programlisting language="java"><![CDATA[    //AppTest.java
@@ -185,10 +213,10 @@ OK (1 test)]]></programlisting>
         assertTrue("app didn't return 0", app.returnOne() == 0);
     }]]></programlisting>
 
-<programlisting language=""><![CDATA[javac -classpath "target/ex1.jar:$JUNIT_JAR" src/test/java/myorg/mypackage/ex1/AppTest.java -d target/test-classes
-java -classpath "target/ex1.jar:$JUNIT_JAR:target/test-classes" org.junit.runner.JUnitCore myorg.mypackage.ex1.AppTest]]></programlisting>
+<programlisting language=""><![CDATA[javac -classpath "target/ex1.jar:$JUNIT_JARS" src/test/java/myorg/mypackage/ex1/AppTest.java -d target/test-classes
+java -classpath "target/ex1.jar:$JUNIT_JARS:target/test-classes" org.junit.runner.JUnitCore myorg.mypackage.ex1.AppTest]]></programlisting>
 
-<programlisting language=""><![CDATA[JUnit version 4.10
+<programlisting language=""><![CDATA[JUnit version 4.12
 .testApp
 Here's One!
 .testFail

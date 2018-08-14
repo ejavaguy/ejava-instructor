@@ -15,16 +15,10 @@
 
     <note>
         <para>
-            Maven/Eclipse integration is probably the most volatile
-            aspects of the environment. Over the years the integration
-            has progressed from a Maven plugin (maven-eclipse-plugin;
-            integrating from the Maven side on-demand) to Eclipse
-            plugins (m2e; continuously integrating from the Eclipse side
-            dynamically). In the middle were phases where the Eclipse
-            m2e plugin had to be manually installed after download. 
-            However, in recent versions, m2e has been pre-installed 
-            into Eclipse. It gets easier to get started every day 
-            but harder to keep instructions up to date.
+            Maven/Eclipse integration was once the most volatile
+            aspects of the environment. However, over the years the two
+            have been designed to work well together as long as you keep 
+            things Maven-centric.
         </para>
     </note>
 
@@ -46,7 +40,7 @@
         <note>
             <title>ex1 ~= firstSimpleModuleEx</title>
             <para>
-                The exercize asked you to name your module "ex1". This portion of the 
+                The exercise asked you to name your module "ex1". This portion of the 
                 exercise demonstrates actions within Eclipse in a posted solution 
                 in your examples tree call "firstSimpleModuleEx". You may/should continue
                 to use your "ex1" solution from the previous chapters but know that
@@ -73,7 +67,7 @@
                 </para>
                 <figure>
                     <title>Imported Project</title>
-                    <graphic scale="60" fileref="images/first-simpleproject-eclipse-project.png"/>
+                    <graphic scalefit="1" fileref="images/first-simpleproject-eclipse-project.png"/>
                 </figure>
                 <itemizedlist>
                     <listitem><para>
@@ -83,20 +77,20 @@
                     </listitem>
 
                     <listitem><para>
-                        Defined the project for use with Java 7.
+                        Defined the project for use with Java 8.
                         </para>
                     </listitem>
 
                     <listitem><para>
-                        Added four Maven dependencies. Notice how the path to these dependencies are from
+                        Added five Maven dependencies. Notice how the path to these dependencies are from
                         the localRepository.
                         </para>
                     </listitem>
 
                     <listitem><para>
-                        Three of these dependencies (commons-logging,
-                        junit, and log4j) were through direct
-                        references. The fourth (hamcrest-core) is through
+                        Four of these dependencies (slf-api,
+                        junit, slf-log4j, and log4j) were through direct
+                        references. The fifth (hamcrest-core) is through
                         a transitive dependency from junit. You can
                         visualize this transitive dependency by opening
                         the pom.xml and selecting the dependency hierarchy
@@ -104,7 +98,7 @@
                         </para>
                         <figure>
                             <title>Visualizing Dependency Hierarchies</title>
-                            <graphic scale="60" fileref="images/first-simpleproject-eclipse-dependency.png"/>
+                            <graphic scalefit="1" fileref="images/first-simpleproject-eclipse-dependency.png"/>
                         </figure>
                     </listitem>
 
@@ -119,11 +113,13 @@
 [INFO] ------------------------------------------------------------------------
 [INFO] 
 [INFO] --- maven-dependency-plugin:2.8:tree (default-cli) @ firstSimpleModuleEx ---
-[INFO] myorg.myproject:firstSimpleModuleEx:jar:1.0-SNAPSHOT
-[INFO] +- commons-logging:commons-logging:jar:1.1.1:compile
-[INFO] +- junit:junit:jar:4.10:test
-[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.1:test
-[INFO] \- log4j:log4j:jar:1.2.13:test]]></programlisting>
+[INFO] myorg.myproject:firstSimpleModuleEx:jar:5.0.0-SNAPSHOT
+[INFO] +- org.slf4j:slf4j-api:jar:1.7.25:provided
+[INFO] +- junit:junit:jar:4.12:test
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
+[INFO] +- org.slf4j:slf4j-log4j12:jar:1.7.25:test
+[INFO] \- log4j:log4j:jar:1.2.17:test
+]]></programlisting>
                     </listitem>
 
                     <listitem><para>
@@ -135,18 +131,18 @@
 <programlisting language="xml"><![CDATA[        <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.13</version>
+            <version>1.2.17</version>
             <scope>test</scope>
         </dependency>]]></programlisting>
 <programlisting language="xml"><![CDATA[        <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.12</version>
+            <version>1.2.16</version>
             <scope>test</scope>
         </dependency>]]></programlisting>
                         <figure>
                             <title>Maven/Eclipse Dependency Coordination</title>
-                            <graphic scale="60" fileref="images/first-simpleproject-eclipse-maven-versions.png"/>
+                            <graphic scalefit="1" fileref="images/first-simpleproject-eclipse-maven-versions.png"/>
                         </figure>
                     </listitem>
                 </itemizedlist>
@@ -160,7 +156,7 @@
         <orderedlist>
             <listitem><para>
                 Right-click on the pom.xml file or project folder and
-                execute Run As-&gt;Maven install".  You can also get back to this
+                execute Run As-&gt;"Maven install".  You can also get back to this
                 window through the Run As option on the toolbar once you have the
                 project selective. This mode runs the JUnit test you wrote within 
                 the context of the full maven project. All pre-test and post-test 
@@ -179,7 +175,7 @@
                 </para>
                 <figure>
                     <title>Run As: Maven Install Output</title>
-                    <graphic scale="60" fileref="images/first-simpleproject-eclipse-maven-install.png"/>
+                    <graphic scalefit="1" fileref="images/first-simpleproject-eclipse-maven-install.png"/>
                 </figure>
             </listitem>
 
@@ -191,7 +187,7 @@
                 </para>
                 <figure>
                     <title>Run As: JUnit Test Results</title>
-                    <graphic scale="60" fileref="images/first-simpleproject-eclipse-junit.png"/>
+                    <graphic scalefit="1" fileref="images/first-simpleproject-eclipse-junit.png"/>
                 </figure>
 
                 <tip>
@@ -218,9 +214,9 @@
         <title>Setup environment to enable interactive debugging</title>
         <para>
             There are two primary ways to use the debugger; separate/remote
-            process and embedded (within Eclipse). The later is much easier
+            process and embedded (within Eclipse). The second is much easier
             to use but is limited by what you can execute within the Eclipse
-            IDE. The second takes a minor amount of setup but can be re-used
+            IDE. The first takes a minor amount of setup but can be re-used
             to debug code running within application servers on your local 
             and remote machines.
         </para>
@@ -312,7 +308,7 @@ java.lang.AssertionError: app didn't return 0
                     <graphic scale="60" fileref="images/first-simpleproject-eclipse-maven-debuglaunch.png"/>
                 </figure>
                 <para>
-                    You should see the Maben build start but pause before executing the 
+                    You should see the Maven build start but pause before executing the 
                     first JUnit test. Think of this as the "server-side" of the debugger
                     session.
                 </para>
@@ -371,6 +367,15 @@ Listening for transport dt_socket at address: 8000]]></programlisting>
             </listitem>
             
         </orderedlist>
+        
+        <note>
+            <title>Debug-As Junit Test Is Even Easier</title>
+            <para>I walked you through the harder debugging session setup that is only 
+            necessary when the problem is occurring in code running in a remote JVM.
+            If the code can be executed using "Run-As -&gt; JUnit Test", then simply set a 
+            breakpoint and use "Debug-As -&gt; JUnut Test"  
+            </para>
+        </note>
     </section>
 
 

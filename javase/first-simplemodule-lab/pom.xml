@@ -19,7 +19,7 @@
     
     <properties>
        <doc.base>first-simplemodule-ex-book</doc.base>
-       <content.version>v2014-08-25</content.version>
+       <content.version>v2018-08-13</content.version>
     </properties>
 
     <build>

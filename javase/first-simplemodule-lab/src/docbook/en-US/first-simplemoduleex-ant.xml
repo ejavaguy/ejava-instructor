@@ -42,7 +42,7 @@
         
     <orderedlist>
     <listitem><para>
-            Create a build.properties file in PROJECT_BASEDIR. This will be
+            Create a build.properties file in $PROJECT_BASEDIR. This will be
             used to define any non-portable property values. Place the most non-portable
             base variables (.e.g, M2_REPO location) towards the top and build lower-level 
             paths from them. This makes the scripts much easier to port to another environment.
@@ -57,7 +57,7 @@ junit.classpath=${M2_REPO}/junit/junit/4.10/junit-4.10.jar]]></programlisting>
         </listitem>
 
         <listitem><para>
-            Create a build.xml file in PROJECT_BASEDIR. Note the following 
+            Create a build.xml file in $PROJECT_BASEDIR. Note the following 
             key elements. 
             </para>
             <itemizedlist spacing="compact">
@@ -92,7 +92,7 @@ junit.classpath=${M2_REPO}/junit/junit/4.10/junit-4.10.jar]]></programlisting>
                 </listitem>
                 <listitem><para>
                         echo - a useful Ant task to printout status and debug information.
-                        See <ulink url="http://ant.apache.org/manual/CoreTasks/echo.html">Ant docs</ulink>
+                        See <ulink url="https://ant.apache.org/manual/Tasks/echo.html">Ant docs</ulink>
                         for more information.
                     </para>
                 </listitem>
@@ -122,14 +122,14 @@ junit.classpath=${M2_REPO}/junit/junit/4.10/junit-4.10.jar]]></programlisting>
             echo target.
             </para>
 <programlisting language=""><![CDATA[$ ant echo
-Buildfile: /home/jcstaff/proj/784/exercises/ex1/build.xml
+Buildfile: /home/jim/proj/784/exercises/ex1/build.xml
 
 echo:
-     [echo] basedir=/home/jcstaff/proj/784/exercises/ex1
+     [echo] basedir=/home/jim/proj/784/exercises/ex1
      [echo] artifactId=ex1
-     [echo] src.dir=/home/jcstaff/proj/784/exercises/ex1/src
-     [echo] build.dir=/home/jcstaff/proj/784/exercises/ex1/target
-     [echo] junit.classpath=/home/jcstaff/.m2/repository/junit/junit/4.10/junit-4.10.jar
+     [echo] src.dir=/home/jim/proj/784/exercises/ex1/src
+     [echo] build.dir=/home/jim/proj/784/exercises/ex1/target
+     [echo] junit.classpath=/home/jim/.m2/repository/junit/junit/4.10/junit-4.10.jar
 
 BUILD SUCCESSFUL
 Total time: 0 seconds]]></programlisting>
@@ -142,19 +142,19 @@ Total time: 0 seconds]]></programlisting>
             <itemizedlist spacing="compact">
                 <listitem><para>
                     mkdir - creates a directory. See 
-                    <ulink url="http://ant.apache.org/manual/CoreTasks/mkdir.html">Ant docs</ulink>
+                    <ulink url="https://ant.apache.org/manual/Tasks/mkdir.html">Ant Mkdir docs</ulink>
                     for more infomation.
                     </para>
                 </listitem>
                 <listitem><para>
                     javac - compiles java sources files. See
-                    <ulink url="http://ant.apache.org/manual/CoreTasks/javac.html">Ant docs</ulink>
-                    for more information. Note that we are making sure we get JavaSE 7 classes compiled.
+                    <ulink url="https://ant.apache.org/manual/Tasks/javac.html">Ant Javac docs</ulink>
+                    for more information. Note that we are making sure we get JavaSE 8 classes compiled.
                     </para>
                 </listitem>
                 <listitem><para>
-                    * jar - builds a java archive. See 
-                    <ulink url="http://ant.apache.org/manual/CoreTasks/jar.html">Ant Docs</ulink>
+                    jar - builds a java archive. See 
+                    <ulink url="https://ant.apache.org/manual/Tasks/jar.html">Ant Jar Docs</ulink>
                     for more information.
                     </para>
                 </listitem>
@@ -165,8 +165,8 @@ Total time: 0 seconds]]></programlisting>
         <javac srcdir="${src.dir}/main/java"
                destdir="${build.dir}/classes"
                debug="true"
-               source="1.7"
-               target="1.7"
+               source="1.8"
+               target="1.8"
                includeantruntime="false">
                <classpath>
                </classpath>
@@ -184,12 +184,12 @@ Total time: 0 seconds]]></programlisting>
             production class in target/.
             </para>
 <programlisting language=""><![CDATA[$ rm -rf target/; ant package
-Buildfile: /home/jcstaff/proj/784/exercises/ex1/build.xml
+Buildfile: /home/jim/proj/784/exercises/ex1/build.xml
 
 package:
-    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/classes
-    [javac] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/classes
-      [jar] Building jar: /home/jcstaff/proj/784/exercises/ex1/target/ex1.jar
+    [mkdir] Created dir: /home/jim/proj/784/exercises/ex1/target/classes
+    [javac] Compiling 1 source file to /home/jim/proj/784/exercises/ex1/target/classes
+      [jar] Building jar: /home/jim/proj/784/exercises/ex1/target/ex1.jar
 
 BUILD SUCCESSFUL
 Total time: 2 seconds]]></programlisting>
@@ -228,8 +228,8 @@ It is currently set to ".../jre"]]></programlisting>
         <javac srcdir="${src.dir}/test/java"
                destdir="${build.dir}/test-classes"
                debug="true"
-               source="1.7"
-               target="1.7"
+               source="1.8"
+               target="1.8"
                includeantruntime="false">
                <classpath>
                    <pathelement location="${build.dir}/${artifactId}.jar"/>
@@ -246,16 +246,16 @@ It is currently set to ".../jre"]]></programlisting>
             with the test class from src/test compiled into target/test-classes.
             </para>
 <programlisting language=""><![CDATA[$ rm -rf target/; ant
-Buildfile: /home/jcstaff/proj/784/exercises/ex1/build.xml
+Buildfile: /home/jim/proj/784/exercises/ex1/build.xml
 
 package:
-    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/classes
-    [javac] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/classes
-      [jar] Building jar: /home/jcstaff/proj/784/exercises/ex1/target/ex1.jar
+    [mkdir] Created dir: /home/jim/proj/784/exercises/ex1/target/classes
+    [javac] Compiling 1 source file to /home/jim/proj/784/exercises/ex1/target/classes
+      [jar] Building jar: /home/jim/proj/784/exercises/ex1/target/ex1.jar
 
 test:
-    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/test-classes
-    [javac] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/test-classes
+    [mkdir] Created dir: /home/jim/proj/784/exercises/ex1/target/test-classes
+    [javac] Compiling 1 source file to /home/jim/proj/784/exercises/ex1/target/test-classes
 
 BUILD SUCCESSFUL
 Total time: 3 seconds]]></programlisting>
@@ -276,8 +276,8 @@ Total time: 3 seconds]]></programlisting>
         <listitem><para>
             Add the junit task to the test target.  The junit task is 
             being configured to run in batch mode and write a TXT and XML reports
-            to the target/test-reports directory.  See
-            {{{http://ant.apache.org/manual/OptionalTasks/junit.html}Ant docs}}
+            to the target/test-reports directory.  See 
+            <ulink url="https://ant.apache.org/manual/Tasks/junit.html">Ant docs</ulink>
             for more details on the junit task. Make special note of the following:
             </para>
             <itemizedlist spacing="compact">
@@ -323,7 +323,7 @@ Total time: 3 seconds]]></programlisting>
 
             <note>
                 <para>
-                    The last time I sanity checked this exercise I got
+                    A few years ago when I sanity checked this exercise I got
                     the common error below. I corrected the issue by 
                     downloading a full installation from the Ant website
                     and exporting my ANT_HOME to the root of that installation.
@@ -333,12 +333,12 @@ Total time: 3 seconds]]></programlisting>
                 </para>
 <programlisting language=""><![CDATA[BUILD FAILED
 
-/home/jcstaff/proj/784/exercises/ex1/build.xml:57: Problem: failed to create task or type junit
+/home/jim/proj/784/exercises/ex1/build.xml:57: Problem: failed to create task or type junit
 Cause: the class org.apache.tools.ant.taskdefs.optional.junit.JUnitTask was not found.        
         This looks like one of Ant's optional components.
 Action: Check that the appropriate optional JAR exists in
         -/usr/share/ant/lib
-        -/home/jcstaff/.ant/lib
+        -/home/jim/.ant/lib
         -a directory added on the command line with the -lib argument
 
 Do not panic, this is a common problem.
@@ -354,14 +354,14 @@ This is not a bug; it is a configuration problem]]></programlisting>
             </para>
 <programlisting language=""><![CDATA[$ rm -rf target; ant
 package:
-    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/classes
-    [javac] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/classes
-      [jar] Building jar: /home/jcstaff/proj/784/exercises/ex1/target/ex1.jar
+    [mkdir] Created dir: /home/jim/proj/784/exercises/ex1/target/classes
+    [javac] Compiling 1 source file to /home/jim/proj/784/exercises/ex1/target/classes
+      [jar] Building jar: /home/jim/proj/784/exercises/ex1/target/ex1.jar
 
 test:
-    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/test-classes
-    [javac] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/test-classes
-    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/test-reports
+    [mkdir] Created dir: /home/jim/proj/784/exercises/ex1/target/test-classes
+    [javac] Compiling 1 source file to /home/jim/proj/784/exercises/ex1/target/test-classes
+    [mkdir] Created dir: /home/jim/proj/784/exercises/ex1/target/test-reports
     [junit] Running myorg.mypackage.ex1.AppTest
     [junit] Tests run: 2, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 15.143 sec
     [junit] Test myorg.mypackage.ex1.AppTest FAILED
@@ -412,7 +412,7 @@ junit.framework.AssertionFailedError: app didn't return 0
 
         <listitem><para>
             Add a clean target to the build.xml file to delete built artifacts.
-            See <ulink url="http://ant.apache.org/manual/CoreTasks/delete.html">Ant docs</ulink>
+            See <ulink url="https://ant.apache.org/manual/Tasks/delete.html">Ant docs</ulink>
             for details on the delete task.
             </para>
 <programlisting language="xml"><![CDATA[    <target name="clean">
@@ -425,20 +425,20 @@ junit.framework.AssertionFailedError: app didn't return 0
             </para>
 <programlisting language=""><![CDATA[
 $ ant clean test
-Buildfile: /home/jcstaff/proj/784/exercises/ex1/build.xml
+Buildfile: /home/jim/proj/784/exercises/ex1/build.xml
 
 clean:
-   [delete] Deleting directory /home/jcstaff/proj/784/exercises/ex1/target
+   [delete] Deleting directory /home/jim/proj/784/exercises/ex1/target
 
 package:
-    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/classes
-    [javac] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/classes
-      [jar] Building jar: /home/jcstaff/proj/784/exercises/ex1/target/ex1.jar
+    [mkdir] Created dir: /home/jim/proj/784/exercises/ex1/target/classes
+    [javac] Compiling 1 source file to /home/jim/proj/784/exercises/ex1/target/classes
+      [jar] Building jar: /home/jim/proj/784/exercises/ex1/target/ex1.jar
 
 test:
-    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/test-classes
-    [javac] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/test-classes
-    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/test-reports
+    [mkdir] Created dir: /home/jim/proj/784/exercises/ex1/target/test-classes
+    [javac] Compiling 1 source file to /home/jim/proj/784/exercises/ex1/target/test-classes
+    [mkdir] Created dir: /home/jim/proj/784/exercises/ex1/target/test-reports
     [junit] Running myorg.mypackage.ex1.AppTest
     [junit] Tests run: 2, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 15.123 sec
     [junit] Test myorg.mypackage.ex1.AppTest FAILED
@@ -450,29 +450,27 @@ Total time: 17 seconds]]></programlisting>
         <listitem><para>
             Comment out the bogus testFail and rerun.
             </para>
+            
 <programlisting language=""><![CDATA[$ cat src/test/java/myorg/mypackage/ex1/AppTest.java
 ...
     //@Test
     public void testFail() {]]></programlisting>
-        </listitem>
 
-        <listitem><para>
-            </para>
 <programlisting language=""><![CDATA[$ ant clean test
-Buildfile: /home/jcstaff/proj/784/exercises/ex1/build.xml
+Buildfile: /home/jim/proj/784/exercises/ex1/build.xml
 
 clean:
-   [delete] Deleting directory /home/jcstaff/proj/784/exercises/ex1/target
+   [delete] Deleting directory /home/jim/proj/784/exercises/ex1/target
 
 package:
-    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/classes
-    [javac] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/classes
-      [jar] Building jar: /home/jcstaff/proj/784/exercises/ex1/target/ex1.jar
+    [mkdir] Created dir: /home/jim/proj/784/exercises/ex1/target/classes
+    [javac] Compiling 1 source file to /home/jim/proj/784/exercises/ex1/target/classes
+      [jar] Building jar: /home/jim/proj/784/exercises/ex1/target/ex1.jar
 
 test:
-    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/test-classes
-    [javac] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/test-classes
-    [mkdir] Created dir: /home/jcstaff/proj/784/exercises/ex1/target/test-reports
+    [mkdir] Created dir: /home/jim/proj/784/exercises/ex1/target/test-classes
+    [javac] Compiling 1 source file to /home/jim/proj/784/exercises/ex1/target/test-classes
+    [mkdir] Created dir: /home/jim/proj/784/exercises/ex1/target/test-reports
     [junit] Running myorg.mypackage.ex1.AppTest
     [junit] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 15.161 sec
 
@@ -485,7 +483,7 @@ Total time: 17 seconds]]></programlisting>
     <section id="first-simple-moduleex-ant-summary">
        <title>Summary</title>
        <para>
-            In this chapter you performed many of the same action you did in the
+            In this chapter you performed many of the same actions you did in the
             previous chapter except that you implemented in a portable build tool
             called Ant. Ant is very powerful and open-ended.  You were shown these 
             same steps in Ant as an intermediate towards Maven. Ant, being open-ended,

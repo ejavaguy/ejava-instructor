@@ -53,7 +53,10 @@
         in sync.  If you know you already have everything you need, you can
         run in off-line mode using the "-o" flag on the command line or its
         equivalent entry within the settings.xml file. This can save you
-        seconds of build time when disconnected from the Internet.
+        seconds of build time when disconnected from the Internet. If you want
+        to make sure that all dependencies have been resolved,
+        use the <code>mvn dependency:go-offline</code> goal to eagerly resolve
+        all dependencies.
         </para>
     </note>
         
@@ -123,9 +126,9 @@
                             </para>
                         </listitem>
                         <listitem><para>
-                            maven-compiler-plugin - this declaration is not necessary
-                            for this exercise, but like our Ant script, specify the Java
-                            version to make sure we get what we need.
+                            maven-compiler-plugin - this declaration is only necessary to 
+                            if we need to override the default Java version -- like what we did 
+                            in our Ant script.
                             </para>
                         </listitem>
                         <listitem><para>
@@ -144,7 +147,7 @@
                     Although the m2e Eclipse plugin reads the pom dependency and creates
                     a classpath within Eclipse, it does not honor the differences
                     between the different scope values. All dependencies are blended 
-                    together. The result is that something may compile and run
+                    together when inside the IDE. The result is that something may compile and run
                     fine within Eclipse and report a missing class when built at
                     the command line. If that happens, check for classes using 
                     artifacts that have been brought in as scope=test or for classes
@@ -168,22 +171,28 @@
 
     <dependencies>
         <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.1.1</version>
-            <scope>compile</scope>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.25</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.10</version>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.25</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.13</version>
+            <version>1.2.17</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -193,10 +202,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.7.0</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>
@@ -236,56 +245,66 @@
             </para>
 <programlisting language=""><![CDATA[$ mvn package
 [INFO] Scanning for projects...
-[INFO]                                                                         
+[INFO]
 [INFO] ------------------------------------------------------------------------
-[INFO] Building My First Simple Project 1.0-SNAPSHOT
+[INFO] Building JavaSE::Simple Module Exercise Solution 5.0.0-SNAPSHOT
 [INFO] ------------------------------------------------------------------------
-[INFO] 
-[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ ex1 ---
+[INFO]
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ firstSimpleModuleEx ---
 [INFO] Using 'UTF-8' encoding to copy filtered resources.
-[INFO] skip non existing resourceDirectory /home/jcstaff/proj/784/exercises/ex1/src/main/resources
-[INFO] 
-[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ ex1 ---
+[INFO] skip non existing resourceDirectory /home/jim/proj/784/exercises/ex1/src/main/resources
+[INFO]
+[INFO] --- maven-compiler-plugin:3.7.0:compile (default-compile) @ firstSimpleModuleEx ---
 [INFO] Changes detected - recompiling the module!
-[INFO] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/classes
-[INFO] 
-[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ ex1 ---
+[INFO] Compiling 1 source file to /home/jim/proj/784/exercises/ex1/target/classes
+[INFO]
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ firstSimpleModuleEx ---
 [INFO] Using 'UTF-8' encoding to copy filtered resources.
 [INFO] Copying 1 resource
-[INFO] 
-[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ ex1 ---
+[INFO]
+[INFO] --- maven-compiler-plugin:3.7.0:testCompile (default-testCompile) @ firstSimpleModuleEx ---
 [INFO] Changes detected - recompiling the module!
-[INFO] Compiling 1 source file to /home/jcstaff/proj/784/exercises/ex1/target/test-classes
-[INFO] 
-[INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ ex1 ---
-[INFO] Surefire report directory: /home/jcstaff/proj/784/exercises/ex1/target/surefire-reports
+[INFO] Compiling 1 source file to /home/jim/proj/784/exercises/ex1/target/test-classes
+[INFO]
+[INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ firstSimpleModuleEx ---
+[INFO] Surefire report directory: /home/jim/proj/784/exercises/ex1/target/surefire-reports
 
 -------------------------------------------------------
  T E S T S
 -------------------------------------------------------
 Running myorg.mypackage.ex1.AppTest
-INFO  27-08 00:15:14,277 (AppTest.java:testApp:17)  -testApp
-DEBUG 27-08 00:15:14,283 (App.java:returnOne:11)  -Here's One!
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.383 sec
+INFO  13-08 19:03:19,264 (AppTest.java:testApp:18)  -testApp
+DEBUG 13-08 19:03:19,267 (App.java:returnOne:11)  -Here's One!
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.13 sec
 
 Results :
 
 Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 
-[INFO] 
-[INFO] --- maven-jar-plugin:2.4:jar (default-jar) @ ex1 ---
-[INFO] Building jar: /home/jcstaff/proj/784/exercises/ex1/target/ex1-1.0-SNAPSHOT.jar
+[INFO]
+[INFO] --- maven-jar-plugin:2.4:jar (default-jar) @ firstSimpleModuleEx ---
+[INFO] Building jar: /home/jim/proj/784/exercises/ex1/target/firstSimpleModuleEx-5.0.0-SNAPSHOT.jar
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 5.984 s
-[INFO] Finished at: 2014-08-27T00:15:14-04:00
-[INFO] Final Memory: 16M/174M
+[INFO] Total time: 1.553 s
+[INFO] Finished at: 2018-08-13T19:03:19-04:00
+[INFO] Final Memory: 19M/309M
 [INFO] ------------------------------------------------------------------------
+[WARNING] The requested profile "h2db" could not be activated because it does not exist.
 ]]></programlisting>
+        <note>
+            <title>Ignore WARNING for Non-existent Profile</title>
+            <para>You were asked to declare a <code>h2db</code> profile as active 
+            within $HOME/.m2/settings.xml during the 
+            software installation instructions. Maven will warn you about any profile you
+            request but is not found within the module to help identify spelling errors.
+            In this case, we simply do not need the profile and have not defined it.</para>
+        </note>
         </listitem>
 
         <listitem><para>
+            The contents of your development tree should look as follows.
             </para>
 <programlisting language=""><![CDATA[> find . -type f
 ./build.xml
@@ -345,7 +364,7 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
             something about your project and have it be processed as part of the
             documentation for the module. You do not need to do this for class
             projects, but walking through this may be helpful in understanding how
-            the class website is created from the source you have on your disk.
+            the course website is created from the source you have on your disk.
             Maven supports a couple of documentation generation languages, but
             lets just use HTML to keep this simple. Place the following content
             to src/site/resources/README.html
@@ -388,13 +407,23 @@ $ cat src/site/resources/README.html
   </body>
 </project>]]></programlisting>
 
-            <para>You must also specify a version# for the maven-project-info-reports-plugin.
+            <para>You must also specify a version# for the maven-site-plugin and
+            maven-project-info-reports-plugin in the pom.xml.
                  Maven is extremely version-aware.</para>
-<programlisting language="xml"><![CDATA[            <plugin> 
+<programlisting language="xml"><![CDATA[<plugins>
+...
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.4</version>
+            </plugin>
+
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.7</version>
-            </plugin>]]></programlisting>
+                <version>2.8</version>
+            </plugin>
+</plugins>]]></programlisting>
 
 <programlisting language=""><![CDATA[> find . -type f
 ./src/main/java/myorg/mypackage/ex1/App.java
@@ -448,8 +477,8 @@ target/site/plugins.html]]></programlisting>
                 <artifactId>maven-site-plugin</artifactId>
                 <version>3.4</version>
                 <configuration>
-                    <skip>true</skip>
-                    <skipDeploy>true</skipDeploy>
+                    <skip>false</skip>
+                    <skipDeploy>false</skipDeploy>
                 </configuration>
             </plugin>
 ]]></programlisting>
@@ -461,19 +490,24 @@ target/site/plugins.html]]></programlisting>
             add javadoc to our project and create a link to it. Add the following 
             contents to the bottom of the pom.xml file.
             </para>
-<programlisting language="xml"><![CDATA[    <reporting>
+<programlisting language="xml"><![CDATA[...
+    </build>
+    <reporting>
         <plugins>
-            <plugin> 
+            <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <groupId>org.apache.maven.plugins</groupId>
-                <version>2.9.1</version>
+                <version>3.0.1</version>
                 <configuration>
-                    <detectLinks/>
+                    <detectLinks>false</detectLinks>
+                    <detectOfflineLinks>true</detectOfflineLinks>
                     <show>private</show>
-                    <source>1.7</source>
+                    <source>1.8</source>
+                    <additionalparam>-Xdoclint:none</additionalparam>
+                    <failOnError>false</failOnError>
                     <links>
-                        <link>http://download.oracle.com/javaee/7/api/</link>
-                        <link>http://download.oracle.com/javase/7/docs/api/</link>
+                        <link>http://download.oracle.com/javase/8/docs/api/</link>
+                        <link>https://javaee.github.io/javaee-spec/javadocs/</link>
                     </links>
                 </configuration>
             </plugin>
@@ -487,7 +521,8 @@ target/site/plugins.html]]></programlisting>
             time we added a new report. Lets add a property to the site.xml menu 
             so a link to Javadoc and other reports can drop in automatically.
             </para>
-<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<programlisting language="xml"><![CDATA[# src/site/site.xml
+<?xml version="1.0" encoding="UTF-8"?>
 <project name="${project.name}">
   <body>
     <menu name="Content">
@@ -519,7 +554,7 @@ target/site/plugins.html]]></programlisting>
                     available to all pom.xml files. You want to be careful
                     not to over-populate the settings.xml file (taking advantage of its
                     re-usable specification) since it will make you pom.xml
-                    files too dependent on a particulate build site. Refer to the 
+                    files too dependent on a particular build location. Refer to the 
                     <ulink url="http://maven.apache.org/maven-settings/settings.html">Settings Descriptor</ulink>
                     for detailed information on settings.xml.
                     The following provides a step-wise generation of the
@@ -563,7 +598,8 @@ target/site/plugins.html]]></programlisting>
             is not active unless someone specifically asks for it (-Pdebugger) or the 
             "debugger" environment variable is set (-Ddebugger=(anything)).
             </para>
-<programlisting language="xml"><![CDATA[        <profile>
+<programlisting language="xml"><![CDATA[    <profiles>
+        <profile>
             <id>debugger</id>
             <!-- this should only be activated when performing interactive
                  debugging -->
@@ -575,7 +611,9 @@ target/site/plugins.html]]></programlisting>
             <properties>
                 <surefire.argLine>-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE</surefire.argLine>
             </properties>                                  
-        </profile>]]></programlisting>
+        </profile>
+    </profiles>
+]]></programlisting>
         </listitem>
 
         <listitem><para>
@@ -652,14 +690,10 @@ $ mvn install:install-file -DgroupId=foo -DartifactId=bar -Dversion=1.1 -Dpackag
 [INFO] ------------------------------------------------------------------------
 [INFO] 
 [INFO] --- maven-install-plugin:2.4:install-file (default-cli) @ ex1 ---
-[INFO] Installing /home/jcstaff/proj/784/exercises/ex1/bar.jar to /home/jcstaff/.m2/repository2/foo/bar/1.1/bar-1.1.jar
-[INFO] Installing /tmp/mvninstall5322334237902777597.pom to /home/jcstaff/.m2/repository2/foo/bar/1.1/bar-1.1.pom
+[INFO] Installing /home/jim/proj/784/exercises/ex1/bar.jar to /home/jim/.m2/repository/foo/bar/1.1/bar-1.1.jar
+[INFO] Installing /tmp/mvninstall5322334237902777597.pom to /home/jim/.m2/repository/foo/bar/1.1/bar-1.1.pom
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time: 0.975 s
-[INFO] Finished at: 2014-08-27T01:22:06-04:00
-[INFO] Final Memory: 6M/105M
 [INFO] ------------------------------------------------------------------------
 ]]></programlisting>
         </listitem>
@@ -667,22 +701,24 @@ $ mvn install:install-file -DgroupId=foo -DartifactId=bar -Dversion=1.1 -Dpackag
         <listitem><para>
             After successfully installing the dummy archive, you should be able to locate the JAR and
             other supporting files in the local repository. Be sure to look where you have directed 
-            lcoalRepository in $HOME/.m2/settings.xml
+            localRepository in $HOME/.m2/settings.xml
             </para>
-<programlisting language="xml"><![CDATA[$ find /home/jcstaff/.m2/repository2/foo/bar/
-/home/jcstaff/.m2/repository2/foo/bar/
-/home/jcstaff/.m2/repository2/foo/bar/1.1
-/home/jcstaff/.m2/repository2/foo/bar/1.1/bar-1.1.pom.lastUpdated
-/home/jcstaff/.m2/repository2/foo/bar/1.1/_remote.repositories
-/home/jcstaff/.m2/repository2/foo/bar/1.1/bar-1.1.jar.lastUpdated
-/home/jcstaff/.m2/repository2/foo/bar/1.1/bar-1.1.jar
-/home/jcstaff/.m2/repository2/foo/bar/1.1/bar-1.1.pom
-/home/jcstaff/.m2/repository2/foo/bar/maven-metadata-local.xml]]></programlisting>
+<programlisting language="xml"><![CDATA[$ find /home/jim/.m2/repository/foo/bar/
+/home/jim/.m2/repository/foo/bar/
+/home/jim/.m2/repository/foo/bar/1.1
+/home/jim/.m2/repository/foo/bar/1.1/bar-1.1.pom.lastUpdated
+/home/jim/.m2/repository/foo/bar/1.1/_remote.repositories
+/home/jim/.m2/repository/foo/bar/1.1/bar-1.1.jar.lastUpdated
+/home/jim/.m2/repository/foo/bar/1.1/bar-1.1.jar
+/home/jim/.m2/repository/foo/bar/1.1/bar-1.1.pom
+/home/jim/.m2/repository/foo/bar/maven-metadata-local.xml]]></programlisting>
         </listitem>
 
         <listitem><para>
+            Notice that Maven always makes sure there is a POM file present -- whether it
+            had to generate it or not.
             </para>
-<programlisting language="xml"><![CDATA[$ more /home/jcstaff/.m2/repository2/foo/bar/1.1/bar-1.1.pom
+<programlisting language="xml"><![CDATA[$ more /home/jim/.m2/repository/foo/bar/1.1/bar-1.1.pom
 
 <?xml version="1.0" encoding="UTF-8"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
@@ -702,9 +738,9 @@ $ mvn install:install-file -DgroupId=foo -DartifactId=bar -Dversion=1.1 -Dpackag
         </listitem>
 
         <listitem><para>
-            One last thing...Maven pulls in defintions from many places in the
+            One last thing...Maven pulls in definitions from many places in the
             build environment. If you ever want to know what the total sum of
-            those sources are (the "effectice POM"), the execute the 
+            those sources are (the "effective POM"), the execute the 
             help:effective-pom goal.
             </para>
 <programlisting language="xml"><![CDATA[ $ mvn help:effective-pom
@@ -719,7 +755,7 @@ $ mvn install:install-file -DgroupId=foo -DartifactId=bar -Dversion=1.1 -Dpackag
   <version>1.0-SNAPSHOT</version>
   <name>My First Simple Project</name>
   <properties>
-    <jboss.home>/opt/jboss-eap-6.1</jboss.home>
+    <jboss.home>/opt/wildfly-13.0.0.Final</jboss.home>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <dependencies>
@@ -729,10 +765,6 @@ $ mvn install:install-file -DgroupId=foo -DartifactId=bar -Dversion=1.1 -Dpackag
       <version>1.1</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-      <version>1.1.1</version>
 ...]]></programlisting>
         </listitem>
     </orderedlist>

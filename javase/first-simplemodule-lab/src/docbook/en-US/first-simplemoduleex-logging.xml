@@ -10,56 +10,53 @@
         to stdout/stderr and be able to re-direct them to log files,
         databases, messaging topics etc.  There are several to choose from
         (Java's built-in logger, Commons logging API, SLF's logging API,
-        and log4j to name a few). This exercise just happens to use
-        commons-logging API and log4j implementation.
+        and log4j to name a few). This course uses the SLF API and 
+        and the log4j implementation.
     </para>
         
     <orderedlist>
         <listitem><para>
            Change the System.out() calls in App and AppTest from
-           Part A to use commons logging API. The commons-logging 
-           <ulink url="http://jakarta.apache.org/commons/logging/apidocs/index.html">Javadoc</ulink>
+           Part A to use SLF logging API. The slf-api 
+           <ulink url="https://www.slf4j.org/apidocs/org/slf4j/package-summary.html">Javadoc</ulink>
            and 
-           <ulink url="http://jakarta.apache.org/commons/logging/guide.html">guide</ulink>
-           will be helpful in understanding this interface. The guide
-           goes into some details about log4j configuration as well.
-            </para>
+           <ulink url="https://www.slf4j.org/manual.html">manual</ulink>
+           will be helpful in understanding this interface.
+           </para>
 <programlisting language="java"><![CDATA[package myorg.mypackage.ex1;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class App {
-    private static Log log = LogFactory.getLog(App.class);
+    private static Logger logger = LoggerFactory.getLogger(App.class);
 
     public int returnOne() { 
         //System.out.println( "Here's One!" );
-        log.debug( "Here's One!" );
+        logger.debug( "Here's One!" );
         return 1; 
     }
 
     public static void main( String[] args ) {
         //System.out.println( "Hello World!" );
-        log.info( "Hello World!" );
+        logger.info( "Hello World!" );
     }
 }]]></programlisting>
 
 <programlisting language="java"><![CDATA[package myorg.mypackage.ex1;
-
 ...
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import static org.junit.Assert.*;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AppTest {
-    private static Log log = LogFactory.getLog(AppTest.class);
-
+    private static Logger logger = LoggerFactory.getLogger(AppTest.class);
 ...
-
     @Test
     public void testApp() {
         //System.out.println("testApp");
-        log.info("testApp");
+        logger.info("testApp");
         App app = new App();
         assertTrue("app didn't return 1", app.returnOne() == 1);
     }
@@ -70,14 +67,13 @@ public class AppTest {
            Add a log4j.xml configuration file to the directory structure.
            Place this file in src/test/resources/log4j.xml. 
            This file is used to control logging output. Refer to the 
-           <ulink url="http://logging.apache.org/log4j/docs/documentation.html">log4j documentation page</ulink>
+           <ulink url="https://logging.apache.org/log4j/1.2/manual.html">log4j manual</ulink>
            for possible information on how to configure 
-           and use log4j. However, they sell a commercial text; so its hard to 
-           find a good, detailed online reference that goes through all options.
-           It doesn't matter whether you use a log4j.xml format or
-           log4j.properties format. However, their 
-           <ulink url="http://logging.apache.org/log4j/docs/manual.html">quick intro</ulink>
-           uses the property file format.
+           and use log4j. It doesn't matter whether you use a log4j.xml format or
+           log4j.properties format.
+           Of note, the implementation we are using is based on
+           "Log4j 1" -- which reached its end of life in 2015. It still works but 
+           all energy in this area is within "Log4j 2".            
             </para>
 <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
@@ -131,44 +127,51 @@ public class AppTest {
         </listitem>
 
         <listitem><para>
-           Add the commons-logging.jar to the compile classpaths and the
-           commons-logging.jar and log4j.jar to the runtime classpath. Also 
+           Add the slf-api.jar to the compile classpaths and the
+           slf-api.jar, slf-log4j.jar, and log4j.jar to the runtime classpath used
+           during tests. Also 
            add an additional task to copy the log4j.xml file into
            target/test-classes so that it is seen by the classloader as a 
            resource. Realize that your classes have no compilation dependencies
            on log4j. Log4j is only used if it is located at runtime.
             </para>
 <programlisting language=""><![CDATA[# ex1 build.properties
-commons-logging.classpath=${M2_REPO}/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar
-log4j.classpath=${M2_REPO}/log4j/log4j/1.2.13/log4j-1.2.13.jar]]></programlisting>
+junit.classpath=${M2_REPO}/junit/junit/4.12/junit-4.12.jar:\
+${M2_REPO}/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar
+
+slf-api.classpath=${M2_REPO}/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar
+slf-log4j.classpath=${M2_REPO}/org/slf4j/slf4j-log4j12/1.7.25/slf4j-log4j12-1.7.25.jar
+log4j.classpath=${M2_REPO}/log4j/log4j/1.2.17/log4j-1.2.17.jar
+]]></programlisting>
 
 <programlisting language="xml"><![CDATA[    <target name="echo">
         ...
-        <echo>commons-logging.classpath=${commons-logging.classpath}</echo>
+        <echo>slf-api.classpath=${slf-api.classpath}</echo>
+        <echo>slf-log4j.classpath=${slf-log4j.classpath}</echo>
         <echo>log4j.classpath=${log4j.classpath}</echo>
     </target>]]></programlisting>
 
 <programlisting language="xml"><![CDATA[        <javac srcdir="${src.dir}/main/java"
                destdir="${build.dir}/classes"
                debug="true"
-               source="1.7"
-               target="1.7"
+               source="1.8"
+               target="1.8"
                includeantruntime="false">
                <classpath>
-                   <pathelement path="${commons-logging.classpath}"/>
+                   <pathelement path="${slf-api.classpath}"/>
                </classpath>
         </javac>]]></programlisting>
 
 <programlisting language="xml"><![CDATA[        <javac srcdir="${src.dir}/test/java"
                destdir="${build.dir}/test-classes"
                debug="true"
-               source="1.7"
-               target="1.7"
+               source="1.8"
+               target="1.8"
                includeantruntime="false">
                <classpath>
                    <pathelement location="${build.dir}/${artifactId}.jar"/>
                    <pathelement path="${junit.classpath}"/>
-                   <pathelement path="${commons-logging.classpath}"/>
+                   <pathelement path="${slf-api.classpath}"/>
                </classpath>
         </javac>
 
@@ -227,8 +230,9 @@ Total time: 17 seconds]]></programlisting>
                 </para>
 
 <programlisting language=""><![CDATA[$ more target/log4j-out.txt 
-INFO  26-08 22:59:23,357 [myorg.mypackage.ex1.AppTest] (AppTest.java:testApp:17)  -testApp
-DEBUG 26-08 22:59:23,361 [myorg.mypackage.ex1.App] (App.java:returnOne:11)  -Here's One! ]]></programlisting>
+INFO  13-08 18:24:21,983 [myorg.mypackage.ex1.AppTest] (AppTest.java:testApp:18)  -testApp
+DEBUG 13-08 18:24:21,986 [myorg.mypackage.ex1.App] (App.java:returnOne:11)  -Here's One!
+]]></programlisting>
 
                 <para>Your project structure should look like the following at this point.</para>
 
@@ -285,9 +289,10 @@ DEBUG 26-08 23:07:04,809 [myorg.mypackage.ex1.App] (App.java:returnOne:11)  -Her
             In this chapter we added some sophistication to the production
             class and its unit test which required additional compile-time
             and runtime resources. Please note that we added only a dependency
-            on commons-logging to the javac compiler task because log4j was
+            on slf-api to the javac compiler task because log4j was
             never directly referenced in the source code. We added a runtime
-            dependency on log4j in order to configure a logger implementation
+            dependency on log4j (and the slf-log4j adapter) in order to configure 
+            a logger implementation
             during the execution of tests. The distinction of resources required
             for compile-time, test, and runtime required will become even more
             important when using Maven. Use the explicit classpaths we created here
