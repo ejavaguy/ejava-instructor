@@ -13,9 +13,9 @@ author.setLastName("seuss");
 author.setSubject("children");
 author.setPublishDate(new Date());
 
-log.debug("creating author:" + author);
+logger.debug("creating author: {}", author);
 em.persist(author);
-log.debug("created author:" + author);]]></programlisting>
+logger.debug("created author: {}", author);]]></programlisting>
 
         <programlisting language=""><![CDATA[
 -creating author:ejava.examples.daoex.bo.Author@17e7691, id=0, fn=dr, ln=seuss, subject=children, pdate=Sun Sep 16 10:14:32 EDT 2012, version=0
@@ -37,12 +37,12 @@ log.debug("created author:" + author);]]></programlisting>
                     <listitem><para>All further changes are watched and will update database</para></listitem>
                 </itemizedlist>                   
         <programlisting language="java"><![CDATA[
-log.debug("em.contains(author)=" + em.contains(author));
+logger.debug("em.contains(author)={}", em.contains(author));
 em.persist(author);
-log.debug("created author:" + author);        
-log.debug("em.contains(author)=" + em.contains(author));
+logger.debug("created author: {}", author);        
+logger.debug("em.contains(author)={}", em.contains(author));
 ]]></programlisting>
-        <programlisting language=""><![CDATA[
+        <programlisting language="java"><![CDATA[
 -em.contains(author)=false
 -created author:...
 -em.contains(author)=true
@@ -53,11 +53,16 @@ log.debug("em.contains(author)=" + em.contains(author));
                 <itemizedlist spacing="compact">
                     <listitem><para>Cascades will still occur for CascadeType.PERSIST and ALL relationships</para></listitem>
                 </itemizedlist>                   
-        <programlisting language="java"><![CDATA[
-        em.persist(author);
+        <programlisting language="java"><![CDATA[        em.persist(author);
         ...
         em.persist(author);
 ]]></programlisting>
+            <tip>
+                <title>Calling persist applies cascades to new relationships</title>
+                <para>It is quite legal to call persist() with an already managed entity.
+                This is how one can get cascade actions to be applied to new relationships
+                formed after the entity is originally managed.</para>
+            </tip>
             </listitem>
             
             <listitem><para>Detached entities will be rejected</para>
@@ -68,15 +73,15 @@ log.debug("em.contains(author)=" + em.contains(author));
         Author author = new Author(1);
         author.setFirstName("dr");
 ...
-        log.debug("creating author:" + author);
-        log.debug("em.contains(author)=" + em.contains(author));
+        logger.debug("creating author: {}", author);
+        logger.debug("em.contains(author)={}", em.contains(author));
         try {
             em.persist(author);
             fail("did not detect detached entity");
         } catch (PersistenceException ex) {
-            log.debug("caught expected exception:" + ex.getLocalizedMessage(), ex);
+            logger.debug("caught expected exception:" + ex.getLocalizedMessage(), ex);
         }
-        log.debug("em.contains(author)=" + em.contains(author));
+        logger.debug("em.contains(author)={}", em.contains(author));
 ]]></programlisting>
                 <programlisting language=""><![CDATA[
 -creating author:ejava.examples.daoex.bo.Author@ad339b, id=1, ...
@@ -186,9 +191,9 @@ void remove(Object entity);
             
             <listitem><para>New entities are ignored but CascadeType.REMOVE and ALL relationships are cascaded</para>
         <programlisting language="java"><![CDATA[
-log.debug("em.contains(author)=" + em.contains(author));
+logger.debug("em.contains(author)={}", em.contains(author));
 em.remove(author);
-log.debug("em.contains(author)=" + em.contains(author));
+logger.debug("em.contains(author)={}", em.contains(author));
 ]]></programlisting>
         <programlisting language=""><![CDATA[
 -em.contains(author)=false
@@ -205,7 +210,7 @@ try {
     em.remove(author);
     fail("did not reject removal of detached object");
 } catch (IllegalArgumentException ex) {
-    log.debug("caught expected exception:" + ex);
+    logger.debug("caught expected exception:" + ex);
 }
 ]]></programlisting>
         <programlisting language=""><![CDATA[
@@ -219,15 +224,15 @@ try {
         <programlisting language="java"><![CDATA[
 Author author = new Author();
 ...
-log.debug("peristed:" + author);
+logger.debug("peristed: {}", author);
 
-log.debug("em.contains(author)=" + em.contains(author));
+logger.debug("em.contains(author)={}", em.contains(author));
 em.remove(author);
-log.debug("em.contains(author)=" + em.contains(author));
+logger.debug("em.contains(author)={}", em.contains(author));
 
 //entity managers will ignore the removal of a removed entity
 em.remove(author);
-log.debug("em.contains(author)=" + em.contains(author));
+logger.debug("em.contains(author)={}", em.contains(author));
 ]]></programlisting>
         <programlisting language=""><![CDATA[
 -peristed:ejava.examples.daoex.bo.Author@6c5356, id=50, ...

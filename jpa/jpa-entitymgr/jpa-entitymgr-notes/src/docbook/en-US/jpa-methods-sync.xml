@@ -47,13 +47,13 @@ em.getTransaction().commit();
 assertEquals("unexpected count", 1, count);
 
 //object state becomes stale when DB changed out-of-band
-log.debug("author.firstName=" + author.getFirstName());
-assertFalse("unexpected name", author.getFirstName().equals(newName));
+logger.debug("author.firstName={}", author.getFirstName());
+assertNotEquals("unexpected name", newName, author.getFirstName());
 
 //get the cached object back in sync
-log.debug("calling refresh");
+logger.debug("calling refresh");
 em.refresh(author);
-log.debug("author.firstName=" + author.getFirstName());
+logger.debug("author.firstName=" + author.getFirstName());
 assertEquals("unexpected name", newName, author.getFirstName());
 ]]></programlisting>
         
@@ -75,7 +75,7 @@ try {
     em.refresh(author);
     fail("refresh of new entity not detected");
 } catch (IllegalArgumentException ex) {
-    log.debug("caught expected exception:" + ex);
+    logger.debug("caught expected exception:" + ex);
 }
 ]]></programlisting>
         <programlisting language=""><![CDATA[
@@ -92,12 +92,12 @@ em.getTransaction().commit();
 //refreshing a detached entity will get rejected
 Author detached = new Author(author.getId());
 em.refresh(author);
-log.debug("refreshed managed entity");
+logger.debug("refreshed managed entity");
 try {
     em.refresh(detached);
     fail("refresh of detached entity not detected");
 } catch (IllegalArgumentException ex) {
-    log.debug("caught expected exception:" + ex);
+    logger.debug("caught expected exception:" + ex);
 }
 ]]></programlisting>
         <programlisting language=""><![CDATA[

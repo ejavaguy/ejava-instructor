@@ -12,7 +12,7 @@
             <holder>${copyright.holder}</holder>
         </copyright>
         <abstract>
-            <para>This presentation provides and introduction to JPA and coverage of the 
+            <para>This presentation provides an introduction to JPA and coverage of the 
                  methods of the EntityManager.
             </para>
         </abstract>

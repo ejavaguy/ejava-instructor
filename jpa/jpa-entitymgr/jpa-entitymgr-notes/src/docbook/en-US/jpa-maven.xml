@@ -12,10 +12,11 @@ src
 |   |   `-- ejava
 |   |       `-- examples
 |   |           `-- daoex
-|   |               |-- AuthorDAO.java
 |   |               |-- bo
 |   |               |   `-- Author.java
-|   |               |-- DAOException.java
+|   |               |-- dao
+|   |               |   |-- AuthorDAO.java
+|   |               |   `-- DAOException.java
 |   |               `-- jpa
 |   |                   `-- JPAAuthorDAO.java
 |   `-- resources
@@ -30,6 +31,9 @@ src
     |               `-- jpa
     |                   |-- JPAAuthorDAOTest.java
     |                   |-- JPACRUDTest.java
+    |                   |-- JPAExtendedOnlyTest.java
+    |                   |-- JPAMembershipTest.java
+    |                   |-- JPASyncTest.java
     |                   `-- JPATestBase.java
     `-- resources
         |-- hibernate.properties (optional)
@@ -43,29 +47,21 @@ src
         
         <section id="jpa-maven-dependencies-jpa">
             <title>JPA API classes</title>
-            <programlisting language="xml"><![CDATA[
-<dependency>
-    <groupId>org.hibernate.javax.persistence</groupId>
-    <artifactId>hibernate-jpa-2.1-api</artifactId>
-    <version>1.0.0.Final</version>
+            <programlisting language="xml"><![CDATA[<dependency>
+    <groupId>javax.persistence</groupId>
+    <artifactId>javax.persistence-api</artifactId>
+    <version>2.2</version>
     <scope>provided</scope>
-</dependency>
+</dependency>        
 ]]></programlisting>
         </section>
 
         <section id="jpa-maven-dependencies-provider">
             <title>JPA Provider classes</title>
-            <programlisting language="xml"><![CDATA[
-<dependency>
+            <programlisting language="xml"><![CDATA[<dependency>
     <groupId>org.hibernate</groupId>
-    <artifactId>hibernate-entitymanager</artifactId>
-    <version>4.3.4.Final</version>
-    <scope>test</scope>
-</dependency>
-<dependency>
-    <groupId>org.slf4j</groupId>
-    <artifactId>slf4j-log4j12</artifactId>
-    <version>1.6.1</version>
+    <artifactId>hibernate-core</artifactId>
+    <version>5.3.1.Final</version>
     <scope>test</scope>
 </dependency>
 ]]></programlisting>
@@ -73,10 +69,10 @@ src
 
         <section id="jpa-maven-dependencies-database">
             <title>Database</title>
-            <programlisting language="xml"><![CDATA[
-<dependency>
+            <programlisting language="xml"><![CDATA[<dependency>
     <groupId>com.h2database</groupId>
     <artifactId>h2</artifactId>
+    <version>1.4.197</version>
     <scope>test</scope>
 </dependency>
 ]]></programlisting>
@@ -89,8 +85,7 @@ src
 
         <section id="jpa-maven-resources-filtering-pom">
             <title>Turn on Resource Filtering in pom.xml</title>
-            <programlisting language="xml"><![CDATA[
-<build>
+            <programlisting language="xml"><![CDATA[<build>
     <resources>
         <resource>
             <directory>src/main/resources</directory>

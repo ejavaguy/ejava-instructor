@@ -7,8 +7,7 @@
 
     <section id="jpa-membership-contains">
         <title>contains()</title>
-        <programlisting language="java"><![CDATA[
-boolean contains(Object entity);
+        <programlisting language="java"><![CDATA[boolean contains(Object entity);
 ]]></programlisting>
         <itemizedlist spacing="compact">
             <listitem><para>Returns true if object is managed in the persistence context</para></listitem>
@@ -17,8 +16,7 @@ boolean contains(Object entity);
 
     <section id="jpa-membership-clear">
         <title>clear()</title>
-        <programlisting language="java"><![CDATA[
-void clear();
+        <programlisting language="java"><![CDATA[void clear();
 ]]></programlisting>
         <itemizedlist spacing="compact">
             <listitem><para>Clears all entities and queued changes from the persistence context</para></listitem>
@@ -28,16 +26,15 @@ void clear();
 
     <section id="jpa-membership-detach">
         <title>detach()</title>
-        <programlisting language="java"><![CDATA[
-em.persist(author);
+        <programlisting language="java"><![CDATA[em.persist(author);
 
 //callers can detach entity from persistence context
-log.debug("em.contains(author)="+em.contains(author));
-log.debug("detaching author");
+logger.debug("em.contains(author)={}", em.contains(author));
+logger.debug("detaching author");
 em.getTransaction().begin();
 em.flush();
 em.detach(author);
-log.debug("em.contains(author)="+em.contains(author));
+logger.debug("em.contains(author)={}", em.contains(author));
 em.getTransaction().commit();
 
 //changes to detached entities do not change database
@@ -45,10 +42,9 @@ author.setFirstName("foo");
 em.getTransaction().begin();
 em.getTransaction().commit();
 Author author2 = em.find(Author.class, author.getId());
-log.debug("author.firstName=" + author.getFirstName());
-log.debug("author2.firstName=" + author2.getFirstName());
-assertFalse("unexpected name change", 
-        author.getFirstName().equals(author2.getFirstName()));
+logger.debug("author.firstName={}", author.getFirstName());
+logger.debug("author2.firstName={}", author2.getFirstName());
+assertNotEquals("unexpected name change", author.getFirstName(), author2.getFirstName());
 ]]></programlisting>
         <programlisting language=""><![CDATA[
 -em.contains(author)=true
@@ -66,10 +62,10 @@ assertFalse("unexpected name change",
         <programlisting language="java"><![CDATA[
 Author author = new Author();
 
-log.debug("em.contains(author)="+em.contains(author));
-log.debug("detaching author");
+logger.debug("em.contains(author)={}", em.contains(author));
+logger.debug("detaching author");
 em.detach(author);
-log.debug("em.contains(author)="+em.contains(author));
+logger.debug("em.contains(author)={}", em.contains(author));
 ]]></programlisting>
         <programlisting language=""><![CDATA[
 -em.contains(author)=false
@@ -87,10 +83,10 @@ em.getTransaction().commit();
 
 //detaching detached entity will be ignored
 Author detached = new Author(author.getId());
-log.debug("em.contains(author)="+em.contains(detached));
-log.debug("detaching detached author");
+logger.debug("em.contains(author)={}", em.contains(detached));
+logger.debug("detaching detached author");
 em.detach(detached);
-log.debug("em.contains(author)="+em.contains(detached));
+logger.debug("em.contains(author)={}", em.contains(detached));
 ]]></programlisting>
         <programlisting language=""><![CDATA[
 -em.contains(author)=false
