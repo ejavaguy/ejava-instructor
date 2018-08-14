@@ -16,8 +16,8 @@
             <listitem><para>Consolidate management of dependency versions 
                 without adding active dependencies to all inheriting children</para>
                 <programlisting language="xml"><![CDATA[<properties>
-    <junit.version>4.7</junit.version>
-    <log4j.version>1.2.13</log4j.version>
+    <junit.version>4.12</junit.version>
+    <log4j.version>1.2.17</log4j.version>
 </properties>
 
 <dependencyManagement>
@@ -50,11 +50,16 @@
     <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.7</version>
+        <version>4.12</version>
         <scope>test</scope>
     </dependency>
 </dependencies>]]></programlisting>
                     <para>Net result is a consistent version for dependency in effective pom</para>
+                    <tip>
+                        <title>Use IDE or Maven help plugin for effective pom</title>
+                        <programlisting language="xml"><![CDATA[$ mvn help:effective-pom]]></programlisting>
+
+                    </tip>
             </listitem>
             
             <listitem><para>Control artifact versions used in transitive dependencies</para></listitem>
@@ -77,7 +82,8 @@
                 </exclusion>
             </exclusions>
         </dependency>]]></programlisting>
-                    <para>Parent defines exclusions for possible dependency (passive)</para>
+                    <para>Parent defines exclusions for possible dependency (passive)
+                    using <code>dependencyManagement</code></para>
                     
         <programlisting language="xml"><![CDATA[<dependencies>
     <dependency>
@@ -85,7 +91,8 @@
         <artifactId>jboss-as-server</artifactId>
         <classifier>jmx-invoker-adaptor-client</classifier>
     </dependency>]]></programlisting>
-                    <para>Child includes simple dependency declaration (active)</para>
+                    <para>Child includes simple dependency declaration (active)
+                    using <code>dependencies</code></para>
             </listitem>
         </itemizedlist>                   
     </section>
@@ -95,7 +102,11 @@
         <itemizedlist spacing="compact">
             <listitem><para>Consolidate management of plugin versions and
                 default configuration without adding activations to all inheriting children</para>
-            <programlisting language="xml"><![CDATA[<build>
+            <programlisting language="xml"><![CDATA[    <properties>
+        <java.source.version>1.8</java.source.version>
+        <java.target.version>1.8</java.target.version>
+    </properties>            
+    <build>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -114,10 +125,9 @@
                 <para>Parent defines version for compiler plugin and configures for Java 8</para>
                 
         <programlisting language="xml"><![CDATA[<parent>
-    <groupId>ejava</groupId>
-    <artifactId>ejava-root</artifactId>
-    <version>3.0.2012.2-SNAPSHOT</version>
-    <relativePath>..</relativePath>
+    <groupId>info.ejava.examples.javase</groupId>
+    <artifactId>javase</artifactId>
+    <version>5.0.0-SNAPSHOT</version>
 </parent>
 <modelVersion>4.0.0</modelVersion>
 
@@ -176,7 +186,8 @@
         </plugin>
     </plugins>
 </pluginManagement>]]></programlisting>
-                <para>Parent defines details of deployment to JBoss container (passive)</para>
+                <para>Parent defines details of deployment to JBoss container (passive)
+                using <code>dependencyManagement</code></para>
                 
         <programlisting language="xml"><![CDATA[<build>
     <plugins>
@@ -197,7 +208,8 @@
 ...
     </plugins>
 </build>]]></programlisting>
-                    <para>Child declares plugin (active) with configuration extensions specific to child project</para>
+                    <para>Child declares plugin (active) in <code>plugins</code> 
+                    with configuration extensions specific to child project</para>
             </listitem>
         </itemizedlist>                   
     </section>

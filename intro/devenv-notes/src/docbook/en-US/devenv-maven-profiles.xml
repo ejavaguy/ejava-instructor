@@ -20,7 +20,7 @@
                     <listitem><para>...</para></listitem>
                 </itemizedlist>
             </listitem>
-            <listitem><para>Cannot include GAV elements</para></listitem>
+            <listitem><para>Cannot include GAV elements (defining <filename>*this*</filename> project)</para></listitem>
         </itemizedlist>                   
         <programlisting language="xml"><![CDATA[<profile> <!-- defines our default database -->
         <id>h2db</id>
@@ -65,9 +65,9 @@
                 </listitem>
 
                 <listitem>            
-                    <para>Specify an active profile in settings..xml</para>
+                    <para>Specify an active profile in settings.xml</para>
                     <programlisting language=""><![CDATA[<activeProfiles>
-    <activeProfile>jboss7</activeProfile>
+    <activeProfile>wildfly13</activeProfile>
     <activeProfile>h2db</activeProfile>
 </activeProfiles>]]></programlisting>                
                 </listitem>
@@ -112,7 +112,7 @@
                 <para>The h2db profile will activate when -Dh2db is not specified</para>
                 </listitem>
 
-                <listitem><para>Property not a spefici value</para>
+                <listitem><para>Property not a specific value</para>
             <programlisting language="xml"><![CDATA[<profile>
     <id>h2db</id>
     <activation>

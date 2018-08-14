@@ -20,53 +20,74 @@
         <title>POM Inheritance</title>
         <itemizedlist spacing="compact">
             <listitem><para>Common properties can be defined in parent pom</para>
-        <programlisting language=""><![CDATA[<project>
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>ejava</groupId>
-    <artifactId>ejava-root</artifactId>
-    <version>3.0.2012.2-SNAPSHOT</version>
+        <programlisting language="xml"><![CDATA[<project>
+    <groupId>info.ejava.examples</groupId>
+    <artifactId>examples-root</artifactId>
+    <version>5.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Enterprise Java</name>
+    <name>Student Root</name>
     <scm>
-        <url>https://jcstaff@github.com/jcstaff/ejava-javaee/tree/master</url>
-        <connection>scm:git:git@github.com:jcstaff/ejava-javaee.git</connection>
-        <developerConnection>scm:git:git@github.com:jcstaff/ejava-javaee.git</developerConnection>
+        <url>https://github.com/ejavaguy/ejava-student/tree/master</url>
+        <connection>scm:git:git@github.com:ejavaguy/ejava-student.git</connection>
+        <developerConnection>scm:git:git@github-ejavaguy:ejavaguy/ejava-student.git</developerConnection>
+        <tag>HEAD</tag>
     </scm>
     ...]]></programlisting>
             <para>In the above example -- the parent pom is defining the CM repository for all sub-modules</para>
             </listitem>
 
             <listitem><para>Child projects can inherit from a parent pom</para>
-        <programlisting language=""><![CDATA[<project>
+        <programlisting language="xml"><![CDATA[<project>
     <parent>
-        <groupId>ejava</groupId>
-        <artifactId>ejava-root</artifactId>
-        <version>3.0.2012.2-SNAPSHOT</version>
-        <relativePath>..</relativePath>
+        <groupId>info.ejava.examples</groupId>
+        <artifactId>examples-root</artifactId>
+        <version>5.0.0-SNAPSHOT</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
-            
-    <groupId>ejava.javaee.intro</groupId>
-    <artifactId>javase5Enhancements</artifactId>
-            
-    <name>Java SE 5 Enhancements</name>
+
+    <groupId>info.ejava.examples.javase</groupId>
+    <artifactId>javase</artifactId>
+    <packaging>pom</packaging>
+
+    <name>JavaSE</name>
     ...]]></programlisting>
-            <para>In the above example, the javase5Enhancements project inherits the CM configuration from the parent</para>
-            <para>If you include a relativePath to the parent, then changes
+            <para>In the above example, the javase project inherits the CM configuration from the parent</para>
+            <para>If you include a relativePath to the parent -- changes
                 to parents in your build environment will be immediately reused
                 without having to install them into the localRepository.</para>
             </listitem>
         </itemizedlist>
+        <tip>
+            <title>Parent source pom is assumed to be in parent directory</title>
+            <para>Use the relativePath element to specify an alternate </para>
+            <itemizedlist spacing="compact">
+              <listitem><para>Use relativePath element to specify a relative 
+              path to the parent pom
+              </para>
+              <programlisting language="xml"><![CDATA[<relativePath>build/dependencies/pom.xml</relativePath>]]></programlisting>
+              </listitem>
+              
+              <listitem><para>Use an empty relativePath to specify the pom in the 
+              parent directory is not the relative location of this project's pom
+              </para>
+              <programlisting language="xml"><![CDATA[<relativePath/>]]></programlisting>
+              </listitem>
+              
+              <listitem><para>Specifying a relativePath to ".." is redundant information
+              since that is the default value.
+              </para>
+              </listitem>
+        </itemizedlist>
+        </tip>
         
         <warning>
-            <title>Avoid defining thick parents</title>
+            <title>Avoid declaring thick parents</title>
             <para>Be careful not to attempt to blindly merge all project
-                definition into a single parent pom. This can bloat the inheriting 
-                children with unwanted dependency, cause slower builds, and
-                can even break a build. When in doubt -- push active definitions
+                declarations into a single parent pom. This can bloat the inheriting 
+                children with unwanted dependencies and actions, cause slower builds, and
+                can even break a build. When in doubt -- push active declarations
                 (like dependencies and plugin declarations) to the leaf modules
-                and leave only passive declarations (like properties, 
+                and leave only passive definitions (like properties, 
                 dependencyManagement, and pluginManagement) in the parent.
             </para>
         </warning>                   
@@ -80,19 +101,17 @@
                 named after their artifactId</para></listitem>
         </itemizedlist>                   
         <programlisting language="xml"><![CDATA[<project>
-   <parent>
-        <groupId>ejava</groupId>
-        <artifactId>ejava-root</artifactId>
-        <version>3.0.2012.2-SNAPSHOT</version>
-        <relativePath>..</relativePath>
+    <parent>
+        <groupId>info.ejava.examples.ejb</groupId>
+        <artifactId>ejb</artifactId>
+        <version>5.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-        
-    <groupId>ejava.javaee.ejb</groupId>
+
     <artifactId>ejbsessionBank</artifactId>
     <packaging>pom</packaging>
-    
-    <name>Session Bean</name>
+
+    <name>EJB::Session EJB Bank Example</name>
     <description>
         This project is the root project for the core session bean example.
     </description>

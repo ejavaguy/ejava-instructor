@@ -19,8 +19,7 @@
     |-- classes
     |-- ex1-1.0-SNAPSHOT.jar
     |-- surefire-reports
-    `-- test-classes
-        ]]></programlisting>
+    `-- test-classes]]></programlisting>
         <variablelist spacing="compact">
             <varlistentry>
                 <term><filename>src</filename></term>
@@ -435,6 +434,17 @@ java.lang.AssertionError: app didn't return 0
                 </para>
                 <programlisting language="xml"><![CDATA[<offline>false</offline>]]></programlisting>
             </tip>
+            <tip>
+                <title>Use <code>dependency:go-offline</code> prior to network/repo outage</title>
+                <para>Maven will lazily download required artifacts on-demand as different
+                plugins are executed. If you know you will be separated from the network or
+                a key repository will have an upcoming outage -- you can prepare your local 
+                environment by having Maven eagerly resolve and download all dependencies
+                using the <code>dependency:go-offline</code> goal.
+                </para>
+<programlisting language="xml"><![CDATA[$ mvn dependency:go-offline
+[INFO] Scanning for projects...]]></programlisting>
+            </tip>
         </section>
 
         <section id="devenv-mavenbasics-props">
@@ -446,7 +456,7 @@ java.lang.AssertionError: app didn't return 0
             </itemizedlist>                   
             <programlisting language="xml"><![CDATA[<properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
+    <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
     <java.source.version>1.8</java.source.version>
     <java.target.version>1.8</java.target.version>
 </properties>]]></programlisting>
@@ -461,20 +471,20 @@ java.lang.AssertionError: app didn't return 0
                 <listitem><para>Modules depend on artifacts from other modules</para></listitem>
             </itemizedlist>                   
             <programlisting language="xml"><![CDATA[<dependencies>
-    <dependency>
-        <groupId>commons-logging</groupId>
-        <artifactId>commons-logging</artifactId>
-        <version>1.1.1</version>
-        <type>jar</type>
-        <scope>compile</scope>
-    </dependency>
-    <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>4.10</version>
-        <scope>test</scope>
-    </dependency>
-....
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.25</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+...
 </dependencies>]]></programlisting>
             <variablelist spacing="compact">
                 <varlistentry>
@@ -527,7 +537,7 @@ java.lang.AssertionError: app didn't return 0
                         <itemizedlist spacing="compact">
                             <listitem><para>classifier=tests - java archive containing test artifacts</para></listitem>
                             <listitem><para>classifier=sources - java archive containing module source code</para></listitem>
-                            <listitem><para>type=... - custom classifiers</para></listitem>
+                            <listitem><para>classifier=... - custom classifiers</para></listitem>
                         </itemizedlist>
                         <programlisting language=""><![CDATA[`-- target
 ...
@@ -545,6 +555,14 @@ java.lang.AssertionError: app didn't return 0
             <itemizedlist spacing="compact">
                 <listitem><para>Provides specific instructions for build</para></listitem>
                 <listitem><para>Usually does the right thing by default when possible</para></listitem>
+                <listitem><para>Default rules based on pom packaging type</para>
+                <programlisting language="xml"><![CDATA[    <groupId>myorg.myproject</groupId>
+    <artifactId>ex1</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>  <<== determines default build
+]]></programlisting>
+
+                </listitem>
             </itemizedlist>                   
     
             <section id="devenv-mavenbasics-plugins">
@@ -557,12 +575,12 @@ java.lang.AssertionError: app didn't return 0
                     <listitem><para>Plugins may have default phases for the goals to be executed</para></listitem>
                     <listitem><para>Plugins can be configured</para></listitem>
                 </itemizedlist>                   
-                <programlisting language=""><![CDATA[<build>
+                <programlisting language="xml"><![CDATA[<build>
     <plugins>
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-compiler-plugin</artifactId>
-            <version>3.1</version>
+            <version>3.7.0</version>
             <configuration>
                 <source>${java.source.version}</source>
                 <target>${java.target.version}</target>
@@ -572,7 +590,7 @@ java.lang.AssertionError: app didn't return 0
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.17</version>
+            <version>2.22</version>
             <configuration>
                 <argLine>${surefire.argLine}</argLine>
             </configuration>
