@@ -17,7 +17,7 @@
     
     <properties>
        <doc.base>jpa-entitymgr-ex-book</doc.base>
-       <content.version>v2015-10-12</content.version>
+       <content.version>v2018-08-14</content.version>
     </properties>
 
     <build>

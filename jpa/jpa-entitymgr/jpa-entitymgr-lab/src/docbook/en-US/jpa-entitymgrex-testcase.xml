@@ -20,7 +20,8 @@
             Create a JUnit test case to hold your test code. The following
             is an example of a 4.x JUnit test case that uses @Annotations.
             </para>
-<programlisting language="java"><![CDATA[package myorg.entitymgrex;
+<programlisting language="java"><![CDATA[# src/test/java/myorg/entitymgrex/EntityMgrTest.java
+package myorg.entitymgrex;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -31,8 +32,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.*;
 import org.junit.After;
@@ -41,13 +42,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-
 public class EntityMgrTest {
-    private static Log log = LogFactory.getLog(EntityMgrTest.class);
+    private static final Logger log = LoggerFactory.getLogger(EntityMgrTest.class);
 
     @Test
     public void testTemplate() {
-        log.info("testTemplate");
+        logger.info("testTemplate");
     }
 }]]></programlisting>
         </listitem>
@@ -88,18 +88,15 @@ public class EntityMgrTest {
             </para>
 <programlisting language="java"><![CDATA[    @After
     public void tearDown() throws Exception {
-        try {
-            log.debug("tearDown() started, em=" + em);
+        if (em!=null) {
+            logger.debug("tearDown() started, em={}", em);
             em.getTransaction().begin();
-            em.flush();            
-            //logAutos();            
-            em.getTransaction().commit();            
+            em.flush();
+            //logAutos();
+            em.getTransaction().commit();
             em.close();
-            log.debug("tearDown() complete, em=" + em);
-        }
-        catch (Exception ex) {
-            log.fatal("tearDown failed", ex);
-            throw ex;
+            logger.debug("tearDown() complete, em={}", em);
+            em=null;
         }
      }]]></programlisting>
         </listitem>
@@ -111,8 +108,11 @@ public class EntityMgrTest {
             </para>
 <programlisting language="java"><![CDATA[    @AfterClass
     public static void tearDownClass() {
-        log.debug("closing entity manager factory");
-        emf.close();
+        if (emf!=null) {
+            logger.debug("closing entity manager factory");
+            emf.close();
+            emf=null;
+        }
     }]]></programlisting>
         </listitem>
         
@@ -134,8 +134,8 @@ public class EntityMgrTest {
     public void logAutos() {
         Query query = em.createQuery("select a from Auto as a");
         for (Object o: query.getResultList()) {
-            log.info("EM_AUTO:" + o);
-        }        
+            logger.info("EM_AUTO: {}", o);
+        }
     }]]></programlisting>
         </listitem>
         
@@ -156,7 +156,7 @@ public class EntityMgrTest {
         Query query = em.createNativeQuery("delete from EM_AUTO");
         int rows = query.executeUpdate();
         em.getTransaction().commit();
-        log.info("removed " + rows + " rows");
+        logger.info("removed {} rows", rows);
     }]]></programlisting>
         </listitem>
         
@@ -210,7 +210,7 @@ public class EntityMgrTest {
                     has to say, it is quite noisy. Consider changing to root priority to
                     fatal so that a majority of the log statements are yours.
                 </para>
-            </note>
+            </note>            
         </listitem>
         
         <listitem><para>
@@ -246,6 +246,19 @@ Results :
 Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 ...
 [INFO] BUILD SUCCESS]]></programlisting>
+
+        <tip>
+            <title>Raise org.hibernate verbosity to help debug errors</title>
+            <para>If you tests failed and there is no key information printed, try
+            raising the verbosity for all org.hibernate classes to DEBUG.
+            </para>
+            <programlisting language=""><![CDATA[# src/test/resources/log4j.xml
+<logger name="org.hibernate">
+   <level value="trace"/>
+   <appender-ref ref="logfile"/>
+</logger>]]></programlisting>
+
+        </tip>
         </listitem>
         
         <listitem><para>

@@ -38,8 +38,7 @@
             </listitem>
 
             <listitem><para>Add property definitions for versions of dependencies and plugins we will be using.</para>
- <programlisting language="xml"><![CDATA[
-    <properties>
+ <programlisting language="xml"><![CDATA[    <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.source.version>1.8</java.source.version>
         <java.target.version>1.8</java.target.version>
@@ -47,23 +46,18 @@
         <jboss.host>localhost</jboss.host>
         <db.host>${jboss.host}</db.host>
 
-        <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
-        <maven-jar-plugin.version>2.6</maven-jar-plugin.version>
-        <maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
-        <sql-maven-plugin.version>1.5</sql-maven-plugin.version>        
+        <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
+        <maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>
+        <maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
+        <sql-maven-plugin.version>1.5</sql-maven-plugin.version>
 
-        <commons-logging.version>1.1.1</commons-logging.version>
-        <h2db.version>1.4.188</h2db.version>
-        <hibernate-jpa-2.1-api.version>1.0.0.Final</hibernate-jpa-2.1-api.version>
-        <hibernate-entitymanager.version>4.3.4.Final</hibernate-entitymanager.version>
-        <hibernate3-maven-plugin.version>3.0</hibernate3-maven-plugin.version>
-        <hibernate3.version>3.6.10.Final</hibernate3.version>
+        <h2db.version>1.4.197</h2db.version>
+        <javax.persistence-api.version>2.2</javax.persistence-api.version>
+        <hibernate-entitymanager.version>5.3.1.Final</hibernate-entitymanager.version>
         <junit.version>4.12</junit.version>
         <log4j.version>1.2.17</log4j.version>
-        <slf4j.version>1.7.12</slf4j.version>
-        <wagon-ssh-external.version>2.9</wagon-ssh-external.version>
-        <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
-        <maven-site-plugin.version>3.4</maven-site-plugin.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <ejava.version>5.0.0-SNAPSHOT</ejava.version>
     </properties>
 ]]></programlisting>
             </listitem>
@@ -75,27 +69,17 @@
                     just define the version and possible exclusions for artifacts so all 
                     child/leaf projects stay consistent.
                 </para>
- <programlisting language="xml"><![CDATA[ <dependencyManagement>
+ <programlisting language="xml"><![CDATA[    <dependencyManagement>
         <dependencies>
             <dependency>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
-              <version>${commons-logging.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.javax.persistence</groupId>
-                <artifactId>hibernate-jpa-2.1-api</artifactId>
-                <version>${hibernate-jpa-2.1-api.version}</version>
+                <groupId>javax.persistence</groupId>
+                <artifactId>javax.persistence-api</artifactId>
+                <version>${javax.persistence-api.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-entitymanager</artifactId>
+                <artifactId>hibernate-core</artifactId>
                 <version>${hibernate-entitymanager.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -103,10 +87,20 @@
                 <version>${junit.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
               <groupId>log4j</groupId>
               <artifactId>log4j</artifactId>
               <version>${log4j.version}</version>
-            </dependency>    
+            </dependency>
         </dependencies>
     </dependencyManagement> ]]></programlisting>
 
@@ -169,14 +163,14 @@
 
  <programlisting language="xml"><![CDATA[ <dependencies>
         <dependency>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-          <scope>compile</scope>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>provided</scope>
         </dependency>
-    
+
         <dependency>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.1-api</artifactId>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
             <scope>provided</scope>
         </dependency>
         ...
@@ -209,9 +203,9 @@
                         </para></listitem>
                 </itemizedlist>
 
- <programlisting language="xml"><![CDATA[ <dependency>
+ <programlisting language="xml"><![CDATA[        <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
+            <artifactId>hibernate-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -226,9 +220,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <scope>test</scope>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+          <scope>test</scope>
         </dependency>    ]]></programlisting>
             </listitem>
 
@@ -313,9 +307,7 @@
                     </para>
                 </note>
 
- <programlisting language="xml"><![CDATA[ <build>
-        <plugins>
-            <plugin>
+ <programlisting language="xml"><![CDATA[            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
@@ -324,9 +316,8 @@
                         <name2>value2</name2>
                     </systemPropertyVariables>
                 </configuration>
-            </plugin>            
-        </plugins>    
-    </build> ]]></programlisting>
+            </plugin>
+]]></programlisting>
             </listitem>
 
 
@@ -349,7 +340,7 @@
             <id>h2srv</id>
             <properties>
                   <jdbc.driver>org.h2.Driver</jdbc.driver>
-                  <jdbc.url>jdbc:h2:tcp://${db.host}:9092/h2db/ejava</jdbc.url>
+                  <jdbc.url>jdbc:h2:tcp://${db.host}:9092/./h2db/ejava</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
                   <jdbc.password/>
                   <hibernate.dialect>org.hibernate.dialect.H2Dialect</hibernate.dialect>

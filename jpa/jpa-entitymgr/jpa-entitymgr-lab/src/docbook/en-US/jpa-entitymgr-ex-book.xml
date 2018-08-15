@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
     "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
-<book id="jpa-entitymgr-ex">
+<book id="jpa-entitymgr-ex" xmlns:xi="http://www.w3.org/2001/XInclude" >
     <bookinfo>
         <title>Java Persistence API: Entity Manager Exercise</title>
         <subtitle>An Introduction to JPA and JPA/Maven Modules</subtitle>
@@ -66,14 +66,14 @@
 
     <toc/>
 
-    <xi:include href="jpa-entitymgrex-dbsetup.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="jpa-entitymgrex-pom.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="jpa-entitymgrex-dbschema.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="jpa-entitymgrex-sqltune.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="jpa-entitymgrex-pu.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="jpa-entitymgrex-testcase.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="jpa-entitymgrex-eclipse.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="jpa-entitymgrex-crud.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="jpa-entitymgrex-dbschemagen.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="jpa-entitymgrex-parent.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entitymgrex-dbsetup.xml"/>
+    <xi:include href="jpa-entitymgrex-pom.xml"/>
+    <xi:include href="jpa-entitymgrex-dbschema.xml"/>
+    <xi:include href="jpa-entitymgrex-sqltune.xml"/>
+    <xi:include href="jpa-entitymgrex-pu.xml"/>
+    <xi:include href="jpa-entitymgrex-testcase.xml"/>
+    <xi:include href="jpa-entitymgrex-eclipse.xml"/>
+    <xi:include href="jpa-entitymgrex-crud.xml"/>
+    <xi:include href="jpa-entitymgrex-dbschemagen.xml"/>
+    <xi:include href="jpa-entitymgrex-parent.xml"/>
 </book>

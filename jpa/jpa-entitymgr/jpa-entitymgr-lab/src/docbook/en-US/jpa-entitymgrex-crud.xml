@@ -25,16 +25,16 @@
             </para>
 <programlisting language="java"><![CDATA[    @Test
     public void testCreate() {
-        log.info("testCreate");
-        
+        logger.info("testCreate");
+
         Auto car = new Auto();
         car.setMake("Chrysler");
         car.setModel("Gold Duster");
         car.setColor("Gold");
         car.setMileage(60*1000);
-        
-        log.info("creating auto:" + car);                        
-        em.persist(car);        
+
+        logger.info("creating auto: {}", car);
+        em.persist(car);
     }]]></programlisting>
 <programlisting language=""><![CDATA[ -testCreate
  -creating auto:myorg.entitymgrex.Auto@140984b, id=0, make=Chrysler, model=Gold Duster, color=Gold, mileage=60000
@@ -49,15 +49,15 @@
             </para>
 <programlisting language="java"><![CDATA[    @Test
     public void testMultiCreate() {
-        log.info("testMultiCreate");
+        logger.info("testMultiCreate");
         for(int i=0; i<5; i++) {
             Auto car = new Auto();
             car.setMake("Plymouth " + i);
             car.setModel("Grand Prix");
             car.setColor("Green");
-            car.setMileage(80*1000);            
-            log.info("creating auto:" + car);                        
-            em.persist(car);        
+            car.setMileage(80*1000);
+            logger.info("creating auto: {}", car);
+            em.persist(car);
         }
     }]]></programlisting>
 <programlisting language=""><![CDATA[ -testMultiCreate
@@ -80,24 +80,24 @@
             </para>
 <programlisting language="java"><![CDATA[    @Test
     public void testFind() {
-        log.info("testFind");
-        
+        logger.info("testFind");
+
         Auto car = new Auto();
         car.setMake("Ford");
         car.setModel("Bronco II");
         car.setColor("Red");
         car.setMileage(0*1000);
-        log.info("creating auto:" + car);                        
+        logger.info("creating auto: {}", car);
         em.persist(car);
-        
-        //we need to associate the em with a transaction to get a 
+
+        //we need to associate the em with a transaction to get a
         //primary key generated and assigned to the auto
         em.getTransaction().begin();
         em.getTransaction().commit();
-        
+
         Auto car2 = em.find(Auto.class, car.getId());
         assertNotNull("car not found:" + car.getId(), car2);
-        log.info("found car:" + car2);
+        logger.info("found car: {}", car2);
     }]]></programlisting>
 <programlisting language=""><![CDATA[ -testFind
  -creating auto:myorg.entitymgrex.Auto@aae86e, id=0, make=Ford, model=Bronco II, color=Red, mileage=0
@@ -112,24 +112,24 @@
             </para>
 <programlisting language="java"><![CDATA[    @Test
     public void testGetReference() {
-        log.info("testGetReference");
-        
+        logger.info("testGetReference");
+
         Auto car = new Auto();
         car.setMake("Ford");
         car.setModel("Escort");
         car.setColor("Red");
         car.setMileage(0*1000);
-        log.info("creating auto:" + car);                        
+        logger.info("creating auto: {}", car);
         em.persist(car);
-        
-        //we need to associate the em with a transaction to get a 
+
+        //we need to associate the em with a transaction to get a
         //primary key generated and assigned to the auto
         em.getTransaction().begin();
         em.getTransaction().commit();
-        
+
         Auto car2 = em.getReference(Auto.class, car.getId());
         assertNotNull("car not found:" + car.getId(), car2);
-        log.info("found car:" + car2);        
+        logger.info("found car: {}", car2);
     }]]></programlisting>
 <programlisting language=""><![CDATA[ -testGetReference
  -creating auto:myorg.entitymgrex.Auto@608760, id=0, make=Ford, model=Escort, color=Red, mileage=0
@@ -144,42 +144,42 @@
             </para>
 <programlisting language="java"><![CDATA[    @Test
     public void testUpdate() {
-        log.info("testUpdate");
-        
+        logger.info("testUpdate");
+
         Auto car = new Auto();
         car.setMake("Pontiac");
         car.setModel("Gran Am");
         car.setColor("Red");
         car.setMileage(0*1000);
-        log.info("creating auto:" + car);                        
+        logger.info("creating auto: {}", car);
         em.persist(car);
-        
-        //we need to associate the em with a transaction to get a 
+
+        //we need to associate the em with a transaction to get a
         //primary key generated and assigned to the auto
         em.getTransaction().begin();
         em.getTransaction().commit();
-        
+
         for(int mileage=car.getMileage(); mileage<(100*1000); mileage+=20000) {
             //here's where the update is done
             car.setMileage(mileage);
-            
-            //commit the update to the database for query 
+
+            //commit the update to the database for query
             em.getTransaction().begin();
             em.getTransaction().commit();
-            
+
             //inspect database for value
             int value = getMileage(car.getId());
             assertTrue("unexpected mileage:" + value, value == mileage);
-            log.info("found mileage:" + value);        
+            logger.info("found mileage: {}", value);
         }
-        
+
     }
 
     private int getMileage(long id) {
-        Query query = 
+        Query query =
             em.createQuery("select a.mileage from Auto as a where a.id=:pk");
         query.setParameter("pk", id);
-        return (Integer)query.getSingleResult();        
+        return (Integer)query.getSingleResult();
     }]]></programlisting>
 <programlisting language=""><![CDATA[ -testUpdate
  -creating auto:myorg.entitymgrex.Auto@6a3960, id=0, make=Pontiac, model=Gran Am, color=Red, mileage=0
@@ -200,43 +200,43 @@
             </para>
 <programlisting language="java"><![CDATA[    @Test
     public void testMerge() throws Exception {
-        log.info("testMerge");
-        
+        logger.info("testMerge");
+
         Auto car = new Auto();
         car.setMake("Chrystler");
         car.setModel("Concord");
         car.setColor("Red");
         car.setMileage(0*1000);
-        log.info("creating auto:" + car);                        
+        logger.info("creating auto: {}", car);
         car = em.merge(car); //using merge to persist new
-        
-        //we need to associate the em with a transaction to get a 
+
+        //we need to associate the em with a transaction to get a
         //primary key generated and assigned to the auto
         em.getTransaction().begin();
         em.getTransaction().commit();
-        
+
         for(int mileage=(10*1000); mileage<(100*1000); mileage+=20000) {
             //simulate sending to remote system for update
             Auto car2 = updateMileage(car, mileage);
-            
+
             //verify the object is not being managed by the EM
             assertFalse("object was managed", em.contains(car2));
             assertTrue("object wasn't managed", em.contains(car));
-            assertTrue("mileage was same", 
+            assertTrue("mileage was same",
                     car.getMileage() != car2.getMileage());
-            
-            //commit the update to the database for query 
+
+            //commit the update to the database for query
             em.merge(car2);
-            assertTrue("car1 not merged:" + car.getMileage(), 
+            assertTrue("car1 not merged:" + car.getMileage(),
                     car.getMileage() == mileage);
             em.getTransaction().begin();
             em.getTransaction().commit();
-            
+
             //inspect database for value
             int value = getMileage(car.getId());
             assertTrue("unexpected mileage:" + value, value == mileage);
-            log.info("found mileage:" + value);        
-        }        
+            logger.info("found mileage:" + value);
+        }
     }
     
     private Auto updateMileage(Auto car, int mileage) throws Exception {
@@ -245,17 +245,17 @@
         ObjectOutputStream oos = new ObjectOutputStream(bos);
         oos.writeObject(car);
         oos.close();
-        
+
         //simulate receiving an update to the object from remote system
-        ByteArrayInputStream bis = 
+        ByteArrayInputStream bis =
             new ByteArrayInputStream(bos.toByteArray());
         ObjectInputStream ois = new ObjectInputStream(bis);
         Auto car2 = (Auto)ois.readObject();
         ois.close();
-        
-        //here's what they would have changed in remote process 
+
+        //here's what they would have changed in remote process
         car2.setMileage(mileage);
-        
+
         return car2;
     }]]></programlisting>
 <programlisting language=""><![CDATA[ -testMerge
@@ -276,33 +276,33 @@
             </para>
 <programlisting language="java"><![CDATA[    @Test
     public void testRemove() {
-        log.info("testRemove");
-        
+        logger.info("testRemove");
+
         Auto car = new Auto();
         car.setMake("Jeep");
         car.setModel("Cherokee");
         car.setColor("Green");
         car.setMileage(30*1000);
-        log.info("creating auto:" + car);                        
+        logger.info("creating auto: {}", car);
         em.persist(car);
 
-        //we need to associate the em with a transaction to get a 
+        //we need to associate the em with a transaction to get a
         //primary key generated and assigned to the auto
         em.getTransaction().begin();
         em.getTransaction().commit();
-        
+
         Auto car2 = em.find(Auto.class, car.getId());
         assertNotNull("car not found:" + car.getId(), car2);
-        log.info("found car:" + car2);
-        
+        logger.info("found car: {}", car2);
+
         //now remove the car
-        log.info("removing car:" + car);
+        logger.info("removing car: {}", car);
         em.remove(car);
-        //we need to associate the em with a transaction to  
+        //we need to associate the em with a transaction to
         //physically remove from database
         em.getTransaction().begin();
         em.getTransaction().commit();
-        
+
         Auto car3 = em.find(Auto.class, car.getId());
         assertNull("car found", car3);
     }]]></programlisting>

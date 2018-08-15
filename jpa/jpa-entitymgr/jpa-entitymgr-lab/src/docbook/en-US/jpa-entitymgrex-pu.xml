@@ -34,7 +34,8 @@
             Create a (Plain Old Java Object (POJO)) class to represent an
             automobile. Use class annotations to provide the following:
             </para>
-<programlisting language="java"><![CDATA[package myorg.entitymgrex;
+<programlisting language="java"><![CDATA[# src/main/java/myorg/entitymgrex/Auto.java
+package myorg.entitymgrex;
 
 import java.io.Serializable;
 import javax.persistence.Column;
@@ -129,7 +130,7 @@ public class Auto implements Serializable {
                     </para></listitem>
                 <listitem><para>
                     provider: specify that this persistence unit is defined for 
-                    the org.hibernate.ejb.HibernatePersistence provider.
+                    the org.hibernate.jpa.HibernatePersistenceProvider provider.
                     </para></listitem>
                 <listitem><para>
                     define provider-specific properties that tell the provider how to 
@@ -148,13 +149,14 @@ public class Auto implements Serializable {
                 </para>
             </note>
 
-<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<programlisting language="xml"><![CDATA[# src/main/resources/META-INF/persistence.xml
+<?xml version="1.0" encoding="UTF-8"?>
 <persistence xmlns="http://java.sun.com/xml/ns/persistence"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" version="2.0">
 
     <persistence-unit name="entityMgrEx">
-        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
         <properties>
            <!-- defined in src/test/resources/hibernate.properties -->
@@ -186,16 +188,20 @@ public class Auto implements Serializable {
                 </para></listitem>
             </itemizedlist>
 
-<programlisting language=""><![CDATA[hibernate.dialect=${hibernate.dialect}
+<programlisting language=""><![CDATA[# src/test/resources/hibernate.properties
 hibernate.connection.url=${jdbc.url}
 hibernate.connection.driver_class=${jdbc.driver}
-hibernate.connection.password=${jdbc.password}
 hibernate.connection.username=${jdbc.user}
+hibernate.connection.password=${jdbc.password}
+
+hibernate.dialect=${hibernate.dialect}
 #hibernate.hbm2ddl.auto=create
-#hibernate.hbm2ddl.import_files=/ddl/emauto-tuningdrop.ddl,/ddl/emauto-tuning.ddl 
+#javax.persistence.schema-generation.database.action=drop-and-create
+hibernate.hbm2ddl.import_files=/ddl/emauto-tuningdrop.ddl,/ddl/emauto-tuning.ddl
 hibernate.show_sql=true
 hibernate.format_sql=true
-#hibernate.jdbc.batch_size=0]]></programlisting>
+#hibernate.jdbc.batch_size=0
+]]></programlisting>
         </listitem>
 
         <listitem><para>
@@ -266,7 +272,7 @@ hibernate.format_sql=true
 target/test-classes/hibernate.properties
 ::::::::::::::
 hibernate.dialect=org.hibernate.dialect.H2Dialect
-hibernate.connection.url=jdbc:h2:tcp://127.0.0.1:9092/h2db/ejava
+hibernate.connection.url=jdbc:h2:tcp://127.0.0.1:9092/./h2db/ejava
 hibernate.connection.driver_class=org.h2.Driver
 hibernate.connection.password=
 hibernate.connection.username=sa

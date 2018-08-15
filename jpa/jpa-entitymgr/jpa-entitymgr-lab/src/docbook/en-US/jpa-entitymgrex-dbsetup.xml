@@ -25,7 +25,10 @@
     the database and the JVM running the unit tests just queries the
     information as they would do in production. We will use this as an option
     to server-based mode since we are using separate plugins to initialize the
-    database.</para>
+    database. We also want to treat our database schema as a first-class artifact
+    for our application -- and not rely on test capabilities to instantiate the
+    database for each test.    
+    </para>
     <para>The server-based option requires a separate process activated but
     allows concurrent connections from database user interface while the JVM
     is under test. This chapter will focus on the setup required to run the 
@@ -51,15 +54,21 @@ java -jar h2.jar]]></programlisting>
 
         <listitem><para>Connect to the database server from the web-based UI.</para>
 <programlisting language="java"><![CDATA[Driver Class: org.h2.Driver
-JDBC URL: jdbc:h2:tcp://localhost:9092/h2db/ejava</jdbc.url>
+JDBC URL: jdbc:h2:tcp://localhost:9092/./h2db/ejava</jdbc.url>
 User Name: sa
 Password: ]]></programlisting>
+
+        <para>Look in the directory where you started the server. After connecting with a 
+        relative URL using the UI, there should be a new "h2db" directory with one or 
+        more files called "ejava*". You want to make sure you use the same URL in the 
+        UI and application so you are seeing the same instance of the database.            
+        </para>
 
         <para>If you use file-based mode, the connection information would look like the following
             where "./h2db/ejava" must point to the exact same path your JVM under test uses. This
             can be a relative or fully-qualified path.</para>
 <programlisting language="java"><![CDATA[Driver Class: org.h2.Driver
-JDBC URL: jdbc:h2:./h2db/ejava
+JDBC URL: jdbc:h2:./target/h2db/ejava
 User Name: sa
 Password: ]]></programlisting>
         </listitem>

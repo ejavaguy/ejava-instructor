@@ -16,11 +16,11 @@
         each year and Eclipse will update your pom.xml with the necessary configuration
         when it is needed. 
     </para>
-    <para>
-        In this chapter we will practively tell Eclipse to ignore the sql-maven-plugin
-        but feel free to wait until Eclipse complains (Who knows, there may be an update
-        that makes this step unecessary).
-    </para>
+
+    <itemizedlist spacing="compact">
+        <listitem><para>Import the project into Eclipse using "Existing Maven Projects" option.
+        You should see an error for the maven-sql-plugin. Ignore the error and continue with 
+        the import. We will address the error in the next step.</para></listitem>
         
         <listitem><para>Add the following profile to your pom.xml. The profile is 
             activated when the m2e.version property is defined -- which is a property
@@ -45,20 +45,6 @@
                       <configuration>
                         <lifecycleMappingMetadata>
                           <pluginExecutions>
-                            
-                            <pluginExecution>
-                              <pluginExecutionFilter>
-                                <groupId>org.codehaus.mojo</groupId>
-                                <artifactId>hibernate3-maven-plugin</artifactId>
-                                <versionRange>[3.0,)</versionRange>
-                                <goals>
-                                  <goal>run</goal>
-                                </goals>
-                              </pluginExecutionFilter>
-                              <action>
-                                <ignore/>
-                              </action>
-                            </pluginExecution>
 
                             <pluginExecution>
                               <pluginExecutionFilter>
@@ -85,9 +71,13 @@
         </profile>
     ...
     </profiles>]]></programlisting>
+        <para>The red error marks should have cleared from the pom.xml editor. The above
+        provide is activated when the "m2e.version" is present within Eclipse and tells
+        Eclipse to ignore the sql-maven-plugin.</para>
         </listitem>
+    </itemizedlist>
 
-        <listitem><para>Import the project into Eclipse using "Existing Maven Projects" option.</para></listitem>
+
         
     <section id="jpa-entitymgrex-eclipse-summary">
        <title>Summary</title>
