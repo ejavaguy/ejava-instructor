@@ -107,8 +107,7 @@
             plugin and fill in the module-specifics. We could optionally add
             it to the database profiles.
             </para>
-<programlisting language="xml"><![CDATA[
-        ...
+<programlisting language="xml"><![CDATA[        ...
         </pluginManagement>
 
         <plugins>
