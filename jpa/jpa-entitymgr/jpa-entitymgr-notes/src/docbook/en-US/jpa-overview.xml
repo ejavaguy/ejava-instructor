@@ -294,7 +294,6 @@ public Author createAuthor(...) {
 
             <!-- hibernate-specific properties -->
             <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
-            <property name="hibernate.hbm2ddl.auto" value="create"/>
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
             <!-- set to 0 to improve error messages when needed
@@ -322,10 +321,10 @@ public Author createAuthor(...) {
         <section id="jpa-overview-persistencexml-server">
                 <title>Server Example</title>
             <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
-<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://java.sun.com/xml/ns/persistence 
-                      http://java.sun.com/xml/ns/persistence/persistence_2_1.xsd"
+  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence 
+                      http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
   version="2.1">
 
     <persistence-unit name="ejbsessionbank">
@@ -368,7 +367,6 @@ hibernate.connection.password=
 hibernate.connection.username=sa
 
 hibernate.dialect=org.hibernate.dialect.H2Dialect
-hibernate.hbm2ddl.auto=create
 hibernate.show_sql=true
 hibernate.format_sql=true
 #hibernate.jdbc.batch_size=0
@@ -500,10 +498,162 @@ hibernate.format_sql=true
         </section>
         
     </section>
+    
+    <section id="jpa-overview-schemagen">
+        <title>Schema Generation</title>
+        <variablelist spacing="compact">
+            <varlistentry>
+                <term><filename>Database schema generation</filename></term>
+                <listitem><para>Live database used by EntityManager has been prepared for persistence at runtime</para></listitem>
+                <listitem><para>Useful for demos and tutorials</para></listitem>
+                <listitem><para>Not an option for production</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>Script schema generation</filename></term>
+                <listitem><para>Database schema commands written without changing the database</para></listitem>
+                <listitem><para>Useful in debugging "what does the provider think I am modeling?"</para></listitem>
+                <listitem><para>Good starting source script to author database migration scripts from</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>Vendor-specific option</filename></term>
+                <listitem><para>Persistence provider is required to provide schema-generation capability</para></listitem>
+                <listitem><para>Likely has for years through a proprietary interface</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>javax.perisistance option</filename></term>
+                <listitem><para>Standard interface added in JPA 2.1 for requesting schema generation</para></listitem>
+            </varlistentry>
+      </variablelist>
+
+        <section id="jpa-overview-schemagen-hbm2ddl-database">
+            <title>Hibernate DDL Generation Example
+              <footnote id="jpa-overview-schemagen-hbm2ddl-ref"><para>
+                  <ulink url="https://docs.jboss.org/hibernate/orm/5.0/manual/en-US/html/ch03.html#configuration-optional">HBM2DDL Docs</ulink></para>
+              </footnote>
+            </title>            
+            <variablelist spacing="compact">
+                <varlistentry>
+                    <term><filename>hibernate.hbm2ddl.auto</filename></term>
+                    <listitem><para>Controls hibernate schema generation</para></listitem>                    
+                    <listitem><para>create, drop, create-drop, update, validate, and none</para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>hibernate.hbm2ddl.import_files</filename></term>
+                    <listitem><para>Allows for self-authored files to be used as well</para></listitem>
+                </varlistentry>
+            </variablelist>
+
+            <itemizedlist spacing="compact">
+                <listitem><para>Expressed thru hibernate.properties using hibernate.hbm2ddl properties</para>
+<programlisting language="java"><![CDATA[hibernate.hbm2ddl.auto=create-drop
+
+hibernate.hbm2ddl.import_files=/ddl/mydb-tuningdrop.ddl,/ddl/mydb-tuning.ddl
+hibernate.connection.url=${jdbc.url}
+hibernate.connection.driver_class=${jdbc.driver}
+hibernate.connection.username=${jdbc.user}
+hibernate.connection.password=${jdbc.password}
+#hibernate.show_sql=true
+#hibernate.format_sql=true
+]]></programlisting>
+                </listitem>
+                <listitem><para>Can be expressed thru persistence.xml but use standard properties instead to avoid confusion</para>
+                </listitem>                
+            </itemizedlist>
+        </section>
+                
+        <section id="jpa-overview-schemagen-javaxp-database">
+            <title>javax.persistence Schema Generation
+              <footnote id="jpa-overview-schemagen-javaxp-database"><para>
+                  <ulink url="https://docs.oracle.com/javaee/7/tutorial/persistence-intro005.htm">javax.persistence schema generation docs</ulink></para>
+              </footnote>            
+            </title>
+
+            <variablelist spacing="compact">
+                <varlistentry>
+                    <term><filename>javax.persistence.schema-generation.database.action</filename></term>
+                    <listitem><para>Values: drop-and-create, drop, create, none</para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>javax.persistence.schema-generation.create-source</filename></term>
+                    <listitem><para>Values: metadata (default), script, metadata-then-script, script-then-metadata</para></listitem>
+                    <listitem><para>javax.persistence.schema-generation.create-script-source - provides reference to create source</para></listitem>
+                    <listitem><para>javax.persistence.schema-generation.drop-script-source - provides reference to drop source</para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>javax.persistence.sql-load-script-source</filename></term>
+                    <listitem><para>Provides reference to script to execute after schema initialized</para></listitem>
+                    <listitem><para>Useful in Pre-populating sample database tables with content</para></listitem>
+                </varlistentry>
+            </variablelist>
+
+
+            <itemizedlist spacing="compact">
+                <listitem><para>Database schema generation example</para>
+<programlisting language="xml"><![CDATA[<persistence-unit name="jpa-schemagen-test">
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+    <properties>
+        <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
+        
+        <!-- a database connection definition is required for database actions -->
+        <property name="javax.persistence.jdbc.url" value="${jdbc.url}"/>
+        <property name="javax.persistence.jdbc.driver" value="${jdbc.driver}"/>
+        <property name="javax.persistence.jdbc.user" value="${jdbc.user}"/>
+        <property name="javax.persistence.jdbc.password" value="${jdbc.password}"/>
+    </properties>
+</persistence-unit>]]></programlisting>
+                </listitem>
+                
+                <listitem><para>Script schema generation example</para>
+<programlisting language="xml"><![CDATA[<persistence-unit name="jpa-schemagen-test">
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+    <properties>
+        <!-- a script file containing create and drop commands will be generated without interacting with database --> 
+        <property name="javax.persistence.schema-generation.scripts.action" value="drop-and-create"/>
+        <property name="javax.persistence.schema-generation.scripts.create-target" value="${project.build.outputDirectory}/ddl/${project.artifactId}-create.ddl"/>
+        <property name="javax.persistence.schema-generation.scripts.drop-target" value="${project.build.outputDirectory}/ddl/${project.artifactId}-drop.ddl"/>
+
+        <!-- otherwise we would get 1 line per statement without standard delimiter character -->
+        <property name="hibernate.format_sql" value="true"/>
+        <property name="hibernate.hbm2ddl.delimiter" value=";"/>
+        <!-- required when no database connection specified -->
+        <property name="hibernate.dialect" value="${hibernate.dialect}"/>
+    </properties>    
+</persistence-unit>]]></programlisting>
+
+                  <itemizedlist spacing="compact">
+                      <listitem><para>Scripts written to target files</para>
+<programlisting language=""><![CDATA[target/classes/ddl/
+|-- jpa-schemagen-create.ddl
+`-- jpa-schemagen-drop.ddl
+]]></programlisting>
+                      </listitem>
+                      <listitem><para>Create script contains commands to create schema</para>
+<programlisting language="java"><![CDATA[create sequence hibernate_sequence start with 1 increment by 1;
+
+create table JPAUTIL_TABLET (
+   id integer not null,
+    maker varchar(255),
+    primary key (id)
+);]]></programlisting>
+                      </listitem>
+                      <listitem><para>Drop script contains commands to drop schema</para>
+<programlisting language="java"><![CDATA[drop table JPAUTIL_TABLET if exists;
+
+drop sequence if exists hibernate_sequence;
+]]></programlisting>
+                      </listitem>
+                  </itemizedlist>
+
+
+                </listitem>
+            </itemizedlist>
+        </section>
+
+    </section>
 
 
     <section id="jpa-overview-steps">
-        <title>Basic Usage Steps</title>
+        <title>Basic Testing Usage Steps</title>
         <itemizedlist spacing="compact">
             <listitem><para>Test Setup -- These actions occur outside of the individual @Test methods
             and normally not within the business and DAO logic. This is the kind of activity the 

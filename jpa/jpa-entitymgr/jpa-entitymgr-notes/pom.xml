@@ -17,7 +17,7 @@
   
     <properties>
         <doc.base>jpa-entitymgr-book</doc.base>
-       <content.version>v2018-08-14</content.version>
+       <content.version>v2018-08-16</content.version>
     </properties>
     <build>
         <plugins>
