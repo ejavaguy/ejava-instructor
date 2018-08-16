@@ -283,7 +283,7 @@ public Author createAuthor(...) {
   version="2.1">
 
     <persistence-unit name="jpaDemo">
-        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <mapping-file>META-INF/orm.xml</mapping-file>
         <properties>
             <!-- standard properties -->

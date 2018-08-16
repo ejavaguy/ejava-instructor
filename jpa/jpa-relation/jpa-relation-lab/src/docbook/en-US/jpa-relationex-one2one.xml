@@ -140,7 +140,7 @@ public class Player {
                     src/test tree</para>
 <programlisting language="xml"><![CDATA[
     <persistence-unit name="relationEx-test">
-        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         ...
         <class>myorg.relex.one2one.Person</class>
         <class>myorg.relex.one2one.Player</class>

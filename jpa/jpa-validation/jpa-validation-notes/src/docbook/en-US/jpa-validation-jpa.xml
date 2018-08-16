@@ -48,7 +48,7 @@ public class Person {
 <persistence ...
 
     <persistence-unit name="jpa-validation-example-test">
-        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
         <validation-mode>AUTO</validation-mode>
         <properties>
