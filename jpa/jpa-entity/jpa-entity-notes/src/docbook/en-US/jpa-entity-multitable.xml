@@ -119,7 +119,7 @@ public class Watch {
 
         <figure>
             <title>Multi-table Mapping Example Test</title>
-<programlisting language=""><![CDATA[//leave a watch in DB to inspect
+<programlisting language="java"><![CDATA[//leave a watch in DB to inspect
 Watch watch3 = new Watch(3);
 watch3.setMake("ontime3");
 watch3.setModel("round-and-round3");

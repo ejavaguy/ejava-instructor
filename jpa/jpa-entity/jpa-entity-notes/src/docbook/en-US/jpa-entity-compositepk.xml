@@ -119,26 +119,75 @@ public class Mower {
         
         <figure>
             <title>Composite @IdClass Example Client</title>
-<programlisting language="java"><![CDATA[@Test
-public void testIdClass() {
-    ejava.examples.orm.core.annotated.Mower mower = 
-        new Mower("acme", "power devil2");
-    mower.setSize(21);
-    
-    //insert a row in the database
-    em.persist(mower);
-    log.info("created mower:" + mower);
+            <itemizedlist spacing="compact">
+                <listitem><para>Create Entity with Composite ID</para>
+<programlisting language="java"><![CDATA[ejava.examples.orm.core.annotated.Mower mower =  new Mower("acme", "power devil2");
+mower.setSize(21);
+
+//insert a row in the database
+logger.info("persisting mower(tx={}): {}", txActive(), mower);
+em.persist(mower);
+logger.info("created mower: {}", mower);
+em.flush();
+logger.info("flushed");
+]]></programlisting>
+
+<programlisting language="java"><![CDATA[-persisting mower(tx=true): 1756435781, make=acme, model=power devil2, size=21
+-created mower: 1756435781, make=acme, model=power devil2, size=21
+-insert into ORMCORE_MOWER (size, make, model) values (?, ?, ?)
+-binding parameter [1] as [INTEGER] - [21]
+-binding parameter [2] as [VARCHAR] - [acme]
+-binding parameter [3] as [VARCHAR] - [power devil2]
+-flushed
 ]]></programlisting>                        
-<programlisting language=""><![CDATA[-created mower:ejava.examples.orm.core.annotated.Mower@2c137a23, make=acme, model=power devil2, size=21]]></programlisting>                        
-    
-<programlisting language="java"><![CDATA[    Mower mower2 = 
-        em.find(Mower.class, new MowerPK("acme", "power devil2"));
-    assertNotNull(mower2);
-    log.info("found mower:" + mower2);
-    assertEquals(mower.getSize(), mower2.getSize());
+                </listitem>
+                
+                <listitem><para>Get Instance by Composite ID</para>
+<programlisting language="java"><![CDATA[//locate instance by ID, while instance still managed        
+Mower mower2 = em.find(Mower.class, new MowerPK("acme", "power devil2"));
+assertNotNull(mower2);
+logger.info("found mower: {}", mower2);
+assertEquals(mower.getSize(), mower2.getSize());        
 ]]></programlisting>                        
-<programlisting language=""><![CDATA[-found mower:ejava.examples.orm.core.annotated.Mower@2c137a23, make=acme, model=power devil2, size=21]]></programlisting>                        
+
+<programlisting language=""><![CDATA[-found mower: 1756435781, make=acme, model=power devil2, size=21
+]]></programlisting>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Instance is found in cache by ID without having to query database</para></listitem>
+                        </itemizedlist>                        
+                </listitem>
+                
+                <listitem><para>Remove Instance from Database</para>
+<programlisting language="java"><![CDATA[em.remove(mower2);
+logger.info("removed mower: {}", mower2);
+em.flush();
+logger.info("removed mower after flush: {}", mower2);
+Mower mower3 = em.find(Mower.class, new MowerPK("acme", "power devil2"));
+assertNull(mower3);
+]]></programlisting>
+
+<programlisting language="java"><![CDATA[-removed mower: 1756435781, make=acme, model=power devil2, size=21
+-delete from ORMCORE_MOWER 
+ where make=? and model=?
+-binding parameter [1] as [VARCHAR] - [acme]
+-binding parameter [2] as [VARCHAR] - [power devil2]
+-removed mower after flush: 1756435781, make=acme, model=power devil2, size=21
+
+-select mower0_.make as make1_7_0_, mower0_.model as model2_7_0_, mower0_.size as size3_7_0_ 
+ from ORMCORE_MOWER mower0_ 
+ where mower0_.make=? and mower0_.model=?
+-binding parameter [1] as [VARCHAR] - [acme]
+-binding parameter [2] as [VARCHAR] - [power devil2]
+]]></programlisting>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Row removed from database and instance detached</para></listitem>
+                        <listitem><para>Primary key used to query database since instance no longer in cache</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
         </figure>
+        
+        
         
     </section>
 

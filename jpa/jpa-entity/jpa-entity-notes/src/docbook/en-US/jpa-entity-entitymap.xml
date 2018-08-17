@@ -129,6 +129,19 @@ public class Car {
 ]]></programlisting>
             </programlistingco>            
             
+            <tip>
+                <title>Precision only for NUMERIC and DECIMAL types</title>
+                <para>Added precision and scale only has impact for certain Java types (e.g., BigDecimal).
+                Check the dialect for specific mappings and what SQL types they translate to in the 
+                <ulink url="https://github.com/hibernate/hibernate-orm/blob/master/hibernate-core/src/main/java/org/hibernate/dialect/H2Dialect.java">source code</ulink>.  
+                </para>
+            </tip>           
+<programlisting language="java"><![CDATA[# H2Dialect.java
+registerColumnType( Types.DECIMAL, "decimal($p,$s)" );
+registerColumnType( Types.NUMERIC, "decimal($p,$s)" );
+registerColumnType( Types.DOUBLE, "double" );
+]]></programlisting>
+
         </section>
 
     </section>    

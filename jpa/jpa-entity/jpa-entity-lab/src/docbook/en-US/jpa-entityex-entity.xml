@@ -110,7 +110,7 @@ java.lang.IllegalArgumentException: Unknown entity: myorg.entityex.mapped.Animal
  <programlisting language="xml"><![CDATA[# src/test/resources/META-INF/persistence.xml
 
     <persistence-unit name="entityEx-test">
-        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
         <mapping-file>orm/Animal-orm.xml</mapping-file>
         <class>myorg.entityex.Auto</class>
@@ -265,7 +265,7 @@ public class Animal2 {]]></programlisting>
             <listitem><para>Register the new entity with the persistence.xml using a 
                 class element reference</para>
 <programlisting language="xml"><![CDATA[    <persistence-unit name="entityEx-test">
-        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
         <mapping-file>orm/Animal-orm.xml</mapping-file>
         <class>myorg.entityex.Auto</class>

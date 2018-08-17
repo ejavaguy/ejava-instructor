@@ -71,9 +71,29 @@ public class Drill  {
        
         <section id="jpa-entity-pkmap-generated-auto">
             <title>GenerationType.AUTO</title>
-           
+            <itemizedlist spacing="compact">
+                <listitem><para>All providers required to provide a default identity strategy</para></listitem>
+                <listitem><para>Can be specifically referenced using "strategy=GenerationType.AUTO"</para></listitem>
+            </itemizedlist>
+
+            <figure><title>GeneratedValue.strategy default</title>
+<programlisting language="java"><![CDATA[package javax.persistence;
+...
+@Target({METHOD, FIELD})
+@Retention(RUNTIME)
+
+public @interface GeneratedValue {
+    /**
+     * (Optional) The primary key generation strategy
+     * that the persistence provider must use to
+     * generate the annotated entity primary key.
+     */
+    GenerationType strategy() default AUTO;
+]]></programlisting>
+            </figure>           
+
             <figure>
-                <title>Entity with GenerationType.AUTO</title>
+                <title>Entity with Default GenerationType (AUTO)</title>
 <programlisting language="java"><![CDATA[@Entity
 @Table(name="ORMCORE_DRILL")
 public class Drill  {
@@ -86,70 +106,107 @@ public class Drill  {
            
             <figure>
                 <title>AUTO (Success) Test</title>
-<programlisting language="java"><![CDATA[
-@Test
-public void testAUTOGood() {
-    log.info("testAUTOGood");
-    //note that since PKs are generated, we must pass in an object that
-    //has not yet been assigned a PK value.
-    ejava.examples.orm.core.annotated.Drill drill = new Drill(0);
-    drill.setMake("acme");
-    
-    //insert a row in the database
-    em.persist(drill);
-    log.info("created drill:" + drill);
-    
-    assertFalse(drill.getId() == 0L);        
-}]]></programlisting>                        
+    <itemizedlist spacing="compact">
+        <listitem><para>Test</para>
+<programlisting language="java"><![CDATA[logger.info("testAUTOGood");
+//since PKs are generated, we must pass in an object that
+//has not yet been assigned a PK value.
+ejava.examples.orm.core.annotated.Drill drill = new Drill(0);
+drill.setMake("acme");
 
+//insert a row in the database
+logger.info("just before persist(tx={}): {}", txActive(), drill);
+em.persist(drill);
+
+logger.info("created drill (after persist and before flush, tx={}): {}", txActive(), drill);
+em.flush(); 
+logger.info("created drill (after flush, tx={}): {}", txActive(), drill);
+
+assertNotEquals(0, drill.getId());        
+]]></programlisting>        
+         
+        </listitem>
+        <listitem><para>Output</para>
 <programlisting language=""><![CDATA[-testAUTOGood
-Hibernate:
-    insert 
-    into
-        ORMCORE_DRILL
-        (id, make) 
-    values
-        (null, ?)
--created drill:ejava.examples.orm.core.annotated.Drill@35853853, id=1, make=acme]]></programlisting>                        
+-just before persist(tx=true): 1171672359, id=0, make=acme
+-call next value for hibernate_sequence
+-created drill (after persist and before flush, tx=true): 1171672359, id=1, make=acme
+
+-insert into ORMCORE_DRILL (make, id) values (?, ?)
+-binding parameter [1] as [VARCHAR] - [acme]
+-binding parameter [2] as [BIGINT] - [1]
+-created drill (after flush, tx=true): 1171672359, id=1, make=acme
+]]></programlisting>
+        </listitem>
+        <listitem><para>AUTO in this case meant SEQUENCE -- more details in sequence section</para>
+        </listitem>
+    </itemizedlist>
             </figure>
             
 
             <figure>
                 <title>AUTO (Failure) Test</title>
-<programlisting language="java"><![CDATA[
-@Test
-public void testAUTOBad() {
-    log.info("testAUTOBad");
-    //he's not going to like they non-zero PK value here
-    ejava.examples.orm.core.annotated.Drill drill = new Drill(25L);
-    drill.setMake("BD");
-    
-    //insert a row in the database
-    boolean exceptionThrown = false;
-    try { 
-        assertFalse(drill.getId() == 0L);        
-        log.info("trying to create drill with pre-exist pk:" + drill);
-        em.persist(drill);
-    }
-    catch (PersistenceException ex) {
-        log.info("got expected exception: " + ex);
-        exceptionThrown = true;
-    }        
-    assertTrue(exceptionThrown);
-}]]></programlisting>                        
+                <itemizedlist spacing="compact">
+                    <listitem><para>Test</para>
+<programlisting language="java"><![CDATA[logger.info("testAUTOBad");
+//provider will not like the non-zero PK value here
+//because we told it to generate the PK
+ejava.examples.orm.core.annotated.Drill drill = new Drill(25L);
+drill.setMake("BD");
 
-<programlisting language=""><![CDATA[
--testAUTOBad
--trying to create drill with pre-exist pk:ejava.examples.orm.core.annotated.Drill@76160af2, id=25, make=BD
+//insert a row in the database
+boolean exceptionThrown = false;
+try { 
+    assertNotEquals(0, drill.getId());        
+    logger.info("trying to create drill with pre-exist pk: {}", drill);
+    em.persist(drill);
+}
+catch (PersistenceException ex) {
+    logger.info("got expected exception: " + ex);
+    exceptionThrown = true;
+}        
+assertTrue(exceptionThrown);
+]]></programlisting>                        
+                    </listitem>
+                    <listitem><para>Output</para>
+<programlisting language=""><![CDATA[-testAUTOBad
+-trying to create drill with pre-exist pk: 1171672359, id=25, make=BD
 -got expected exception: javax.persistence.PersistenceException: 
     org.hibernate.PersistentObjectException: 
         detached entity passed to persist: ejava.examples.orm.core.annotated.Drill
 ]]></programlisting>                        
+                    </listitem>
+                </itemizedlist>
             </figure>
-        </section>    
+            <tip>
+                <title>GeneratedValue must be generated by provider</title>
+                <para>If an entity is defined to have its primary key automatically
+                generated -- no matter the strategy -- the provider will insist on
+                implementing the value. It is always an error to pass a detached/transient
+                object to persist() with an id already assigned.</para>
+            </tip>
+            
+            <tip>
+                <title>Don't default GenerationStrategy</title>
+                <para>One should always identify what the GenerationStrategy should 
+                be so that the strategy remains consistent over time. For example,
+                Hibernate use to default to a form of IDENTITY in JavaSE environments
+                and SEQUENCE in JavaEE environments.</para>
+            </tip>
+        </section>
+        
+        
 
         <section id="jpa-entity-pkmap-generated-identity">
            <title>GenerationType.IDENTITY</title>
+           <itemizedlist spacing="compact">
+                <listitem><para>Uses database identity column type</para></listitem>
+                <listitem><para>If value provided to database -- it is used</para></listitem>
+                <listitem><para>If value not provided to database -- a follow-up call required to obtain value used</para></listitem>
+                <listitem><para>Not supported by all databases (e.g., Oracle)</para></listitem>
+            </itemizedlist>
+
+           
             <figure>
                <title>Entity with GenerationType.IDENTITY</title>
 <programlisting language="java"><![CDATA[@Entity
@@ -163,7 +220,7 @@ public class Gadget {
             
             <figure>
                 <title>IDENTITY Database Schema</title>
-<programlisting language=""><![CDATA[create table ORMCORE_GADGET (
+<programlisting language="java"><![CDATA[create table ORMCORE_GADGET (
     id bigint generated by default as identity,
     make varchar(255),
     primary key (id)
@@ -172,73 +229,134 @@ public class Gadget {
             
 
             <figure>
-                <title>IDENTITY Test</title>
-<programlisting language="java"><![CDATA[@Test
-public void testIDENTITY() {
-    ejava.examples.orm.core.annotated.Gadget gadget = new Gadget(0);
-    gadget.setMake("gizmo 1");
-    
-    //insert a row in the database
-    em.persist(gadget);
-    log.info("created gadget (before flush):" + gadget);
-    em.flush(); 
-    log.info("created gadget (after flush):" + gadget);
-    
-    assertFalse(gadget.getId() == 0L);                
-}]]></programlisting>                        
-<programlisting language=""><![CDATA[-testIDENTITY
-Hibernate:
-    insert 
-    into
-        ORMCORE_GADGET
-        (id, make) 
-    values
-        (null, ?)
--created gadget (before flush):ejava.examples.orm.core.annotated.Gadget@7b61257e, id=1, make=gizmo 1
--created gadget (after flush):ejava.examples.orm.core.annotated.Gadget@7b61257e, id=1, make=gizmo 1
+                <title>IDENTITY Test (with Active Transaction)</title>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Test (with Transaction Active)</para>
+<programlisting language="java"><![CDATA[ejava.examples.orm.core.annotated.Gadget gadget = new Gadget(0);
+gadget.setMake("gizmo 1");
+
+//insert a row in the database
+//start with a tx already active
+logger.info("gadget (before persist; tx={}): {}", txActive(), gadget);
+em.persist(gadget);
+logger.info("created gadget (after persist, before flush; tx={}): {}", txActive(), gadget);
+em.flush(); 
+logger.info("created gadget (after flush; tx={}): {}", txActive(), gadget);            
+assertNotEquals(0, gadget.getId());     
 ]]></programlisting>                        
+                    </listitem>
+                    
+                    <listitem><para>Output (with Transaction Active)</para>
+<programlisting language=""><![CDATA[-gadget (before persist; tx=true): 1798443618, id=0, make=gizmo 1
+
+-insert into ORMCORE_GADGET (id, make) values (null, ?)
+-binding parameter [1] as [VARCHAR] - [gizmo 1]
+-created gadget (after persist, before flush; tx=true): 1798443618, id=1, make=gizmo 1
+
+-created gadget (after flush; tx=true): 1798443618, id=1, make=gizmo 1
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Follow-on IDENTITY Allocations (with Transaction Active)</para>
+<programlisting language=""><![CDATA[-insert into ORMCORE_GADGET (id, make) values (null, ?)
+-binding parameter [1] as [VARCHAR] - [gizmo 2]
+-created gadget(tx=true): 370055648, id=2, make=gizmo 2
+
+-insert into ORMCORE_GADGET (id, make) values (null, ?)
+-binding parameter [1] as [VARCHAR] - [gizmo 3]
+-created gadget(tx=true): 911933063, id=3, make=gizmo 3
+
+-insert into ORMCORE_GADGET (id, make) values (null, ?)
+-binding parameter [1] as [VARCHAR] - [gizmo 4]
+-created gadget(tx=true): 568613487, id=4, make=gizmo 4
+]]></programlisting>                        
+                    </listitem>
+                    <listitem>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Provider inserts row into database with null ID</para></listitem>
+                            <listitem><para>Provider queries database (not shown in debug) for primary key generated for the row</para></listitem>
+                            <listitem><para>Provider eagerly inserts row during persist() and before flush() when transaction is open -- to determine primary key</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </itemizedlist>
+                <tip>
+                    <title>Using IDENTITY doubles calls to database</title>
+                    <para>When using the IDENTITY strategy, the provider must make at least 
+                    two calls to the database. One for the INSERT and one to determine the 
+                    primary key value generated by the database.</para>
+                </tip>
             </figure>
             
-            <figure>
-                <title>Follow-on IDENTITY Allocations</title>
-<programlisting language=""><![CDATA[Hibernate:
-    insert 
-    into
-        ORMCORE_GADGET
-        (id, make) 
-    values
-        (null, ?)
--created gadget:ejava.examples.orm.core.annotated.Gadget@581e495d, id=2, make=gizmo 2
-Hibernate:
-    insert 
-    into
-        ORMCORE_GADGET
-        (id, make) 
-    values
-        (null, ?)
--created gadget:ejava.examples.orm.core.annotated.Gadget@1f06d526, id=3, make=gizmo 3
-Hibernate:
-    insert 
-    into
-        ORMCORE_GADGET
-        (id, make) 
-    values
-        (null, ?)
--created gadget:ejava.examples.orm.core.annotated.Gadget@199bdabd, id=4, make=gizmo 4
-...]]></programlisting>                        
-            </figure>
+            <figure><title>IDENTITY Test (persist() with Inactive Transaction)</title>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Test</para>
+<programlisting language="java"><![CDATA[em.getTransaction().rollback();
+logger.info("rolled back tx(tx={})", txActive());
+for (int i=0; i<3; i++) {
+    Gadget g = new Gadget();
+    g.setMake("gizmo " + counter++);
+    em.persist(g);
+    logger.info("created gadget(tx={}): {}", txActive(), g);
+    if (i==0) {
+        gadget=g;
+    }
+}
 
-            <note>
-                <title>IDENTITY Requires Provider to Get All PK Values from Database</title>
-                <para>The provider must obtain the next primary key value from the database 
-                   each time. Notice in the first case above -- the provider has already flushed the
-                   INSERT to the database during the persist and before our manual call to flush()</para>
-            </note>
+logger.info("starting tx(tx={}): {}", txActive(), gadget);
+em.getTransaction().begin();
+logger.info("tx started, flushing (tx={}): {}", txActive(), gadget);
+em.flush();
+logger.info("cache flushed (tx={}): {}", txActive(), gadget);
+em.getTransaction().commit();
+logger.info("tx committed (tx={}): {}", txActive(), gadget);
+]]></programlisting>
+                    </listitem>
+                    <listitem><para>Output (persist() with inactive transaction)</para>
+<programlisting language="java"><![CDATA[-rolled back tx(tx=false)
+
+-created gadget(tx=false): 1372646511, id=0, make=gizmo 5
+-created gadget(tx=false): 1202178366, id=0, make=gizmo 6
+-created gadget(tx=false): 1872410525, id=0, make=gizmo 7
+
+-starting tx(tx=false): 1372646511, id=0, make=gizmo 5
+]]></programlisting>            
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Provider could not insert rows or determine primary key while transaction inactive</para></listitem>
+                            <listitem><para>Business logic could not rely on PK values being set (e.g., send event or log)</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+
+                    <listitem><para>Output (active transaction following persist)</para>
+<programlisting language="java"><![CDATA[-tx started, flushing (tx=true): 1372646511, id=0, make=gizmo 5
+-insert into ORMCORE_GADGET (id, make) values (null, ?)
+-binding parameter [1] as [VARCHAR] - [gizmo 5]
+-insert into ORMCORE_GADGET (id, make) values (null, ?)
+-binding parameter [1] as [VARCHAR] - [gizmo 6]
+-insert into ORMCORE_GADGET (id, make) values (null, ?)
+-binding parameter [1] as [VARCHAR] - [gizmo 7]
+
+-cache flushed (tx=true): 1372646511, id=5, make=gizmo 5
+-tx committed (tx=false): 1372646511, id=5, make=gizmo 5
+]]></programlisting>            
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Provider waited for next flush() cycle (not tx start) to perform INSERTs and determine primary key</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </itemizedlist>
+            </figure>
         </section>
        
 
         <section id="jpa-entity-pkmap-generated-sequence">
             <title>GenerationType.SEQUENCE</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Uses a formal database SEQUENCE construct to generate a unique ID</para></listitem>
+                <listitem><para>SEQUENCE is not part of a transaction -- cannot rollback the generation of a sequence value</para></listitem>
+                <listitem><para>Database SEQUENCE value may have gaps</para></listitem>
+                <listitem><para>Common, but not supported by all databases (e.g., HSQL)</para></listitem>
+            </itemizedlist>
+
+
             <figure>
                 <title>Entity with GenerationType.SEQUENCE</title>
 <programlisting language="java"><![CDATA[@Entity
@@ -246,7 +364,7 @@ Hibernate:
 @SequenceGenerator(
     name="fanSequence",     //required logical name
     sequenceName="FAN_SEQ", //name in database
-    initialValue=4,         //start with something odd to be noticeable
+    initialValue=5,         //start with something odd to be noticeable
     allocationSize=3)       //number of IDs to internally assign per-sequence value
 public class Fan {
     @Id
@@ -265,64 +383,209 @@ public class Fan {
     primary key (id)
 )
 
-create sequence FAN_SEQ]]></programlisting>                        
+create sequence FAN_SEQ start with 5 increment by 3
+]]></programlisting>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Provider generates schema with SEQUENCE starting with 5 with increment of 3</para></listitem>
+                    <listitem><para>Inspecting database server through UI prior to start -- showed current value of 2 <code>(2+3=5)</code></para></listitem>
+                </itemizedlist>                        
             </figure>
+
 
             <figure>
-                <title>SEQUENCE Test</title>
-<programlisting language="java"><![CDATA[@Test
-public void testSEQUENCE() {
-    log.info("testSEQUENCE");
-    //note that since PKs are generated, we must pass in an object that
-    //has not yet been assigned a PK value.
-    ejava.examples.orm.core.annotated.Fan fan = new Fan(0);
-    fan.setMake("cool runner 1");
-    
-    //insert a row in the database
-    em.persist(fan);
-    log.info("created fan (before flush):" + fan);
-    em.flush(); 
-    log.info("created fan (after flush):" + fan);
-    
-    assertFalse(fan.getId() == 0L);
-}]]></programlisting>                 
+                <title>SEQUENCE Test (with active transaction)</title>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Test (with active transaction)</para>
+<programlisting language="java"><![CDATA[Assume.assumeTrue(Boolean.parseBoolean(System.getProperty("sql.sequences", "true")));
 
-<programlisting language=""><![CDATA[-testSEQUENCE
-Hibernate:
-    call next value for FAN_SEQ
--created fan (before flush):ejava.examples.orm.core.annotated.Fan@e18a174, id=3, make=cool runner 1
-Hibernate:
-    insert 
-    into
-        ORMCORE_FAN
-        (make, id) 
-    values
-        (?, ?)
--created fan (after flush):ejava.examples.orm.core.annotated.Fan@e18a174, id=3, make=cool runner 1]]></programlisting>                               
+ejava.examples.orm.core.annotated.Fan fan = new Fan(0);
+fan.setMake("cool runner 1");
+
+//insert a row in the database
+logger.info("persisting fan(tx={}): {}", txActive(), fan);
+em.persist(fan);
+logger.info("created fan (before flush, tx={}):", txActive(), fan);
+em.flush(); 
+logger.info("created fan (after flush; tx={}): {}", txActive(), fan);            
+assertNotEquals(0, fan.getId());
+]]></programlisting>                 
+                    </listitem>
+                    
+                    <listitem><para>Output (with active transaction)</para>
+<programlisting language=""><![CDATA[-persisting fan(tx=true): 1413306467, id=0, make=cool runner 1
+-call next value for FAN_SEQ
+-call next value for FAN_SEQ   #Current value=8 after this call, next result will be 11
+
+-created fan (before flush, tx=true): 1413306467, id=5, make=cool runner 1
+-insert into ORMCORE_FAN (make, id) values (?, ?)
+-binding parameter [1] as [VARCHAR] - [cool runner 1]
+-binding parameter [2] as [BIGINT] - [5]
+-created fan (after flush; tx=true): 1413306467, id=5, make=cool runner 1
+
+
+-persisting fan(tx=true): 1413306467, id=0, make=cool runner 1
+-call next value for FAN_SEQ
+-call next value for FAN_SEQ
+
+-created fan (before flush, tx=true): 1413306467, id=5, make=cool runner 1
+-insert into ORMCORE_FAN (make, id) values (?, ?)
+-binding parameter [1] as [VARCHAR] - [cool runner 1]
+-binding parameter [2] as [BIGINT] - [5]
+-created fan (after flush; tx=true): 1413306467, id=5, make=cool runner 1
+]]></programlisting>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Provider obtains primary key value prior to inserting row (x2 calls addressed later)</para></listitem>
+                            <listitem><para>First primary key value (5) corresponds with the <code>@SequenceGenerator.initialValue property</code></para></listitem>
+                            <listitem><para>Primary key value available to business logic prior to insert into database</para></listitem>
+                            <listitem><para>Provider inserts the row during next flush cycle</para></listitem>
+                            <listitem><para>Inspecting database server through UI -- shows current value of 8 (2x calls to next value)</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </itemizedlist>
+
             </figure>
+            
+        <tip>
+            <title>SEQUENCE allows individual primary keys to be allocated in blocks</title>
+            <para>The database advances its SEQUENCE by the allocationSize on each call to next value.
+            The provider may use the returned value and allacationSize values above the returned value
+            before returning to the database for a new value. The database and provider *must* have
+            the same increment/allocationSize configured.</para>
+        </tip>
             
             <figure>
                 <title>Follow-on SEQUENCE Allocations</title>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Output prior to flush/commit</para>
+<programlisting language=""><![CDATA[-created fan(tx=true): 1289462509, id=6, make=cool runner 2
+-created fan(tx=true): 740265405, id=7, make=cool runner 3
+-created fan(tx=true): 1439003682, id=8, make=cool runner 4
+-call next value for FAN_SEQ
+-created fan(tx=true): 578969118, id=9, make=cool runner 5
+-created fan(tx=true): 493310435, id=10, make=cool runner 6
+-created fan(tx=true): 757436159, id=11, make=cool runner 7
+-call next value for FAN_SEQ
+-created fan(tx=true): 1682973478, id=12, make=cool runner 8
+...
+-created fan(tx=true): 1501844857, id=22, make=cool runner 18
+-created fan(tx=true): 817994751, id=23, make=cool runner 19
+-call next value for FAN_SEQ
+-created fan(tx=true): 1312250810, id=24, make=cool runner 20
+-created fan(tx=true): 1296316112, id=25, make=cool runner 21
+...]]></programlisting>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Provider calling database to get next allocation prior to exhausting current allocation</para></listitem>
+                            <listitem><para>Provider knows to self-generate next allocationSize values for value returned prior to obtaining next allocation</para></listitem>
+                            <listitem><para>Provider waits for next flush cycle to insert rows into database</para></listitem>
+                        </itemizedlist>                    
+                    </listitem>
+                    <listitem><para>Output during commit</para>
 <programlisting language=""><![CDATA[
--created fan:ejava.examples.orm.core.annotated.Fan@6806da29, id=4, make=cool runner 2
--created fan:ejava.examples.orm.core.annotated.Fan@77d5a139, id=5, make=cool runner 3
--
-    call next value for FAN_SEQ
--created fan:ejava.examples.orm.core.annotated.Fan@1c0cf528, id=6, make=cool runner 4
--created fan:ejava.examples.orm.core.annotated.Fan@27c3a4a3, id=7, make=cool runner 5
--created fan:ejava.examples.orm.core.annotated.Fan@17f7ed6e, id=8, make=cool runner 6
--
-    call next value for FAN_SEQ
-...]]></programlisting>                        
+-committing (tx=true): 1289462509, id=6, make=cool runner 2
+-insert into ORMCORE_FAN (make, id) values (?, ?)
+-binding parameter [1] as [VARCHAR] - [cool runner 2]
+-binding parameter [2] as [BIGINT] - [6]
+-insert into ORMCORE_FAN (make, id) values (?, ?)
+-binding parameter [1] as [VARCHAR] - [cool runner 3]
+-binding parameter [2] as [BIGINT] - [7]
+-insert into ORMCORE_FAN (make, id) values (?, ?)
+-binding parameter [1] as [VARCHAR] - [cool runner 4]
+...
+-insert into ORMCORE_FAN (make, id) values (?, ?)
+-binding parameter [1] as [VARCHAR] - [cool runner 21]
+-binding parameter [2] as [BIGINT] - [25]
+-tx committed (tx=false): 1289462509, id=6, make=cool runner 2
+]]></programlisting>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Rows inserted into database during next flush cycle triggered by commit</para></listitem>
+                            <listitem><para>Database makes no correlation between sequence numbers returned and primary key value assigned to a row</para></listitem>
+                        </itemizedlist>                    
+                    </listitem>
+                </itemizedlist>
             </figure>
             
-            <note>
-                <title>SEQUENCE Strategy Allows Clients to Self-Generate Groups of PK Values</title>
-                <para>The provider generates allocationSize primary key values before performing a flush or 
-                    follow-on poll of the sequence. An allocationSize greater than one (1) is much less communication
-                    with the database than the IDENTITY strategy -- which would be somewhat 
-                    analogous to a SEQUENCE allocationSize=1.</para>
-            </note>
+            <tip>
+                <title>Increase increment/allocationSize for faster ingest</title>
+                <para>The default increment/allocationSize requires two (2) calls per insert. A larger 
+                increment/allocationSize can reduce the number of calls by up to 50%, but will potentially
+                leave gaps and exhaust the unique sequence values earlier in the lifetime of the database
+                if clients terminate and restart prior to exhausting an allocation.</para>
+            </tip>
+            
+            <figure>
+                <title>SEQUENCE Test (persist without active transaction)</title>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Test</para>
+<programlisting language="java"><![CDATA[logger.info("tx(tx={})", txActive());
+for (int i=0; i<20; i++) {
+    Fan f = new Fan();
+    f.setMake("cool runner " + counter++);
+    em.persist(f);
+    logger.info("created fan(tx={}): {}", txActive(), f);
+    if (i==0) {
+        fan=f;
+    }
+}
+
+logger.info("starting tx(tx={}): {}", txActive(), fan);
+em.getTransaction().begin();
+logger.info("tx started, flushing (tx={}): {}", txActive(), fan);
+em.flush();
+logger.info("cache flushed (tx={}): {}", txActive(), fan);
+em.getTransaction().commit();
+logger.info("tx committed (tx={}): {}", txActive(), fan);
+]]></programlisting>
+                    </listitem>
+
+                    <listitem><para>Output while transaction inactive</para>
+<programlisting language=""><![CDATA[-tx(tx=false)
+-created fan(tx=false): 1451387509, id=26, make=cool runner 22
+-call next value for FAN_SEQ
+-created fan(tx=false): 1238209644, id=27, make=cool runner 23
+-created fan(tx=false): 1371953731, id=28, make=cool runner 24
+-created fan(tx=false): 1947060963, id=29, make=cool runner 25
+-call next value for FAN_SEQ
+-created fan(tx=false): 1309934743, id=30, make=cool runner 26
+-created fan(tx=false): 833420622, id=31, make=cool runner 27
+-created fan(tx=false): 1601333072, id=32, make=cool runner 28
+...
+-call next value for FAN_SEQ
+-created fan(tx=false): 1591063329, id=42, make=cool runner 38
+-created fan(tx=false): 2129344690, id=43, make=cool runner 39
+-created fan(tx=false): 223662325, id=44, make=cool runner 40
+-call next value for FAN_SEQ
+-created fan(tx=false): 1835794313, id=45, make=cool runner 41
+]]></programlisting>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Same as transaction active so far</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                    
+
+                    <listitem><para>Output when transaction activated</para>
+<programlisting language=""><![CDATA[-starting tx(tx=false): 1451387509, id=26, make=cool runner 22
+
+-tx started, flushing (tx=true): 1451387509, id=26, make=cool runner 22
+-insert into ORMCORE_FAN (make, id) values (?, ?)
+-binding parameter [1] as [VARCHAR] - [cool runner 22]
+-binding parameter [2] as [BIGINT] - [26]
+-insert into ORMCORE_FAN (make, id) values (?, ?)
+-binding parameter [1] as [VARCHAR] - [cool runner 23]
+-binding parameter [2] as [BIGINT] - [27]
+...
+-insert into ORMCORE_FAN (make, id) values (?, ?)
+-binding parameter [1] as [VARCHAR] - [cool runner 41]
+-binding parameter [2] as [BIGINT] - [45]
+-cache flushed (tx=true): 1451387509, id=26, make=cool runner 22
+-tx committed (tx=false): 1451387509, id=26, make=cool runner 22
+]]></programlisting>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>As with previous case -- nothing started with transaction opening</para></listitem>
+                            <listitem><para>All inserts are delayed until next flush cycle</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </itemizedlist>
+            </figure>           
             
         </section>
 
@@ -330,6 +593,16 @@ Hibernate:
 
         <section id="jpa-entity-pkmap-generated-table">
            <title>GenerationType.TABLE</title>
+           <itemizedlist spacing="compact">
+              <listitem><para>A poor man's SEQUENCE</para></listitem>
+              <listitem><para>A generic answer to "some databases don't support ..."</para></listitem>
+              <listitem><para>Both can allocate IDs in blocks and allow the client provider to assign IDs with less requests to the database</para></listitem>
+              <listitem><para>SEQUENCES are implemented in the database as non-transactional resources for this specific purpose</para></listitem>
+              <listitem><para>The TABLEs strategy is implemented using RDBMS Table and is transactional</para></listitem>
+              <listitem><para>The deterministic read and update of a RDBMS table requires a transaction with a at least a row lock that will allow a read, increment, and update a column value for a row</para></listitem>
+              <listitem><para>Transactions and locks required on the ID table row -- may induce sequential access to inserts</para></listitem>
+           </itemizedlist>
+           
             <figure>
            <title>Entity with GenerationType.TABLE</title>
 <programlisting language="java"><![CDATA[@Entity
@@ -340,8 +613,9 @@ Hibernate:
         pkColumnName="UID_ID",         //pk column for seq table
         pkColumnValue="ORMCORE_EGGBEATER",  //pk value in pk column
         valueColumnName="UID_VAL",     //column for seq value
+        initialValue=7,               //first value database should provide
         allocationSize=5              //increment UID_ID after using this many
-    )        
+    )   
 public class EggBeater {
     @Id
     @GeneratedValue(strategy=GenerationType.TABLE, //use DB table 
@@ -362,125 +636,128 @@ public class EggBeater {
 create table ORMCORE_EB_UID (
      UID_ID varchar(255),
      UID_VAL integer 
-)]]></programlisting>                        
+)
+
+-insert into ORMCORE_EB_UID(UID_ID, UID_VAL) values ('ORMCORE_EGGBEATER',7)
+-insert into ORMCORE_EB_UID(UID_ID, UID_VAL) values ('ORMCORE_EGGBEATER',7)
+]]></programlisting>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Row insert initializes ID row</para></listitem>
+                    <listitem><para>Duplicate row inserts likely caused by demonstration environment having annotated and mapped classes define same table mapping</para></listitem>
+                </itemizedlist>
+                        
             </figure>
 
             <figure>
                 <title>TABLE Test</title>
-<programlisting language="java"><![CDATA[@Test
-public void testTABLE() {
-    log.info("testTABLE");
-    log.debug("table id before=" + getTableId());
-    //note that since PKs are generated, we must pass in an object that
-    //has not yet been assigned a PK value.
-    ejava.examples.orm.core.annotated.EggBeater eggbeater = new EggBeater(0);
-    eggbeater.setMake("done right");
-    
-    //insert a row in the database
-    em.persist(eggbeater);
-    log.info("created eggbeater (before flush):" + eggbeater);
-    em.flush(); 
-    log.info("created eggbeater (after flush):" + eggbeater);
-    
-    assertFalse(eggbeater.getId() == 0L);   
-}
-]]></programlisting>                        
-<programlisting language=""><![CDATA[
--testTABLE
-Hibernate:
-    select
-        UID_VAL 
-    from
-        ORMCORE_EB_UID 
-    where
-        UID_ID='ORMCORE_EGGBEATER'
--table id before=null
-Hibernate:
-    select
-        UID_VAL 
-    from
-        ORMCORE_EB_UID 
-    where
-        UID_ID = 'ORMCORE_EGGBEATER' for update
-Hibernate:
-    insert 
-    into
-        ORMCORE_EB_UID
-        (UID_ID, UID_VAL) 
-    values
-        ('ORMCORE_EGGBEATER', ?)
-Hibernate:
-    update
-        ORMCORE_EB_UID 
-    set
-        UID_VAL = ? 
-    where
-        UID_VAL = ? 
-        and UID_ID = 'ORMCORE_EGGBEATER'
--created eggbeater (before flush):ejava.examples.orm.core.annotated.EggBeater@4eb8b5a9, id=1, make=done right
-Hibernate:
-    insert 
-    into
-        ORMCORE_EGGBEATER
-        (make, id) 
-    values
-        (?, ?)
--created eggbeater (after flush):ejava.examples.orm.core.annotated.EggBeater@4eb8b5a9, id=1, make=done right
-]]></programlisting>                        
+<programlisting language="java"><![CDATA[logger.info("testTABLE");
+logger.debug("table id before(tx={})={}", txActive(), getTableId());
+//note that since PKs are generated, we must pass in an object that
+//has not yet been assigned a PK value.
+ejava.examples.orm.core.annotated.EggBeater eggbeater = new EggBeater(0);
+eggbeater.setMake("done right 1");
+
+//insert a row in the database
+logger.info("persisting eggbeater (tx={}): {}", txActive(), eggbeater);
+em.persist(eggbeater);
+logger.info("created eggbeater (before flush; tx={}): {}", txActive(), eggbeater);
+em.flush(); 
+logger.info("created eggbeater (after flush; tx={}): {}", txActive(), eggbeater);
+
+assertNotEquals(0, eggbeater.getId());   
+logger.debug("table id after(tx={})={}", txActive(), getTableId());
+]]></programlisting>                     
+
+   
+<programlisting language=""><![CDATA[-testTABLE
+-select UID_VAL from ORMCORE_EB_UID where UID_ID='ORMCORE_EGGBEATER'
+-extracted value ([UID_VAL] : [NUMERIC]) - [7]
+-table id before(tx=true)=7
+
+-persisting eggbeater (tx=true): 1049628186, id=0, make=done right 1
+-select tbl.UID_VAL from ORMCORE_EB_UID tbl where tbl.UID_ID=? for update
+-update ORMCORE_EB_UID set UID_VAL=?  where UID_VAL=? and UID_ID=?
+-select tbl.UID_VAL from ORMCORE_EB_UID tbl where tbl.UID_ID=? for update
+-update ORMCORE_EB_UID set UID_VAL=?  where UID_VAL=? and UID_ID=?
+
+-created eggbeater (before flush; tx=true): 1049628186, id=8, make=done right 1
+-insert into ORMCORE_EGGBEATER (make, id) values (?, ?)
+-binding parameter [1] as [VARCHAR] - [done right 1]
+-binding parameter [2] as [BIGINT] - [8]
+
+-created eggbeater (after flush; tx=true): 1049628186, id=8, make=done right 1
+-select UID_VAL from ORMCORE_EB_UID where UID_ID='ORMCORE_EGGBEATER'
+-extracted value ([UID_VAL] : [NUMERIC]) - [17]
+-table id after(tx=true)=17
+]]></programlisting> 
+
+                <itemizedlist spacing="compact">
+                    <listitem><para>Provider gets a primary key value during persist</para></listitem>
+                    <listitem><para>Provider locks row (SELECT FOR UPDATE) during transaction and updates with new value</para></listitem>
+                    <listitem><para>Provider inserts row during flush cycle with generated primary key value</para></listitem>
+                    <listitem><para>Cannot explain the initial 2x ID requests but both incremented the value to a result of 17 <code>(7+5+5=17)</code></para></listitem>
+                </itemizedlist>
             </figure>
 
             <figure>
                 <title>Follow-on TABLE Allocations</title>
 <programlisting language=""><![CDATA[
--table id after=1
--created ehhbeater:ejava.examples.orm.core.annotated.EggBeater@3576465f, id=2, make=null
--table id after[2]=1
--created ehhbeater:ejava.examples.orm.core.annotated.EggBeater@306435cd, id=3, make=null
--table id after[3]=1
--created ehhbeater:ejava.examples.orm.core.annotated.EggBeater@35194a50, id=4, make=null
--table id after[4]=1
-Hibernate:
-    select
-        UID_VAL 
-    from
-        ORMCORE_EB_UID 
-    where
-        UID_ID = 'ORMCORE_EGGBEATER' for update
-Hibernate:
-    update
-        ORMCORE_EB_UID 
-    set
-        UID_VAL = ? 
-    where
-        UID_VAL = ? 
-        and UID_ID = 'ORMCORE_EGGBEATER'
--created ehhbeater:ejava.examples.orm.core.annotated.EggBeater@288c819b, id=5, make=null
--table id after[5]=2
--created ehhbeater:ejava.examples.orm.core.annotated.EggBeater@10508cb2, id=6, make=null
--table id after[6]=2
--created ehhbeater:ejava.examples.orm.core.annotated.EggBeater@49250068, id=7, make=null
--table id after[7]=2
--created ehhbeater:ejava.examples.orm.core.annotated.EggBeater@372b2a85, id=8, make=null
--table id after[8]=2
--created ehhbeater:ejava.examples.orm.core.annotated.EggBeater@5e69cd5e, id=9, make=null
--table id after[9]=2
-Hibernate:
-    select
-        UID_VAL 
-    from
-        ORMCORE_EB_UID 
-    where
-        UID_ID = 'ORMCORE_EGGBEATER' for update
-Hibernate:
-    update
-        ORMCORE_EB_UID 
-    set
-        UID_VAL = ? 
-    where
-        UID_VAL = ? 
-        and UID_ID = 'ORMCORE_EGGBEATER'
--created ehhbeater:ejava.examples.orm.core.annotated.EggBeater@1dbf9510, id=10, make=null
--table id after[10]=3
+-created ehhbeater(tx=true): 1275580924, id=9, make=done right 2
+	-insert into ORMCORE_EGGBEATER (make, id) values (?, ?)
+	-binding parameter [1] as [VARCHAR] - [done right 2]
+	-binding parameter [2] as [BIGINT] - [9]
+-table id after[2](tx=true)=17
+
+-created ehhbeater(tx=true): 1726759945, id=10, make=done right 3
+	-insert into ORMCORE_EGGBEATER (make, id) values (?, ?)
+	-binding parameter [1] as [VARCHAR] - [done right 3]
+	-binding parameter [2] as [BIGINT] - [10]
+-table id after[3](tx=true)=17
+...
+-created ehhbeater(tx=true): 154468798, id=13, make=done right 6
+	-insert into ORMCORE_EGGBEATER (make, id) values (?, ?)
+	-binding parameter [1] as [VARCHAR] - [done right 6]
+	-binding parameter [2] as [BIGINT] - [13]
+-table id after[6](tx=true)=17
+
+	-select tbl.UID_VAL from ORMCORE_EB_UID tbl where tbl.UID_ID=? for update
+	-update ORMCORE_EB_UID set UID_VAL=?  where UID_VAL=? and UID_ID=?
+-created ehhbeater(tx=true): 490475818, id=14, make=done right 7
+	-insert into ORMCORE_EGGBEATER (make, id) values (?, ?)
+	-binding parameter [1] as [VARCHAR] - [done right 7]
+	-binding parameter [2] as [BIGINT] - [14]
+-table id after[7](tx=true)=22
+...
+-created ehhbeater(tx=true): 360233196, id=18, make=done right 11
+	-insert into ORMCORE_EGGBEATER (make, id) values (?, ?)
+	-binding parameter [1] as [VARCHAR] - [done right 11]
+	-binding parameter [2] as [BIGINT] - [18]
+-table id after[11](tx=true)=22
+
+	-select tbl.UID_VAL from ORMCORE_EB_UID tbl where tbl.UID_ID=? for update
+	-update ORMCORE_EB_UID set UID_VAL=?  where UID_VAL=? and UID_ID=?	
+-created ehhbeater(tx=true): 1912769093, id=19, make=done right 12
+	-insert into ORMCORE_EGGBEATER (make, id) values (?, ?)
+	-binding parameter [1] as [VARCHAR] - [done right 12]
+	-binding parameter [2] as [BIGINT] - [19]
+-table id after[12](tx=true)=27
+...
+-created ehhbeater(tx=true): 1947681232, id=23, make=done right 16
+	-insert into ORMCORE_EGGBEATER (make, id) values (?, ?)
+	-binding parameter [1] as [VARCHAR] - [done right 16]
+	-binding parameter [2] as [BIGINT] - [23]
+-table id after[16](tx=true)=27
+
+	-select tbl.UID_VAL from ORMCORE_EB_UID tbl where tbl.UID_ID=? for update
+	-update ORMCORE_EB_UID set UID_VAL=?  where UID_VAL=? and UID_ID=?
+-created ehhbeater(tx=true): 783682673, id=24, make=done right 17
+	-insert into ORMCORE_EGGBEATER (make, id) values (?, ?)
+	-binding parameter [1] as [VARCHAR] - [done right 17]
+	-binding parameter [2] as [BIGINT] - [24]
+-table id after[17](tx=true)=32
+...
+-committing (tx=true): 1275580924, id=9, make=done right 2
+-tx committed (tx=false): 1275580924, id=9, make=done right 2
 ...]]></programlisting>                        
             </figure>
 
@@ -490,6 +767,90 @@ Hibernate:
                     amount of primary key values before requiring a flush of the current batch or
                     polling for a new table value.</para>
             </note>
+            
+            <figure><title>TABLE Test (persist without active transaction)</title>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Output prior to transaction</para>
+<programlisting language=""><![CDATA[-tx(tx=false)
+-created ehhbeater(tx=false): 150835665, id=29, make=done right 22
+-table id after[22](tx=false)=37
+-created ehhbeater(tx=false): 315885065, id=30, make=done right 23
+-table id after[23](tx=false)=37
+-created ehhbeater(tx=false): 423539130, id=31, make=done right 24
+-table id after[24](tx=false)=37
+-created ehhbeater(tx=false): 841313896, id=32, make=done right 25
+-table id after[25](tx=false)=37
+-created ehhbeater(tx=false): 1673518027, id=33, make=done right 26
+-table id after[26](tx=false)=37
+
+-select tbl.UID_VAL from ORMCORE_EB_UID tbl where tbl.UID_ID=? for update
+-update ORMCORE_EB_UID set UID_VAL=?  where UID_VAL=? and UID_ID=?
+-created ehhbeater(tx=false): 1042223174, id=34, make=done right 27
+-table id after[27](tx=false)=42
+...
+-created ehhbeater(tx=false): 584643821, id=38, make=done right 31
+-table id after[31](tx=false)=42
+
+-select tbl.UID_VAL from ORMCORE_EB_UID tbl where tbl.UID_ID=? for update
+-update ORMCORE_EB_UID set UID_VAL=?  where UID_VAL=? and UID_ID=?
+-created ehhbeater(tx=false): 999999316, id=39, make=done right 32
+-table id after[32](tx=false)=47
+...
+-created ehhbeater(tx=false): 1815337594, id=43, make=done right 36
+-table id after[36](tx=false)=47
+
+-select tbl.UID_VAL from ORMCORE_EB_UID tbl where tbl.UID_ID=? for update
+-update ORMCORE_EB_UID set UID_VAL=?  where UID_VAL=? and UID_ID=?
+-created ehhbeater(tx=false): 362311125, id=44, make=done right 37
+-table id after[37](tx=false)=52
+...
+-created ehhbeater(tx=false): 1292683326, id=48, make=done right 41
+-table id after[41](tx=false)=52
+]]></programlisting>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Provider obtains next allocation value outside of transaction where rows inserted</para></listitem>
+                            <listitem><para>Next allocation value requires transaction to update -- results in extra transaction per allocation</para></listitem>                            
+                            <listitem><para>Provider assigns ID to object from allocation prior to transaction where rows are inserted</para></listitem>
+                        </itemizedlist>
+
+                    </listitem>
+                    
+                    <listitem><para>Output once transaction started</para>
+<programlisting language=""><![CDATA[
+-starting tx(tx=false): 150835665, id=29, make=done right 22
+-tx started, flushing (tx=true): 150835665, id=29, make=done right 22
+-insert into ORMCORE_EGGBEATER (make, id) values (?, ?)
+-binding parameter [1] as [VARCHAR] - [done right 22]
+-binding parameter [2] as [BIGINT] - [29]
+-insert into ORMCORE_EGGBEATER (make, id) values (?, ?)
+-binding parameter [1] as [VARCHAR] - [done right 23]
+-binding parameter [2] as [BIGINT] - [30]
+-insert into ORMCORE_EGGBEATER (make, id) values (?, ?)
+-binding parameter [1] as [VARCHAR] - [done right 24]
+-binding parameter [2] as [BIGINT] - [31]
+-insert into ORMCORE_EGGBEATER (make, id) values (?, ?)
+-binding parameter [1] as [VARCHAR] - [done right 25]
+-binding parameter [2] as [BIGINT] - [32]
+-insert into ORMCORE_EGGBEATER (make, id) values (?, ?)
+-binding parameter [1] as [VARCHAR] - [done right 26]
+-binding parameter [2] as [BIGINT] - [33]
+...
+-insert into ORMCORE_EGGBEATER (make, id) values (?, ?)
+-binding parameter [1] as [VARCHAR] - [done right 41]
+-binding parameter [2] as [BIGINT] - [48]
+-cache flushed (tx=true): 150835665, id=29, make=done right 22
+-tx committed (tx=false): 150835665, id=29, make=done right 22
+]]></programlisting>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Provider inserts rows from cache during next flush cycle</para></listitem>
+                            <listitem><para>Each row has a pre-assigned ID from provider</para></listitem>
+                            <listitem><para>Database makes no correlation between ID within row and the table maintaining the IDs</para></listitem>
+                        </itemizedlist>
+
+                    </listitem>
+                </itemizedlist>
+            </figure>          
+            
         </section>
     </section>
 </chapter>
