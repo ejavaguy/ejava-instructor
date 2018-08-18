@@ -21,12 +21,12 @@
 package myorg.queryex;
 
 import static org.junit.Assert.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.Test;
 
 public class QueryLocksTest extends QueryBase {
-    private static final Log log = LogFactory.getLog(QueryLocksTest.class);
+    private static final Logger log = LoggerFactory.getLogger(QueryLocksTest.class);
     
     @Test 
     public void test(){}

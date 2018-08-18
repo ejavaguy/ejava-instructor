@@ -66,28 +66,29 @@
                 Activate the webdev-repositories profile (-Pwebdev-repositories) so that you can resolve
                 the archetype off the Internet. The following should be run outside of the class example
                 tree.</para>
- <programlisting language=""><![CDATA[
- >mvn archetype:generate -B -DarchetypeGroupId=info.ejava.examples.jpa -DarchetypeArtifactId=jpa-archetype -DgroupId=myorg.relex -DartifactId=relationEx -Pwebdev-repositories
-
- [INFO] ----------------------------------------------------------------------------
- [INFO] Using following parameters for creating project from Archetype: jpa-archetype:4.0.0-SNAPSHOT
- [INFO] ----------------------------------------------------------------------------
- [INFO] Parameter: groupId, Value: myorg.relex
- [INFO] Parameter: artifactId, Value: relationEx
- [INFO] Parameter: version, Value: 1.0-SNAPSHOT
- [INFO] Parameter: package, Value: myorg.relex
- [INFO] Parameter: packageInPathFormat, Value: myorg/relex
- [INFO] Parameter: version, Value: 1.0-SNAPSHOT
- [INFO] Parameter: package, Value: myorg.relex
- [INFO] Parameter: groupId, Value: myorg.relex
- [INFO] Parameter: artifactId, Value: relationEx
- [INFO] project created from Archetype in dir: C:\proj\784\relationEx
- [INFO] ------------------------------------------------------------------------
- [INFO] BUILD SUCCESS
- [INFO] ------------------------------------------------------------------------
- [INFO] Total time: 2.719 s
- [INFO] Finished at: 2014-09-20T22:31:16-04:00
- [INFO] Final Memory: 10M/32M
+ <programlisting language=""><![CDATA[$ mvn archetype:generate -B -DarchetypeGroupId=info.ejava.examples.jpa -DarchetypeArtifactId=jpa-archetype -DarchetypeVersion=5.0.0-SNAPSHOT -DgroupId=myorg.relex -DartifactId=relationEx -Pwebdev-repositories
+[INFO] Scanning for projects...
+...
+[INFO] ----------------------------------------------------------------------------
+[INFO] Using following parameters for creating project from Archetype: jpa-archetype:5.0.0-SNAPSHOT
+[INFO] ----------------------------------------------------------------------------
+[INFO] Parameter: groupId, Value: myorg.relex
+[INFO] Parameter: artifactId, Value: relationEx
+[INFO] Parameter: version, Value: 1.0-SNAPSHOT
+[INFO] Parameter: package, Value: myorg.relex
+[INFO] Parameter: packageInPathFormat, Value: myorg/relex
+[INFO] Parameter: version, Value: 1.0-SNAPSHOT
+[INFO] Parameter: package, Value: myorg.relex
+[INFO] Parameter: groupId, Value: myorg.relex
+[INFO] Parameter: artifactId, Value: relationEx
+[INFO] Project created from Archetype in dir: /Users/jim/proj/784/relationEx
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 2.287 s
+[INFO] Finished at: 2018-08-18T12:19:05-04:00
+[INFO] Final Memory: 18M/314M
+[INFO] ------------------------------------------------------------------------
 ]]></programlisting>
             </listitem>
             <listitem><para>You should now have an instantiated template for a JPA project</para>
@@ -119,7 +120,7 @@ relationEx/
 <programlisting language=""><![CDATA[
 relationEx]$ mvn clean test -Ph2db -P\!h2srv
 ...
- -HHH000401: using driver [org.h2.Driver] at URL [jdbc:h2:C:\proj\784\relationEx/target/h2db/ejava]
+ -HHH000401: using driver [org.h2.Driver] at URL [jdbc:h2:/Users/jim/proj/784/relationEx/target/h2db/ejava]
 ...
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
@@ -138,7 +139,7 @@ $ java -jar M2_REPO/com/h2database/h2/1.3.168/h2-1.3.168.jar
 <programlisting language=""><![CDATA[
 relationEx]$ mvn clean test -P\!h2db -Ph2srv
 ...
- -HHH000401: using driver [org.h2.Driver] at URL [jdbc:h2:tcp://127.0.0.1:9092/h2db/ejava]
+ -HHH000401: using driver [org.h2.Driver] at URL [jdbc:h2:tcp://127.0.0.1:9092/./h2db/ejava]
 ...
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
@@ -156,12 +157,12 @@ relationEx]$ mvn clean test -P\!h2db -Ph2srv
 package myorg.relex;
 
 import javax.persistence.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.*;
 
 public class JPATestBase {
-    private static Log log = LogFactory.getLog(JPATestBase.class);
+    private static Logger log = LoggerFactory.getLogger(JPATestBase.class);
     private static final String PERSISTENCE_UNIT = "relationEx-test";
     private static EntityManagerFactory emf;
     protected EntityManager em;    
@@ -182,23 +183,20 @@ public class JPATestBase {
 
     @After
     public void tearDown() throws Exception {
-        try {
-            log.debug("tearDown() started, em=" + em);
-            if (!em.getTransaction().isActive()) {
-                em.getTransaction().begin();
-                em.getTransaction().commit();            
-            } else if (!em.getTransaction().getRollbackOnly()) {
-                em.getTransaction().commit();                           
+        logger.debug("tearDown() started, em={}", em);
+        if (em!=null) {
+            EntityTransaction tx = em.getTransaction();
+            if (tx.isActive()) {
+                if (tx.getRollbackOnly() == true) { tx.rollback(); }
+                else                              { tx.commit(); }
             } else {
-                em.getTransaction().rollback();
+                tx.begin();
+                tx.commit();
             }
             em.close();
-            log.debug("tearDown() complete, em=" + em);
+            em=null;
         }
-        catch (Exception ex) {
-            log.fatal("tearDown failed", ex);
-            throw ex;
-        }
+        logger.debug("tearDown() complete, em={}", em);
      }
     
     @AfterClass

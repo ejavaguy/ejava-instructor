@@ -18,12 +18,12 @@
 <programlisting language="java"><![CDATA[
 package myorg.queryex;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.Test;
 
 public class QueryTest extends QueryBase {
-    private static final Log log = LogFactory.getLog(QueryTest.class);
+    private static final Logger log = LoggerFactory.getLogger(QueryTest.class);
     @Test
     public void test() {}
 }]]></programlisting>                        
