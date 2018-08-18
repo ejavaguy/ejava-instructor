@@ -65,7 +65,7 @@ private Validator val = vf.getValidator();
 
 Set<ConstraintViolation<Person>> violations = val.validate(p);
 for (ConstraintViolation<Person> v : violations) {
-    log.info(v.getPropertyPath() + ":" + v.getInvalidValue() + " " + v.getMessage());
+    logger.info("{}:{} {}", v.getPropertyPath(), v.getInvalidValue(),  v.getMessage());          
 }
 
 assertEquals("unexpected number of violations", 3, violations.size());]]></programlisting>                        
@@ -299,7 +299,7 @@ Person p = new Person()
 
 Set<ConstraintViolation<Person>> violations = val.validate(p, Drivers.class);
 for (ConstraintViolation<Person> v : violations) {
-    log.debug(v.getPropertyPath() + ":" + v.getInvalidValue() + " " + v.getMessage());
+    logger.info("{}:{} {}", v.getPropertyPath(), v.getInvalidValue(), v.getMessage());
 }
 ...
 assertFalse("valid driver", violations.isEmpty());]]></programlisting>                        
@@ -398,7 +398,7 @@ public @interface ValidName {
 
 Set<ConstraintViolation<Person>> violations = val.validate(p);
 for (ConstraintViolation<Person> v : violations) {
-    log.debug(v.getPropertyPath() + ":" + v.getInvalidValue() + " " + v.getMessage());
+    logger.info("{}:{} {}", v.getPropertyPath(), v.getInvalidValue(), v.getMessage());
 }
 ]]></programlisting>
                         

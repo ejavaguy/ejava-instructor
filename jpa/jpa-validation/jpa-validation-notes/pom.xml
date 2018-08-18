@@ -14,7 +14,7 @@
     
     <properties>
        <doc.base>jpa-validation-book</doc.base>
-       <content.version>v2013-09-23</content.version>
+       <content.version>v2018-08-18</content.version>
     </properties>
 
     <build>

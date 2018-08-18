@@ -94,7 +94,7 @@ public class Person {
 try {
     em.persist(p);
 } catch (ConstraintViolationException ex) {
-    log.info("caught expected exception:" + ex);
+    logger.info("caught expected exception:" + ex);
 }]]></programlisting>                        
 
 <programlisting language=""><![CDATA[ -caught expected exception:javax.validation.ConstraintViolationException: 
