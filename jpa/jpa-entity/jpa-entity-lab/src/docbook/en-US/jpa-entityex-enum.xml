@@ -100,16 +100,17 @@ public class Dog {
                 properly.</para>
 <programlisting language="java"><![CDATA[    @Test
     public void testEnums() {
-        log.info("testEnums");
+        logger.info("testEnums");
         Dog dog = new Dog()
             .setGender(Dog.Sex.FEMALE);
         em.persist(dog);
         em.flush();
         
         //check the raw value stored in the database
-        Object o = em.createNativeQuery("select GENDER from ENTITYEX_DOG where id=" + dog.getId())
+        Object[] o = (Object[])em.createNativeQuery("select GENDER from ENTITYEX_DOG where id=?")
+                .setParameter(1, dog.getId())
                 .getSingleResult();
-        log.debug("col=" + o);
+        logger.debug("col=" + o);
         assertEquals("unexpected gender", Dog.Sex.FEMALE.ordinal(), ((Number)o).intValue());
         
         //get a new instance
@@ -187,7 +188,7 @@ public class Dog {
                 the color property.</para>
 <programlisting language="java"><![CDATA[    @Test
     public void testEnums() {
-        log.info("testEnums");
+        logger.info("testEnums");
         Dog dog = new Dog()
             .setGender(Dog.Sex.FEMALE)
             .setColor(Dog.Color.MIX);
@@ -195,9 +196,10 @@ public class Dog {
         em.flush();
         
         //check the raw value stored in the database
-        Object[] o = (Object[])em.createNativeQuery("select GENDER, COLOR from ENTITYEX_DOG where id=" + dog.getId())
+        Object[] o = (Object[])em.createNativeQuery("select GENDER, COLOR from ENTITYEX_DOG where id=?")
+                .setParameter(1, dog.getId())
                 .getSingleResult();
-        log.debug("cols=" + Arrays.toString(o));
+        logger.debug("cols=" + Arrays.toString(o));
         assertEquals("unexpected gender", Dog.Sex.FEMALE.ordinal(), ((Number)o[0]).intValue());
         assertEquals("unexpected color", Dog.Color.MIX.name(), ((String)o[1]));
         
@@ -312,7 +314,7 @@ public class Dog {
             </para>
 <programlisting language="java"><![CDATA[    @Test
     public void testEnums() {
-        log.info("testEnums");
+        logger.info("testEnums");
         Dog dog = new Dog()
             .setGender(Dog.Sex.FEMALE)
             .setColor(Dog.Color.MIX)
@@ -321,9 +323,10 @@ public class Dog {
         em.flush();
         
         //check the raw value stored in the database
-        Object[] o = (Object[])em.createNativeQuery("select GENDER, COLOR, BREED from ENTITYEX_DOG where id=" + dog.getId())
+        Object[] o = (Object[])em.createNativeQuery("select GENDER, COLOR, BREED from ENTITYEX_DOG where id=?")
+                .setParameter(1, dog.getId())
                 .getSingleResult();
-        log.debug("cols=" + Arrays.toString(o));
+        logger.debug("cols=" + Arrays.toString(o));
         assertEquals("unexpected gender", Dog.Sex.FEMALE.ordinal(), ((Number)o[0]).intValue());
         assertEquals("unexpected color", Dog.Color.MIX.name(), ((String)o[1]));
         assertEquals("unexpected breed", Dog.Breed.SAINT_BERNARD.prettyName, ((String)o[2]));

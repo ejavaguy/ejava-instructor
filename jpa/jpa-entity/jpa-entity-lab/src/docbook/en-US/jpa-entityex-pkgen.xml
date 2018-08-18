@@ -93,13 +93,13 @@ public class Bunny {
 <programlisting language="java"><![CDATA[
     @Test
     public void testPKGen() {
-        log.info("testPKGen");
+        logger.info("testPKGen");
         Bunny bunny = new Bunny();
         bunny.setName("fuzzy");
         assertTrue("primary key unexpectedly assigned", bunny.getId()==0);
         em.persist(bunny);
         em.flush();
-        log.info("bunny.getId()=" + bunny.getId());
+        logger.info("bunny.getId()=" + bunny.getId());
         assertFalse("primary key not assigned", bunny.getId()==0);
         
         Set<Integer> ids = new HashSet<Integer>();
@@ -111,7 +111,7 @@ public class Bunny {
             em.flush();
             assertTrue("id not unique:" + b.getId(), ids.add(b.getId()));
         }
-        log.debug("ids=" + ids);
+        logger.debug("ids=" + ids);
     }
 ]]></programlisting>
                 <para>The em.flush() exists after the persist because we want to 
@@ -254,15 +254,6 @@ Hibernate:
         </attributes>
     </entity>
 ]]></programlisting>
-            <note>
-                <para>The sequence-generator element allows for the specification of 
-                    an initial value and increment and the H2 documentation states it 
-                    supports these values in its definition. However, if supplied,
-                    they do not seem to make it into the database schema so I left
-                    that level of specification out of the exercise. This  
-                    sounds worse than it really is. Production schema is nearly always
-                    generated wither by hand or with some manual adjustments.</para>
-            </note>
             </listitem>
             
 

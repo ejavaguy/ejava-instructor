@@ -304,14 +304,14 @@ public class Cat2 {]]></programlisting>
                 to the getter and setter methods</para>
 <programlisting language="java"><![CDATA[# src/main/java/myorg/entityex/annotated/Cat2.java
 
-    private static final Log log = LogFactory.getLog(Cat2.class);
+    private static final Log logger = LogFactory.getLog(Cat2.class);
 ...
     public BigDecimal getWeight() {
-        log.debug("annotated.getWeight()");
+        logger.debug("annotated.getWeight()");
         return new BigDecimal(weight); 
     }
     public void setWeight(BigDecimal weight) {
-        log.debug("annotated.setWeight()");
+        logger.debug("annotated.setWeight()");
         this.weight = weight==null ? 0 : weight.doubleValue();
     }]]></programlisting>
             </listitem>
@@ -325,7 +325,7 @@ public class Cat2 {]]></programlisting>
 
     @Test
     public void testCreateCatAnnotated() {
-        log.info("testCreateCatAnnotated");
+        logger.info("testCreateCatAnnotated");
         myorg.entityex.annotated.Cat2 cat = new myorg.entityex.annotated.Cat2("fluffy", null, 99.9);
         em.persist(cat);                                                 //get provider to call getters
         em.flush(); em.detach(cat);
@@ -366,18 +366,18 @@ Hibernate:
 <programlisting language="java"><![CDATA[# src/main/java/myorg/entityex/mapped/Cat.java
 
 public class Cat {
-    private static final Log log = LogFactory.getLog(Cat.class);
+    private static final Log logger = LogFactory.getLog(Cat.class);
 ...
     private double weight;
 ...
     public Cat(String name, Date dob, double weight) {
 ...
     public BigDecimal getWeight() {
-        log.debug("mapped.getWeight()");
+        logger.debug("mapped.getWeight()");
         return new BigDecimal(weight); 
     }
     public void setWeight(BigDecimal weight) {
-        log.debug("mapped.setWeight()");
+        logger.debug("mapped.setWeight()");
         this.weight = weight==null ? 0 : weight.doubleValue();
     }]]></programlisting>
             </listitem>
@@ -385,7 +385,7 @@ public class Cat {
             <listitem><para>Add the following test method to your JUnit class.</para>
 <programlisting language="java"><![CDATA[    @Test
     public void testCreateCatMapped() {
-        log.info("testCreateCatMapped");
+        logger.info("testCreateCatMapped");
         myorg.entityex.mapped.Cat cat = new myorg.entityex.mapped.Cat("fluffy", null, 99.9);
         em.persist(cat);                                                 //get provider to call getters
         em.flush(); em.detach(cat);

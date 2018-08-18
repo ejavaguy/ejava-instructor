@@ -65,7 +65,7 @@ public class Animal {
  
     @Test
     public void testCreateAnimal() {
-        log.info("testCreateAnimal");
+        logger.info("testCreateAnimal");
         Animal animal = new Animal("bessie", 
                 new GregorianCalendar(1960, 1, 1).getTime(), 1400.2);
         em.persist(animal);        
@@ -179,7 +179,7 @@ Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
                 find().</para>
  <programlisting language="java"><![CDATA[    @Test
     public void testCreateAnimal() {
-        log.info("testCreateAnimal");
+        logger.info("testCreateAnimal");
         Animal animal = new Animal("bessie", 
                 new GregorianCalendar(1960, 1, 1).getTime(), 1400.2);
         em.persist(animal);        
@@ -307,7 +307,7 @@ target/test-classes
             <listitem><para>Add a new test method to work with the new class added to the module.</para>
 <programlisting language="java"><![CDATA[    @Test
     public void testCreateAnimalAnnotated() {
-        log.info("testCreateAnimalAnnotated");
+        logger.info("testCreateAnimalAnnotated");
         myorg.entityex.annotated.Animal2 animal = new myorg.entityex.annotated.Animal2("bessie", 
                 new GregorianCalendar(1960, 1, 1).getTime(), 1400.2);
         em.persist(animal);        
@@ -316,7 +316,16 @@ target/test-classes
         
         em.flush(); //make sure all writes were issued to DB
         em.clear(); //purge the local entity manager entity cache to cause new instance
-        assertNotNull("animal not found", em.find(myorg.entityex.annotated.Animal2.class,animal.getId()));]]></programlisting>                        
+        assertNotNull("animal not found", em.find(myorg.entityex.annotated.Animal2.class,animal.getId()));]]></programlisting>
+                <tip>
+                    <para>If you get a very generic error message like 
+                    "PersistenceException: No Persistence provider for EntityManager named entityEx-test" within Eclipse
+                    when running Junit -- build from the command line to help see errors produced by Hibernate. If you 
+                    do not see valuable error messages -- try turning up the verbosity on "org.hibernate" or looking in
+                    the target/log4j-out.txt file.
+                    </para>
+                
+                </tip>                                
             </listitem>
 
             <listitem><para>Attempt to build/run your module at this point. You should get a familiar 
@@ -363,7 +372,7 @@ hibernate.format_sql=true
                         to choose it as one of your active profiles in .m2/settings.xml and have
                         Eclipse re-read your settings.xml</para>
 <programlisting language=""><![CDATA[# start server
-$ java -jar (localRepository)/com/h2database/h2/1.3.168/h2-1.3.168.jar
+$ java -jar (localRepository)/com/h2database/h2/1.4.197/h2-1.4.197.jar
 
 
 # .m2/settings.xml
@@ -387,6 +396,13 @@ ID      DOB     NAME    WEIGHT
             </listitem>
             
         </orderedlist>
+        
+        <tip>
+            <title>UI and application JDBC URLs should be the same</title>
+            <para>If you do not see your EM_AUTO, ANIMAL, and ANIMAL2 tables in the 
+            UI, verify the URL used by the application and the UI. They must be the 
+            same. </para>
+        </tip>
     </section>
 
         

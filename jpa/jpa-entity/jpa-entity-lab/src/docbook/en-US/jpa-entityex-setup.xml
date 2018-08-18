@@ -9,13 +9,13 @@
         
         <warning>
             <para>The project created from this archetype has two mechanisms for managing schema;
-                maven plugin-based and entitymanager-based. Know that when you start this exercise
+                maven plugin-based and EntityManager-based. Know that when you start this exercise
                 the two mechanisms may be both activated and competing (last one wins). One type may be
-                better for some usages while the other may be more helpful in others. Know which is
+                better for some uses while the other may be more helpful in others. Know which is
                 best to use in which circumstance and which one is active or turned off when encountering
                 a database setup issue.</para> 
             <para>
-                The entitymanager mechanism is activated and deactivated through the 
+                The EntityManager mechanism is activated and deactivated through the 
                 hibernate.hbm2ddl.auto property in src/test/resources/hibernate.properties. Set to 
                 create to turn on or comment out to turn off. 
             </para>
@@ -41,7 +41,7 @@
                              -->
 ]]></programlisting>                        
             
-            <para>The entitymanager technique is useful when making quick schema changes to your 
+            <para>The EntityManager technique is useful when making quick schema changes to your 
                 entities within Eclipse but not as good if you want to preserve data for analysis.
                 The maven plugin technique is useful when you commonly build from maven after making
                 entity changes. It is also useful in generating schema that can be analyzed after the
@@ -98,28 +98,43 @@
                 the archetype off the Internet. The following should be run outside of the class example
                 tree.</para>
  <programlisting language=""><![CDATA[
- >mvn archetype:generate -B -DarchetypeGroupId=info.ejava.examples.jpa -DarchetypeArtifactId=jpa-archetype -DgroupId=myorg.entityex -DartifactId=entityEx -Pwebdev-repositories
+ >mvn archetype:generate -B -DarchetypeGroupId=info.ejava.examples.jpa -DarchetypeArtifactId=jpa-archetype -DarchetypeVersion=5.0.0-SNAPSHOT -DgroupId=myorg.entityex -DartifactId=entityEx -Pwebdev-repositories
 
- [INFO] ----------------------------------------------------------------------------
- [INFO] Using following parameters for creating project from Archetype: jpa-archetype:4.0.0-SNAPSHOT
- [INFO] ----------------------------------------------------------------------------
- [INFO] Parameter: groupId, Value: myorg.entityex
- [INFO] Parameter: artifactId, Value: entityEx
- [INFO] Parameter: version, Value: 1.0-SNAPSHOT
- [INFO] Parameter: package, Value: myorg.entityex
- [INFO] Parameter: packageInPathFormat, Value: myorg/entityex
- [INFO] Parameter: version, Value: 1.0-SNAPSHOT
- [INFO] Parameter: package, Value: myorg.entityex
- [INFO] Parameter: groupId, Value: myorg.entityex
- [INFO] Parameter: artifactId, Value: entityEx
- [INFO] project created from Archetype in dir: C:\proj\784\entityEx
- [INFO] ------------------------------------------------------------------------
- [INFO] BUILD SUCCESS
- [INFO] ------------------------------------------------------------------------
- [INFO] Total time: 26.591 s
- [INFO] Finished at: 2014-09-20T22:16:20-04:00
- [INFO] Final Memory: 11M/29M
- [INFO] ------------------------------------------------------------------------
+INFO] Scanning for projects...
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Maven Stub Project (No POM) 1
+[INFO] ------------------------------------------------------------------------
+[INFO]
+[INFO] >>> maven-archetype-plugin:3.0.1:generate (default-cli) > generate-sources @ standalone-pom >>>
+[INFO]
+[INFO] <<< maven-archetype-plugin:3.0.1:generate (default-cli) < generate-sources @ standalone-pom <<<
+[INFO]
+[INFO]
+[INFO] --- maven-archetype-plugin:3.0.1:generate (default-cli) @ standalone-pom ---
+[INFO] Generating project in Batch mode
+[WARNING] Archetype not found in any catalog. Falling back to central repository.
+[WARNING] Add a repsoitory with id 'archetype' in your settings.xml if archetype's repository is elsewhere.
+[INFO] ----------------------------------------------------------------------------
+[INFO] Using following parameters for creating project from Archetype: jpa-archetype:5.0.0-SNAPSHOT
+[INFO] ----------------------------------------------------------------------------
+[INFO] Parameter: groupId, Value: myorg.entityex
+[INFO] Parameter: artifactId, Value: entityEx
+[INFO] Parameter: version, Value: 1.0-SNAPSHOT
+[INFO] Parameter: package, Value: myorg.entityex
+[INFO] Parameter: packageInPathFormat, Value: myorg/entityex
+[INFO] Parameter: version, Value: 1.0-SNAPSHOT
+[INFO] Parameter: package, Value: myorg.entityex
+[INFO] Parameter: groupId, Value: myorg.entityex
+[INFO] Parameter: artifactId, Value: entityEx
+[INFO] Project created from Archetype in dir: .../proj/784/entityEx
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 20.490 s
+[INFO] Finished at: 2018-08-17T19:59:39-04:00
+[INFO] Final Memory: 18M/317M
+[INFO] ------------------------------------------------------------------------
 ]]></programlisting>
             </listitem>
             <listitem><para>You should now have an instantiated template for a JPA project</para>
@@ -150,19 +165,19 @@ entityEx/
                         This option does not require a server but is harder to inspect database state in between tests. Remember
                         that the "!" character must be escaped ("\!") for bash shells.</para>
 <programlisting language=""><![CDATA[
-entityEx> mvn clean test -Ph2db -P!h2srv
+entityEx> mvn clean test -Ph2db -P\!h2srv
 ...
- -HHH000401: using driver [org.h2.Driver] at URL [jdbc:h2:C:\proj\784\entityEx/target/h2db/ejava]
+ -HHH10001005: using driver [org.h2.Driver] at URL [jdbc:h2:/Users/jim/proj/784/entityEx/target/h2db/ejava]
 ...
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-]]></programlisting>                        
+]]></programlisting>                       
                     </listitem>
 
                     <listitem><para>Start your database server</para>
 <programlisting language=""><![CDATA[
-$ java -jar M2_REPO/com/h2database/h2/1.3.168/h2-1.3.168.jar
+$ java -jar M2_REPO/com/h2database/h2/1.4.197/h2-1.4.197.jar
 ]]></programlisting>                        
                     </listitem>
 
@@ -171,7 +186,7 @@ $ java -jar M2_REPO/com/h2database/h2/1.3.168/h2-1.3.168.jar
 <programlisting language=""><![CDATA[
 entityEx> mvn clean test -P\!h2db -Ph2srv
 ...
- -HHH000401: using driver [org.h2.Driver] at URL [jdbc:h2:tcp://127.0.0.1:9092/h2db/ejava]
+ -HHH10001005: using driver [org.h2.Driver] at URL [jdbc:h2:tcp://127.0.0.1:9092/./h2db/ejava]
 ...
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
