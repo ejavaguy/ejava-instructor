@@ -26,7 +26,6 @@
                     <listitem><para>Mapping relationships between JPA entity classes to a relational database</para></listitem>
                     <listitem><para>Propagating dependent primary key values derived from a parent relationship</para></listitem>
                     <listitem><para>Relating entity classes which use built-in and composite primary key types</para></listitem>
-                    <listitem><para></para></listitem>
                     <listitem><para>Witnessing the functional and potential performance differences between different mapping styles and properties</para></listitem>
                 </itemizedlist>
             </listitem>
@@ -39,11 +38,21 @@
                     <listitem><para>Realize relationships to a parent entity using a composite primary/foreign key</para></listitem>
                     <listitem><para>Enforce mandatory and allow optional relationships</para></listitem>
                     <listitem><para>Reduce interaction with the EntityManager using relationship Cascades</para></listitem>
-                    <listitem><para></para></listitem>
                     <listitem><para>Impact performance through informed decisions on selecting certain relationship styles and properties</para></listitem>
                 </itemizedlist>
             </listitem>
         </itemizedlist>
+        <warning>
+            <title>GeneratedValue strategy change from IDENTITY to SEQUENCE</title>
+            <para>This exercise makes use of the AUTO GeneratedValue strategy and was 
+            originally authored when that strategy was IDENTITY. As of 2018 using H2,
+            the strategy resolves SEQUENCE. That means that there will be an additional
+            set of calls to "next value" and database rows may be delayed in their
+            insertion. Simply add an <code>em.flush()</code> to force the insert of any
+            new rows where there is a confusing mis-match between the instructions and 
+            your observed output. This should be another reminder to not leverage 
+            the AUTO strategy -- since it can change over time.</para>
+        </warning>
     </preface>
 
     <toc/>
