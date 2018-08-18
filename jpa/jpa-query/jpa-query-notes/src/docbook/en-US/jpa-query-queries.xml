@@ -84,7 +84,7 @@ catch (NonUniqueResultException ex) { ... }
         </itemizedlist>
 
         <figure>
-            <title>Returns List of Results Based on Query</title>
+            <title>Return List of Results Based on Query</title>
 <programlisting language="java"><![CDATA[TypedQuery<Clerk> query = em.createQuery(
     "select c from Clerk c where lastName='Pep'", Clerk.class);
 List<Clerk> clerks = query.getResultList();
@@ -108,6 +108,46 @@ where clerk0_.LAST_NAME='Pep'
 ]]></programlisting>                        
         </figure>
     </section>    
+    
+    <section id="jpa-query-queries-stream">
+        <title>Query.getResultStream</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Returns a <code>java.util.stream.Stream</code></para></listitem>
+            <listitem><para>Useful when obtaining large results set, bypass paging</para></listitem>
+            <listitem><para>Allows query results to be scrolled by a processing stream</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Return Stream of Results based on Query</title>
+<programlisting language="java"><![CDATA[TypedQuery<Customer> query = em.createQuery(
+        "select c from Customer as c", 
+        Customer.class);
+List<Customer> results = query.getResultList();
+for (Customer result : results) {
+    log.info("found=" + result);
+}
+int rows = results.size();
+assertTrue("unexpected number of customers", rows > 0);
+]]></programlisting>
+
+<programlisting language=""><![CDATA[select
+    customer0_.CUSTOMER_ID as CUSTOMER1_1_,
+    customer0_.FIRST_NAME as FIRST_NA2_1_,
+    customer0_.LAST_NAME as LAST_NAM3_1_
+from
+    JPAQL_CUSTOMER customer0_
+]]></programlisting>
+        </figure>
+        
+        <tip>
+            <title>Implement row filtering in SQL where clause when possible</title>
+            <para>The <code>java.util.stream</code> capability contains many features
+            that perform filtering of results -- emulating the purpose of the SQL where
+            clause. The database where clause is a much better place to implement filters.
+            Avoid using streams in an attempt to override core RDBMS capability when 
+            the data is available within the database.</para>
+        </tip>        
+    </section>
 
     <section id="jpa-query-queries-parameters">
        <title>Parameters</title>
