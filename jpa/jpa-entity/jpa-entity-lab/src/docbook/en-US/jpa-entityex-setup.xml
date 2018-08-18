@@ -97,8 +97,7 @@
                 Activate the webdev-repositories profile (-Pwebdev-repositories) so that you can resolve
                 the archetype off the Internet. The following should be run outside of the class example
                 tree.</para>
- <programlisting language=""><![CDATA[
- >mvn archetype:generate -B -DarchetypeGroupId=info.ejava.examples.jpa -DarchetypeArtifactId=jpa-archetype -DarchetypeVersion=5.0.0-SNAPSHOT -DgroupId=myorg.entityex -DartifactId=entityEx -Pwebdev-repositories
+ <programlisting language=""><![CDATA[$ mvn archetype:generate -B -DarchetypeGroupId=info.ejava.examples.jpa -DarchetypeArtifactId=jpa-archetype -DarchetypeVersion=5.0.0-SNAPSHOT -DgroupId=myorg.entityex -DartifactId=entityEx -Pwebdev-repositories
 
 INFO] Scanning for projects...
 [INFO]
