@@ -16,7 +16,7 @@
     
     <properties>
        <doc.base>jpa-relation-book</doc.base>
-       <content.version>v2015-09-30</content.version>
+       <content.version>v2018-08-18</content.version>
     </properties>
 
     <build>

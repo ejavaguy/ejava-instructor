@@ -85,22 +85,41 @@
             <title>Primary Key Join Example Usage</title>
 <programlisting language="java"><![CDATA[
 //create the person we'll use in the relationship
-ejava.examples.orm.rel.annotated.Person person = new Person();
+Person person = new Person();
 ...
 //create the Borrower, who requires a Person for its identity
-ejava.examples.orm.rel.annotated.Borrower borrower = new Borrower(person);
+Borrower borrower = new Borrower(person);
 borrower.setStartDate(new Date());
 
 //persist the borrower, creating the relationship to person
 em.persist(borrower);
-log.info("created borrower:" + borrower);
+logger.info("created borrower: {}", borrower);
 assertEquals(person.getId(), borrower.getId()); //ctor copies PK         
-]]></programlisting>                        
+]]></programlisting>          
+
+<programlisting language="java"><![CDATA[-Person@61f377d1, ctor()
+-
+    call next value for hibernate_sequence
+-created person:Person@61f377d1, id=1, name=jerome doe, phone=410-555-1212, photo=null
+-Borrower@27960b1e, ctor():
+-created borrower:Borrower, 
+    id=1, startDate=Sat Aug 18 12:00:37 EDT 2018, endDate=null, 
+    identity=Person@61f377d1, id=1, name=jerome doe, phone=410-555-1212, photo=null, applicant=null, checkouts={}
+]]></programlisting>
+
+         <itemizedlist spacing="compact">
+              <listitem><para>The identity is determined for Person from the database</para></listitem>
+              <listitem><para>The identity of Borrower is obtained from Person at some point prior to the next flush cycle</para></listitem>
+              <listitem><para>The identity of Person and Borrower will always be the same in a PrimaryKeyJoin</para></listitem>
+              <listitem><para>Since Borrower requires a primary key and the column is also a foreign key to Person -- Borrower must
+                 always have a Person</para></listitem>
+          </itemizedlist>
+      
         </figure>
         
         
         <section id="jpa-relation-fkey-pkjoin-annotation">
-           <title>@PrimaryKeyJoinAnnotation</title>
+           <title>@PrimaryKeyJoin Annotation</title>
            <para>Signals primary key column used as foreign key -- no separate foreign key column</para>
             <variablelist spacing="compact">
                 <varlistentry>

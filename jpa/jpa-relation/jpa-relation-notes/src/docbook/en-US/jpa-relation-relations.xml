@@ -55,7 +55,7 @@ private Collection<Checkout> checkouts = new ArrayList<Checkout>();]]></programl
             <figure>
                 <title>fetch=LAZY Example Use</title>
 <programlisting language="java"><![CDATA[Borrower borrower2 = em.find(Borrower.class, borrower.getId());
-log.info("found borrower: " + borrower.getName());
+logger.info("found borrower: {}", borrower.getName());
 assertEquals(6, borrower2.getCheckouts().size());]]></programlisting>                        
             </figure>
             <itemizedlist spacing="compact">
@@ -64,41 +64,36 @@ assertEquals(6, borrower2.getCheckouts().size());]]></programlisting>
             
             <figure>
                 <title>fetch=LAZY SQL Output</title>
-<programlisting language=""><![CDATA[Hibernate: 
+<programlisting language=""><![CDATA[-
     select
-        applicant0_.id as id1_12_2_,
-        applicant0_.APP_BORROWER as APP2_12_2_,
-        applicant0_.APP_PERSON as APP3_12_2_,
-        borrower1_.BORROWER_ID as BORROWER1_15_0_,
-        borrower1_.endDate as endDate2_15_0_,
-        borrower1_.startDate as startDat3_15_0_,
-        person2_.PERSON_ID as PERSON1_24_1_,
+        borrower0_.BORROWER_ID as BORROWER1_15_0_,
+        borrower0_.endDate as endDate2_15_0_,
+        borrower0_.startDate as startDat3_15_0_
+    from
+        ORMREL_BORROWER borrower0_
+    where
+        borrower0_.BORROWER_ID=?
+-Borrower@7cfb0c4c, ctor()
 ...
-        person2_.PERSON_PHOTO as PERSON5_24_1_ 
-    from ORMREL_APPLICANT applicant0_ 
-    left outer join ORMREL_BORROWER borrower1_ 
-            on applicant0_.APP_BORROWER=borrower1_.BORROWER_ID 
-    inner join ORMREL_PERSON person2_ 
-            on applicant0_.APP_PERSON=person2_.PERSON_ID 
-    where applicant0_.APP_BORROWER=?
-
 -found borrower: john smith
-
-Hibernate: 
+-
     select
-        checkouts0_.CHECKOUT_BID as CHECKOUT4_15_1_,
-        checkouts0_.CHECKOUT_ID as CHECKOUT1_16_1_,
-        checkouts0_.CHECKOUT_ID as CHECKOUT1_16_0_,
         checkouts0_.CHECKOUT_BID as CHECKOUT4_16_0_,
-        checkouts0_.outDate as outDate2_16_0_,
-        checkouts0_.returnDate as returnDa3_16_0_ 
-    from ORMREL_CHECKOUT checkouts0_ 
-    where checkouts0_.CHECKOUT_BID=?
+        checkouts0_.CHECKOUT_ID as CHECKOUT1_16_0_,
+        checkouts0_.CHECKOUT_ID as CHECKOUT1_16_1_,
+        checkouts0_.CHECKOUT_BID as CHECKOUT4_16_1_,
+        checkouts0_.outDate as outDate2_16_1_,
+        checkouts0_.returnDate as returnDa3_16_1_
+    from
+        ORMREL_CHECKOUT checkouts0_
+    where
+        checkouts0_.CHECKOUT_BID=?
 ]]></programlisting>                        
             </figure>
             <itemizedlist spacing="compact">
                 <listitem><para>Debug for parent printed before child rows retrieved</para></listitem>
                 <listitem><para>Child rows retrieved when parent collection accessed</para></listitem>
+                <listitem><para>Other SQL details of Borrower left out of example</para></listitem>
             </itemizedlist>
             
             
@@ -117,9 +112,8 @@ private Collection<Checkout> checkouts = new ArrayList<Checkout>();]]></programl
 
             <figure>
                 <title>fetch=EAGER Example Use</title>
-<programlisting language="java"><![CDATA[
-Borrower borrower3 = em.find(Borrower.class, borrowerId);
-log.info("found borrower: " + borrower.getName());
+<programlisting language="java"><![CDATA[Borrower borrower3 = em.find(Borrower.class, borrowerId);
+logger.info("found borrower: {}", borrower.getName());
 assertEquals(0,borrower3.getCheckouts().size());        
 ]]></programlisting>                        
             </figure>
@@ -131,40 +125,49 @@ assertEquals(0,borrower3.getCheckouts().size());
             
             <figure>
                 <title>fetch=EAGER SQL Output</title>
-<programlisting language=""><![CDATA[Hibernate: 
+<programlisting language=""><![CDATA[-
     select
-        applicant0_.id as id1_12_3_,
-        applicant0_.APP_BORROWER as APP2_12_3_,
-        applicant0_.APP_PERSON as APP3_12_3_,
-        borrower1_.BORROWER_ID as BORROWER1_15_0_,
-        borrower1_.endDate as endDate2_15_0_,
-        borrower1_.startDate as startDat3_15_0_,
-        checkouts2_.CHECKOUT_BID as CHECKOUT4_15_5_,
-        checkouts2_.CHECKOUT_ID as CHECKOUT1_16_5_,
-        checkouts2_.CHECKOUT_ID as CHECKOUT1_16_1_,
-        checkouts2_.CHECKOUT_BID as CHECKOUT4_16_1_,
-        checkouts2_.outDate as outDate2_16_1_,
-        checkouts2_.returnDate as returnDa3_16_1_,
-        person3_.PERSON_ID as PERSON1_24_2_,
-...
-        person3_.PERSON_PHOTO as PERSON5_24_2_ 
-    from ORMREL_APPLICANT applicant0_ 
-    left outer join ORMREL_BORROWER borrower1_ 
-            on applicant0_.APP_BORROWER=borrower1_.BORROWER_ID 
-    left outer join ORMREL_CHECKOUT checkouts2_ 
-            on borrower1_.BORROWER_ID=checkouts2_.CHECKOUT_BID 
-    inner join ORMREL_PERSON person3_ 
-            on applicant0_.APP_PERSON=person3_.PERSON_ID 
-    where applicant0_.APP_BORROWER=?
-
+        borrower0_.BORROWER_ID as BORROWER1_15_0_,
+        borrower0_.endDate as endDate2_15_0_,
+        borrower0_.startDate as startDat3_15_0_,
+        checkouts1_.CHECKOUT_BID as CHECKOUT4_16_1_,
+        checkouts1_.CHECKOUT_ID as CHECKOUT1_16_1_,
+        checkouts1_.CHECKOUT_ID as CHECKOUT1_16_2_,
+        checkouts1_.CHECKOUT_BID as CHECKOUT4_16_2_,
+        checkouts1_.outDate as outDate2_16_2_,
+        checkouts1_.returnDate as returnDa3_16_2_
+    from
+        ORMREL_BORROWER borrower0_
+    left outer join
+        ORMREL_CHECKOUT checkouts1_
+            on borrower0_.BORROWER_ID=checkouts1_.CHECKOUT_BID
+    where
+        borrower0_.BORROWER_ID=?
 -found borrower: john smith
 ]]></programlisting>                        
-            </figure>
+
             <itemizedlist spacing="compact">
                 <listitem><para>Child objects fetched with parent</para></listitem>
                 <listitem><para>Access to child collection occurs after all children fetched</para></listitem>
             </itemizedlist>
+            </figure>
             
+            <tip>
+                <title>fetch=EAGER does not always mean "done "efficiently"</title>
+                <para>fetch=EAGER is only a promise to fetch the related object before returning from the 
+                call. It does not always mean that a SQL JOIN was performed. There are times (e.g., fetch=EAGER
+                on multiple collections within parent) when the provider will perform a SQL JOIN for some of the 
+                relationships and the functional equivalent of a fetch=LAZY for the remaining relationships.</para>
+            </tip>
+            <tip>
+                <title>Don't over user fetch=EAGER</title>
+                <para>Although useful at times, avoid haphazard use of fetch=EAGER when defining relationships
+                and look to rely on custom queries to do this behavior instead. It is very easy to turn a 
+                fetch=LAZY into EAGER at query time. It is very difficult to do the opposite. Custom queries
+                also allow us to incrementally build a complex parent object tree an optimized query at a time.
+                fetch=EAGER will do the same, but may perform 10s, 100s, 1000s of more unoptimized queries
+                of child rows we may never need.</para>
+            </tip>
         </section>
     </section>
     

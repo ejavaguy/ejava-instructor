@@ -108,10 +108,10 @@ em.persist(inventory);
 for(int i=0; i<5; i++) {
     ejava.examples.orm.rel.annotated.Media media = new Media();
     em.persist(media);
-    log.info("created media:" + media);
+    logger.info("created media: {}", media);
     inventory.getMedia().add(media);
 }
-log.info("created inventory:" + inventory);]]></programlisting>                        
+logger.info("created inventory:{}", inventory);]]></programlisting>                        
         </figure>
         <itemizedlist spacing="compact">
             <listitem><para>Relationship formed when inverse side added to owning collection</para></listitem>
@@ -119,33 +119,45 @@ log.info("created inventory:" + inventory);]]></programlisting>
         
         <figure>
             <title>One-to-Many Uni-directional Database Usage</title>
-<programlisting language=""><![CDATA[Hibernate:
-    insert into ORMREL_INVENTORY (id, name) 
-    values (null, ?)
-Hibernate:
-    insert into ORMREL_MEDIA (MEDIA_ID, title) 
-    values (null, ?)
--created media:ejava.examples.orm.rel.annotated.Media@5ae9fa73, id=1, title=null, authors(0)={}
+<programlisting language=""><![CDATA[-
+    call next value for hibernate_sequence
+-
+    call next value for hibernate_sequence
+-created media:Media@7b222230, id=2, title=null, authors(0)={}
+-
+    call next value for hibernate_sequence
+-created media:Media@7df6d663, id=3, title=null, authors(0)={}
 ...
-Hibernate:
-    insert into ORMREL_MEDIA (MEDIA_ID, title) 
-    values (null, ?)
--created media:Media@433a3459, id=5, title=null, authors(0)={}
--created inventory:Inventory@5b9e6638, id=1, name=testLinkCreate, media(5)={1,2,3,4,5,}
-Hibernate:
-    update ORMREL_MEDIA 
-    set INVENTORY_ID=? 
-    where MEDIA_ID=?
+-
+    insert
+    into
+        ORMREL_INVENTORY
+        (name, id)
+    values
+        (?, ?)
+-
+    insert
+    into
+        ORMREL_MEDIA
+        (title, MEDIA_ID)
+    values
+        (?, ?)
+-
+    insert
+    into
+        ORMREL_MEDIA
+        (title, MEDIA_ID)
+    values
+        (?, ?)
 ...
-Hibernate:
-    update ORMREL_MEDIA 
-    set INVENTORY_ID=? 
-    where MEDIA_ID=?]]></programlisting>                        
-        </figure>
+-created inventory:Inventory@4ef4f627, id=1, name=testLinkCreate, media(5)={2,3,4,5,6,}
+]]></programlisting>                        
+
         <itemizedlist spacing="compact">
             <listitem><para>The foreign key is in the inverse entity class table</para></listitem>
             <listitem><para>No construct in inverse class maps to this foreign key column</para></listitem>
         </itemizedlist>
+        </figure>
 
     </section>
 
@@ -206,26 +218,40 @@ Hibernate:
         <figure>
             <title>One-to-Many Bi-directional Example Usage (Create)</title>
 <programlisting language="java"><![CDATA[//get a borrower
-Borrower borrower = em.find(Borrower.class, borrowerId);
+Borrower borrower =  em.find(Borrower.class, borrowerId);
 assertNotNull(borrower);
-assertTrue(borrower.getCheckouts().size() == 0);
+assertEquals(0, borrower.getCheckouts().size());
 
 //create 1st checkout
 Checkout checkout = new Checkout(new Date());
 checkout.setBorrower(borrower); //set owning side of the relation
+    //wrapper around - borrower.getCheckouts().add(checkout)
 borrower.addCheckout(checkout); //set inverse side of relation
-    //wrapper around - borower.getCheckouts().add(checkout)
 em.persist(checkout);   //persist owning side of the relation
+em.flush();
 ]]></programlisting>
 
 <programlisting language=""><![CDATA[
-Hibernate: -- query for the parent object, lazily loads child objects
+-getting borrower id=1
+-
     select
         borrower0_.BORROWER_ID as BORROWER1_15_0_,
         borrower0_.endDate as endDate2_15_0_,
-        borrower0_.startDate as startDat3_15_0_ 
-    from ORMREL_BORROWER borrower0_ 
-    where borrower0_.BORROWER_ID=?
+        borrower0_.startDate as startDat3_15_0_
+    from
+        ORMREL_BORROWER borrower0_
+    where
+        borrower0_.BORROWER_ID=?
+...
+-
+    call next value for hibernate_sequence
+-
+    insert
+    into
+        ORMREL_CHECKOUT
+        (CHECKOUT_BID, outDate, returnDate, CHECKOUT_ID)
+    values
+        (?, ?, ?, ?)
 ]]></programlisting>                        
 
 <programlisting language="java"><![CDATA[//get a borrower
@@ -235,11 +261,23 @@ for(int i=0; i<5; i++) {
     co.setBorrower(borrower);   //set owning side of the relation
     borrower.addCheckout(co);   //set inverse side of relation
     em.persist(co);  //persist owning side of the relation
-}]]></programlisting>                        
+}
+em.flush();
+]]></programlisting>                        
 
-<programlisting language=""><![CDATA[Hibernate:
-    insert into ORMREL_CHECKOUT (CHECKOUT_ID, CHECKOUT_BID, outDate, returnDate) 
-    values (null, ?, ?, ?)]]></programlisting>                        
+<programlisting language=""><![CDATA[
+-
+    call next value for hibernate_sequence
+...    
+-
+    insert
+    into
+        ORMREL_CHECKOUT
+        (CHECKOUT_BID, outDate, returnDate, CHECKOUT_ID)
+    values
+        (?, ?, ?, ?)
+...        
+]]></programlisting>                        
         </figure>
         
         <figure>

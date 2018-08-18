@@ -104,8 +104,7 @@
     for(Media m: media) {
         //we can only navigate this in one direction
         w.getMedia().add(m);
-        log.info("added media(" + m.getId() + 
-                ") to want list (" + w.getId() +")");
+        logger.info("added media({}) to want list ({})", m.getId(), w.getId());
     }
 }]]></programlisting>                        
         </figure>
@@ -189,11 +188,9 @@ Hibernate:
 <programlisting language="java"><![CDATA[for(Author a: authors) {
     for(Media m: media) {
         a.getMedia().add(m);
-        log.info("added media(" + m.getId() + 
-                ") to author (" + a.getId() +")");
+        logger.info("added media({}) to author ({})",  m.getId(), a.getId());
         m.getAuthors().add(a);
-        log.info("added author(" + a.getId() + 
-                ") to media (" + m.getId() +")");
+        logger.info("added author({}) to media ({})", a.getId(), m.getId());
     }
 }]]></programlisting>                        
         </figure>

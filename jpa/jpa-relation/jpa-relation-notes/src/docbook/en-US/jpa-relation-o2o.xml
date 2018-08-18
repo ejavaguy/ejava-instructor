@@ -104,7 +104,10 @@
 
         <figure>
            <title>One-to-One Uni-directional Usage</title>
-<programlisting language="java"><![CDATA[//create the owning side 
+           <itemizedlist spacing="compact">
+              <listitem><para>Form the Relationship</para>
+<programlisting language="java"><![CDATA[
+//create the owning side 
 ejava.examples.orm.rel.annotated.Person person = new Person();
 person.setFirstName("john");
 person.setLastName("doe");
@@ -114,53 +117,106 @@ person.setPhone("410-555-1212");
 ejava.examples.orm.rel.annotated.Photo photo = new Photo();        
 photo.setImage(image);        
 
+//create the person and photo detached
+assertEquals(0, person.getId());
+assertEquals(0, photo.getId());
+
 //add photo to person and persist object tree
 person.setPhoto(photo); //this sets the FK in person
-log.info("added photo to person:" + person);
+logger.info("added photo to person:{}", person);
 em.persist(person);        
-assertTrue("personId not set", person.getId() != 0);
-assertTrue("photoId not set", photo.getId() != 0);
-log.info("created person:" + person);]]></programlisting>                        
+assertNotEquals("personId not set", 0, person.getId());
+assertNotEquals("photoId not set", 0, photo.getId());
+logger.info("created person:{}", person);
+logger.info("     and photo:{}", photo);
+em.flush();
+]]></programlisting>                        
+              </listitem>
+              
+              <listitem><para>Output</para>
+<programlisting language=""><![CDATA[
+-added photo to person:Person@7ab802f4, id=0, name=john doe, phone=410-555-1212, 
+    photo=Photo@608cd501, id=0. image=46080 bytes
+-
+    call next value for hibernate_sequence
+-
+    call next value for hibernate_sequence
+-Photo@608cd501: getId()=2
+-created person:Person@7ab802f4, id=1, name=john doe, phone=410-555-1212, 
+    photo=Photo@608cd501, id=2. image=46080 bytes
+-     and photo:Photo@608cd501, id=2. image=46080 bytes
+-
+    insert
+    into
+        ORMREL_PHOTO
+        (image, PHOTO_ID)
+    values
+        (?, ?)
+-
+    insert
+    into
+        ORMREL_PERSON
+        (firstName, lastName, phone, PERSON_PHOTO, PERSON_ID)
+    values
+        (?, ?, ?, ?, ?)
+]]></programlisting>
 
-<programlisting language=""><![CDATA[-added photo to person:Person@1201f5bc, id=0, name=john doe, phone=410-555-1212, 
-    photo=Photo@130b5045, id=0. image=46080 bytes
-Hibernate:
-    insert into ORMREL_PHOTO (PHOTO_ID, image) 
-    values (null, ?)
-Hibernate:
-    insert into ORMREL_PERSON (PERSON_ID, firstName, lastName, phone, PERSON_PHOTO) 
-    values (null, ?, ?, ?, ?)
--created person:Person@1201f5bc, id=1, name=john doe, phone=410-555-1212, 
-        photo=Photo@130b5045, id=1. image=46080 bytes]]></programlisting>                        
-
-
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Person and Photo are given an ID during the persist</para></listitem>
+                        <listitem><para>Photo is inspected for its ID to be assigned to Person FK to Photo</para></listitem>
+                        <listitem><para>Rows (with foreign key) are inserted into database on next flush cycle</para></listitem>
+                    </itemizedlist>                        
+              </listitem>
+              
+              <listitem><para>Find Object with Relationship in Database</para>
 <programlisting language="java"><![CDATA[//verify what we can get from DB
 em.flush(); em.clear();
 Person person2 = em.find(Person.class, person.getId());
 assertNotNull(person2);
 assertNotNull(person2.getPhoto());
-log.info("found person:" + person2);]]></programlisting>                        
-
-<programlisting language=""><![CDATA[
-Hibernate:
+logger.info("found person:{}", person2);
+]]></programlisting>
+              </listitem>
+              
+              <listitem><para>Output</para>
+<programlisting language=""><![CDATA[-
     select
-        person0_.PERSON_ID as PERSON1_24_0_,
-        person0_.firstName as firstNam2_24_0_,
-        person0_.lastName as lastName3_24_0_,
-        person0_.phone as phone4_24_0_,
-        person0_.PERSON_PHOTO as PERSON5_24_0_ 
-    from ORMREL_PERSON person0_ 
-    where person0_.PERSON_ID=?
-Hibernate:
+        person0_.PERSON_ID as PERSON_I1_27_0_,
+        person0_.firstName as firstNam2_27_0_,
+        person0_.lastName as lastName3_27_0_,
+        person0_.phone as phone4_27_0_,
+        person0_.PERSON_PHOTO as PERSON_P5_27_0_
+    from
+        ORMREL_PERSON person0_
+    where
+        person0_.PERSON_ID=?
+-Person@20cdb152, ctor()
+-Photo$HibernateProxy$2MfejJnf@0: ctor()
+-
     select
-        photo0_.PHOTO_ID as PHOTO1_25_0_,
-        photo0_.image as image2_25_0_ 
-    from ORMREL_PHOTO photo0_ 
-    where photo0_.PHOTO_ID=?
--found person:Person@29564bb9, id=1, name=john doe, phone=410-555-1212, 
-    photo=Photo@785e7845, id=1. image=46080 bytes]]></programlisting>                        
+        photo0_.PHOTO_ID as PHOTO_ID1_28_0_,
+        photo0_.image as image2_28_0_
+    from
+        ORMREL_PHOTO photo0_
+    where
+        photo0_.PHOTO_ID=?
+-Photo@57fdb8a4: ctor()
+-found person:Person@20cdb152, id=1, name=john doe, phone=410-555-1212, 
+    photo=Photo@57fdb8a4, id=2. image=46080 bytes
+]]></programlisting>
+              </listitem>
+          </itemizedlist>
         </figure>
 
+        <tip>
+            <title>Calls to em.clear() are for test purposes only!</title>
+            <para>Calls to <code>em.clear()</code> for are test purposes only and should not
+            be a common thing in production code. We must clear the current instance from
+            the cache if we want the provider to query the database for the rows versus
+            pulling the existing instance from the cache. Calling <code>em.clear()</code>
+            within production code will clear all instances from the persistence context
+            and make your code have unwanted side-effects when called.</para>
+        </tip>
     </section>
 
     <section id="jpa-relation-o2o-annotation">
@@ -332,55 +388,49 @@ Hibernate:
                         
             <figure>
                 <title>One-to-One Uni-directional Example Usage (cont.)</title>
-<programlisting language="java"><![CDATA[        
-        //locate them from DB
-        em.flush(); em.clear();
-        Applicant applicant3 = em.find(Applicant.class, applicant.getId());
-        Borrower borrower3 = em.find(Borrower.class, borrower.getId());
-        assertEquals(applicant.getId(), borrower3.getApplication().getId());
-        assertEquals(borrower.getId(), applicant3.getBorrower().getId());
+<programlisting language="java"><![CDATA[//locate them from DB
+em.flush(); em.clear();
+Applicant applicant3 = em.find(Applicant.class, applicant.getId());
+Borrower borrower3 = em.find(Borrower.class, borrower.getId());
+assertEquals(applicant.getId(), borrower3.getApplication().getId());
+assertEquals(borrower.getId(), applicant3.getBorrower().getId());
 ]]></programlisting>         
 
-<programlisting language=""><![CDATA[
-Hibernate:
-   select
-        applicant0_.id as id1_12_2_,
-        applicant0_.APP_BORROWER as APP2_12_2_,
-        applicant0_.APP_PERSON as APP3_12_2_,
-        borrower1_.BORROWER_ID as BORROWER1_15_0_,
-        borrower1_.endDate as endDate2_15_0_,
-        borrower1_.startDate as startDat3_15_0_,
-        person2_.PERSON_ID as PERSON1_24_1_,
-        ...
-    from ORMREL_APPLICANT applicant0_ 
-    left outer join ORMREL_BORROWER borrower1_ 
-            on applicant0_.APP_BORROWER=borrower1_.BORROWER_ID 
-    inner join ORMREL_PERSON person2_ 
-            on applicant0_.APP_PERSON=person2_.PERSON_ID 
-    where applicant0_.id=?
-Hibernate:
+<programlisting language=""><![CDATA[-
     select
-        applicant0_.id as id1_12_2_,
-        applicant0_.APP_BORROWER as APP2_12_2_,
-        applicant0_.APP_PERSON as APP3_12_2_,
-        borrower1_.BORROWER_ID as BORROWER1_15_0_,
-        borrower1_.endDate as endDate2_15_0_,
-        borrower1_.startDate as startDat3_15_0_,
-        person2_.PERSON_ID as PERSON1_24_1_,
-        ...
-    from ORMREL_APPLICANT applicant0_ 
-    left outer join ORMREL_BORROWER borrower1_ 
-            on applicant0_.APP_BORROWER=borrower1_.BORROWER_ID 
-    inner join ORMREL_PERSON person2_ 
-            on applicant0_.APP_PERSON=person2_.PERSON_ID 
-    where applicant0_.APP_BORROWER=?
-        -]]></programlisting>
-            </figure>
+        applicant0_.id as id1_12_0_,
+        applicant0_.APP_BORROWER as APP_BORR2_12_0_,
+        applicant0_.APP_PERSON as APP_PERS3_12_0_,
+        borrower1_.BORROWER_ID as BORROWER1_15_1_,
+        borrower1_.endDate as endDate2_15_1_,
+        borrower1_.startDate as startDat3_15_1_,
+        person2_.PERSON_ID as PERSON_I1_27_2_,
+        person2_.firstName as firstNam2_27_2_,
+        person2_.lastName as lastName3_27_2_,
+        person2_.phone as phone4_27_2_,
+        person2_.PERSON_PHOTO as PERSON_P5_27_2_
+    from
+        ORMREL_APPLICANT applicant0_
+    left outer join
+        ORMREL_BORROWER borrower1_
+            on applicant0_.APP_BORROWER=borrower1_.BORROWER_ID
+    inner join
+        ORMREL_PERSON person2_
+            on applicant0_.APP_PERSON=person2_.PERSON_ID
+    where
+        applicant0_.id=?
+-Applicant@1a531422, ctor()
+-Borrower@7a388990, ctor()
+-Person@13213f26, ctor()
+]]></programlisting>
+
             <itemizedlist spacing="compact">
                 <listitem><para>Notice the extra joins that occur with default fetch mode=EAGER</para></listitem>
                 <listitem><para>inner joins used for optional=false relationships</para></listitem>
                 <listitem><para>left outer joins used for optional=true relationships</para></listitem>
+                <listitem><para>Borrower already fetched when obtained Applicant</para></listitem>
             </itemizedlist>
+            </figure>
     </section>
     
     <section id="jpa-relation-o2o-bi-ownership">
@@ -431,8 +481,9 @@ assertNull("applicant has unexpected borrower:" +
         applicant.getBorrower(), 
         applicant.getBorrower());  
 
-log.info("writing rel owner (application) to DB:" + applicant);
-log.info("writing rel inverse (borrower) to DB:" + borrower);]]></programlisting>
+logger.info("writing rel owner (application) to DB:{}", applicant);
+logger.info("writing rel inverse (borrower) to DB:{}", borrower);
+]]></programlisting>
                 <calloutlist>
                     <callout arearefs="jpa-relation-o2o-bi-ownership-area-setting"><para>Only inverse side being set</para></callout>
                     <callout arearefs="jpa-relation-o2o-bi-ownership-area-notsetting"><para>Setter does not automatically propagate to other side in cache</para></callout>
