@@ -477,23 +477,31 @@ public class ProductsResource {
         @Context 
         private UriInfo uriInfo;
 
-        @POST @Path("")
-        @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-        @Produces(MediaType.APPLICATION_XML)
-        public Response createProduct(
-                        @FormParam("name") String name,
-                        @FormParam("quantity") Integer quantity,
-                        @FormParam("price") Double price,
-                        @FormParam("category") String category) {
-             Product product = new Product(name, quantity, price);
-             Product p = ejb.addProduct(product, category);
-             URI uri = UriBuilder.fromUri(uriInfo.getAbsolutePath())
-                                     .path(ProductsResource.class, "getProduct")
-                                     .build(p.getId());
-             return Response.created(uri)
-                             .entity(p)
-                             .build();
+    /**
+     * Updates a product with the values of the object passed in
+     * @param id
+     * @param product
+     * @return updated product if successful
+     */
+    @PUT @Path("{id}")
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @JsonbAnnotation  //helps trigger JSON-B response marshaling when DTO also JAXB
+    public Response updateProduct(@PathParam("id") int id, 
+            @JsonbProperty Product product  //annotation helps trigger JSON-B request demarshaling when DTO also JAXB
+         ) {
+        logger.debug("{} {}", request.getMethod(), uriInfo.getAbsolutePath());
+
+        try {
+            Product p = ejb.updateProduct(product);
+            logger.info("updated pojo product={}", p);
+            return Response.ok(p)
+                    .tag("" + p.getVersion())
+                    .build();
+        } catch (Exception ex) {
+            return ResourceHelper.serverError(logger, "update product", ex).build();
         }
+    }
 }]]></programlisting>
    </figure>
             
