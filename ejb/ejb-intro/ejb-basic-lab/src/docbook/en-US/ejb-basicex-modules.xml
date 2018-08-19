@@ -265,7 +265,7 @@ $ mkdir basicejb-ejb
 
     <properties>
 ...
-        <maven-ejb-plugin.version>2.3</maven-ejb-plugin.version>
+        <maven-ejb-plugin.version>3.0.1</maven-ejb-plugin.version>
     </properties>
 
 
@@ -405,10 +405,10 @@ $ mkdir basicejb-ejb
 
     <properties>
         ...
-        <javax.ejb-api.version>3.2</javax.ejb-api.version>
-        <junit.version>4.11</junit.version>
-        <log4j.version>1.2.13</log4j.version>
-        <slf4j.version>1.7.2</slf4j.version>
+        <javax.ejb-api.version>3.2.2</javax.ejb-api.version>
+        <junit.version>4.12</junit.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <log4j.version>1.2.17</log4j.version>
 ...
     <dependencyManagement>
         <dependencies>
@@ -762,7 +762,7 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
                     <para>
                         Notice the we are automatically getting a surefire execution and our JUnit test
                         run. We get this because surefire is automatically brought in by the pom's packaging
-                        type *and* we ended the Java class with Test. Looking at the 
+                        type *and* we ended the Java class name with Test. Looking at the 
                         <ulink url="http://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclusion.html">
                         plugin page</ulink>, the other default name patterns include.
                     </para>
@@ -831,7 +831,7 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
                         put in place the following in the JBoss/Wildfly application server
                         configuration file to address logging.
                     </para>
-<programlisting language=""><![CDATA[# wildfly-8.1.0.Final/standalone/configuration/standalone.xml
+<programlisting language=""><![CDATA[# wildfly-13.0.0.Final/standalone/configuration/standalone.xml
             <logger category="org.myorg">
                 <level name="DEBUG"/>
             </logger>
@@ -853,6 +853,14 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
                         server's console output. The extra debug will be placed in the 
                         standalone/log/server.log file.
                     </para>
+<programlisting language=""><![CDATA[$ tail -f standalone/log/server.log
+...
+06:57:32,031 INFO  [info.ejava.examples.ejb.basic.ejb.GreeterEJB] (default task-1) *** GreeterEJB:init(1127977520) ***
+06:57:32,031 DEBUG [info.ejava.examples.ejb.basic.ejb.GreeterEJB] (default task-1) sayHello()
+06:57:32,113 DEBUG [info.ejava.examples.ejb.basic.ejb.GreeterEJB] (default task-3) sayHello(cat inhat)
+...
+]]></programlisting>
+
                     </listitem>
             </orderedlist>
         </section>
@@ -888,35 +896,36 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
                             configuration file.
                             </para></listitem>
                     </itemizedlist>
-<programlisting language=""><![CDATA[wildfly-8.1.0.Final]$ ./bin/standalone.sh 
+<programlisting language=""><![CDATA[wildfly-13.0.0.Final$ ./bin/standalone.sh
 =========================================================================
 
   JBoss Bootstrap Environment
 
-  JBOSS_HOME: /opt/wildfly-8.1.0.Final
+  JBOSS_HOME: /Users/jim/apps/wildfly-13.0.0.Final
 
-  JAVA: /usr/lib/jvm/java-1.7.0/bin/java
+  JAVA: java
 
-  JAVA_OPTS:  -server -Xms64m -Xmx512m -XX:MaxPermSize=256m -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.byteman -Djava.awt.headless=true -agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=n
+  JAVA_OPTS:  -server -Xms64m -Xmx512m -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.byteman -Djava.awt.headless=true
 
 =========================================================================
 
-Listening for transport dt_socket at address: 8787
-01:33:57,008 INFO  [org.jboss.modules] (main) JBoss Modules version 1.3.3.Final
-01:33:57,508 INFO  [org.jboss.msc] (main) JBoss MSC version 1.2.2.Final
-01:33:57,970 INFO  [org.jboss.as] (MSC service thread 1-1) JBAS015899: WildFly 8.1.0.Final "Kenny" starting
+10:14:01,139 INFO  [org.jboss.modules] (main) JBoss Modules version 1.8.5.Final
+10:14:01,372 INFO  [org.jboss.msc] (main) JBoss MSC version 1.4.2.Final
+10:14:01,379 INFO  [org.jboss.threads] (main) JBoss Threads version 2.3.2.Final
+10:14:01,474 INFO  [org.jboss.as] (MSC service thread 1-2) WFLYSRV0049: WildFly Full 13.0.0.Final (WildFly Core 5.0.0.Final) starting
 ...
-01:34:56,423 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015874: WildFly 8.1.0.Final "Kenny" started in 60065ms - Started 309 of 362 services (113 services are lazy, passive or on-demand)
+10:14:03,969 INFO  [org.jboss.as] (Controller Boot Thread) WFLYSRV0025: WildFly Full 13.0.0.Final (WildFly Core 5.0.0.Final) started in 3104ms - Started 358 of 581 services (356 services are lazy, passive or on-demand)
 ]]></programlisting>
                     </listitem>
 
                 <listitem><para>
                     Shutdown the server using the command line interface (CLI)
                     </para>
-<programlisting language=""><![CDATA[
-$ /opt/wildfly-8.1.0.Final/bin/jboss-cli.sh --connect command=:shutdown 
-{"outcome" => "success"}
-]]></programlisting>
+<programlisting language=""><![CDATA[wildfly-13.0.0.Final$ ./bin/jboss-cli.sh --connect command=:shutdown
+{
+    "outcome" => "success",
+    "result" => undefined
+}]]></programlisting>
                     </listitem>
 
                 <listitem><para>
@@ -931,13 +940,15 @@ $ /opt/wildfly-8.1.0.Final/bin/jboss-cli.sh --connect command=:shutdown
                     Shutdown the server by pressing Control-C keys
                     </para>
 <programlisting language=""><![CDATA[
-01:39:20,291 INFO  [org.jboss.as.messaging] (MSC service thread 1-4) JBAS011601: Bound messaging object to jndi name java:jboss/DefaultJMSConnectionFactory
-^C 01:39:32,666 INFO  [org.wildfly.extension.undertow] (MSC service thread 1-4) JBAS017532: Host default-host stopping
-01:39:32,666 INFO  [org.jboss.as.messaging] (ServerService Thread Pool -- 57) JBAS011605: Unbound messaging object to jndi name java:jboss/exported/jms/RemoteConnectionFactory
+^C10:17:19,557 INFO  [org.jboss.as.server] (Thread-2) WFLYSRV0236: Suspending server with no timeout.
+10:17:19,558 INFO  [org.jboss.as.ejb3] (Thread-2) WFLYEJB0493: EJB subsystem suspension complete
+10:17:19,559 INFO  [org.jboss.as.server] (Thread-2) WFLYSRV0220: Server shutdown has been requested via an OS signal
+...
+10:17:19,616 INFO  [org.jboss.as] (MSC service thread 1-1) WFLYSRV0050: WildFly Full 13.0.0.Final (WildFly Core 5.0.0.Final) stopped in 53ms
 ]]></programlisting>
                     <note>
                         <para>
-                            There is no negative impacts from stopping the application server
+                            There is no negative impact from stopping the application server
                             using Control-C key sequence.
                         </para>
                     </note>
@@ -956,15 +967,16 @@ $ /opt/wildfly-8.1.0.Final/bin/jboss-cli.sh --connect command=:shutdown
             <note>
                 <para>
                     The following steps assumes JBoss AS Tools have been installed. 
-                    If the server setup does not list a Wildfly 8.x server option
-                    please make install that option.
+                    If the server setup does not list a Wildfly 13.x server option
+                    please make install that option. Use the latest version if 
+                    Wildfly 13.x is not yet available.
                 </para>
             </note>
 
             <orderedlist>
 
                 <listitem><para>
-                    Add a new Wildfly 8.x Server off the Servers tab of the JavaEE IDE profile.
+                    Add a new Wildfly (latest).x Server off the Servers tab of the JavaEE IDE profile.
                     Accept all defaults.
                     </para>
                     <graphic scale="60" fileref="images/ejb-dev-server-embedded-addserver.png"/>

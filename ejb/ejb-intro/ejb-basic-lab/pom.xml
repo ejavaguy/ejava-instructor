@@ -17,7 +17,7 @@
     
     <properties>
        <doc.base>ejb-basic-lab-book</doc.base>
-       <content.version>v2015-10-12</content.version>
+       <content.version>v2018-08-19</content.version>
 
        <dependency.includes>
             images/ejb-dev-server-embedded-addserver.png,

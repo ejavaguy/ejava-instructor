@@ -162,7 +162,7 @@ pre-existing WEB-INF/web.xml if executing in update mode)
                 </para>
 <programlisting language="xml"><![CDATA[    <properties>
         ...
-        <maven-war-plugin.version>2.4</maven-war-plugin.version>]]></programlisting>                        
+        <maven-war-plugin.version>3.2.2</maven-war-plugin.version>]]></programlisting>                        
 <programlisting language="xml"><![CDATA[    <build>
     	<pluginManagement>
             <plugins>
@@ -196,7 +196,7 @@ pre-existing WEB-INF/web.xml if executing in update mode)
 ...
 [INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ basicejb-war ---
 ...
-[INFO] --- maven-war-plugin:2.4:war (default-war) @ basicejb-war ---
+[INFO] --- maven-war-plugin:3.2.2:war (default-war) @ basicejb-war ---
 [INFO] Packaging webapp
 [INFO] Assembling webapp [basicejb-war] in [/home/jcstaff/proj/basicejbEx/basicejb-war/target/basicejb-war-1.0-SNAPSHOT]
 [INFO] Processing war project
@@ -234,7 +234,7 @@ WEB-INF/lib/basicejb-ejb-1.0-SNAPSHOT.jar
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
             </plugin>]]></programlisting>                        
-                <note>
+                <tip>
                     <title>Cargo will Deploy Local Artifact by Default</title>
                     <para>
                         Since we are deploying the local artifact, we do not need
@@ -252,7 +252,7 @@ WEB-INF/lib/basicejb-ejb-1.0-SNAPSHOT.jar
                         actively declare them on a per-module basis in the implementation 
                         modules.
                     </para>
-                </note>
+                </tip>
                 </listitem>
 
             <listitem><para>
@@ -261,7 +261,7 @@ WEB-INF/lib/basicejb-ejb-1.0-SNAPSHOT.jar
                 </para>
 <programlisting language="xml"><![CDATA[$ mvn clean verify
 ...
-[INFO] --- maven-war-plugin:2.4:war (default-war) @ basicejb-war ---
+[INFO] --- maven-war-plugin:3.2.2:war (default-war) @ basicejb-war ---
 [INFO] Packaging webapp
 [INFO] Assembling webapp [basicejb-war] in [/home/jcstaff/proj/basicejbEx/basicejb-war/target/basicejb-war-1.0-SNAPSHOT]
 [INFO] Processing war project
@@ -388,7 +388,6 @@ basicejb-ear-1.0-SNAPSHOT/basicejb-ejb-1.0-SNAPSHOT/ReservationEJB!org.myorg.bas
 |           |               `-- earejb
 |           |                   `-- ReservationIT.java
 |           `-- resources
-|               |-- jboss-ejb-client.properties
 |               |-- jndi.properties
 |               `-- log4j.xml
 |-- basicejb-war
@@ -492,8 +491,8 @@ basicejb-ear-1.0-SNAPSHOT/basicejb-ejb-1.0-SNAPSHOT/ReservationEJB!org.myorg.bas
                 </listitem>
 
             <listitem><para>
-                Create a JNDI configuration by copying your jndi.properties and jboss-ejb-client.properties
-                from the EAR-based RMI Test module.  Place these files in src/test/resources of the WAR.
+                Create a JNDI configuration by copying your jndi.properties
+                from the EAR-based RMI Test module.  Place this file in src/test/resources of the WAR.
                 </para>
 <programlisting language=""><![CDATA[
 $ mkdir -p basicejb-war/src/test/resources
@@ -502,27 +501,12 @@ $ cp basicejb-test/src/test/resources/*.properties basicejb-war/src/test/resourc
 <programlisting language=""><![CDATA[$ cat basicejb-war/src/test/resources/jndi.properties
 
 #jndi.properties
-java.naming.factory.initial=${jboss.remoting.java.naming.factory.initial}
-java.naming.factory.url.pkgs=${jboss.ejbclient.java.naming.factory.url.pkgs}
-java.naming.provider.url=${jboss.remoting.java.naming.provider.url}
+java.naming.factory.initial=${java.naming.factory.initial}
+java.naming.factory.url.pkgs=${java.naming.factory.url.pkgs}
+java.naming.provider.url=${java.naming.provider.url}
 #java.naming.security.principal=${jndi.user}
 #java.naming.security.credentials=${jndi.password}
-jboss.naming.client.ejb.context=true
 ]]></programlisting>
-<programlisting language=""><![CDATA[$ cat basicejb-war/src/test/resources/jboss-ejb-client.properties
-
-#top level property listing the names of the connections. There will be a set 
-#of properties for each name listed here
-remote.connections=default
-
-#here we define the properties for the server we have called "default"
-remote.connection.default.host=${jboss.host}
-remote.connection.default.port=${jboss.naming.port}
-remote.connectionprovider.create.options.org.xnio.Options.SSL_ENABLED=false
-
-#remote.connection.default.username=${jndi.user}
-#remote.connection.default.password=${jndi.password}
-]]></programlisting>                        
                 </listitem>
 
             <listitem><para>
@@ -619,28 +603,14 @@ $ mvn clean process-test-resources
 ..
 [INFO] BUILD SUCCESS
 ]]></programlisting>                        
-<programlisting language="xml"><![CDATA[$ cat basicejb-war/target/test-classes/jndi.properties
+<programlisting language="java"><![CDATA[$ cat basicejb-war/target/test-classes/jndi.properties
 #jndi.properties
-java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
-java.naming.factory.url.pkgs=org.jboss.ejb.client.naming
-java.naming.provider.url=http-remoting://localhost:8080
+java.naming.factory.initial=org.wildfly.naming.client.WildFlyInitialContextFactory
+java.naming.factory.url.pkgs=
+java.naming.provider.url=http-remoting://127.0.0.1:8080
 #java.naming.security.principal=known
 #java.naming.security.credentials=password1!
-jboss.naming.client.ejb.context=true
 ]]></programlisting>
-<programlisting language="xml"><![CDATA[$ cat basicejb-war/target/test-classes/jboss-ejb-client.properties
-#top level property listing the names of the connections. There will be a set 
-#of properties for each name listed here
-remote.connections=default
-
-#here we define the properties for the server we have called "default"
-remote.connection.default.host=localhost
-remote.connection.default.port=8080
-remote.connectionprovider.create.options.org.xnio.Options.SSL_ENABLED=false
-
-#remote.connection.default.username=known
-#remote.connection.default.password=password1!
-]]></programlisting>                        
                 </listitem>
 
             <listitem><para>
@@ -718,7 +688,7 @@ public class ReservationIT {
 ...
 [INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ basicejb-war ---
 ...
-[INFO] --- maven-war-plugin:2.4:war (default-war) @ basicejb-war ---
+[INFO] --- maven-war-plugin:3.2.2:war (default-war) @ basicejb-war ---
 ...
 [INFO] --- cargo-maven2-plugin:1.4.3:redeploy (cargo-prep) @ basicejb-war ---
 ...
@@ -748,21 +718,22 @@ public class ReservationIT {
                         using the failsafe configuration. The JNDI name differs slightly from the 
                         EAR-based form and can be obtained from the names printed on the JBoss console
                         or server.log.
-                    </para>
+                    </para>                    
 <programlisting language=""><![CDATA[
 java:jboss/exported/basicejb-war-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
 ]]></programlisting>                        
-                    <note>
-                        <para>
-                            This JNDI name does not contain an EAR application name are the beginning
-                            because there is no EAR. It contains a WAR module name instead of an EJB 
-                            module name and then the rest of the EJB is the same.
-                        </para>
+                    <warning>
+                        <title>Don't leave off the leading slash "/" for EAR-less deployments</title>
                         <para>
                             Be sure to include the leading "/" prior to the module name when there is 
                             no EAR (e.g., "ejb:/".
                         </para>
-                    </note>
+                        <para>
+                            This JNDI name does not contain an EAR application name at the beginning
+                            because there is no EAR. It contains a WAR module name instead of an EJB 
+                            module name and then the rest of the EJB is the same.
+                        </para>
+                    </warning>
                 </listitem>
 
 
@@ -786,7 +757,7 @@ java:jboss/exported/basicejb-war-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.
 ...
 [INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ basicejb-war ---
 ...
-[INFO] --- maven-war-plugin:2.4:war (default-war) @ basicejb-war ---
+[INFO] --- maven-war-plugin:3.2.2:war (default-war) @ basicejb-war ---
 ...
 [INFO] --- cargo-maven2-plugin:1.4.3:redeploy (cargo-prep) @ basicejb-war ---
 ...
@@ -902,6 +873,7 @@ import javax.ejb.Remote;
 @Remote
 public interface ShopperRemote {
     int ping();
+    void close();    
 }]]></programlisting>
                 </listitem>
 
@@ -917,6 +889,7 @@ package org.myorg.basicejb.webejb;
 import javax.annotation.PostConstruct;
 
 import javax.annotation.PreDestroy;
+import javax.ejb.Remove;
 import javax.ejb.Stateful;
 
 import org.slf4j.Logger;
@@ -944,12 +917,25 @@ public class ShopperEJB implements ShopperRemote {
         logger.debug("ping({}) called, returned {}", super.hashCode(), counter);
         return counter++;
     }
+
+    @Override
+    @Remove
+    public void close() {
+        logger.debug("close({}) called", super.hashCode());        
+    }
 }]]></programlisting>
                 <note>
                     <para>
                         We have added information to the ping call debug text that will provide
                         us an indication which EJB instance is being called.
                     </para>
+                </note>
+                <note>
+                    <title>Use @javax.ejb.Remove for client to release state</title>
+                    <para>Annotate a business method with @javax.ejb.Remove for the 
+                    client to call -- to inform the container when the client is done
+                    with the server-side state. Otherwise the container will hold onto the
+                    state until the defined timeout.</para>
                 </note>
                 </listitem>
 
@@ -992,14 +978,15 @@ $ mvn clean pre-integration-test
             <artifactId>javax.ejb-api</artifactId>
             <scope>provided</scope>
         </dependency>]]></programlisting>                        
-                    <note>
+                    <tip>
+                        <title>Declare scope=provided dependency on JavaEE API artifacts</title>
                         <para>
                             You should always declare a scope=provided dependency on the 
                             JavaEE API artifacts so they are not unnecessarily deployed
                             in the WAR to the server. The server already has a compliant
                             version of these APIs and implementations for those APIs.
                         </para>
-                    </note>
+                    </tip>
                     </listitem>
 
             <listitem><para>
@@ -1085,19 +1072,32 @@ public class ShopperIT {
     @Test
     public void testPing() throws NamingException {
         logger.info("*** testPing ***");
-        ShopperRemote shopper1= (ShopperRemote) jndi.lookup(shopperJNDI);
-        for (int i=0; i<10; i++) {
-            int counter1=shopper1.ping();
-            assertEquals("unexpected count from shopper1",  i, counter1);
+        ShopperRemote shopper1=null;
+        try {
+            shopper1= (ShopperRemote) jndi.lookup(shopperJNDI);
+            for (int i=0; i<10; i++) {
+                int counter1=shopper1.ping();
+                assertEquals("unexpected count from shopper1",  i, counter1);
+            }
+        } finally {
+            if (shopper1!=null) { shopper1.close(); }
         }
     }
 }]]></programlisting>
-                <para>
-                    Notice the difference in the way we constructed the stateful instance
-                    for our IT test. Since the EJB is stateful, we create a reference to it
-                    close to where we will use it. Stateful EJBs have (in-memory) state related
-                    to a specific client and will be unique to each client.
-                </para>
+                    <note>
+                        <para>
+                            Notice the difference in the way we constructed the stateful instance
+                            for our IT test. Since the EJB is stateful, we create a reference to it
+                            close to where we will use it. Stateful EJBs have (in-memory) state related
+                            to a specific client and will be unique to each client.
+                        </para>
+                    </note>
+                    <tip>
+                        <title>Don't forget to close stateful resources</title>
+                        <para>If you are going to implement a server-side stateful session, you should
+                        be sure to close it from the client-side when done. Otherwise the resources
+                        will remain allocated until the configured timeout.</para>
+                    </tip>                
                 </listitem>
 
             <listitem><para>
@@ -1134,31 +1134,39 @@ Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
 [INFO] BUILD SUCCESS
 ]]></programlisting>
 <programlisting language=""><![CDATA[
-2014-10-11 15:28:09,702 DEBUG [org.myorg.basicejb.ejb.ReservationEJB] (EJB default - 2) *** ReservationEJB.destroy() ***
-2014-10-11 15:28:09,734 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 10) *** ShopperEJB(626691370).init() ***
-2014-10-11 15:28:09,831 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 9) ping(626691370) called, returned 0
-2014-10-11 15:28:09,835 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 4) ping(626691370) called, returned 1
+2018-08-19 17:30:21,688 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (default task-1) *** ShopperEJB(1087164002).init() ***
+2018-08-19 17:30:21,697 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (default task-1) ping(1087164002) called, returned 0
+2018-08-19 17:30:21,701 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (default task-1) ping(1087164002) called, returned 1
 ...
-2014-10-11 15:28:09,864 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 2) ping(626691370) called, returned 8
-2014-10-11 15:28:09,868 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 10) ping(626691370) called, returned 9
+2018-08-19 17:30:21,737 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (default task-1) ping(1087164002) called, returned 9
+2018-08-19 17:30:21,741 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (default task-1) close(1087164002) called
+2018-08-19 17:30:21,742 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (default task-1) *** ShopperEJB(1087164002).destroy() ***
 ]]></programlisting>
                 </listitem>
 
             <listitem><para>
                 Update the IT test to add a second instance used concurrently with the first.
                 </para>
-<programlisting language="java"><![CDATA[    @Test
-    public void testPing() throws NamingException {
-        logger.info("*** testPing ***");
-        ShopperRemote shopper1= (ShopperRemote) jndi.lookup(shopperJNDI);
-        ShopperRemote shopper2= (ShopperRemote) jndi.lookup(shopperJNDI);
+<programlisting language="java"><![CDATA[@Test
+public void testPing() throws NamingException {
+    logger.info("*** testPing ***");
+    ShopperRemote shopper1=null;
+    ShopperRemote shopper2=null;
+    try {
+        shopper1= (ShopperRemote) jndi.lookup(shopperJNDI);
+        shopper2= (ShopperRemote) jndi.lookup(shopperJNDI);
         for (int i=0; i<10; i++) {
             int counter1=shopper1.ping();
             int counter2=shopper2.ping();
             assertEquals("unexpected count from shopper1",  i, counter1);
             assertEquals("unexpected count from shopper2",  i, counter2);
         }
-    }]]></programlisting>
+    } finally {
+        if (shopper1!=null) { shopper1.close(); }
+        if (shopper2!=null) { shopper2.close(); }           
+    }
+}
+]]></programlisting>
                 </listitem>
 
             <listitem><para>
@@ -1178,18 +1186,24 @@ Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
 [INFO] BUILD SUCCESS
 ]]></programlisting>
 <programlisting language=""><![CDATA[
-2014-10-11 15:38:44,380 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 4) *** ShopperEJB(2010115892).init() ***
-2014-10-11 15:38:44,457 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 3) *** ShopperEJB(741113002).init() ***
-2014-10-11 15:38:44,467 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 5) ping(2010115892) called, returned 0
-2014-10-11 15:38:44,472 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 6) ping(741113002) called, returned 0
-2014-10-11 15:38:44,477 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 8) ping(2010115892) called, returned 1
-2014-10-11 15:38:44,483 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 7) ping(741113002) called, returned 1
+2018-08-19 17:37:20,686 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (default task-2) *** ShopperEJB(1430132394).init() ***
+2018-08-19 17:37:20,688 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (default task-1) *** ShopperEJB(1087164002).init() ***
+2018-08-19 17:37:20,694 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (default task-2) ping(1430132394) called, returned 0
+2018-08-19 17:37:20,697 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (default task-1) ping(1087164002) called, returned 0
+2018-08-19 17:37:20,699 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (default task-2) ping(1430132394) called, returned 1
+2018-08-19 17:37:20,701 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (default task-1) ping(1087164002) called, returned 1
 ...
-2014-10-11 15:38:44,548 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 10) ping(2010115892) called, returned 8
-2014-10-11 15:38:44,556 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 9) ping(741113002) called, returned 8
-2014-10-11 15:38:44,561 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 4) ping(2010115892) called, returned 9
-2014-10-11 15:38:44,566 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (EJB default - 3) ping(741113002) called, returned 9
+2018-08-19 17:37:20,735 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (default task-2) ping(1430132394) called, returned 9
+2018-08-19 17:37:20,737 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (default task-1) ping(1087164002) called, returned 9
+2018-08-19 17:37:20,739 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (default task-2) close(1430132394) called
+2018-08-19 17:37:20,739 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (default task-2) *** ShopperEJB(1430132394).destroy() ***
+2018-08-19 17:37:20,741 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (default task-1) close(1087164002) called
+2018-08-19 17:37:20,742 DEBUG [org.myorg.basicejb.webejb.ShopperEJB] (default task-1) *** ShopperEJB(1087164002).destroy() ***
 ]]></programlisting>
+                    <note>
+                        <para>Notice how the EJB @PreDestroy callback was immediately invoked just after the 
+                        @Remove method was invoked and before the next business method was called on the server.</para>
+                    </note>
                 </listitem>
 
             <listitem><para>
@@ -1219,18 +1233,17 @@ WEB-INF/classes/org/myorg/basicejb/webejb/ShopperEJB.class
                 to ping where the client library is trying to broker something in the call.
                 </para>
 <programlisting language=""><![CDATA[
-Running org.myorg.basicejb.warejb.ShopperIT
-java.lang.ClassCastException: java.lang.Class cannot be cast to java.lang.String
-	at org.jboss.ejb.client.remoting.ProtocolMessageHandler.readAttachments(ProtocolMessageHandler.java:55)
-	at org.jboss.ejb.client.remoting.InvocationExceptionResponseHandler$MethodInvocationExceptionResultProducer.getResult(InvocationExceptionResponseHandler.java:82)
-	at org.jboss.ejb.client.EJBClientInvocationContext.getResult(EJBClientInvocationContext.java:276)
-        ...
-	at org.jboss.ejb.client.EJBInvocationHandler.invoke(EJBInvocationHandler.java:144)
-	at com.sun.proxy.$Proxy6.ping(Unknown Source)
-	at org.myorg.basicejb.warejb.ShopperIT.testPing(ShopperIT.java:35)
+[INFO] Running org.myorg.basicejb.warejb.ShopperIT
+17:23:30,284 DEBUG (ShopperIT.java:24) -getting jndi initial context
+17:23:30,285 DEBUG (ShopperIT.java:26) -jndi={java.naming.factory.initial=org.wildfly.naming.client.WildFlyInitialContextFactory, java.naming.provider.url=http-remoting://127.0.0.1:8080, java.naming.factory.url.pkgs=}
+17:23:30,286 INFO  (ShopperIT.java:31) -*** testPing ***
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.098 s <<< FAILURE! - in org.myorg.basicejb.warejb.ShopperIT
+[ERROR] testPing(org.myorg.basicejb.warejb.ShopperIT)  Time elapsed: 0.098 s  <<< ERROR!
+javax.ejb.EJBException: java.lang.IllegalStateException: WFLYEJB0234: Session id hasn't been set for stateful component: ShopperEJB
+Caused by: java.lang.IllegalStateException: WFLYEJB0234: Session id hasn't been set for stateful component: ShopperEJB
 ...
-Tests in error: 
-  ShopperIT.testPing:35 » ClassCast java.lang.Class cannot be cast to java.lang....
+[ERROR] Errors:
+[ERROR]   ShopperIT.testPing » EJB java.lang.IllegalStateException: WFLYEJB0234: Session...
 
 Tests run: 2, Failures: 0, Errors: 1, Skipped: 0
 [INFO] BUILD FAILURE
@@ -1276,7 +1289,6 @@ Tests run: 2, Failures: 0, Errors: 1, Skipped: 0
 |           |               `-- earejb
 |           |                   `-- ReservationIT.java
 |           `-- resources
-|               |-- jboss-ejb-client.properties
 |               |-- jndi.properties
 |               `-- log4j.xml
 |-- basicejb-war
@@ -1300,7 +1312,6 @@ Tests run: 2, Failures: 0, Errors: 1, Skipped: 0
 |           |                   |-- ReservationIT.java
 |           |                   `-- ShopperIT.java
 |           `-- resources
-|               |-- jboss-ejb-client.properties
 |               |-- jndi.properties
 |               `-- log4j.xml
 `-- pom.xml

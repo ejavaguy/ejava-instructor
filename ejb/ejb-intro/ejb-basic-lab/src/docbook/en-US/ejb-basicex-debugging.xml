@@ -87,27 +87,25 @@
             To derive properties for the InitialContext -- we used filtered property files.
         </para>
 <programlisting language=""><![CDATA[#jndi.properties
-java.naming.factory.initial=${jboss.remoting.java.naming.factory.initial}
-java.naming.factory.url.pkgs=${jboss.ejbclient.java.naming.factory.url.pkgs}
-java.naming.provider.url=${jboss.remoting.java.naming.provider.url}
+java.naming.factory.initial=${java.naming.factory.initial}
+java.naming.factory.url.pkgs=${java.naming.factory.url.pkgs}
+java.naming.provider.url=${java.naming.provider.url}
 #java.naming.security.principal=${jndi.user}
 #java.naming.security.credentials=${jndi.password}
-jboss.naming.client.ejb.context=true
 ]]></programlisting>                        
         <para>
-            That got expanded by out initial Maven build to contain the following. The
+            That got expanded by our initial Maven build to contain the following. The
             Maven/Eclipse plugin (<ulink url="https://www.eclipse.org/m2e/">m2e</ulink>) 
             within Eclipse will continue to keep this up to date. It has a plugin
             the provides understanding of what the maven-resource-plugin would do
             outside of the IDE and re-creates that functionality within the IDE environment.
         </para>
 <programlisting language=""><![CDATA[#jndi.properties
-java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
-java.naming.factory.url.pkgs=org.jboss.ejb.client.naming
-java.naming.provider.url=http-remoting://localhost:8080
+java.naming.factory.initial=org.wildfly.naming.client.WildFlyInitialContextFactory
+java.naming.factory.url.pkgs=
+java.naming.provider.url=http-remoting://127.0.0.1:8080
 #java.naming.security.principal=known
 #java.naming.security.credentials=password1!
-jboss.naming.client.ejb.context=true
 ]]></programlisting>                        
         <para>
             There is nothing magical about jndi.properties. We can add more properties to 
@@ -150,10 +148,10 @@ jboss.naming.client.ejb.context=true
                     </para>
                     <orderedlist spacing="compact">
                         <listitem><para>
-                            Removed all modules from Eclipse
+                            Removed all modules related to this assignment from Eclipse
                             </para></listitem>
                         <listitem><para>
-                            Deleted all .settings directories and .project and .classpath files
+                            Deleted all .settings directories and .project and .classpath files from the filesystem
                             </para></listitem>
                         <listitem><para>
                             Re-imported the modules fresh and everything cleared with the "facet" JavaEE versions.
@@ -306,26 +304,20 @@ public void testPing() throws NamingException {
             is done with a remote server first.
         </para>
         <orderedlist spacing="compact">
-            Verify the server has the following JVM debugger options turned on and has been restarted since 
-            they were put in place.
-            <listitem><para>
-                </para>
-<programlisting language=""><![CDATA[wildfly-8.1.0.Final/bin/standalone.conf
-JAVA_OPTS="$JAVA_OPTS -agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=n"
-]]></programlisting>                        
-<programlisting language=""><![CDATA[wildfly-8.1.0.Final/bin/standalone.conf.bat
-set "JAVA_OPTS=%JAVA_OPTS% -agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=n"
-]]></programlisting>                        
-<programlisting language=""><![CDATA[=========================================================================
+            
+            <listitem><para>Start the server with the debug option</para>
+<programlisting language=""><![CDATA[wildfly-13.0.0.Final$ ./bin/standalone.sh -c standalone.xml --debug 8787
+...
+=========================================================================
 
 Listening for transport dt_socket at address: 8787
-00:09:23,260 INFO  [org.jboss.modules] (main) JBoss Modules version 1.3.3.Final
+18:23:37,054 INFO  [org.jboss.modules] (main) JBoss Modules version 1.8.5.Final
 ]]></programlisting>
                 <note>
                     <para>
-                        The use of suspend=n allows the server to run normally until connected
+                        The server to run normally until connected
                         to a debugger client and a breakpoint is hit. Until then there is no 
-                        noticable impact so you can leave this setting active on your development
+                        noticeable impact so you can leave this setting active on your development
                         server instance all the time.
                     </para>
                 </note>

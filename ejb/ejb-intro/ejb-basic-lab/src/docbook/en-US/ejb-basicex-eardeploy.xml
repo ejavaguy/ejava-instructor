@@ -362,12 +362,10 @@ $ mkdir basicejb-test
                 </listitem>
 
             <listitem><para>
-                    Add the dependencies required to be an RMI client of JBoss/Wildfly. This
-                    is not as clean or simple as it sounds. There are many APIs in JavaEE
-                    and many layered jars that implement them. If we use something that 
-                    includes everything -- we get a dependency tree that is very bloated.
-                    I have attempted to cut the list down to a set we need for class and 
-                    have included it in the following project.
+                    Add the dependencies required to be an RMI client of JBoss/Wildfly.
+                    The dependencies required and how we define them have varied over the 
+                    years -- so I created a module ("info.ejava.examples.common:jboss-rmi-client") 
+                    within the course examples as a single entry point.
                 </para>
 <programlisting language="xml"><![CDATA[        <!-- dependencies used for remote interface -->
         <dependency>
@@ -376,7 +374,24 @@ $ mkdir basicejb-test
             <type>pom</type>
             <scope>test</scope>
         </dependency>    
-]]></programlisting>                        
+]]></programlisting>
+                    <note>
+                        <para>The dependency added above is just a "pom" dependency.
+                        However, it will bring in dependencies that bring in other
+                        dependencies related to a remote EJB and JMS client of JBoss</para>
+                    </note>
+                    <tip>
+                        <title>Optionally replace dependency with ejb-client-bom</title>
+                        <para>Recent JBoss/Wildfly packaging has made my use of jboss-rmi-client 
+                        across the course examples ]less valuable than in the past. If you take a 
+                        look at the implementation of that module, you will see it simply creates a dependency on 
+                        <ulink url="https://mvnrepository.com/artifact/org.wildfly.bom/ejb-client-bom">org.wildfly.bom:ejb-client-bom</ulink>
+                        and 
+                        <ulink url="https://mvnrepository.com/artifact/org.wildfly.bom/jms-client-bom">org.wildfly.bom:jms-client-bom</ulink>.
+                        You can reduce your dependencies by declaring a direct dependency
+                        on org.wildfly.bom:ejb-client-bom in this case.                        
+                        </para>
+                    </tip>
                 </listitem>
 
             <listitem><para>
@@ -384,7 +399,7 @@ $ mkdir basicejb-test
                 </para>
 <programlisting language="xml"><![CDATA[    <properties>
         ...
-        <ejava.version>4.0.0-SNAPSHOT</ejava.version>
+        <ejava.version>5.0.0-SNAPSHOT</ejava.version>
 ...
         <dependency>
             <groupId>info.ejava.examples.common</groupId>
@@ -403,12 +418,12 @@ $ mkdir basicejb-test
 <programlisting language=""><![CDATA[(from basicejb-test directory)
 $ mvn dependency:go-offline
 ...
-[WARNING] The POM for info.ejava.examples.common:jboss-rmi-client:pom:4.0.0-SNAPSHOT is missing, no dependency information available
+[WARNING] The POM for info.ejava.examples.common:jboss-rmi-client:pom:5.0.0-SNAPSHOT is missing, no dependency information available
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD FAILURE
 ...
 [ERROR] Failed to execute goal on project basicejb-test: Could not resolve dependencies for project myorg.basicejb:basicejb-test:jar:1.0-SNAPSHOT: 
-Could not find artifact info.ejava.examples.common:jboss-rmi-client:pom:4.0.0-SNAPSHOT -> [Help 1]
+Could not find artifact info.ejava.examples.common:jboss-rmi-client:pom:5.0.0-SNAPSHOT -> [Help 1]
 ]]></programlisting>                        
                 </listitem>
 
@@ -437,10 +452,10 @@ $ mvn dependency:go-offline
 
 ...
 [INFO] <<< maven-dependency-plugin:2.8:go-offline (default-cli) < :resolve-plugins @ basicejb-test <<<
-Downloading: http://webdev.jhuep.com/~jcs/maven2-snapshot/info/ejava/examples/common/jboss-rmi-client/4.0.0-SNAPSHOT/maven-metadata.xml
-Downloaded: http://webdev.jhuep.com/~jcs/maven2-snapshot/info/ejava/examples/common/jboss-rmi-client/4.0.0-SNAPSHOT/maven-metadata.xml (621 B at 0.8 KB/sec)
-Downloading: http://webdev.jhuep.com/~jcs/maven2-snapshot/info/ejava/examples/common/jboss-rmi-client/4.0.0-SNAPSHOT/jboss-rmi-client-4.0.0-20141001.053140-16.pom
-Downloaded: http://webdev.jhuep.com/~jcs/maven2-snapshot/info/ejava/examples/common/jboss-rmi-client/4.0.0-SNAPSHOT/jboss-rmi-client-4.0.0-20141001.053140-16.pom (5 KB at 77.3 KB/sec)
+Downloading: http://webdev.jhuep.com/~jcs/maven2-snapshot/info/ejava/examples/common/jboss-rmi-client/5.0.0-SNAPSHOT/maven-metadata.xml
+Downloaded: http://webdev.jhuep.com/~jcs/maven2-snapshot/info/ejava/examples/common/jboss-rmi-client/5.0.0-SNAPSHOT/maven-metadata.xml (621 B at 0.8 KB/sec)
+Downloading: http://webdev.jhuep.com/~jcs/maven2-snapshot/info/ejava/examples/common/jboss-rmi-client/5.0.0-SNAPSHOT/jboss-rmi-client-5.0.0-20141001.053140-16.pom
+Downloaded: http://webdev.jhuep.com/~jcs/maven2-snapshot/info/ejava/examples/common/jboss-rmi-client/5.0.0-SNAPSHOT/jboss-rmi-client-5.0.0-20141001.053140-16.pom (5 KB at 77.3 KB/sec)
 ...
 [INFO] BUILD SUCCESS
 ]]></programlisting>                        
@@ -454,7 +469,7 @@ Downloaded: http://webdev.jhuep.com/~jcs/maven2-snapshot/info/ejava/examples/com
                         You can also try adding the -U (update snapshots) flag to the command line.
                     </para>
 <programlisting language=""><![CDATA[
-$ rm -rf $HOME/.m2/repository/info/ejava/examples/common/jboss-rmi-client/4.0.0-SNAPSHOT
+$ rm -rf $HOME/.m2/repository/info/ejava/examples/common/jboss-rmi-client/5.0.0-SNAPSHOT
 ]]></programlisting>                        
                 </note>
                 </listitem>
@@ -472,24 +487,13 @@ $ vi basicejb-test/src/test/resources/jndi.properties
 <programlisting language=""><![CDATA[
 $ cat basicejb-test/src/test/resources/jndi.properties
 
-#jndi.properties for JBoss Remoting
-java.naming.factory.initial=${jboss.remoting.java.naming.factory.initial}
-java.naming.factory.url.pkgs=${jboss.remoting.java.naming.factory.url.pkgs}
-java.naming.provider.url=${jboss.remoting.java.naming.provider.url}
+#jndi.properties
+java.naming.factory.initial=${java.naming.factory.initial}
+java.naming.factory.url.pkgs=${java.naming.factory.url.pkgs}
+java.naming.provider.url=${java.naming.provider.url}
 #java.naming.security.principal=${jndi.user}
 #java.naming.security.credentials=${jndi.password}
-jboss.naming.client.ejb.context=true
 ]]></programlisting>
-                <note>
-                    <para>
-                        JBoss/Wildfly provides two types of interfacing with EJBs thru JNDI;
-                        JBoss Remoting and EJB Client. JBoss Remoting is ignorant of the specifics
-                        of EJB and can be used with any resource type. EJB Client is specific to 
-                        EJB but tuned to work more efficiently than the general purpose JBoss Remoting.
-                        We are using the general purpose method here so that it can be re-usable
-                        for other resources -- like JMS -- without changing technologies.
-                    </para>
-                </note>
                 </listitem>
 
             <listitem><para>
@@ -512,13 +516,12 @@ $ mvn clean process-test-resources
 <programlisting language=""><![CDATA[
 $ cat basicejb-test/target/test-classes/jndi.properties
 
-#jndi.properties for JBoss Remoting
-java.naming.factory.initial=${jboss.remoting.java.naming.factory.initial}
-java.naming.factory.url.pkgs=${jboss.remoting.java.naming.factory.url.pkgs}
-java.naming.provider.url=${jboss.remoting.java.naming.provider.url}
+#jndi.properties
+java.naming.factory.initial=${java.naming.factory.initial}
+java.naming.factory.url.pkgs=${java.naming.factory.url.pkgs}
+java.naming.provider.url=${java.naming.provider.url}
 #java.naming.security.principal=${jndi.user}
 #java.naming.security.credentials=${jndi.password}
-jboss.naming.client.ejb.context=true
 ]]></programlisting>                        
                 </listitem>
 
@@ -545,17 +548,17 @@ jboss.naming.client.ejb.context=true
                 </excludes>
             </testResource>
         </testResources>]]></programlisting>                        
-                <note>
+                <tip>
                     <title>Restrict Filtering to Targeted Files</title>
                     <para>
-                        The above definition of filtering is restricting filtering to 
+                        The above definition of filtering restricts filtering to 
                         a specific pattern of files and leaving all other files unfiltered.
                         This is more verbose but suggested. Filtering some files that were
                         not meant to be filtered causes issues. Binary files (e.g., PKI certs)
                         and variables meant to be expanded in the deployment environment
                         do not work well with filtering.
                     </para>
-                </note>
+                </tip>
                 </listitem>
 
             <listitem><para>
@@ -580,13 +583,12 @@ $ mvn clean process-test-resources
 <programlisting language=""><![CDATA[
 $ cat basicejb-test/target/test-classes/jndi.properties
 
-#jndi.properties for JBoss Remoting
-java.naming.factory.initial=${jboss.remoting.java.naming.factory.initial}
-java.naming.factory.url.pkgs=${jboss.remoting.java.naming.factory.url.pkgs}
-java.naming.provider.url=${jboss.remoting.java.naming.provider.url}
+#jndi.properties
+java.naming.factory.initial=${java.naming.factory.initial}
+java.naming.factory.url.pkgs=${java.naming.factory.url.pkgs}
+java.naming.provider.url=${java.naming.provider.url}
 #java.naming.security.principal=${jndi.user}
 #java.naming.security.credentials=${jndi.password}
-jboss.naming.client.ejb.context=true
 ]]></programlisting>                        
                 </listitem>
 
@@ -594,17 +596,17 @@ jboss.naming.client.ejb.context=true
                 Add the properties referenced in jndi.properties to the *root* pom.xml.
                 </para>
 <programlisting language="xml"><![CDATA[$ cat pom.xml
-    <properties>
+<properties>
 ...
-        <jboss.host>localhost</jboss.host>
-        <jboss.http.port>8080</jboss.http.port>
-        <jndi.user>known</jndi.user>
-        <jndi.password>password1!</jndi.password>
+    <jboss.host>localhost</jboss.host>
+    <jboss.http.port>8080</jboss.http.port>
+    <jndi.user>known</jndi.user>
+    <jndi.password>password1!</jndi.password>
 
-        <jboss.remoting.java.naming.factory.initial>org.jboss.naming.remote.client.InitialContextFactory</jboss.remoting.java.naming.factory.initial>
-        <jboss.remoting.java.naming.provider.url>http-remoting://${jboss.host}:${jboss.http.port}</jboss.remoting.java.naming.provider.url>
-        <jboss.remoting.java.naming.factory.url.pkgs/>
-    </properties>]]></programlisting>                        
+    <jjava.naming.factory.initial>org.jboss.naming.remote.client.InitialContextFactory</java.naming.factory.initial>
+    <java.naming.provider.url>http-remoting://${jboss.host}:${jboss.http.port}</java.naming.provider.url>
+    <java.naming.factory.url.pkgs/>
+</properties>]]></programlisting>                        
                 </listitem>
 
             <listitem><para>
@@ -622,34 +624,34 @@ $ mvn clean process-test-resources
 ...
 [INFO] BUILD SUCCESS
 ]]></programlisting>                        
-<programlisting language=""><![CDATA[
+<programlisting language="java"><![CDATA[
 $ cat target/test-classes/jndi.properties
 
-#jndi.properties for JBoss Remoting
-java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
+#jndi.properties
+java.naming.factory.initial=org.wildfly.naming.client.WildFlyInitialContextFactory
 java.naming.factory.url.pkgs=
-java.naming.provider.url=http-remoting://localhost:8080
+java.naming.provider.url=http-remoting://127.0.0.1:8080
 #java.naming.security.principal=known
 #java.naming.security.credentials=password1!
-jboss.naming.client.ejb.context=true
 ]]></programlisting>                        
                 <itemizedlist spacing="compact">
                     <listitem><para>
                         java.naming.factory.initial - an implementation class for the 
-                        InitialContext() created by the Java code. A default javax.naming
-                        implementation will be used if this is not supplied or blank.
+                        InitialContext() created by the Java code. The WildFlyInitialContextFactory
+                        will be able to easily switch between JBoss Remoting and EJB Client 
+                        JNDI names.
                         </para></listitem>
                     <listitem><para>
                         java.naming.factory.url.pkgs= - a list of java packages to search
                         in the classpath to resolve a well-known-named class handler 
-                        for custom name prefixes (e.g., http-remoting).
-                        However, since we are using a custom JBoss Remoting factory.initial
-                        there is no need to list anything here to resolve the http-remoting 
-                        naming prefix.
+                        for custom name prefixes (e.g., ejb:).
+                        However, since we are using a custom WildFlyInitialContextFactory factory.initial
+                        there is no need to list anything here to resolve the "http-remoting"
+                        protocol and the "ejb:" naming prefix.
                         </para></listitem>
                     <listitem><para>
                         java.naming.provider.url - URL to the JNDI provider. JBoss uses 
-                        the HTTP port and protocol for JNDI lookups. 
+                        the HTTP port and protocol to initiate communications for JNDI lookups. 
                         </para></listitem>
                     <listitem><para>
                         java.naming.security.principal and java.naming.security.credentials -
@@ -657,10 +659,6 @@ jboss.naming.client.ejb.context=true
                         we have the server locked down so that JNDI lookups require credentials
                         prior to even getting to the application. If your Java code does not
                         supply credentials -- this can be used to authenticate with the server.
-                        </para></listitem>
-                    <listitem><para>
-                        jboss.naming.client.ejb.context=true - required for JBoss Remoting to
-                        correctly work with EJBs.
                         </para></listitem>
                 </itemizedlist>
                 </listitem>
@@ -855,7 +853,7 @@ $ cp basicejb-ejb/src/test/resources/log4j.xml basicejb-test/src/test/resources/
                 </itemizedlist>
 <programlisting language="xml"><![CDATA[    <properties>
     ...
-        <maven-failsafe-plugin.version>2.17</maven-failsafe-plugin.version>
+        <maven-failsafe-plugin.version>2.22.0</maven-failsafe-plugin.version>
     ...
     <build>
     	<pluginManagement>
@@ -914,7 +912,7 @@ $ cp basicejb-ejb/src/test/resources/log4j.xml basicejb-test/src/test/resources/
 ...
 [INFO] --- maven-jar-plugin:2.4:jar (default-jar) @ basicejb-test ---
 ...
-[INFO] --- maven-failsafe-plugin:2.17:integration-test (default) @ basicejb-test ---
+[INFO] --- maven-failsafe-plugin:2.22.0:integration-test (default) @ basicejb-test ---
 ...
 -------------------------------------------------------
  T E S T S
@@ -934,7 +932,7 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 
 [WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
 [INFO] 
-[INFO] --- maven-failsafe-plugin:2.17:verify (default) @ basicejb-test ---
+[INFO] --- maven-failsafe-plugin:2.22.0:verify (default) @ basicejb-test ---
 [INFO] Failsafe report directory: /home/jcstaff/proj/basicejbEx/basicejb-test/target/failsafe-reports
 [WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
 [INFO] 
@@ -995,7 +993,7 @@ Tests in error:
 
 Tests run: 1, Failures: 0, Errors: 1, Skipped: 0
 ...
-[INFO] --- maven-failsafe-plugin:2.17:verify (default) @ basicejb-test ---
+[INFO] --- maven-failsafe-plugin:2.22.0:verify (default) @ basicejb-test ---
 ...
 [INFO] BUILD FAILURE
 ]]></programlisting>                        
@@ -1107,9 +1105,9 @@ $ mvn clean install
                     </para>
 <programlisting language="xml"><![CDATA[    <properties>
         ...
-        <wildfly.version>8.1.0.Final</wildfly.version>
         <cargo-maven2-plugin.version>1.4.3</cargo-maven2-plugin.version>
-        <cargo.containerId>wildfly8x</cargo.containerId>
+        <cargo.containerId>wildfly9x</cargo.containerId>
+        <wildfly-controller-client.version>8.2.1.Final</wildfly-controller-client.version>
         <jboss.mgmt.host>${jboss.host}</jboss.mgmt.host>
         <jboss.mgmt.port>9990</jboss.mgmt.port>
     ...
@@ -1140,7 +1138,7 @@ $ mvn clean install
                         <dependency>
                             <groupId>org.wildfly</groupId>
                             <artifactId>wildfly-controller-client</artifactId>
-                            <version>${wildfly.version}</version>
+                            <version>${wildfly-controller-client.version}</version>
                         </dependency>
                     </dependencies>
                     <executions>
@@ -1159,7 +1157,15 @@ $ mvn clean install
                             </goals>
                         </execution>
                     </executions>
-                </plugin>]]></programlisting>                        
+                </plugin>]]></programlisting>
+                
+                <tip>
+                    <title>wildfly9x works with wildfly13</title>
+                    <para>I have not had time to investigate updating cargo to the 
+                    latest configurations for wildfly. This is mostly because the older
+                    version (and containerId) still work with the newer software and 
+                    a quick upgrade of cargo version# was not immediately successful.</para>
+                </tip>                        
                     </listitem>
 
                 <listitem><para>
@@ -1181,7 +1187,7 @@ INFO: XNIO NIO Implementation Version 3.2.2.Final
 Oct 05, 2014 11:17:36 PM org.jboss.remoting3.EndpointImpl <clinit>
 INFO: JBoss Remoting version 4.0.3.Final
 ...
-[INFO] --- maven-failsafe-plugin:2.17:integration-test (default) @ basicejb-test ---
+[INFO] --- maven-failsafe-plugin:2.22.0:integration-test (default) @ basicejb-test ---
 ...
 Running org.myorg.basicejb.earejb.ReservationIT
 ...
@@ -1189,7 +1195,7 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 ...
 [INFO] --- cargo-maven2-plugin:1.4.3:undeploy (cargo-post) @ basicejb-test ---
 ...
-[INFO] --- maven-failsafe-plugin:2.17:verify (default) @ basicejb-test ---
+[INFO] --- maven-failsafe-plugin:2.22.0:verify (default) @ basicejb-test ---
 ...
 [INFO] BUILD SUCCESS
 ]]></programlisting>                        
@@ -1295,11 +1301,18 @@ java:jboss/exported/basicejb-ear-1.0-SNAPSHOT/basicejb-ejb-1.0-SNAPSHOT/Reservat
         <artifactId>maven-failsafe-plugin</artifactId>
         <configuration>
             <systemPropertyVariables>
-                <jndi.name.reservation>basicejb-ear-${project.version}/basicejb-ejb-${project.version}/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote</jndi.name.reservation>
+                <jndi.name.reservation>ejb:basicejb-ear-${project.version}/basicejb-ejb-${project.version}/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote</jndi.name.reservation>
             </systemPropertyVariables>
         </configuration>
     </plugin>]]></programlisting>                        
-
+                    <tip>
+                        <title>Always prefix EJB JNDI names with "ejb:" to use EJB Client</title>
+                        <para>The more EJB-aware and efficient EJB Client is used for communications
+                        with our EJB when we prefix the JNDI name with "ejb:". However, leaving it
+                        off will work but we would be using JBoss Remoting. We will use JBoss Remoting
+                        for non-EJB communications like JMS. For now and always get familiar to always
+                        prefixing EJB JNDI names with "ejb:".</para>
+                    </tip>
                 </listitem>
 
             <listitem><para>
@@ -1383,7 +1396,7 @@ INFO: XNIO NIO Implementation Version 3.2.2.Final
 Oct 06, 2014 12:16:23 AM org.jboss.remoting3.EndpointImpl <clinit>
 INFO: JBoss Remoting version 4.0.3.Final
 ...
-[INFO] --- maven-failsafe-plugin:2.17:integration-test (default) @ basicejb-test ---
+[INFO] --- maven-failsafe-plugin:2.22.0:integration-test (default) @ basicejb-test ---
 ...
 Running org.myorg.basicejb.earejb.ReservationIT
 00:16:25,660 DEBUG (ReservationIT.java:23) -getting jndi initial context
@@ -1399,7 +1412,7 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 ...
 [INFO] --- cargo-maven2-plugin:1.4.3:undeploy (cargo-post) @ basicejb-test ---
 ...
-[INFO] --- maven-failsafe-plugin:2.17:verify (default) @ basicejb-test ---
+[INFO] --- maven-failsafe-plugin:2.22.0:verify (default) @ basicejb-test ---
 ...
 [INFO] BUILD SUCCESS
 ]]></programlisting>                        
@@ -1560,209 +1573,11 @@ $ mvn clean install
         </orderedlist>
     </section>
 
-    <section id="ejb-basicex-eardeploy-ejbclient">
-        <title>EJB Client</title>
-        <para>
-            In this section we will make a few slight changes to upgrade the remote
-            communications to EJB Client.  JBoss recommends against
-            the general purpose JBoss Remoting for RMI access to EJBs in favor of the
-            EJB-specific EJB Client. Since EJB Client knows it is talking to a JBoss
-            Server with an EJB at the remote end -- portions of the interactions can be 
-            optimized. JBoss also uses EJB Client exclusively within the server.
-        </para>
-        <para>
-            We will have to make a few changes to our client in order to support EJB Client.
-        </para>
-        <itemizedlist spacing="compact">
-            <listitem><para>Modify jndi properties</para></listitem>
-            <listitem><para>Add jboss-ejb-client.properties</para></listitem>
-            <listitem><para>Change the JNDI name</para></listitem>
-        </itemizedlist>
 
-        <orderedlist spacing="compact">
-            <listitem><para>
-                    Re-run your build and note the output during the IT test. This will be slightly different after the next 
-                    few steps.
-                </para>
-<programlisting language=""><![CDATA[
-$ mvn clean install
-...
-Running org.myorg.basicejb.earejb.ReservationIT
-...
-01:33:43,814 DEBUG (ReservationIT.java:31) -jndi name:basicejb-ear-1.0-SNAPSHOT/basicejb-ejb-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
-...
-01:33:43,922 INFO  (ReservationIT.java:38) -*** testPing ***
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.123 sec - in org.myorg.basicejb.earejb.ReservationIT
-01:33:43,984 INFO  (ChannelAssociation.java:458) -EJBCLIENT000016: Channel Channel ID b2993636 (outbound) of Remoting connection 4ceee548 to localhost/127.0.0.1:8080 can no
-longer process messages
-...
-]]></programlisting>                        
-                </listitem>
-
-            <listitem><para>
-                    Update the java.naming.factory.url.pkgs specification in the jndi.properties. 
-                </para>
-<programlisting language=""><![CDATA[
-$ cat src/test/resources/jndi.properties
-...
-java.naming.factory.url.pkgs=${jboss.ejbclient.java.naming.factory.url.pkgs}
-...
-]]></programlisting>                        
-                </listitem>
-
-            <listitem><para>
-                Create a second new file in src/test/resources to house EJB Client custom properties.
-                </para>
-<programlisting language=""><![CDATA[
-$ cat src/test/resources/jboss-ejb-client.properties
-
-#top level property listing the names of the connections. There will be a set 
-#of properties for each name listed here
-remote.connections=default
-
-#here we define the properties for the server we have called "default"
-remote.connection.default.host=${jboss.host}
-remote.connection.default.port=${jboss.naming.port}
-remote.connectionprovider.create.options.org.xnio.Options.SSL_ENABLED=false
-#remote.connection.default.username=${jndi.user}
-#remote.connection.default.password=${jndi.password}
-]]></programlisting>                        
-                </listitem>
-
-            <listitem><para>
-                Add the following new properties to the root pom. This will define the 
-                extra properties used in the files in src/test/resources.
-                </para>
-<programlisting language="xml"><![CDATA[        <jboss.remoting.port>${jboss.http.port}</jboss.remoting.port>
-        <jboss.naming.port>${jboss.remoting.port}</jboss.naming.port>
-        ...
-        <jboss.ejbclient.java.naming.factory.url.pkgs>org.jboss.ejb.client.naming</jboss.ejbclient.java.naming.factory.url.pkgs>]]></programlisting>                        
-                </listitem>
-
-            <listitem><para>
-                Build the test resources to see the new property files fully instantiated.
-                Notice the jndi.properties now has a new java.naming.factory.url.pkgs
-                property. The package specification will be used to search for JNDI
-                prefix handlers not handled by the InitialContextFactory.
-                
-                </para>
-<programlisting language="xml"><![CDATA[ 
-$ mvn clean process-test-resources
-$ cat target/test-classes/jndi.properties
-
-#jndi.properties
-java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
-java.naming.factory.url.pkgs=org.jboss.ejb.client.naming
-java.naming.provider.url=http-remoting://localhost:8080
-#java.naming.security.principal=known
-#java.naming.security.credentials=password1!
-jboss.naming.client.ejb.context=true
-]]></programlisting>                        
-                </listitem>
-
-            <listitem><para>
-                Add the JNDI prefix "ejb:" to the beginning of the JNDI name in the 
-                failsafe configuration.
-                </para>
-<programlisting language="xml"><![CDATA[<jndi.name.reservation>ejb:basicejb-ear-${project.version}/basicejb-ejb-${project.version}/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote</jndi.name.reservation>]]></programlisting>                        
-                <para>
-                   Notice the jboss-ejb-client.jar is in the classpath for the IT Test.
-                   This was brought in by the direct dependency on info.ejava.examples.common:jboss-rmi-client.
-                </para>
-<programlisting language=""><![CDATA[
-$ mvn dependency:tree
-
-[INFO] +- info.ejava.examples.common:jboss-rmi-client:pom:4.0.0-SNAPSHOT:test
-[INFO] |  +- org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec:jar:1.0.0.Final:test
-[INFO] |  +- org.jboss.spec.javax.ejb:jboss-ejb-api_3.2_spec:jar:1.0.0.Final:test
-[INFO] |  +- org.jboss:jboss-ejb-client:jar:2.0.1.Final:test
-]]></programlisting>                        
-                <para>
-                    Notice that jboss-ejb-client.jar provides a handler for the "ejb:" prefix
-                    below the "org.jboss.ejb.client.naming" package as specified in the 
-                    java.naming.factory.url.pkgs property. Prior to adding the extra package
-                    specification, the InitialContextFactory would not have been able to resolve
-                    a handler for the "ejb:" prefix.
-                </para>
-<programlisting language=""><![CDATA[
-$ jar tf ~/.m2/repository/org/jboss/jboss-ejb-client/2.0.1.Final/jboss-ejb-client-2.0.1.Final.jar | grep org.jboss.ejb.client.naming
-org/jboss/ejb/client/naming/
-org/jboss/ejb/client/naming/ejb/
-org/jboss/ejb/client/naming/ejb/SecurityActions$1.class
-org/jboss/ejb/client/naming/ejb/EjbNamingContext$2.class
-org/jboss/ejb/client/naming/ejb/EjbNamingContext.class
-org/jboss/ejb/client/naming/ejb/EjbNamingContextSetup.class
-org/jboss/ejb/client/naming/ejb/ejbURLContextFactory.class
-org/jboss/ejb/client/naming/ejb/SecurityActions.class
-org/jboss/ejb/client/naming/ejb/EjbJndiIdentifier.class
-org/jboss/ejb/client/naming/ejb/EjbJndiNameParser.class
-org/jboss/ejb/client/naming/ejb/SecurityActions$2.class
-org/jboss/ejb/client/naming/ejb/SecurityActions$3.class
-org/jboss/ejb/client/naming/ejb/EjbNamingContext$1.class
-]]></programlisting>                        
-                </listitem>
-
-
-            <listitem><para>
-                Re-run your IT test
-                </para>
-<programlisting language=""><![CDATA[
-$ mvn clean install
-...
-Running org.myorg.basicejb.earejb.ReservationIT
-...
-01:39:27,809 DEBUG (ReservationIT.java:31) -jndi name:ejb:basicejb-ear-1.0-SNAPSHOT/basicejb-ejb-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote
-...
-01:39:27,831 INFO  (ReservationIT.java:38) -*** testPing ***
-01:39:27,906 INFO  (VersionReceiver.java:103) -EJBCLIENT000017: Received server version 2 and marshalling strategies [river]
-01:39:27,913 INFO  (RemotingConnectionEJBReceiver.java:215) -EJBCLIENT000013: Successful version handshake completed for receiver context
-EJBReceiverContext{clientContext=org.jboss.ejb.client.EJBClientContext@301487f9, receiver=Remoting connection EJB receiver
-[connection=org.jboss.ejb.client.remoting.ConnectionPool$PooledConnection@13eb0518,channel=jboss.ejb,nodename=fedora17x64-kde]} on channel Channel ID ccb6efe6 (outbound) of
-Remoting connection 0231556b to localhost/127.0.0.1:8080
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.215 sec - in org.myorg.basicejb.earejb.ReservationIT
-01:39:28,012 INFO  (ChannelAssociation.java:458) -EJBCLIENT000016: Channel Channel ID ccb6efe6 (outbound) of Remoting connection 0231556b to localhost/127.0.0.1:8080 can no
-longer process messages
-01:39:28,015 INFO  (ChannelAssociation.java:458) -EJBCLIENT000016: Channel Channel ID f4db6e8d (outbound) of Remoting connection 68eefca4 to localhost/127.0.0.1:8080 can no
-longer process messages
-
-Results :
-
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
-...
-[INFO] BUILD SUCCESS
-]]></programlisting>                        
-                </listitem>
-
-            <listitem><para>
-                    Temporarily remove the java.naming.factory.url.pkgs value while keeping the 
-                    "ejb:" JNDI prefix.
-                </para>
-<programlisting language=""><![CDATA[
-#jndi.properties
-java.naming.factory.url.pkgs=
-]]></programlisting>                        
-                </listitem>
-
-            <listitem><para>
-                Re-run the IT test and notice the JNDI failure when the package specification is not present.
-                </para>
-<programlisting language=""><![CDATA[
-javax.naming.NameNotFoundException: ejb:basicejb-ear-1.0-SNAPSHOT/basicejb-ejb-1.0-SNAPSHOT/ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote -- service jboss.naming.context.java.jboss.exported."ejb:basicejb-ear-1.0-SNAPSHOT"."basicejb-ejb-1.0-SNAPSHOT"."ReservationEJB!org.myorg.basicejb.ejb.ReservationRemote"
-	at org.jboss.as.naming.ServiceBasedNamingStore.lookup(ServiceBasedNamingStore.java:104)
-...
-[INFO] BUILD FAILURE
-]]></programlisting>                        
-                </listitem>
-
-            <listitem><para>
-                Restore the jndi.properties package specification.
-                </para>
-<programlisting language=""><![CDATA[
-java.naming.factory.url.pkgs=${jboss.ejbclient.java.naming.factory.url.pkgs}
-]]></programlisting>                        
-                </listitem>
-
-            <listitem><para>
+    <section id="ejb-basicex-eardeploy-files">
+        <title>Directory Sanity Check</title>
+        <orderedlist>
+            <listitem><para>            
                 As a final sanity check, this is what your multi-module application
                 should look like at this time.
                 </para>
@@ -1801,7 +1616,6 @@ java.naming.factory.url.pkgs=${jboss.ejbclient.java.naming.factory.url.pkgs}
 |           |               `-- earejb
 |           |                   `-- ReservationIT.java
 |           `-- resources
-|               |-- jboss-ejb-client.properties
 |               |-- jndi.properties
 |               `-- log4j.xml
 `-- pom.xml
