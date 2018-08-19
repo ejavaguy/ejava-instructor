@@ -102,7 +102,7 @@
                 <!-- 
               <entry namest="comment"><link linkend="emarket-project1-part">Project 1</link> due by Sun, 8am Oct14</entry>
                  -->
-              <entry namest="comment">Project 1 - due by Sun, 8am Oct18</entry>
+              <entry namest="comment">Project 1 - due by Sun, 8am Oct14</entry>
             </row>
             <row rowsep="1">
               <entry namest="topic"><para><link linkend="jpa-tuning">JPA/SQL Tuning</link></para></entry>
