@@ -311,7 +311,6 @@ JNDI bindings for session bean named GreeterEJB in deployment unit deployment "e
     </assembly-descriptor>
 </jboss:ejb-jar>]]></programlisting>
             </listitem>
-            <listitem><para></para></listitem>
         </itemizedlist>
     </section>
 

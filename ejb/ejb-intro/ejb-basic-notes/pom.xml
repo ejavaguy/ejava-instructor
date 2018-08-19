@@ -16,7 +16,7 @@
     
     <properties>
        <doc.base>ejb-basic-book</doc.base>
-       <content.version>v2014-10-12</content.version>
+       <content.version>v2018-08-19</content.version>
     </properties>
 
     <build>

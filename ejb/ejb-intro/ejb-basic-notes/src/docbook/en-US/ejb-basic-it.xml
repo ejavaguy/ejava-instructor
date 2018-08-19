@@ -94,9 +94,14 @@ java.naming.provider.url=...
 <programlisting language=""><![CDATA[
 java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
 java.naming.factory.url.pkgs=
-java.naming.provider.url=http-remoting://localhost:8080
-jboss.naming.client.ejb.context=true
+java.naming.provider.url=http-remoting://127.0.0.1:8080
+#java.naming.security.principal=
+#java.naming.security.credentials=
 ]]></programlisting>
+              <itemizedlist spacing="compact">
+                  <listitem><para>Credentials are strictly for JNDI lookups</para></listitem>
+                  <listitem><para>Credentials are optional when client connecting from same machine as server (i.e., development mode)</para></listitem>
+              </itemizedlist>
             </section>
             
             <section id="ejb-basic-it-ejbaccess-remoting-jndinames">
@@ -122,22 +127,20 @@ jboss.naming.client.ejb.context=true
             
             <section id="ejb-basic-it-ejbaccess-ejbclient-jndi">
                 <title>EJB Client jndi.properties</title>
-<programlisting language=""><![CDATA[java.naming.factory.initial=
-java.naming.factory.url.pkgs=org.jboss.ejb.client.naming
-java.naming.provider.url=]]></programlisting>
-            </section>
-            
-            <section id="ejb-basic-it-ejbaccess-ejbclient-ejbclient">
-                <title>EJB Client jndi.properties</title>
 <programlisting language=""><![CDATA[
-#top level property listing the names of the connections
-remote.connections=default
-
-#here we define the properties for the server we have called "default"
-remote.connection.default.host=localhost
-remote.connection.default.port=8080
-remote.connectionprovider.create.options.org.xnio.Options.SSL_ENABLED=false
-]]></programlisting>
+#java.naming.factory.initial
+java.naming.factory.url.pkgs=org.jboss.ejb.client.naming
+java.naming.provider.url=http-remoting://127.0.0.1:8080]]></programlisting>
+                <itemizedlist spacing="compact">
+                    <listitem><para><code>java.naming.factory.initial</code> can be anything legal and not blank</para></listitem>
+                </itemizedlist>                
+                <tip>
+                    <title>EJB Client has additional communication details</title>
+                    <para>EJB Client contains other details like alternate URLs, authentication configuration,
+                    and encryption options that go beyond basic communications but address more detailed use of 
+                    remote interfaces. These details are configured in a separate configuration file that is 
+                    specific to JBoss and will not be covered here.</para>
+                </tip>
             </section>
             
             <section id="ejb-basic-it-ejbaccess-ejbclient-jndinames">
@@ -160,32 +163,44 @@ remote.connectionprovider.create.options.org.xnio.Options.SSL_ENABLED=false
                     <listitem><para>java.naming.factory.url.pkgs lists base package names to start looking for extensions</para></listitem>
                     <listitem><para>jboss-ejb-client.jar must be in the classpath</para></listitem>
                 </itemizedlist>
+
+                <itemizedlist spacing="compact">
+                    <listitem><para>Provider extracts "ejb" prefix from "ejb:/..." JNDI name</para>
+<programlisting language=""><![CDATA[
+ejb:/ejb-basic-ejb/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote]]></programlisting>                    
+                    </listitem>
+                    <listitem><para>Provider obtains list of Java package prefixes from "jndi.naming.factory.url.pkgs"</para>
+<programlisting language=""><![CDATA[
+#jndi.properties
+java.naming.factory.url.pkgs=org.jboss.ejb.client.naming
+]]></programlisting>                    
+                    </listitem>
+                    <listitem><para>Provider searches for "org.jboss.ejb.client.naming.ejb" Java package in classpath</para>
 <programlisting language=""><![CDATA[
 $ mvn dependency:tree
-
-[INFO] +- info.ejava.examples.common:jboss-rmi-client:pom:4.0.0-SNAPSHOT:test
-[INFO] |  +- org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec:jar:1.0.0.Final:test
-[INFO] |  +- org.jboss.spec.javax.ejb:jboss-ejb-api_3.2_spec:jar:1.0.0.Final:test
-[INFO] |  +- org.jboss:jboss-ejb-client:jar:2.0.1.Final:test
-]]></programlisting>                        
-                <itemizedlist spacing="compact">
-                    <listitem><para>Provider looks for "ejb" extension below "org.jboss.ejb.client.naming" package</para></listitem>
-                </itemizedlist>
-<programlisting language=""><![CDATA[#jndi.properties
-java.naming.factory.url.pkgs=org.jboss.ejb.client.naming]]></programlisting>                        
-<programlisting language=""><![CDATA[$ jar tf ~/.m2/repository/org/jboss/jboss-ejb-client/2.0.1.Final/jboss-ejb-client-2.0.1.Final.jar | grep org.jboss.ejb.client.naming
 ...
-org/jboss/ejb/client/naming/ejb/SecurityActions$1.class
-org/jboss/ejb/client/naming/ejb/EjbNamingContext$2.class
-org/jboss/ejb/client/naming/ejb/EjbNamingContext.class
-org/jboss/ejb/client/naming/ejb/EjbNamingContextSetup.class
+[INFO] +- info.ejava.examples.common:jboss-rmi-client:pom:5.0.0-SNAPSHOT:test
+[INFO] |  |  +- org.jboss:jboss-ejb-client:jar:4.0.10.Final:test
+[INFO] |  |  +- org.jboss.remoting:jboss-remoting:jar:5.0.5.Final:test
+[INFO] |  |  +- org.wildfly:wildfly-naming-client:jar:1.0.9.Final:test
+[INFO] |  |  +- org.wildfly.wildfly-http-client:wildfly-http-naming-client:jar:1.0.12.Final:test
+...
+]]></programlisting>                        
+                    </listitem>
+                    
+                    <listitem><para>Provider locates an ObjectFactory class in the "org.jboss.ejb.client.naming" Java package that starts with "ejb"</para>
+<programlisting language=""><![CDATA[
+$ jar tf ~/.m2/repository/org/jboss/jboss-ejb-client/4.0.10.Final/jboss-ejb-client-4.0.10.Final.jar | grep org.jboss.ejb.client.naming
 org/jboss/ejb/client/naming/ejb/ejbURLContextFactory.class
-org/jboss/ejb/client/naming/ejb/SecurityActions.class
-org/jboss/ejb/client/naming/ejb/EjbJndiIdentifier.class
-org/jboss/ejb/client/naming/ejb/EjbJndiNameParser.class
-org/jboss/ejb/client/naming/ejb/SecurityActions$2.class
-org/jboss/ejb/client/naming/ejb/SecurityActions$3.class
-org/jboss/ejb/client/naming/ejb/EjbNamingContext$1.class]]></programlisting>                        
+]]></programlisting>                        
+                    </listitem>
+                    <listitem><para>Provider uses that ObjectFactory to resolve the remaining portion of the JNDI name</para>
+<programlisting language=""><![CDATA[
+ejb:/ejb-basic-ejb/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote]]></programlisting>                    
+                    </listitem>
+                </itemizedlist>
+
+
             </section>
         </section>
 
@@ -198,10 +213,23 @@ org/jboss/ejb/client/naming/ejb/EjbNamingContext$1.class]]></programlisting>
                 <listitem><para>Extend JBoss Remoting InitialContextFactory with EJB Client</para></listitem>
             </itemizedlist>
             
-<programlisting language=""><![CDATA[java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
+<programlisting language=""><![CDATA[
+java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
 java.naming.factory.url.pkgs=org.jboss.ejb.client.naming
 java.naming.provider.url=http-remoting://localhost:8080
-jboss.naming.client.ejb.context=true]]></programlisting>
+]]></programlisting>
+
+                <para>However, 
+                <ulink url="https://github.com/wildfly/jboss-ejb-client/blob/master/src/main/java/org/jboss/ejb/client/naming/ejb/ejbURLContextFactory.java">ejbURLContextFactory</ulink> 
+                is deprecated in favor of using
+                <ulink url="https://github.com/wildfly/wildfly-naming-client/blob/master/src/main/java/org/wildfly/naming/client/WildFlyInitialContextFactory.java"> 
+                WildFlyInitialContextFactory</ulink>. The following is a bit easier to remember and configure.
+                </para>
+
+<programlisting language=""><![CDATA[java.naming.factory.initial=org.wildfly.naming.client.WildFlyInitialContextFactory
+java.naming.factory.url.pkgs=
+java.naming.provider.url=http-remoting://localhost:8080
+]]></programlisting>
             </section>
     </section>
         
@@ -317,7 +345,6 @@ public class GreeterIT {
         |                       `-- ejbclient
         |                           |-- GreeterIT.java
         `-- resources
-            |-- jboss-ejb-client.properties
             |-- jndi.properties
             `-- log4j.xml
 ]]></programlisting>                               

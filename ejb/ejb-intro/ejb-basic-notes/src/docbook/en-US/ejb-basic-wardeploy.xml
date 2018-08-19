@@ -118,8 +118,7 @@ java:module/WebGreeterEJB
                 </varlistentry>
             </variablelist>
 
-<programlisting language="xml"><![CDATA[
-<project>
+<programlisting language="xml"><![CDATA[<project>
     <groupId>info.ejava.examples.ejb.basicejb</groupId>
     <artifactId>ejb-basic-war</artifactId>
     <packaging>war</packaging>
@@ -158,8 +157,7 @@ java:module/WebGreeterEJB
             <title>IT Test Module</title>
             <itemizedlist spacing="compact">            
                 <listitem><para>Add EAR artifact as a scope=compile dependency when deploying from separate (test) module</para>
-<programlisting language="xml"><![CDATA[
-    <dependencies>      
+<programlisting language="xml"><![CDATA[    <dependencies>      
 ...
         <!-- packages being deployed must be a dependency -->
         <dependency>        
@@ -174,8 +172,7 @@ java:module/WebGreeterEJB
 ]]></programlisting>
                 </listitem>
                 <listitem><para>Declare EAR artifact to be deployed</para>
-<programlisting language="xml"><![CDATA[
-    <build>
+<programlisting language="xml"><![CDATA[    <build>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
