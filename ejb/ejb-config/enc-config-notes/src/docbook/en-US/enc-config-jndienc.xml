@@ -161,13 +161,22 @@ private DataSource ds3;]]></programlisting>
             
             <listitem><para>Perform actions on injected resources after injection
                 complete using <code>@PostConstruct</code></para>
-<programlisting language="java"><![CDATA[@PostConstruct
-public void init() {
-...    
-}]]></programlisting>                        
-            </listitem>
+<programlisting language="java"><![CDATA[@Resource(name="jdbc/ds3")
+private DataSource ds3;
 
+@PostConstruct
+public void init() {
+    ds3...
+...    
+}]]></programlisting>
+                        
+            </listitem>
         </itemizedlist>
+                <para>Call Order:</para>
+                <orderedlist>
+                    <listitem><para>Properties are injected</para></listitem>
+                    <listitem><para>@PostConstruct is invoked</para></listitem>
+                </orderedlist>
     </section>
         
     <section id="enc-config-jndienc-summary">

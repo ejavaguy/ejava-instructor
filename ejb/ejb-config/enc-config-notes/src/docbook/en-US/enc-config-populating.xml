@@ -204,6 +204,12 @@ emf2 = (EntityManagerFactory)ctx.lookup("jpa/emf2"); ]]></programlisting>
 private EntityManager em1;
 @PersistenceUnit(unitName="enc-config")
 private EntityManagerFactory emf1;]]></programlisting>
+                <tip>
+                    <title>Use unitName for persistence unit name</title>
+                    <para>Use <code>unitName</code> and not <code>name</code>
+                    when specifying the name of the persistence unit. <code>name</code>
+                    is for the ENC name.</para>
+                </tip>
             </listitem>                        
         </itemizedlist>
     </section>
@@ -260,6 +266,13 @@ private Topic topic3;
 private ConnectionFactory cf3;]]></programlisting>                        
             </listitem>
             <listitem><para>Lookup ENC resource using JNDI or SessionContext</para>
+<programlisting language="java"><![CDATA[private @Resource SessionContext ctx;
+protected Context jndi;
+
+@PostConstruct
+public void init() {
+    jndi=new InitialContext();
+}]]></programlisting>
 <programlisting language="java"><![CDATA[queue2 = (Queue)jndi.lookup("java:comp/env/jms/queue2"); 
 queue2 = (Queue)ctx.lookup("jms/queue2"); 
 topic2 = (Topic)jndi.lookup("java:comp/env/jms/topic2"); 
