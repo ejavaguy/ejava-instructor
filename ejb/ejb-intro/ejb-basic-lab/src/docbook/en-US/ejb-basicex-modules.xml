@@ -912,9 +912,12 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 10:14:01,139 INFO  [org.jboss.modules] (main) JBoss Modules version 1.8.5.Final
 10:14:01,372 INFO  [org.jboss.msc] (main) JBoss MSC version 1.4.2.Final
 10:14:01,379 INFO  [org.jboss.threads] (main) JBoss Threads version 2.3.2.Final
-10:14:01,474 INFO  [org.jboss.as] (MSC service thread 1-2) WFLYSRV0049: WildFly Full 13.0.0.Final (WildFly Core 5.0.0.Final) starting
+10:14:01,474 INFO  [org.jboss.as] (MSC service thread 1-2) WFLYSRV0049: 
+    WildFly Full 13.0.0.Final (WildFly Core 5.0.0.Final) starting
 ...
-10:14:03,969 INFO  [org.jboss.as] (Controller Boot Thread) WFLYSRV0025: WildFly Full 13.0.0.Final (WildFly Core 5.0.0.Final) started in 3104ms - Started 358 of 581 services (356 services are lazy, passive or on-demand)
+10:14:03,969 INFO  [org.jboss.as] (Controller Boot Thread) WFLYSRV0025: 
+    WildFly Full 13.0.0.Final (WildFly Core 5.0.0.Final) started in 3104ms 
+    - Started 358 of 581 services (356 services are lazy, passive or on-demand)
 ]]></programlisting>
                     </listitem>
 
@@ -979,7 +982,33 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
                     Add a new Wildfly (latest).x Server off the Servers tab of the JavaEE IDE profile.
                     Accept all defaults.
                     </para>
-                    <graphic scale="60" fileref="images/ejb-dev-server-embedded-addserver.png"/>
+            
+                        <figure>
+                            <title>Choose New Server</title>
+                            <graphic scale="60" fileref="images/ejb-dev-server-embedded-addserver.png"/>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>Locate Server tab in the Eclipse JavaEE Profile</para></listitem>
+                                <listitem><para>Right-Click in panel and select New Server</para></listitem>
+                                <listitem><para>Choose most recent Wildfly configuration closest to current</para></listitem>
+                            </itemizedlist>
+                        </figure>
+            
+                        <figure>
+                            <title>Configure New Server</title>
+                            <graphic scale="60" fileref="images/ejb-dev-server-embedded-addserver2.png"/>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>Defaults are usually good enough</para></listitem>
+                            </itemizedlist>
+                        </figure>
+            
+                        <figure>
+                            <title>Create New Runtime</title>
+                            <graphic scale="60" fileref="images/ejb-dev-server-embedded-addserver3.png"/>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>Set home directory to root of Wildfly installation</para></listitem>
+                            </itemizedlist>
+                        </figure>
+
                     </listitem>
 
                 <listitem><para>

@@ -109,25 +109,28 @@ public class GreeterEJB implements Greeter {
             
             <figure>
                 <title>Start Standalone Server at Shell</title>
-<programlisting language=""><![CDATA[wildfly-8.1.0.Final]$ ./bin/standalone.sh 
+<programlisting language=""><![CDATA[wildfly-13.0.0.Final$ ./bin/standalone.sh -c standalone.xml 
 =========================================================================
 
   JBoss Bootstrap Environment
 
-  JBOSS_HOME: /opt/wildfly-8.1.0.Final
+  JBOSS_HOME: /Users/jim/apps/wildfly-13.0.0.Final
 
-  JAVA: /usr/lib/jvm/java-1.7.0/bin/java
+  JAVA: java
 
-  JAVA_OPTS:  -server -Xms64m -Xmx512m -XX:MaxPermSize=256m -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.byteman -Djava.awt.headless=true -agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=n
+  JAVA_OPTS:  -server -Xms64m -Xmx512m -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.byteman -Djava.awt.headless=true
 
 =========================================================================
 
-Listening for transport dt_socket at address: 8787
-01:33:57,008 INFO  [org.jboss.modules] (main) JBoss Modules version 1.3.3.Final
-01:33:57,508 INFO  [org.jboss.msc] (main) JBoss MSC version 1.2.2.Final
-01:33:57,970 INFO  [org.jboss.as] (MSC service thread 1-1) JBAS015899: WildFly 8.1.0.Final "Kenny" starting
+10:14:01,139 INFO  [org.jboss.modules] (main) JBoss Modules version 1.8.5.Final
+10:14:01,372 INFO  [org.jboss.msc] (main) JBoss MSC version 1.4.2.Final
+10:14:01,379 INFO  [org.jboss.threads] (main) JBoss Threads version 2.3.2.Final
+10:14:01,474 INFO  [org.jboss.as] (MSC service thread 1-2) WFLYSRV0049: 
+    WildFly Full 13.0.0.Final (WildFly Core 5.0.0.Final) starting
 ...
-01:34:56,423 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015874: WildFly 8.1.0.Final "Kenny" started in 60065ms - Started 309 of 362 services (113 services are lazy, passive or on-demand)
+10:14:03,969 INFO  [org.jboss.as] (Controller Boot Thread) WFLYSRV0025: 
+    WildFly Full 13.0.0.Final (WildFly Core 5.0.0.Final) started in 3104ms 
+    - Started 358 of 581 services (356 services are lazy, passive or on-demand)
 ]]></programlisting>
             </figure>
             <itemizedlist spacing="compact">
@@ -144,10 +147,11 @@ Listening for transport dt_socket at address: 8787
             
             <figure>
                 <title>Shutdown Standalone Server using Command</title>
-<programlisting language=""><![CDATA[
-$ /opt/wildfly-8.1.0.Final/bin/jboss-cli.sh --connect command=:shutdown 
-{"outcome" => "success"}
-]]></programlisting>
+<programlisting language=""><![CDATA[wildfly-13.0.0.Final$ ./bin/jboss-cli.sh --connect command=:shutdown
+{
+    "outcome" => "success",
+    "result" => undefined
+}]]></programlisting>
             </figure>
             <itemizedlist spacing="compact">
                 <listitem><para>All server actions can be scripted with command-line interface</para></listitem>
@@ -156,9 +160,11 @@ $ /opt/wildfly-8.1.0.Final/bin/jboss-cli.sh --connect command=:shutdown
             <figure>
                 <title>Kill Standalone Server using Control-C</title>
 <programlisting language=""><![CDATA[
-01:39:20,291 INFO  [org.jboss.as.messaging] (MSC service thread 1-4) JBAS011601: Bound messaging object to jndi name java:jboss/DefaultJMSConnectionFactory
-^C 01:39:32,666 INFO  [org.wildfly.extension.undertow] (MSC service thread 1-4) JBAS017532: Host default-host stopping
-01:39:32,666 INFO  [org.jboss.as.messaging] (ServerService Thread Pool -- 57) JBAS011605: Unbound messaging object to jndi name java:jboss/exported/jms/RemoteConnectionFactory
+^C10:17:19,557 INFO  [org.jboss.as.server] (Thread-2) WFLYSRV0236: Suspending server with no timeout.
+10:17:19,558 INFO  [org.jboss.as.ejb3] (Thread-2) WFLYEJB0493: EJB subsystem suspension complete
+10:17:19,559 INFO  [org.jboss.as.server] (Thread-2) WFLYSRV0220: Server shutdown has been requested via an OS signal
+...
+10:17:19,616 INFO  [org.jboss.as] (MSC service thread 1-1) WFLYSRV0050: WildFly Full 13.0.0.Final (WildFly Core 5.0.0.Final) stopped in 53ms
 ]]></programlisting>
             </figure>
             <itemizedlist spacing="compact">
@@ -183,20 +189,30 @@ $ /opt/wildfly-8.1.0.Final/bin/jboss-cli.sh --connect command=:shutdown
             </itemizedlist>
 
             <figure>
-                <title>Add New Server</title>
+                <title>Choose New Server</title>
                 <graphic scale="60" fileref="images/ejb-dev-server-embedded-addserver.png"/>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Locate Server tab in the Eclipse JavaEE Profile</para></listitem>
+                    <listitem><para>Right-Click in panel and select New Server</para></listitem>
+                    <listitem><para>Choose most recent Wildfly configuration closest to current</para></listitem>
+                </itemizedlist>
             </figure>
-            <itemizedlist spacing="compact">
-                <listitem><para>Locate Server tab in the JavaEE Profile</para></listitem>
-            </itemizedlist>
 
             <figure>
                 <title>Configure New Server</title>
                 <graphic scale="60" fileref="images/ejb-dev-server-embedded-addserver2.png"/>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Defaults are usually good enough</para></listitem>
+                </itemizedlist>
             </figure>
-            <itemizedlist spacing="compact">
-                <listitem><para>Defaults are usually good enough</para></listitem>
-            </itemizedlist>
+
+            <figure>
+                <title>Create New Runtime</title>
+                <graphic scale="60" fileref="images/ejb-dev-server-embedded-addserver3.png"/>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Set home directory to root of Wildfly installation</para></listitem>
+                </itemizedlist>
+            </figure>
         </section>
         
         <section id="ejb-dev-server-embedded-start">

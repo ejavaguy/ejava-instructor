@@ -21,6 +21,8 @@
 
        <dependency.includes>
             images/ejb-dev-server-embedded-addserver.png,
+            images/ejb-dev-server-embedded-addserver2.png,
+            images/ejb-dev-server-embedded-addserver3.png,
             images/ejb-dev-server-embedded-startserver.png,
             images/ejb-dev-server-embedded-stopserver.png
        </dependency.includes>

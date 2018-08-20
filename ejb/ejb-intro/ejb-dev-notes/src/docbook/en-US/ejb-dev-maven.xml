@@ -102,16 +102,14 @@
            
            <figure>
                <title>Example Source Resource File: src/test/resources/jndi.properties</title>
-<programlisting language=""><![CDATA[
+<programlisting language="java"><![CDATA[
 $ cat src/test/resources/jndi.properties 
 
-###jboss-remoting technique
-java.naming.factory.initial=${jboss.remoting.java.naming.factory.initial}
-java.naming.factory.url.pkgs=${jboss.remoting.java.naming.factory.url.pkgs}
-java.naming.provider.url=${jboss.remoting.java.naming.provider.url}
-java.naming.security.principal=${jboss.remoting.java.naming.security.principal}
-java.naming.security.credentials=${jboss.remoting.java.naming.security.credentials}
-jboss.naming.client.ejb.context=true
+java.naming.factory.initial=${java.naming.factory.initial}
+java.naming.factory.url.pkgs=${java.naming.factory.url.pkgs}
+java.naming.provider.url=${java.naming.provider.url}
+#java.naming.security.principal=${jndi.user}
+#java.naming.security.credentials=${jndi.password}
 ]]></programlisting>
            </figure>
            <itemizedlist spacing="compact">
@@ -120,16 +118,14 @@ jboss.naming.client.ejb.context=true
            
            <figure>
                <title>Example Filtered Resource File: target/test-classes/jndi.properties</title>
-<programlisting language=""><![CDATA[
+<programlisting language="java"><![CDATA[
 $ cat target/test-classes/jndi.properties 
 
-###jboss-remoting technique
-java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
+java.naming.factory.initial=org.wildfly.naming.client.WildFlyInitialContextFactory
 java.naming.factory.url.pkgs=
-java.naming.provider.url=http-remoting://localhost:8080
-java.naming.security.principal=known
-java.naming.security.credentials=password1!
-jboss.naming.client.ejb.context=true
+java.naming.provider.url=http-remoting://127.0.0.1:8080
+#java.naming.security.principal=known
+#java.naming.security.credentials=password1!
 ]]></programlisting>
            </figure>
            <itemizedlist spacing="compact">
@@ -141,13 +137,12 @@ jboss.naming.client.ejb.context=true
 <programlisting language="xml"><![CDATA[<properties>
     <jboss.host>localhost</jboss.host>
     <jboss.http.port>8080</jboss.http.port>
-    <jndi.user>known</jndi.user>
-    <jndi.password>password1!</jndi.password>
-    <jboss.remoting.java.naming.factory.initial>org.jboss.naming.remote.client.InitialContextFactory</jboss.remoting.java.naming.factory.initial>
-    <jboss.remoting.java.naming.provider.url>http-remoting://${jboss.host}:${jboss.http.port}</jboss.remoting.java.naming.provider.url>
-    <jboss.remoting.java.naming.factory.url.pkgs/>
-    <jboss.remoting.java.naming.security.principal>${jndi.user}</jboss.remoting.java.naming.security.principal>
-    <jboss.remoting.java.naming.security.credentials>${jndi.password}</jboss.remoting.java.naming.security.credentials>
+    
+	<java.naming.factory.initial>org.wildfly.naming.client.WildFlyInitialContextFactory</java.naming.factory.initial>
+	<java.naming.provider.url>http-remoting://${jboss.host}:${jboss.http.port}</java.naming.provider.url>
+	<java.naming.factory.url.pkgs/>
+	<jndi.user>known</jndi.user>
+	<jndi.password>password1!</jndi.password>
 </properties> ]]></programlisting>
 <programlisting language="xml"><![CDATA[    <build>
         <!-- filter test/resource files for profile-specific valies -->
