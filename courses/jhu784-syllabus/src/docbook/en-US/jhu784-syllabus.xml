@@ -141,24 +141,18 @@
                 <entry namest="topic"><para><link linkend="ejb-dev">EJB Development Scenarios</link></para></entry>
                 <entry namest="comment"><para><ulink url="../html/ejb-basic-lab.html">Exercise: Basic EJB Development</ulink></para></entry>
             </row>
+            
             <row rowsep="1">
+                <entry namest="session">8</entry>
+                <entry namest="date">Oct17</entry>
                 <entry namest="topic"><para><link linkend="enc-config">Configuring EJBs using ENC and JNDI</link></para></entry>
                 <entry namest="comment"><para>Rubinger &amp; Burke: Ch 16</para></entry>
             </row>
             <row rowsep="1">
                 <entry namest="comment"><para><ulink url="../html/encconfig-lab.html">Exercise: JNDI/ENC Configuration</ulink></para></entry>
             </row>
-            
             <row rowsep="1">
-                <entry namest="session">8</entry>
-                <entry namest="date">Oct17</entry>
-                <entry namest="topic"><para>Web-enabled Services</para></entry>
-            </row>
-            <row rowsep="1">
-                <entry namest="topic"><para>Java XML and JSON Binding</para></entry>
-            </row>
-            <row rowsep="1">
-                <entry namest="topic"><para><link linkend="ejb-jaxrs">Web-enabled EJBs with JAX-RS</link></para></entry>
+                <entry namest="topic"><para><link linkend="cdi-config">CDI</link></para></entry>
             </row>
             
 
@@ -177,10 +171,16 @@
             <row rowsep="1">
                 <entry namest="session">10</entry>
                 <entry namest="date">Oct31</entry>
+                <entry namest="topic"><para>Web-enabled Services</para></entry>
+                <!-- 
                 <entry namest="topic"><para><link linkend="webtier">Web/UI Applications</link> <ulink url="../ppt/webTier.ppt">slides</ulink></para></entry>
+                 -->
             </row>
             <row rowsep="1">
-                <entry namest="topic"><para><link linkend="cdi-config">CDI</link></para></entry>
+                <entry namest="topic"><para>Java XML and JSON Binding</para></entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic"><para><link linkend="ejb-jaxrs">Web-enabled EJBs with JAX-RS</link></para></entry>
             </row>
             <row rowsep="1">
                 <!-- 
