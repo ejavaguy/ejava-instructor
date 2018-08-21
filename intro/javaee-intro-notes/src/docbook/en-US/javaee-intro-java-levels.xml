@@ -44,9 +44,18 @@
     </section>
     
     <section id="javaeeintro-javaee-levels-ee">
-        <title>Java Enterprise Edition(tm) (JavaEE or JEE)</title>
+        <title>Java Enterprise Edition(tm) (JavaEE, JEE, EE4J, or Jakarta EE)</title>
         <itemizedlist spacing="compact">
             <listitem><para>Formerly called J2EE. Change started with JavaEE 5</para></listitem>
+            <listitem><para>Movement from Oracle to Eclipse Foundation after/at JavaEE 8</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Temporarily called 
+                    <ulink url="https://projects.eclipse.org/projects/ee4j">EE4J (Eclipse Enterprise for Java)</ulink>
+                    </para></listitem>
+                    <listitem><para>Has officially become <ulink url="https://jakarta.ee/">Jakarta EE</ulink></para></listitem>
+                </itemizedlist>
+
+            </listitem>
             <listitem><para>Targeted at enterprise deployments commonly deployed to data centers</para>
                 <itemizedlist spacing="compact">
                     <listitem><para>Persistence/Data Access</para></listitem>
@@ -71,7 +80,7 @@
                     <listitem><para>APIs (standardized)</para></listitem>
                     <listitem><para>Compatibility test suites</para></listitem>
                     <listitem><para>Reference Implementation (Glassfish)</para></listitem>
-                    <listitem><para>Providers (e.g., Glassfish, JBoss/Wildfly, WebSphere, WebLogic)</para></listitem>
+                    <listitem><para>Providers (e.g., Glassfish, JBoss/Wildfly, WebSphere, WebLogic, Payara)</para></listitem>
                 </itemizedlist>
             </listitem>
         </itemizedlist>                   

@@ -31,8 +31,26 @@
                     </itemizedlist>
                 </listitem>
             </itemizedlist>
-            
-        </section>                   
+        </section>
+        
+        <section id="javaeeintro-javaee-profiles-micro">
+            <title>Micro Profile (coming?)</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Not yet officially pay of Jakarta EE but part of Eclipse Foundation 
+                    (<ulink url="https://projects.eclipse.org/projects/technology.microprofile">Eclipse MicroProfile</ulink>)</para></listitem>
+                <listitem><para><ulink url="https://docs.google.com/presentation/d/1BYfVqnBIffh-QDIrPyromwc9YSwIbsawGUECSsrSQB0/edit#slide=id.g3d2897e2e8_109_332">
+                Micro-Container-focused services</ulink></para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Config</para></listitem>
+                        <listitem><para>Metrics</para></listitem>
+                        <listitem><para>Fault Tolerance</para></listitem>
+                        <listitem><para>JAX-RS</para></listitem>
+                        <listitem><para>...</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+                           
     </section>
     
     <section id="javaeeintro-javaee-appcomp">
@@ -70,7 +88,7 @@
             <itemizedlist spacing="compact">
                 <listitem><para>Generate content to browser from Web container</para></listitem>
                 <listitem><para>Can be UI/HTML-based</para></listitem>
-                <listitem><para>Can be service/XML (or other structured data forms)-based</para></listitem>
+                <listitem><para>Can be service/XML/JSON (or other structured data forms)-based</para></listitem>
                 <listitem><para>May contain EJBs providing transactional support</para></listitem>
             </itemizedlist>                   
         </section>

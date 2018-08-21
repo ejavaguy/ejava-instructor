@@ -64,17 +64,10 @@
         <title>Sources</title>
         <orderedlist>
             <listitem><para>
-                <emphasis>"Java Platform, Enterprise Edition 6 Specification (JSR-316 Final Release)"</emphasis>,
-                Roberto Chinnici and Bill Shannon, 
-                <ulink url="http://jcp.org/aboutJava/communityprocess/final/jsr316">http://jcp.org/aboutJava/communityprocess/final/jsr316</ulink>,
-                2009 Sun Microsystems.
-                </para>
-            </listitem>
-            <listitem><para>
-                <emphasis>"Java Platform, Enterprise Edition 7 Specification (JSR-342 Final Release)"</emphasis>,
-                Linda DeMichiel and Bill Shannon, 
-                <ulink url="https://jcp.org/aboutJava/communityprocess/final/jsr342/index.html">https://jcp.org/aboutJava/communityprocess/final/jsr342/index.html</ulink>,
-                2013 Oracle America, Inc.
+                <emphasis>"JSR-000366 JavaTM Platform, Enterprise Edition 8 (Java EE 8) Specification (Final Release)"</emphasis>,
+                Linda DeMichiel, Bill Shannon, 
+                <ulink url="https://jcp.org/aboutJava/communityprocess/final/jsr366/index.html">https://jcp.org/aboutJava/communityprocess/final/jsr366/index.html</ulink>,
+                7/31/17 Oracle America, Inc.
                 </para>
             </listitem>
             <listitem><para>

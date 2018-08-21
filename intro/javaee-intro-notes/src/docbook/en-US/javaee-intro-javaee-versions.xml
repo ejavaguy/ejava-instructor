@@ -76,6 +76,19 @@
                 </itemizedlist>
             </listitem>
         </varlistentry>
+        
+        <varlistentry>
+            <term><filename>8</filename></term>
+            <listitem><para>"Focus on modern web applications";August 2017</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Expanding support of JSON with JSON-B</para></listitem>
+                    <listitem><para>HTTP/2 protocol</para></listitem>
+                    <listitem><para>JAX-RS server-sent events</para></listitem>
+                    <listitem><para>API for identity stores</para></listitem>
+                    <listitem><para>...</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </varlistentry>
     </variablelist>
     
 </chapter>
