@@ -145,25 +145,39 @@
             <row rowsep="1">
                 <entry namest="session">8</entry>
                 <entry namest="date">Oct17</entry>
+                <entry namest="topic"><para>Configuring EJBs using ENC and JNDI</para></entry>
+                <!--
                 <entry namest="topic"><para><link linkend="enc-config">Configuring EJBs using ENC and JNDI</link></para></entry>
+                -->
                 <entry namest="comment"><para>Rubinger &amp; Burke: Ch 16</para></entry>
             </row>
+            <!--
             <row rowsep="1">
                 <entry namest="comment"><para><ulink url="../html/encconfig-lab.html">Exercise: JNDI/ENC Configuration</ulink></para></entry>
             </row>
+            -->
             <row rowsep="1">
+                <entry namest="topic"><para>CDI</para></entry>
+                <!--
                 <entry namest="topic"><para><link linkend="cdi-config">CDI</link></para></entry>
+                -->
             </row>
             
 
             <row rowsep="1">
                 <entry namest="session">9</entry>
                 <entry namest="date">Oct24</entry>
+                <entry namest="topic"><para>EJB/Server-Side JPA Topics</para></entry>
+                <!--
                 <entry namest="topic"><para><link linkend="ejb-jpa">EJB/Server-Side JPA Topics</link></para></entry>
                 <entry namest="comment"><para><ulink url="../html/ejb-jpa-lab.html">Exercise: JPA/EJB Remote Interfaces</ulink></para></entry>
+                -->
             </row>
             <row rowsep="1">
+                <entry namest="topic"><para>EJB Transactions</para></entry>
+                <!--
                 <entry namest="topic"><para><link linkend="ejb-tx">EJB Transactions</link> <ulink url="../ppt/javaeeTransactions.ppt">slides</ulink></para></entry>
+                -->
                 <entry namest="comment"><para>Rubinger &amp; Burke: Ch 17</para></entry>
             </row>
 
@@ -180,7 +194,10 @@
                 <entry namest="topic"><para>Java XML and JSON Binding</para></entry>
             </row>
             <row rowsep="1">
+                <entry namest="topic"><para>Web-enabled EJBs with JAX-RS</para></entry>
+                <!--
                 <entry namest="topic"><para><link linkend="ejb-jaxrs">Web-enabled EJBs with JAX-RS</link></para></entry>
+                -->
             </row>
             <row rowsep="1">
                 <!-- 
@@ -212,18 +229,27 @@
             <row rowsep="1">
                 <entry namest="session">11</entry>
                 <entry namest="date">Nov07</entry>
+                <entry namest="topic"><para>JavaEE Security</para></entry>
+                <!--
                 <entry namest="topic"><para><link linkend="javaee-security">JavaEE Security</link></para></entry>
+                -->
                 <entry namest="comment"><para>Rubinger &amp; Burke: Ch 15</para></entry>
             </row>
             <row rowsep="1">
                 <entry namest="session"/>
+                <entry namest="topic"><para>JavaEE Interceptors</para></entry>
+                <!--
                 <entry namest="topic"><para><link linkend="javaee-interceptors">JavaEE Interceptors</link></para></entry>
+                -->
             </row>
             
             <row rowsep="1">
                 <entry namest="session">12</entry>
                 <entry namest="date">Nov14</entry>
+                <entry namest="topic"><para>JMS Core</para></entry>
+                <!--
                 <entry namest="topic"><para><ulink url="../ppt/jmsCore.ppt">JMS Core</ulink></para></entry>
+                -->
             </row>
 
             <row rowsep="1">
@@ -236,7 +262,10 @@
             <row rowsep="1">
                 <entry namest="session">13</entry>
                 <entry namest="date">Nov28</entry>
+                <entry namest="topic"><para>EJB and JMS</para></entry>
+                <!--
                 <entry namest="topic"><para><ulink url="../ppt/asyncEJB.ppt">EJB and JMS</ulink></para></entry>
+                -->
                 <entry namest="comment"><para>Rubinger &amp; Burke: Ch 8 &amp; 19</para></entry>
             </row>
             <row rowsep="1">

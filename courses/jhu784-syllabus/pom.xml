@@ -12,12 +12,12 @@
 
     <name>Courses::JHU 605.784 Course Syllabus</name>
     <description>
-        This project contains the course syllabus
+        This document contains the course syllabus
     </description>
     
     <properties>
        <doc.base>jhu784-syllabus-book</doc.base>
-       <content.version>v2018-12-18</content.version>
+       <content.version>v2018-12-21</content.version>
     </properties>
 
     <dependencies>
