@@ -1,0 +1,299 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="esport-project3-tech">
+    <title>Project 3 Technical Details</title>
+
+    <section id="esport-project3-tech-impl">
+        <title>Data Tier, Business Logic, and EJB/WAR Support</title>
+        <para>
+            Provide all functionality from Projects 1 and 2.
+        </para>
+    </section>
+
+    <section id="esport-project3-tech-salesaccess">
+        <title>eSales Access Restrictions</title>
+        <para>
+            Enhance eSales with access restrictions.
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Assign the EJB to the "other" security domain
+                </para>
+                </listitem>
+            <listitem><para>
+                Restrict access to the EJB methods to appropriate read/write roles
+                using declarative security.
+                </para>
+                <orderedlist spacing="compact">
+                    <listitem><para>
+                        Only users with the eleague-user role can access account information
+                        but only for their authenticated identity. Derive this information from 
+                        their login. (i.e., user1 logs in and may only access user1's account as 
+                        "my account". They do not specify which account they access.
+                        </para>
+                        </listitem>
+                    <listitem><para>
+                        Only users with the eleague-admin role may run the test utility functions.
+                        </para>
+                        </listitem>
+                    <listitem><para>
+                        Anonymous users may access Auction information.
+                        </para>
+                        </listitem>
+                </orderedlist>
+                </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="esport-project3-tech-salesclient">
+        <title>eSales RMI client Authentication</title>
+        <para>
+            Extend your existing eSales RMI Test project and any RMI client(s) to
+            address new authentication requirements.
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Add a valid login to your existing tests to re-enable them under
+                the newly secure environment.
+                </para>
+                </listitem>
+            <listitem><para>
+                Add a new unit test that verifies the access controls of the
+                protected and open methods. This means that -- after fixing access
+                issues in the previous bullet -- you purposely attempt to violate
+                access restrictions from a new JUnit test to show a test of 
+                access control.
+                </para>
+                </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="esport-project3-tech-bidaccess">
+        <title>eBidbot Access Restrictions</title>
+        <para>
+            Enhance eBidbot with access restrictions.
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Assign the EJB to the "other" security domain.
+                </para>
+                </listitem>
+            <listitem><para>
+                Restrict access to the EJB read/write methods to appropriate roles
+                using declarative security.
+                </para>
+                <orderedlist spacing="compact">
+                    <listitem><para>
+                        Only users with the eclub-user role may access OrderMgmt
+                        (once their account is created).
+                        </para>
+                        </listitem>
+                    <listitem><para>
+                        Only users with the bidbot-admin role may run the test utility functions.
+                        </para>
+                        </listitem>
+                </orderedlist>
+                </listitem>
+            <listitem><para>
+                run-as an eleague-trusted user when making bids on behalf of a user. 
+                This may require the use of a "helper" EJB to encapsulate the scope
+                of the run-as role/identity
+                </para>
+                </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="esport-project3-tech-bidclient">
+        <title>eBidbot RMI client Authentication</title>
+        <para>
+            Extend your existing eBidbot RMI Test project and any RMI
+            client(s) to address new authentication requirements.
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Add a valid login to your existing tests to re-enable them under 
+                the new secure environment.
+                </para>
+                </listitem>
+            <listitem><para>
+                Add a new unit test that verifies the access controls of the
+                protected and open methods. Same comment as above -- after
+                fixing proper access to eBidbot you should have at least
+                one test that demonstrates how the application is preventing
+                unauthorized access.
+                </para>
+                </listitem>
+        </orderedlist>
+    </section>
+
+
+    <section id="esport-project3-tech-saleswar">
+        <title>eSalesWAR Access Restrictions</title>
+        <para>
+            Enhance eSalesWAR with access restrictions.
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Assign the WAR to the "other" security-domain.
+                </para>
+                </listitem>
+            <listitem><para>
+                Restrict access beyond the main page to users with
+                the appropriate roles. You may use FORM or BASIC authentication.
+                (I suggest FORM for easy logout/login as new user).
+                </para>
+                </listitem>
+            <listitem><para>
+                Permit only users to only ask the EJB tier for
+                information that is associated with their login. For example, an 
+                eleague-user/non esales-trusted user should only be allowed to enter 
+                a bid for the account they authenticated against.
+                </para>
+                </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="esport-project3-tech-bidwar">
+        <title>eBidbotWAR Access Restrictions</title>
+        <para>
+            Enhance eBidbotWAR with access restrictions.
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Assign the WAR to the "other" security domain.
+                </para>
+                </listitem>
+            <listitem><para>
+                Restrict access beyond the main page to users with
+                the appropriate roles. You may use FORM or BASIC authentication.
+                (I suggest FORM for easy logout).
+                </para>
+                </listitem>
+            <listitem><para>
+                Permit only users to only ask the EJB tier for information that
+                is associated with their login. For example, a eBidbot
+                user should not see an option to reset the database or see 
+                another users' account.
+                </para>
+                </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="esport-project3-tech-interceptors">
+        <title>Interceptors and Validators</title>
+        <para>
+            Implement a "thin slice" of capability to demonstrate JavaEE interceptors
+            using validation.
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Define javax.validation constraints on at least one of your DTOs.
+                </para>
+                </listitem>
+            <listitem><para>
+                Implement a JavaEE interceptor that gets a Validator injected,
+                intercepts all calls of your EJBs, and runs the validator against
+                each parameter input to the EJB method.
+                </para>
+                </listitem>
+            <listitem><para>
+                The interceptor can have no knowledge of the specific EJB, method, or 
+                parameters it is intercepting and validating.
+                </para>
+                </listitem>
+            <listitem><para>
+                The EJB can have no knowledge of the interceptor and should do no
+                work to validate the DTO itself.
+                </para>
+                </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="esport-project3-tech-salespublish">
+        <title>eSales JMS Publisher</title>
+        <figure>
+            <title>eSales Async</title>
+            <graphic scalefit="1" fileref="images/esport-async.jpg"/>
+        </figure>
+        <para>
+            Extend your eSales implementations to publish a JMS message
+            to a topic whenever information for an auction changes.
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Use the esport-eleague-auction topic (JNDI name: topic/ejava/projects/emarket/esales-auction)
+                </para>
+                </listitem>
+            <listitem><para>
+                Design your JMS Message. You can use any JMS Type and JMS/custom
+                properties you wish.  However, know that some subscribers will
+                be filtering on such things as the category or state of an auction.
+                </para>
+                </listitem>
+            <listitem><para>
+                Have your eSales EJBs publish JMS Messages to the topic when the 
+                Auction changes state (created, bid, close).
+                </para>
+                </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="esport-project3-tech-bidjavase">
+        <title>eBidbot JavaSE Subscriber </title>
+        <para>
+            Add a Java SE JMS subscriber to consume events about Auctions 
+            pertaining to a specific category.
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Implement a Java SE JMS subscriber that listens for Auctions with 
+                a category matching a JMS Selector. This must be a JMS selector, not 
+                client-side Java logic.
+                </para>
+                </listitem>
+            <listitem><para>
+                Simply print the fact that the process was called and the
+                contents reported in the message.
+                </para>
+                </listitem>
+            <listitem><para>
+                You must launch this subscriber using an Ant wrapper script.
+                </para>
+                </listitem>
+        </orderedlist>
+    </section>
+
+
+    <section id="esport-project3-tech-bidmdb">
+        <title>eBidbot MDB Subscriber</title>
+        <para>
+            Implement a Message Driven Bean within eBidbot to subscribe to auction closed events.
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Use a JMS Selector for the MDB to limit the types of messages consumed.
+                </para>
+                </listitem>
+            <listitem><para>
+                Update any orders as being closed and with results based on the contents of the JMS message.
+                </para>
+                </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="esport-project3-tech-salestimer">
+        <title>eSales EJBTimer</title>
+        <para>
+            Implement an EJB Timer that will allow eSales to automatically wake-up and expire auctions.
+        </para>
+    </section>
+
+    <section id="esport-project3-tech-bidtimer">
+        <title>eBidbot EJBTimer</title>
+        <para>
+            Implement an EJB Timer that will allow eBidbot to periodically wake-up and check on the open auctions that it has bid orders for.
+        </para>
+    </section>
+</chapter>
+  

@@ -1,0 +1,120 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="esport-project1-testing">
+    <title>Project 1 Testing</title>
+
+    <note>
+        <para>
+            The end-to-end scenario will test your business logic, DAO, and BOs in a 
+            "happy path" scenario. Any white-box or black-box testing of alternate
+            and error paths would be appropriate to put in the separate unit tests.
+        </para>
+    </note>
+    <orderedlist spacing="compact">
+        <listitem><para>
+            Provide a JUnit test for your business objects (BOs) that
+            test the manipulation of the data. An example test might be
+            to try adding a bid to a closed auction.  These tests should
+            be packaged with the BOs.  There should be a separate project
+            and test for both eSales and eBidbot.  It is anticipated that
+            these tests will be a minimal demonstration of understanding.
+            </para> </listitem>
+        <listitem><para>
+            Provide a JUnit test for your eSales and eBidbot JPA DAOs. This
+            should test the implementation for the required CRUD operations
+            for each type of object. It is understood that some of the operations
+            will be handled by cascades, so you might not have a set of methods
+            handling each type of business object.  This test should be packaged
+            with the DAOs.
+            </para> </listitem>
+        <listitem><para>
+            Provide a JUnit test for your business logic to test the
+            basic functionality of your business logic design, including ingest.
+            The ingestor test should be able to reference a known data file and
+            ingest records into the database using the DAOs. These tests
+            should be packaged with the business logic implementation.
+            </para> </listitem>
+        <listitem><para>
+            Provide a set of JUnit test programs to verify the following
+            end-to-end scenario in eSales.  This test should be implemented as
+            a JUnit test and packaged with the business logic implementation.
+            </para>
+            <orderedlist spacing="compact">
+                <listitem><para>
+                    reset (using SalesTestUtilImpl) -- reset the esales 
+                        database to an initial starting state.
+                    </para> </listitem>
+                <listitem><para>
+                    ingest data (using Ingestor) -- ingest the full XML test
+                        data file.
+                    </para> </listitem>
+                <listitem><para>
+                    createAccount for seller, buyer1, and buyer2 (using
+                    AccountMgmtImpl)
+                    </para> </listitem>
+                <listitem><para>
+                    createAuction for seller (using SellerMgmtImpl)
+                    </para> </listitem>
+                <listitem><para>
+                    getUserAuctions for seller (using SellerMgmtImpl)
+                    </para> </listitem>
+                <listitem><para>
+                    getAuction using SellerMgmtImpl) -- i.e., for a specific 
+                      auction.
+                    </para> </listitem>
+                <listitem><para>
+                    getOpenAuctions (using BuyerMgmtImpl) -- i.e., page
+                      through open auctions.
+                    </para> </listitem>
+                <listitem><para>
+                    placeBid for buyer1 (using BuyerMgmtImpl)
+                    </para> </listitem>
+                <listitem><para>
+                    placeBid for buyer2 (using BuyerMgmtImpl)
+                    </para> </listitem>
+                <listitem><para>
+                    getAuction (using BuyerMgmtImpl) -- i.e., showing auction
+                        has bids associated.
+                    </para> </listitem>
+                <listitem><para>
+                    closeAuction (using AuctionMgmtImpl) -- i.e., winner
+                        declared and no more bids should be accepted.
+                    </para> </listitem>
+            </orderedlist>
+        </listitem>
+        <listitem><para>
+            Provide a set of JUnit test programs to verify the following
+            end-to-end scenario in eBidbot.  This test should be implemented as
+            a JUnit test and packaged with the business logic implementation.
+            </para> 
+            <orderedlist spacing="compact">
+                <listitem><para>
+                  reset (using BidbotTestUtilImpl) -- reset the bidbot
+                      database to an initial starting state.
+                    </para> </listitem>
+                <listitem><para>
+                  place order (using OrderMgmtImpl) -- i.e., create a record
+                      within bidbot that indicates the sale and maximum bid.
+                      This may require some stubbing in project 1.
+                    </para> </listitem>
+                <listitem><para>
+                  place bid (using OrderMgmtImpl) -- i.e., place a bid
+                      that is higher than the current bid for an open auction but
+                      less than the order maximum. This will require some stubbing
+                      for project1.
+                    </para> </listitem>
+                <listitem><para>
+                  end order (using OrderMgmtImpl) -- i.e., complete order
+                      processing once auction has closed and note if won.
+                      This will require some stubbing in project1.
+                    </para> </listitem>
+                <listitem><para>
+                  get order status (using OrderMgmtImpl) -- i.e., did user win 
+                      or not.
+                    </para> </listitem>
+            </orderedlist>
+        </listitem>
+    </orderedlist>
+</chapter>
+  

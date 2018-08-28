@@ -1,0 +1,294 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="esport-project1-grading">
+    <title>Project 1 Grading</title>
+    <para>
+        Your project will be graded on completeness and quality of product. In
+        order for you to receive full credit in each area, it must be a)
+        complete, b) done well, and c) tested.  The breakdown of grading 
+        will be as follows:
+    </para>
+    <itemizedlist spacing="compact">
+        <listitem><para>
+            README provided that describes where each requirement satisfied: 10pts
+            </para> </listitem>
+        <listitem><para>
+            Projects cleanly builds with Maven: 15pts
+            </para> </listitem>
+        <listitem><para>
+            Managed schema to include declaration of key indexes (i.e., defined 
+            in a set of files and explicitly used to coldstart and initialize the 
+            database at defined times): 5pts
+            </para> </listitem>
+        <listitem><para>
+            Business Objects: 10pts
+            </para> </listitem>
+        <listitem><para>
+            Use of Validation API: 5pts
+            </para> </listitem>
+        <listitem><para>
+            JPA DAO and JPA O/R Mapping: 25pts
+            </para> </listitem>
+        <listitem><para>
+            Ingest: 10pts
+            </para> </listitem>
+        <listitem><para>
+            Business Logic: 10pts
+            </para> </listitem>
+        <listitem><para>
+            End-to-end Integration Test: 10pts
+            </para> </listitem>
+    </itemizedlist>
+
+    <para>
+        The following table contains examples of where projects have lost 
+        points in the past. Of course, each project submitted can introduce
+        new issues or different severity levels of the same issues. Do not
+        treat this as a complete list.
+    </para>
+    <table>
+        <title>Sample Lost Points</title>
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>README</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">Not provided</entry>
+                  <entry namest="points">10</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>Projects cleanly builds with Maven</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">groupIds, schema, java packaging, etc do not have a project-specific name mangler</entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Avoidable build errors</entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Key areas not building</entry>
+                  <entry namest="points">10</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Poluting project with do-nothing tests or tests that are not tests</entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Managing multiple copies of the same source file.</entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Large commented out blocks of code.</entry>
+                  <entry namest="points">2-5</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Non-portable references to external resources (e.g., ingested file)</entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>Managed Schema</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">Database columns not well defined and constrained (e.g., FKs, non-null, max size)</entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Improper use of DATE, TIME, and/or TIMESTAMP
+                  </entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">No definition of any indexes</entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>Business Objects</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">Improper/no TemporalType declaration for Dates</entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">PK classes (if exist) did not implement required constructs</entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>Use of Validation API</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">Missing any declaration of validation criteria in BOs</entry>
+                  <entry namest="points">3</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Not explicitly performing validation</entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>JPA DAO and JPA O/R Mapping</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">Missing key relationships</entry>
+                  <entry namest="points">5</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Managing transactions in DAO</entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Relationships should not be modeled as entities</entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Using provider-specific mechanisms over JPA-provided technique</entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Not honoring dependencies. Attempt to delete entities with incoming relationships/FKs.</entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Walking the object tree functionally works but using a JPA-QL query would be much cleaner
+                      and more efficient.
+                      </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>Ingest</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">Re-used IDs from ingested XML file and did not generate IDs local to project</entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Did not include a unit test that *verified* injest worked</entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>Business Logic</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">Implemented stateful logic (Wrong!)</entry>
+                  <entry namest="points">5</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">No separate testing of business logic. Relied too much on end-to-end as unit test.</entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Managing transactions in business logic</entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Did not implement all methods required for end-to-end</entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Not exhibiting good command of what it means for an entity to be managed and what you do and don't need to do in that state
+                  </entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Persisting BOs from other application. Not preserving separation between applications.</entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>End-to-end Integration Test</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">Poluted, hard to follow, too much extra stuff</entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Missing resetAll and populate at start of scenarios</entry>
+                  <entry namest="points">5</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Missing step X</entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+    </table>
+
+</chapter>
+  

@@ -1,0 +1,403 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="esport-project2-tech">
+    <title>Project 2 Technical Details</title>
+
+    <section id="esport-project2-tech-impl">
+        <title>Data Tier and Business Logic Support</title>
+        <para>
+            Continue to provide all functionality from Project 1;
+            especially the unit tests as you revise your earlier implementations
+            For example, you should continue to have the ability to run the
+            unit and end-to-end tests implemented in project 1. Make sure you 
+            design your project 2 testing such that it does not depend on residue
+            from project 1 tests.
+        </para>
+    </section>
+
+    <section id="esport-project2-tech-ejb">
+        <title>EJB Tier</title>
+
+        <section id="esport-project2-tech-salesejb">
+            <title>eSales EJB Tier</title>
+            <para>
+                Create an EJB tier to host your eSales business logic and
+                data access tiers. Each of the EJBs provided will supply the
+                necessary dependency injection and initialization for the business
+                objects. Transaction scope will be added as a part of a separate
+                requirement. Security will be added in the next project. The main
+                construction, deployment, and remote interfaces of the EJB will be
+                the focus of this requirement.  You will have to address the data
+                that gets serialized to the client in a set of Data Transfer Objects
+                (DTOs).
+            </para>
+            <figure>
+                <title>eSales Candidate EJB Tier</title>
+                <graphic scalefit="1" fileref="images/eleague-ejbtier.jpg"/>
+            </figure>
+
+            <para>
+                The EJBs will be used to inject and initialize
+                implementation objects and provide a remote interface.
+            </para>
+            <variablelist spacing="compact">
+                <varlistentry>
+                    <term><filename>AccountMgmtEJB</filename></term>
+                    <listitem><para>
+                        This EJB will primarily host the AccountMgmtImpl
+                        business logic. A remote interface and bean
+                        implementation will need to be designed for
+                        this EJB.
+                        </para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>SellerMgmtEJB</filename></term>
+                    <listitem><para>
+                        This EJB will primarily host the 
+                        SellerMgmtImpl business logic. A remote interface and
+                        bean implementation will need to be designed for this EJB.
+                        </para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>BuyerMgmtEJB</filename></term>
+                    <listitem><para>
+                        This EJB will primarily host the 
+                        BuyerMgmtImpl business logic. A remote interface and bean 
+                        implementation will need to be designed for this EJB.
+                        </para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>SalesTestUtilEJB</filename></term>
+                    <listitem><para>
+                        This support EJB will primarily
+                        host the TestUtilImpl business logic to support
+                        remote testing requirements. A remote interface and bean
+                        implementation will need to be designed for this EJB.
+                        </para></listitem>
+                </varlistentry>
+            </variablelist>
+        </section>
+
+        <section id="esport-project2-tech-salesdto">
+            <title>eSales DTOs</title>
+            <para>
+                Create a set of Data Transfer Objects (DTOs) to serialize the state of the
+                business objects between the EJB and client when using the remote
+                interface. 
+            </para>
+            <figure>
+                <title>eSales Candidate DTOs</title>
+                <graphic scalefit="1" fileref="images/eleague-dtos.jpg"/>
+            </figure>
+
+            <para>
+                Remember that there can be more than 1 DTO to represent
+                the same information related to a business object. For example,
+                collections might contain summary information only
+                and a single result might contain full details. The following is
+                only provided as a reasonable starting point.
+            </para>
+            <variablelist spacing="compact">
+                <varlistentry>
+                    <term><filename>AccountDTO</filename></term>
+                    <listitem><para>
+                        This class is meant to primarily be an aggregation
+                        of the state found in the Account and related
+                        POC business objects.
+                        </para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>AddressDTO</filename></term>
+                    <listitem><para>
+                        This class is meant to be a representation
+                        of the state found in the Address business
+                        object. Depending on how the Address business
+                        object is designed, there may not be a need for
+                        this stand-in.
+                        </para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>AuctionDTO</filename></term>
+                    <listitem><para>
+                        This class is meant to be a representation
+                        of the state found in the AuctionItem and POC
+                        business objects.
+                        </para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>BidDTO</filename></term>
+                    <listitem><para>
+                        This class is meant to be a representation
+                        of the state found in the Bid and related POC
+                        business objects.
+                        </para></listitem>
+                </varlistentry>
+            </variablelist>
+        </section>
+
+        <section id="esport-project2-tech-salesear">
+            <title>eSales EAR Deployment</title>
+            <para>
+                Create an EAR to host the eSales server-side
+                components; including the EJB component just developed.
+            </para>
+        </section>
+
+        <section id="esport-project2-tech-salesrmitest">
+            <title>eSales RMI Test</title>
+            <para>
+                Create a Test project that will deploy the EAR to the
+                application server and run through a set of JUnit test using the
+                remote interface of the EJBs. 
+            </para>
+        </section>
+
+
+        <section id="esport-project2-tech-bidbl">
+            <title>eBidbot/eSales Business Logic Integration</title>
+            <para>
+                Complete and test the eBidbot business logic using the remote
+                interface of eSales. The diagram below shows the business logic within
+                the context of the EJB Tier implemented as a part of a separate
+                requirement.
+            </para>
+
+            <figure>
+                <title>eBidbot Candidate Business Logic and EJB Tiers</title>
+                <graphic scalefit="1" fileref="images/eclub-ejbtier.jpg"/>
+            </figure>
+
+            <variablelist spacing="compact">
+                <varlistentry>
+                    <term><filename>OrderMgmt/OrderMgmtImpl</filename></term>
+                    <listitem><para>
+                        Encapsulates the functionality required to
+                        create an automated bidding account, place an
+                        order, and check the status of that order. You
+                        should be able to test this component using the
+                        running eSales application or implement a stub
+                        that implements the BuyerMgmtRemote interface.
+                        This implementation may return the eSales DTO classes if desired.
+                        </para></listitem>
+                </varlistentry>
+            </variablelist>
+        </section>
+
+        <section id="esport-project2-tech-bidwar">
+            <title>eBidbot WAR Deployment</title>
+            <para>
+                Create a WAR module to host the eBidbot server-side
+                components and the remote tests for the WAR/EJB components.
+            </para>
+        </section>
+
+        <section id="esport-project2-tech-bidejb">
+            <title>eBidbot EJB Tier</title>
+            <para>
+                Create an EJB tier to host your eBidbot business logic and
+                data access tiers. To provide practice in alternative deployments,
+                it is a requirement that this EJB either be implemented as part 
+                of the implementation module, as part of the WAR module, or 
+                part of a combined implementation/EJB/WAR module. Either way, the
+                eBidbot EJBs must ultimately be deployed using a WAR.
+                The EJB(s) provided will have the
+                necessary dependency injection and initialization for the business
+                objects. Transaction scope will be added as a part of a separate
+                requirement. Security will be added in the next project. The main
+                construction, deployment, and remote interfaces of the EJB will be
+                the focus of this requirement. 
+            </para>
+
+            <variablelist spacing="compact">
+                <varlistentry>
+                    <term><filename>OrderMgmtEJB</filename></term>
+                    <listitem><para>
+                        This EJB will primarily host the
+                        OrderMgmtImpl business logic. A remote interface, local
+                        interface and bean implementation will need to be designed
+                        for this EJB.
+                        </para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>BidbotTestUtilEJB</filename></term>
+                    <listitem><para>
+                        This support EJB will primarily
+                        host the TestUtilImpl business logic to support remote
+                        testing requirements. A remote interface, local interface
+                        and bean implementation will need to be designed for this EJB.
+                        </para></listitem>
+                </varlistentry>
+            </variablelist>
+        </section>
+
+        <section id="esport-project2-tech-biddto">
+            <title>eBidbot DTOs</title>
+            <para>
+                The DTOs are be used to serialize the state of the
+                business objects between the EJB and client when using the remote
+                interface. However, with care, business objects can be directly
+                used as DTOs. You are required to re-use the entity classes 
+                as DTOs in this application. That means you must account for 
+                serialization of the entity class and Lazy-Load issues that 
+                can occur during post-transaction marshalling of the entity class.
+            </para>
+        </section>
+    </section>
+
+
+
+    <section id="esport-project2-tech-webui">
+        <title>Web UI</title>
+        <para>
+            Add separate Web UIs (WARs) to both applications to demonstrate
+            integration between the Web UI and EJB Tiers.
+        </para>
+
+        <tip>
+           <para> 
+                In order to save development time and better leverage the 
+                work you have already performed in the remote interface testing,
+                you may use the remote interfaces between your WAR and EJB 
+                components even though local interfaces would be more efficient
+                when deployed within the same EAR or WAR. This is being done 
+                to cut down on the amount of project work for class. You would
+                ideally use the local interfaces when possible. You should 
+                already be using the local interfaces between EJBs.
+           </para> 
+        </tip>
+        
+        <section id="esport-project2-tech-salesweb">
+            <title>eSales Web UI</title>
+            <para>
+                Add a Web UI to the eSales application. This may use EJB local
+                or remote interfaces. The WAR for the Web UI must be deployed
+                as part of the eSales EAR. The Web UI must have the following
+                functionality. 
+            </para>
+
+            <itemizedlist spacing="compact">
+                <listitem><para>Anonymous User</para>
+                    <orderedlist spacing="compact">
+                        <listitem><para>
+                            List open auctions
+                            </para></listitem>
+                        <listitem><para>
+                            Get details for specific auction
+                            </para></listitem>
+                        <listitem><para>
+                            createAccount (using AccountMgmtEJB)
+                            </para></listitem>
+                    </orderedlist>
+                    </listitem>
+                <listitem><para>Test Admin</para>
+                    <orderedlist spacing="compact">
+                        <listitem><para>
+                            reset All tables
+                            </para></listitem>
+                        <listitem><para>
+                            populate tables (using Ingestor)
+                            </para></listitem>
+                    </orderedlist>
+                    </listitem>
+                <listitem><para>Seller</para>
+                    <orderedlist spacing="compact">
+                        <listitem><para>
+                            createAction (using SellerMgmtEJB)
+                            </para></listitem>
+                        <listitem><para>
+                            getUserActions (using SellerMgmtEJB)
+                            </para></listitem>
+                        <listitem><para>
+                            getAuction (using SellerMgmtEJB)
+                            </para></listitem>
+                    </orderedlist>
+                    </listitem>
+                <listitem><para>Buyer</para>
+                    <orderedlist spacing="compact">
+                        <listitem><para>
+                            Place bid (using BuyerMgmtEJB)
+                            </para></listitem>
+                    </orderedlist>
+                    </listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="esport-project2-tech-bidwebui">
+            <title>eBidbot WEB UI Tier</title>
+            <para>
+                Add a Web UI to the eBidbot application (i.e., to the WAR you
+                have already created for the EJBs). This may use the EJB local or
+                remote interfaces. The WAR for the Web UI must be deployed solo --
+                containing the EJBs and Impls. The Web UI must have the following
+                functionality.
+            </para>
+
+            <itemizedlist spacing="compact">
+                <listitem><para>Test Admin</para>
+                    <orderedlist spacing="compact">
+                        <listitem><para>
+                            reset All tables
+                            </para></listitem>
+                    </orderedlist>
+                    </listitem>
+                <listitem><para>Admin</para>
+                    <orderedlist spacing="compact">
+                        <listitem><para>
+                            createAccount (using OrderMgmtEJB)
+                            </para></listitem>
+                    </orderedlist>
+                    </listitem>
+                <listitem><para>Bidder</para>
+                    <orderedlist spacing="compact">
+                        <listitem><para>
+                            placeOrder (using OrderMgmtEJB)
+                            </para></listitem>
+                    </orderedlist>
+                    </listitem>
+            </itemizedlist>
+        </section>
+    </section>
+
+    <section id="esport-project2-tech-tx">
+        <title>Transactions</title>
+        <para>
+            Add transaction properties to the EJBs. 
+        </para>
+
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Transaction Scope - all session bean methods in these two
+                applications should require a transaction.
+                </para></listitem>
+            <listitem><para>
+                Transaction Integrity - add transaction rollback logic to
+                EJBs that detect a move date for a residence is prior to the move-in 
+                date.
+                </para></listitem>
+            <listitem><para>
+                Create a demonstration of
+                transactions and the capability of rollback by implementing a
+                scenario that adds something to the database and then a *follow-on*
+                rollback causes the changes to be undone.
+                </para></listitem>
+        </orderedlist>
+
+        <note>
+            <para>
+                To satisfy the transaction demonstration requirement, you
+                must actually store something in the database and then later in
+                the transaction roll it back based on some decision. If you make
+                the decision before you store the information -- you are not
+                satisfying the requirement. It is common for students to
+                implement a wrapper around an existing method that takes a
+                collection and populate the collection with good data up front
+                and bad data at the end. The good data that got successfully
+                processed should get rolled back once the bad data is
+                processed. Create remote methods that can tell your RMI client
+                that this actually occured.
+            </para>
+        </note>
+    </section>
+</chapter>
+  

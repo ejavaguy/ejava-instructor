@@ -1,0 +1,377 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="esport-project3-grading">
+    <title>Project 3 Grading</title>
+    <para>
+        Your project will be graded on completeness and quality of product. In
+        order for you to receive full credit in each area, it must be a)
+        complete, b) done well, and c) tested.  The breakdown of grading 
+        will be as follows:
+    </para>
+
+    <itemizedlist spacing="compact">
+        <listitem><para>
+            README provided that describes where each requirement satisfied: 10pts
+            </para></listitem>
+        <listitem><para>
+            Projects cleanly builds with Maven: 15pts
+            </para></listitem>
+        <listitem><para>
+            Project 1 and 2 functionality: 5pts
+            </para></listitem>
+        <listitem><para>
+            Client Security Login: 10pts
+            </para></listitem>
+        <listitem><para>
+            EJB Security: 10pts
+            </para> </listitem>
+        <listitem><para>
+            WAR Security: 10pts
+            </para></listitem>
+        <listitem><para>
+            EJB JMS Publisher: 5pts
+            </para></listitem>
+        <listitem><para>
+            EJB MDB Subscriber: 5pts
+            </para></listitem>
+        <listitem><para>
+            Java SE JMS Listener: 5pts
+            </para></listitem>
+        <listitem><para>
+            JavaEE Interceptors/Validator: 5pts
+            </para></listitem>
+        <listitem><para>
+            EJB Timers: 10pts
+            </para></listitem>
+        <listitem><para>
+            End-to-End Integration Test: 10pts
+            </para></listitem>
+    </itemizedlist>
+
+
+    <para>
+        The following table contains examples of where projects have lost 
+        points in the past. Of course, each project submitted can introduce
+        new issues or different severity levels of the same issues. Do not
+        treat this as a complete list.
+    </para>
+    <table>
+        <title>Sample Lost Points</title>
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>README</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">The WebUI is hard to navigate (fine) but README offered no assistance</entry>
+                  <entry namest="points">5</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>Projects cleanly builds with Maven</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                    Using rogue users that are not part of the standard class setup in your end-to-end.
+                    </entry>
+                  <entry namest="points">3</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    Initial build fails. Looks to depend on DB schema bleedover between unit and IT tests.
+                    </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>Project 1 and 2 functionality</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                      Second application being deployed as EAR and not WAR
+                      </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                      Relying on persistence unit to create schema -- thus blowing away all DB data on deployment
+                      </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                      Missing scenario feature (e.g., wrong data) from project 2 end-to-end scenario.
+                      </entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                      Attempting to set the state of a @Stateless EJB. What do you think will happen to that state 
+                      when you get a different bean instance the next time you call?
+                      </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                      Not self managing schema. With the end-to-end having resetAll() in place, why did you rely on the JPA 
+                      provider to initialize your schema?
+                      </entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>Client Security Login</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                    Fine, but too many fine-grain logins.
+                    </entry>
+                  <entry namest="points">0</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>EJB Security</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                    Using credential logins for the JMS Connection from EJBs -- versus leveraging the @RunAs role 
+                    </entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    Not relying on declaritive security to perform the role checks. You are also having the caller authorized for the role
+                    supply instance-specific information. For example, any division coordinator is allowed to report the score for any division.                        
+                    </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    Not constraining authorized caller to manage only their information. Caller is passing references to information using
+                    identifiers that could be associated with any user versus "manage my stuff". By relying on those identifiers you are allowing
+                    them to "manage that stuff which may or may not be my stuff".
+                    </entry>
+                  <entry namest="points">3</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                      EJB module not being associated with a specific security-domain. Relying on defaults.
+                    </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    @RunAs takes a role -- not a principal
+                    </entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>WAR Security</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                    Requiring login to pages that should allow anonymous access.
+                    </entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    WAR is not properly locked down.
+                    </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                      Mixed use of BASIC and FORM. When signing in to perform action a Basic authentication popup appears and 
+                      logout no longer functions, need to close browser to log out.
+                    </entry>
+                  <entry namest="points"></entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>EJB JMS Publisher</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                    Copied provided example wholesale and did not adjust to be your solution (e.g., features specific to the 
+                    example are not required for project, comments specific to example are not appropriate for a project 
+                    solution).
+                    </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    Not closing resources (JMS 1.1) This eventually exhausts resources over time.
+                    </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    Could not find testing of this anywhere to makeup for the fact that the end-to-end was not implemented
+                    </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>EJB MDB Subscriber</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                    Not implemented
+                    </entry>
+                  <entry namest="points">10</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    Using System.out versus logging framework or better error reporting
+                    </entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>Java SE JMS Listener</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                    Did not provide your subscriber any credentials to interact with the server.
+                    </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">
+                    Didn't work out of box. JMS topic mis-named
+                    </entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>EJB Timers</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                    It would be a better design to treat the timer() callback as an interface facade and not the triggering implementation mechanism. You have combined EJB
+                    Timer, JMS publishing, and business logic within a single method.
+                    </entry>
+                  <entry namest="points">0</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+
+
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+            <colspec colname="area"/>
+            <colspec colname="points"/>
+            <thead>
+                <row>
+                  <entry>End-to-end Integration Test</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="area">
+                    Your configuration made it hard to run the end-to-end scenario in a debugger. All JNDI names and properties 
+                    were solely expressed in the pom.xml rather than having suitable defaults in the IT test and overrides 
+                    from the pom.xml. With that type of setup you did not have your pom.xml and surefire setup to allow remote debugging.
+                    </entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Poluted, hard to follow, too much extra stuff</entry>
+                  <entry namest="points">2</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Missing resetAll and populate at start of scenarios</entry>
+                  <entry namest="points">5</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">Missing step X</entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+                <row rowsep="1">
+                  <entry namest="area">No. I want different functionality in this step</entry>
+                  <entry namest="points">1</entry>
+                </row>                        
+            </tbody>
+        </tgroup>
+    </table>
+
+</chapter>
+  

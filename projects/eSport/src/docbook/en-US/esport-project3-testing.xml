@@ -1,0 +1,119 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="esport-project3-testing">
+    <title>Project 3 Testing</title>
+
+    <note>
+        <para>
+            The end-to-end scenario will test your end-to-end application in a 
+            "happy path" scenario. Any white-box or black-box testing of alternate
+            and error paths would be appropriate to put in the separate unit and IT tests.
+        </para>
+    </note>
+
+    <orderedlist spacing="compact">
+        <listitem><para>
+            Provide JUnit IT tests that verify the EJB functionality of 
+            eSales accessed through its remote interface using new
+            access control restrictions.
+            </para> </listitem>
+        <listitem><para>
+            Provide JUnit IT tests that verify the EJB functionality of 
+            eBidbot using its new access control restrictions and ability
+            to authenticate with eSales.
+            </para> </listitem>
+        <listitem><para>
+            Provide a JUnit IT tests that demonstrates the functionality of the 
+            JavaEE interceptor/validator.
+            </para> </listitem>
+        <listitem><para>
+            Implement the scripted use case below as an automated JUnit test and
+            manually accessed script through the Web UI. All command
+            line implementations must be wrapped in an Ant runtime script to
+            encapsulate the classpath details in a portable manner (see the
+            class jmsNotifier project for an example of using an Ant runtime script).
+            The full JSE subscriber need not be part of the automated end-to-end
+            JUnit test. The JUnit test/module must be delivered in a state that can 
+            be executed in a debugger -- whether directly within Eclipse or using a 
+            remote debugging session.
+            </para>
+            <orderedlist spacing="compact">
+                <listitem><para>
+                    eSales initializes the EJB Timer to check for expired auctions
+                    </para> </listitem>
+                <listitem><para>
+                    eBidbot initializes the EJB Timer to check auctions associated with its bids.
+                    </para> </listitem>
+                <listitem><para>
+                    admin1 resets all eSales tables (using the eSalesTestUtilEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    admin1 populates the eSales tables (using the ESalesIngestor)
+                    </para> </listitem>
+                <listitem><para>
+                    admin2 resets the eBidbot tables (using the EBidbotTestUtilEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    admin2 populates the eBidbot tables (using the EBidTestUtilEJB) if necessary. Suggest adding account for user3 at this point.
+                    </para> </listitem>
+                <listitem><para>
+                    user1 creates auction
+                    </para> </listitem>
+                <listitem><para>
+                    user2 gets a list of open auctions
+                    </para> </listitem>
+                <listitem><para>
+                    user2 places bid on an auction
+                    </para> </listitem>
+                <listitem><para>
+                    user2 views the current status of the auction they are bidding on
+                    </para> </listitem>
+                <listitem><para>
+                    user3 gets a list of open auctions
+                    </para> </listitem>
+                <listitem><para>
+                    user3 views the current status of the auction that was bid by user2
+                    </para> </listitem>
+                <listitem><para>
+                    user3 places order with eBidbot
+                    </para> </listitem>
+                <listitem><para>
+                    eBidbot EJB wakes up from an EJB Timer
+                    </para> </listitem>
+                <listitem><para>
+                    eBidbot EJB places bid for user3
+                    </para> </listitem>
+                <listitem><para>
+                    user2 places another bid on auction
+                    </para> </listitem>
+                <listitem><para>
+                    eBidbot EJB wakes up again from an EJBTimer
+                    </para> </listitem>
+                <listitem><para>
+                    eBidbot EJB sees they have been raised and places another bid for user3
+                    </para> </listitem>
+                <listitem><para>
+                    eSales EJB wakes up from an EJBTimer and closes the auction
+                    </para> </listitem>
+                <listitem><para>
+                    eSales EJB publishes a message to the topic that informs everyone of the closing and that user3 has win.
+                    </para> </listitem>
+                <listitem><para>
+                    The eBidbot MDB receives the message and updates the order.
+                    </para> </listitem>
+                <listitem><para>
+                    The stand-alone client recieves the message if it matches their JMS selector for a specific category.
+                    </para> </listitem>
+                <listitem><para>
+                    user3 checks their order with eBidbot and finds out they won
+                    </para> </listitem>
+            </orderedlist>
+        </listitem>
+    </orderedlist>
+    <figure>
+        <title>eMarket Full Sequence</title>
+        <graphic scalefit="1" fileref="images/esport-full-sequence.jpg"/>
+    </figure>
+</chapter>
+  

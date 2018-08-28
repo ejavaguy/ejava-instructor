@@ -1,0 +1,79 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="esport-project2-testing">
+    <title>Project 2 Testing</title>
+
+    <note>
+        <para>
+            The end-to-end scenario will test your end-to-end application in a 
+            "happy path" scenario. Any white-box or black-box testing of alternate
+            and error paths would be appropriate to put in the separate unit and IT tests.
+        </para>
+    </note>
+
+    <orderedlist spacing="compact">
+        <listitem><para>
+            Provide JUnit tests that verify the EJB functionality of
+            eSales accessed through its remote interface. This will also test the
+            DTOs. These tests should be packaged in the eSales RMI Test project.
+            </para> </listitem>
+        <listitem><para>
+            Provide JUnit tests that verify the extra business logic
+            functionality of eBidbot interfacing with eSales. These tests may
+            be placed either with the business logic project or where you 
+            test the remote interfaces.
+            </para> </listitem>
+        <listitem><para>
+            Provide JUnit tests that verify the EJB functionality of
+            eBidbot accessed through its remote interface. This will also test
+            its use of DTOs. Theses tests should be packaged in the eBidbot
+            WAR (or optional RMI Test) project.
+            </para> </listitem>
+        <listitem><para>
+            Perform an end-to-end use case to do the following. This must be 
+            demonstrated in an automated JUnit test and then be manually
+            implementable using the Web UI.
+            </para>
+            <orderedlist spacing="compact">
+                <listitem><para>
+                    Reset all eSales and eBidbot tables (using the SalesTestUtilEJB and BidbotTestUtilEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    Populate the eSales tables (using the Ingestor)
+                    </para> </listitem>
+                <listitem><para>
+                    Create account for seller, buyer1, and buyer2 in eSales
+                    </para> </listitem>
+                <listitem><para>
+                    Create account for buyer2 in eBidbot
+                    </para> </listitem>
+                <listitem><para>
+                    Create auction for seller
+                    </para> </listitem>
+                <listitem><para>
+                    Get auctions for seller
+                    </para> </listitem>
+                <listitem><para>
+                    Get auction for the one created in earlier step
+                    </para> </listitem>
+                <listitem><para>
+                    Get open auctions
+                    </para> </listitem>
+                <listitem><para>
+                    Place bid for buyer1
+                    </para> </listitem>
+                <listitem><para>
+                    Get auctions for buyer1
+                    </para> </listitem>
+                <listitem><para>
+                    Place order for buyer2 in eBidbot (stimulate a bid)
+                    </para> </listitem>
+                <listitem><para>
+                    Get auction to verify bids were placed for buyer1 and buyer2
+                    </para> </listitem>
+            </orderedlist>
+        </listitem>
+    </orderedlist>
+</chapter>
+  
