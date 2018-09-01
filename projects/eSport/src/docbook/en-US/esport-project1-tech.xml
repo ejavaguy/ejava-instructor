@@ -867,6 +867,17 @@
 
         <section id="esport-project1-tech-leaguebo">
             <title>eLeague Candidate Business Objects</title>
+    <warning>
+      <title>Stick to JPA 2.1 constructs</title>
+      <para>I discovered very late in the preparation for the Fall 2018 course
+      that the course dependencies are set to Hibernate 5.3.x, to leverage
+      JPA 2.2 in some of the examples and capabilities. However, without being 
+      and to fully run Wildfly in ee8 preview mode, we will be limited to 
+      Hibernate 5.1.x when deployed to the server in follow-on projects this 
+      semester. That version of Hibernate is JPA 2.1.  This should not be an 
+      issue unless you make use of the new Java DateTime
+      API mappings or the getStream() query result.</para>
+    </warning>
             <figure>
                 <title>eLeague Candidate Business Objects</title>
                 <graphic scalefit="1" fileref="images/eleague-business-objects.jpg"/>
