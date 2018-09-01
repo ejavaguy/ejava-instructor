@@ -11,18 +11,18 @@
             especially the unit tests as you revise your earlier implementations
             For example, you should continue to have the ability to run the
             unit and end-to-end tests implemented in project 1. Make sure you 
-            design your project 2 testing such that it does not depend on residue
-            from project 1 tests.
+            design your project 2 testing such that it does not depend on 
+            database residue from project 1 tests.
         </para>
     </section>
 
     <section id="esport-project2-tech-ejb">
         <title>EJB Tier</title>
 
-        <section id="esport-project2-tech-salesejb">
-            <title>eSales EJB Tier</title>
+        <section id="esport-project2-tech-leagueejb">
+            <title>eLeague EJB Tier</title>
             <para>
-                Create an EJB tier to host your eSales business logic and
+                Create an EJB tier to host your eLeague business logic and
                 data access tiers. Each of the EJBs provided will supply the
                 necessary dependency injection and initialization for the business
                 objects. Transaction scope will be added as a part of a separate
@@ -33,7 +33,7 @@
                 (DTOs).
             </para>
             <figure>
-                <title>eSales Candidate EJB Tier</title>
+                <title>eLeague Candidate EJB Tier</title>
                 <graphic scalefit="1" fileref="images/eleague-ejbtier.jpg"/>
             </figure>
 
@@ -43,35 +43,34 @@
             </para>
             <variablelist spacing="compact">
                 <varlistentry>
-                    <term><filename>AccountMgmtEJB</filename></term>
+                    <term><filename>LeagueMgmtEJB</filename></term>
                     <listitem><para>
-                        This EJB will primarily host the AccountMgmtImpl
-                        business logic. A remote interface and bean
-                        implementation will need to be designed for
-                        this EJB.
+                        This EJB will primarily host the 
+                        LeagueMgmtImpl business logic. A remote interface 
+                        and bean implementation will need to be designed for this EJB.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
-                    <term><filename>SellerMgmtEJB</filename></term>
+                    <term><filename>ContestMgmtEJB</filename></term>
                     <listitem><para>
                         This EJB will primarily host the 
-                        SellerMgmtImpl business logic. A remote interface and
+                        ContestMgmtImpl business logic. A remote interface and
                         bean implementation will need to be designed for this EJB.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
-                    <term><filename>BuyerMgmtEJB</filename></term>
+                    <term><filename>ClubMgmtEJB</filename></term>
                     <listitem><para>
                         This EJB will primarily host the 
-                        BuyerMgmtImpl business logic. A remote interface and bean 
+                        ClubMgmtImpl business logic. A remote interface and bean 
                         implementation will need to be designed for this EJB.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
-                    <term><filename>SalesTestUtilEJB</filename></term>
+                    <term><filename>LeagueTestUtilEJB</filename></term>
                     <listitem><para>
                         This support EJB will primarily
-                        host the TestUtilImpl business logic to support
+                        host the LeagueTestUtilImpl business logic to support
                         remote testing requirements. A remote interface and bean
                         implementation will need to be designed for this EJB.
                         </para></listitem>
@@ -79,15 +78,15 @@
             </variablelist>
         </section>
 
-        <section id="esport-project2-tech-salesdto">
-            <title>eSales DTOs</title>
+        <section id="esport-project2-tech-leaguedto">
+            <title>eLeague DTOs</title>
             <para>
                 Create a set of Data Transfer Objects (DTOs) to serialize the state of the
                 business objects between the EJB and client when using the remote
                 interface. 
             </para>
             <figure>
-                <title>eSales Candidate DTOs</title>
+                <title>eLeague Candidate DTOs</title>
                 <graphic scalefit="1" fileref="images/eleague-dtos.jpg"/>
             </figure>
 
@@ -100,52 +99,78 @@
             </para>
             <variablelist spacing="compact">
                 <varlistentry>
-                    <term><filename>AccountDTO</filename></term>
+                    <term><filename>ContactDTO</filename></term>
                     <listitem><para>
-                        This class is meant to primarily be an aggregation
-                        of the state found in the Account and related
-                        POC business objects.
+                        This class is meant to hold contact
+                        information. This is primarily made up of Contact and
+                        TeamContactRole business object information.
+                        </para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>TeamDTO</filename></term>
+                    <listitem><para>
+                        This class is meant to hold team information
+                        relative to the current season. This is primarily made up
+                        of Team and TeamSeason business object information and the
+                        sum of wins/losses/ties.
+                        </para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>ContestDTO</filename></term>
+                    <listitem><para>
+                        This class is meant to hold contest
+                        information relative to a specific team. This is primarily
+                        made up of Contest business object information.
+                        </para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>DivisionStandingDTO</filename></term>
+                    <listitem><para>
+                        This class is meant to hold an 
+                        ordered list of TeamDTOs according to the team's rank within
+                        the division. This is primarily made up of Season and Division
+                        business object information and the result of comparing 
+                        team results within the division.
+                        </para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>VenueDTO</filename></term>
+                    <listitem><para>
+                        This class is used to represent a summary
+                        of the Venue business object information. As an example of
+                        this, the address is expressed as a String rather than an
+                        embedded object.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
                     <term><filename>AddressDTO</filename></term>
                     <listitem><para>
-                        This class is meant to be a representation
-                        of the state found in the Address business
-                        object. Depending on how the Address business
-                        object is designed, there may not be a need for
-                        this stand-in.
+                        This class is meant to represent the 
+                        Addess of a Venue, but is only used when setting the address
+                        of a Venue. 
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
-                    <term><filename>AuctionDTO</filename></term>
+                    <term><filename>ClubDTO</filename></term>
                     <listitem><para>
-                        This class is meant to be a representation
-                        of the state found in the AuctionItem and POC
-                        business objects.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                    <term><filename>BidDTO</filename></term>
-                    <listitem><para>
-                        This class is meant to be a representation
-                        of the state found in the Bid and related POC
-                        business objects.
+                        This class is meant to hold the Club
+                        information, which includes Venues and Teams. However, team
+                        schedules are not necessary when used within this context.
                         </para></listitem>
                 </varlistentry>
             </variablelist>
         </section>
 
-        <section id="esport-project2-tech-salesear">
-            <title>eSales EAR Deployment</title>
+        <section id="esport-project2-tech-leagueear">
+            <title>eLeague EAR Deployment</title>
             <para>
-                Create an EAR to host the eSales server-side
+                Create an EAR to host the eLeague server-side
                 components; including the EJB component just developed.
             </para>
         </section>
 
-        <section id="esport-project2-tech-salesrmitest">
-            <title>eSales RMI Test</title>
+        <section id="esport-project2-tech-leaguermitest">
+            <title>eLeague Remote Test</title>
             <para>
                 Create a Test project that will deploy the EAR to the
                 application server and run through a set of JUnit test using the
@@ -154,53 +179,50 @@
         </section>
 
 
-        <section id="esport-project2-tech-bidbl">
-            <title>eBidbot/eSales Business Logic Integration</title>
+        <section id="esport-project2-tech-clubbl">
+            <title>eClub/eLeague Business Logic Integration</title>
             <para>
-                Complete and test the eBidbot business logic using the remote
-                interface of eSales. The diagram below shows the business logic within
+                Complete and test the eClub business logic using the remote
+                interface of eLeague. The diagram below shows the business logic within
                 the context of the EJB Tier implemented as a part of a separate
                 requirement.
             </para>
 
             <figure>
-                <title>eBidbot Candidate Business Logic and EJB Tiers</title>
+                <title>eClub Candidate Business Logic and EJB Tiers</title>
                 <graphic scalefit="1" fileref="images/eclub-ejbtier.jpg"/>
             </figure>
 
             <variablelist spacing="compact">
                 <varlistentry>
-                    <term><filename>OrderMgmt/OrderMgmtImpl</filename></term>
+                    <term><filename>OrgMgmtEJB</filename></term>
                     <listitem><para>
-                        Encapsulates the functionality required to
-                        create an automated bidding account, place an
-                        order, and check the status of that order. You
-                        should be able to test this component using the
-                        running eSales application or implement a stub
-                        that implements the BuyerMgmtRemote interface.
-                        This implementation may return the eSales DTO classes if desired.
+                        [[A]] OrganizationMgmt/OrganizationMgmtImpl - update this 
+                        business logic interface and implementation to be able to obtain
+                        team schedule and divisional standings for a team from eLeague.
+                        This implementation may return the eLeague DTO classes if desired.
                         </para></listitem>
                 </varlistentry>
             </variablelist>
         </section>
 
-        <section id="esport-project2-tech-bidwar">
-            <title>eBidbot WAR Deployment</title>
+        <section id="esport-project2-tech-clubwar">
+            <title>eClub WAR Deployment</title>
             <para>
-                Create a WAR module to host the eBidbot server-side
+                Create a WAR module to host the eClub server-side
                 components and the remote tests for the WAR/EJB components.
             </para>
         </section>
 
-        <section id="esport-project2-tech-bidejb">
-            <title>eBidbot EJB Tier</title>
+        <section id="esport-project2-tech-clubejb">
+            <title>eClub EJB Tier</title>
             <para>
-                Create an EJB tier to host your eBidbot business logic and
+                Create an EJB tier to host your eClub business logic and
                 data access tiers. To provide practice in alternative deployments,
                 it is a requirement that this EJB either be implemented as part 
                 of the implementation module, as part of the WAR module, or 
                 part of a combined implementation/EJB/WAR module. Either way, the
-                eBidbot EJBs must ultimately be deployed using a WAR.
+                eClub EJBs must ultimately be deployed using a WAR.
                 The EJB(s) provided will have the
                 necessary dependency injection and initialization for the business
                 objects. Transaction scope will be added as a part of a separate
@@ -211,28 +233,35 @@
 
             <variablelist spacing="compact">
                 <varlistentry>
-                    <term><filename>OrderMgmtEJB</filename></term>
+                    <term><filename>OrgMgmtEJB</filename></term>
                     <listitem><para>
-                        This EJB will primarily host the
-                        OrderMgmtImpl business logic. A remote interface, local
-                        interface and bean implementation will need to be designed
-                        for this EJB.
+                        This EJB will primarily host the 
+                        OrganizationMgmtImpl business logic. A remote interface 
+                        and bean implementation will need to be designed for this EJB.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
-                    <term><filename>BidbotTestUtilEJB</filename></term>
+                    <term><filename>MemberMgmtEJB</filename></term>
+                    <listitem><para>
+                        This EJB will primarily host the 
+                        MemberMgmtImpl business logic. A remote interface and bean
+                        implementation will need to be designed for this EJB.
+                        </para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>ClubTestUtilEJB</filename></term>
                     <listitem><para>
                         This support EJB will primarily
-                        host the TestUtilImpl business logic to support remote
-                        testing requirements. A remote interface, local interface
-                        and bean implementation will need to be designed for this EJB.
+                        host the ClubTestUtilImpl business logic to support
+                        remote testing requirements. A remote interface and bean
+                        implementation will need to be designed for this EJB.
                         </para></listitem>
                 </varlistentry>
             </variablelist>
         </section>
 
-        <section id="esport-project2-tech-biddto">
-            <title>eBidbot DTOs</title>
+        <section id="esport-project2-tech-clubdto">
+            <title>eClub DTOs</title>
             <para>
                 The DTOs are be used to serialize the state of the
                 business objects between the EJB and client when using the remote
@@ -241,6 +270,14 @@
                 as DTOs in this application. That means you must account for 
                 serialization of the entity class and Lazy-Load issues that 
                 can occur during post-transaction marshalling of the entity class.
+            </para>
+            <para>
+              <title></title>
+              <para>The only remote client of eClub is the eClub remote test 
+              and this can be implemented within the WAR module to keep things
+              simple. That should mean there is no need to create a remote client 
+              archive to complete this assignment. That was not the case for 
+              eLeague.</para>
             </para>
         </section>
     </section>
@@ -267,29 +304,19 @@
            </para> 
         </tip>
         
-        <section id="esport-project2-tech-salesweb">
-            <title>eSales Web UI</title>
+        <section id="esport-project2-tech-leagueweb">
+            <title>eLeague Web UI</title>
             <para>
-                Add a Web UI to the eSales application. This may use EJB local
+                Add a Web UI to the eLeague application. This may use EJB local
                 or remote interfaces. The WAR for the Web UI must be deployed
-                as part of the eSales EAR. The Web UI must have the following
+                as part of the eLeague EAR. The Web UI must have the following
                 functionality. 
+                Note that the test data will already have a current season, divisions,
+                other clubs, teams, etc. We will just be adding eClub information 
+                to that information prior to the season being scheduled.
             </para>
 
             <itemizedlist spacing="compact">
-                <listitem><para>Anonymous User</para>
-                    <orderedlist spacing="compact">
-                        <listitem><para>
-                            List open auctions
-                            </para></listitem>
-                        <listitem><para>
-                            Get details for specific auction
-                            </para></listitem>
-                        <listitem><para>
-                            createAccount (using AccountMgmtEJB)
-                            </para></listitem>
-                    </orderedlist>
-                    </listitem>
                 <listitem><para>Test Admin</para>
                     <orderedlist spacing="compact">
                         <listitem><para>
@@ -300,33 +327,51 @@
                             </para></listitem>
                     </orderedlist>
                     </listitem>
-                <listitem><para>Seller</para>
+                <listitem><para>League Officials</para>
                     <orderedlist spacing="compact">
-                        <listitem><para>
-                            createAction (using SellerMgmtEJB)
+                        <listitem>create Club<para>
                             </para></listitem>
-                        <listitem><para>
-                            getUserActions (using SellerMgmtEJB)
-                            </para></listitem>
-                        <listitem><para>
-                            getAuction (using SellerMgmtEJB)
+                        <listitem>schedule a Season<para>
                             </para></listitem>
                     </orderedlist>
                     </listitem>
-                <listitem><para>Buyer</para>
+                <listitem><para>Club Coordinators</para>
                     <orderedlist spacing="compact">
                         <listitem><para>
-                            Place bid (using BuyerMgmtEJB)
+                            add Venue for Club
+                            </para></listitem>
+                        <listitem><para>
+                            add a Team for Club
+                            </para></listitem>
+                        <listitem><para>
+                            add a contact for a Team
+                            </para></listitem>
+                        <listitem><para>
+                            assign a Team to a Division
+                            </para></listitem>
+                    </orderedlist>
+                    </listitem>
+                <listitem><para>Division Coordinators</para>
+                    <orderedlist spacing="compact">
+                        <listitem><para>
+                            report a Score
+                            </para></listitem>
+                    </orderedlist>
+                    </listitem>
+                <listitem><para>Anonymous User</para>
+                    <orderedlist spacing="compact">
+                        <listitem><para>
+                            show Division Standings
                             </para></listitem>
                     </orderedlist>
                     </listitem>
             </itemizedlist>
         </section>
 
-        <section id="esport-project2-tech-bidwebui">
-            <title>eBidbot WEB UI Tier</title>
+        <section id="esport-project2-tech-clubwebui">
+            <title>eClub WEB UI Tier</title>
             <para>
-                Add a Web UI to the eBidbot application (i.e., to the WAR you
+                Add a Web UI to the eClub application (i.e., to the WAR you
                 have already created for the EJBs). This may use the EJB local or
                 remote interfaces. The WAR for the Web UI must be deployed solo --
                 containing the EJBs and Impls. The Web UI must have the following
@@ -339,19 +384,43 @@
                         <listitem><para>
                             reset All tables
                             </para></listitem>
-                    </orderedlist>
-                    </listitem>
-                <listitem><para>Admin</para>
-                    <orderedlist spacing="compact">
                         <listitem><para>
-                            createAccount (using OrderMgmtEJB)
+                            populate tables
                             </para></listitem>
                     </orderedlist>
                     </listitem>
-                <listitem><para>Bidder</para>
+                <listitem><para>Members</para>
                     <orderedlist spacing="compact">
                         <listitem><para>
-                            placeOrder (using OrderMgmtEJB)
+                            create Parent
+                            </para></listitem>
+                        <listitem><para>
+                            create PLayer
+                            </para></listitem>
+                        <listitem><para>
+                            add Coach Role
+                            </para></listitem>
+                        <listitem><para>
+                            get Team Roster for their team
+                            </para></listitem>
+                        <listitem><para>
+                            get Team Schedule for their team
+                            </para></listitem>
+                    </orderedlist>
+                    </listitem>
+                <listitem><para>Organization Officials</para>
+                    <orderedlist spacing="compact">
+                        <listitem><para>
+                            create Team
+                            </para></listitem>
+                        <listitem><para>
+                            assign Players to Team
+                            </para></listitem>
+                        <listitem><para>
+                            assign Coach to Team
+                            </para></listitem>
+                        <listitem><para>
+                            assign Manager to Team
                             </para></listitem>
                     </orderedlist>
                     </listitem>
@@ -367,19 +436,16 @@
 
         <orderedlist spacing="compact">
             <listitem><para>
-                Transaction Scope - all session bean methods in these two
-                applications should require a transaction.
+                Transaction Scope - all session bean update methods in these two
+                applications should require a transaction. All session bean read-only
+                methods should support a transaction.
                 </para></listitem>
             <listitem><para>
-                Transaction Integrity - add transaction rollback logic to
-                EJBs that detect a move date for a residence is prior to the move-in 
-                date.
-                </para></listitem>
-            <listitem><para>
-                Create a demonstration of
-                transactions and the capability of rollback by implementing a
+                Transaction Integrity - Create a demonstration of
+                transactions integrity and the capability of rollback by implementing a
                 scenario that adds something to the database and then a *follow-on*
-                rollback causes the changes to be undone.
+                rollback causes the changes to be undone. The state of the database
+                must remain consistent once complete.
                 </para></listitem>
         </orderedlist>
 
@@ -394,8 +460,8 @@
                 collection and populate the collection with good data up front
                 and bad data at the end. The good data that got successfully
                 processed should get rolled back once the bad data is
-                processed. Create remote methods that can tell your RMI client
-                that this actually occured.
+                processed. Create remote methods that can tell your remote test
+                client that this actually occured.
             </para>
         </note>
     </section>

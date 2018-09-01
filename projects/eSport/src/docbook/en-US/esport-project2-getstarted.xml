@@ -8,20 +8,20 @@
         point for your overall application. It assumes you already have either
         a consolidated Impl -or- a BO, DAO, and BLImpl set of projects in
         place from Project 1. You will not have the option of consolidating
-        the EJB, WAR, EAR, and RMI Test into a single project for eSales. They must be
+        the EJB, WAR, EAR, and RMI Test into a single project for eLeague. They must be
         implemented as separate projects with proper dependencies between
         them declared. You *do* have the option of merging all modules
-        into a single WAR module for eBidbit or many of the alternatives
+        into a single WAR module for eClub or many of the alternatives
         as long as eBidbit is deployed as a WAR.
     </para>
 
     <figure>
         <title>Candidate Source Module Structure</title>
 <programlisting language=""><![CDATA[
-`-- eMarket
-    |-- eSales
-    |   |-- eSales (module(s) from project1)
-    |   |-- eSalesEJB
+`-- eSport
+    |-- eLeague
+    |   |-- eLeague (module(s) from project1)
+    |   |-- eLeagueEJB
     |   |   |-- pom.xml
     |   |   `-- src
     |   |       `-- main
@@ -34,7 +34,7 @@
     |   |                   |-- persistence.xml
     |   |                   |-- (ejb-jar.xml)
     |   |                   `-- (jboss-ejb3.xml)
-    |   |-- eSalesWAR
+    |   |-- eLeagueWAR
     |   |   |-- pom.xml
     |   |   `-- src
     |   |       `-- main
@@ -49,9 +49,9 @@
     |   |               |   |-- (jboss-web.xml)
     |   |               |   `-- content
     |   |               `-- index.jsp
-    |   |-- eSalesEAR
+    |   |-- eLeagueEAR
     |   |   `-- pom.xml
-    |   |-- eSalesTest
+    |   |-- eLeagueTest
     |   |   |-- pom.xml
     |   |   `-- src
     |   |       `-- test
@@ -61,11 +61,9 @@
     |   |           `-- resources
     |   |               `-- jndi.properties
     |   `-- pom.xml
-    |-- eBidbot (many options)
-    |   |-- (eBidbotImpl -- should be merged with EJB or WAR)
-    |   |-- (eBidbotEJB -- could be separate from WAR)
-    |   |-- (eBidbotTest -- could be separate from WAR)
-    |   |-- eBidbotWAR
+    |-- eClub (many options)
+    |   |-- (eClubEJB -- could be merged with or separate from WAR)
+    |   |-- eClubWAR
     |   |   |-- pom.xml
     |   |   `-- src
     |   |       +-- main

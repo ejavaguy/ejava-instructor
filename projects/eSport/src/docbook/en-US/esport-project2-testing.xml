@@ -15,19 +15,19 @@
     <orderedlist spacing="compact">
         <listitem><para>
             Provide JUnit tests that verify the EJB functionality of
-            eSales accessed through its remote interface. This will also test the
-            DTOs. These tests should be packaged in the eSales RMI Test project.
+            eLeague accessed through its remote interface. This will also test the
+            DTOs. These tests should be packaged in the eLeague RMI Test project.
             </para> </listitem>
         <listitem><para>
             Provide JUnit tests that verify the extra business logic
-            functionality of eBidbot interfacing with eSales. These tests may
+            functionality of eClub interfacing with eLeague. These tests may
             be placed either with the business logic project or where you 
             test the remote interfaces.
             </para> </listitem>
         <listitem><para>
             Provide JUnit tests that verify the EJB functionality of
-            eBidbot accessed through its remote interface. This will also test
-            its use of DTOs. Theses tests should be packaged in the eBidbot
+            eClub accessed through its remote interface. This will also test
+            its use of DTOs. Theses tests should be packaged in the eClub
             WAR (or optional RMI Test) project.
             </para> </listitem>
         <listitem><para>
@@ -37,42 +37,77 @@
             </para>
             <orderedlist spacing="compact">
                 <listitem><para>
-                    Reset all eSales and eBidbot tables (using the SalesTestUtilEJB and BidbotTestUtilEJB)
+                    reset all eLeague tables (using the LeagueTestUtilEJB)
                     </para> </listitem>
                 <listitem><para>
-                    Populate the eSales tables (using the Ingestor)
+                    populate the eLeague tables (using the LeagueIngestor)
                     </para> </listitem>
                 <listitem><para>
-                    Create account for seller, buyer1, and buyer2 in eSales
+                    create a Club in eLeague (using the LeagueMgmtEJB; rep=user2)
                     </para> </listitem>
                 <listitem><para>
-                    Create account for buyer2 in eBidbot
+                    add Venue for Club in eLeague (using ClubMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    Create auction for seller
+                    create Parent in eClub (using MemberMgmtEJB; loginId=user3)
                     </para> </listitem>
                 <listitem><para>
-                    Get auctions for seller
+                    create Player in eClub (using MemberMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    Get auction for the one created in earlier step
+                    add a Coach role in eClub (using MemberMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    Get open auctions
+                    create a Team in eClub (using OrgMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    Place bid for buyer1
+                    assign Players to a Team in eClub (using OrgMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    Get auctions for buyer1
+                    assign Coach to a Team in eClub (using OrgMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    Place order for buyer2 in eBidbot (stimulate a bid)
+                    assign Manager to a Team in eClub (using OrgMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    Get auction to verify bids were placed for buyer1 and buyer2
+                    show team roster in eClub (using OrgMgmtEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    add a Team for Club in eLeague (using ClubMgmtEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    [[a]] add a contact for a Team eLeague (using ClubMgmtEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    [[a]] assign a Team to an existing Division eLeague (using
+                    ClubMgmtEJB; division=U13-A, refid="Division-845")
+                    </para> </listitem>
+                <listitem><para>
+                    [[a]] schedule a Season eLeague (using ContestMgmtEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    [[a]] show a Team Schedule in eClub (using OrgMgmtEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    [[a]] report a Score in eLeague (using ContestMgmtEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    [[a]] show Division Standings in eLeague (using LeagueMgmtEJB)
                     </para> </listitem>
             </orderedlist>
+
+            <note>
+              <para>
+                To be clear. The above scenario should be both automated with a
+                single JUnit test and then repeated with interactive Web UI actions. 
+                It is suggested that you start by implementing the JUnit version
+                first and then begin the Web UI in backwards sequence order (i.e.,
+                implement the Web UI for "show Division Standings in eLeague" first),
+                using a copy of the full JUnit implementation that you remove one
+                step at a time.
+              </para>
+            </note>
+
         </listitem>
     </orderedlist>
 </chapter>
