@@ -2,7 +2,7 @@
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
 <chapter id="esport-project3-desc">
-    <title>eMarket Project 3 Description</title>
+    <title>eSport Project 3 Description</title>
     <subtitle>Secure and Asynchronous N-Tier Application</subtitle>
 
     <section id="esport-project3-purpose">
@@ -28,7 +28,7 @@
             <title>Objectives</title>
             <itemizedlist spacing="compact">
                 <listitem><para>
-                    Re-use the eSales and eBidbot implementations from projects 1 and 2.
+                    Re-use the eLeague and eClub implementations from projects 1 and 2.
                     </para></listitem>
                 <listitem><para>
                     Define access controls and implement authentication mechanisms for 
@@ -38,7 +38,7 @@
                     Implement DTO validation using interceptors
                     </para></listitem>
                 <listitem><para>
-                    Implement a publish/subscribe capability between the eBidbot
+                    Implement a publish/subscribe capability between eLeague, eClub,
                     and stand-alone client applications.
                     </para></listitem>
                 <listitem><para>
@@ -67,8 +67,33 @@
             We will use the simple, default/"other" security-domain defined
             within the standard JBoss installation. This uses the RealmUsersRoles
             login-module -- which is powered by two property files supplied and
-            pre-populated by the class server files from ejava-wildfly901.
+            pre-populated by the course server files from ejava-wildfly.
         </para>
+
+        <table>
+            <title>HTTPS Keystore(s)</title>
+            <tgroup cols='2' align='left' colsep='1' rowsep='0'>
+            <colspec colname="file"/>
+            <colspec colname="desc"/>
+            <thead>
+                <row>
+                  <entry>File</entry>
+                  <entry>Description</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                   <entry namest="file">
+                        ${jboss.server.config.dir}/application.keystore
+                        </entry>
+                   <entry namest="desc">
+                        Self-signed JKS keystore with server certificate. 
+                        Also also used as client trustStore during testing.
+                        </entry>
+                </row>
+            </tbody>
+            </tgroup>
+        </table>    
 
 
         <table>
@@ -125,44 +150,65 @@
                 <row rowsep="1">
                    <entry namest="role">anonymous</entry>
                    <entry namest="desc">
-                        these users can view auctions and create an account
+                        These users can view standings and schedules in league
                         </entry>
                 </row>
                 <row rowsep="1">
-                   <entry namest="role">esales-admin</entry>
+                   <entry namest="role">eleague-sys</entry>
                    <entry namest="desc">
-                        these users can reset and populate the eSales database
+                        Authorized to publish to eLeague topic
                         </entry>
                 </row>
                 <row rowsep="1">
-                   <entry namest="role">esales-user</entry>
+                   <entry namest="role">eleague-user</entry>
                    <entry namest="desc">
-                        these users can create and auction, and bid on auctions. 
-                        This role is also required to subscribe to JMS auction events.
+                        Authorized to subscribe to eLeague topic
                         </entry>
                 </row>
                 <row rowsep="1">
-                   <entry namest="role">esales-sys</entry>
+                   <entry namest="role">eleague-admin</entry>
                    <entry namest="desc">
-                        role required to perform internal auction actions like JMS publishing
+                        Authorized to reset and populate the database
                         </entry>
                 </row>
                 <row rowsep="1">
-                   <entry namest="role">esales-trusted</entry>
+                   <entry namest="role">eleague-coord</entry>
                    <entry namest="desc">
-                        these users can bid on auctions on behalf of a specified user
+                        Authorized to create season, divisions, clubs, 
+                        and schedule contests.
                         </entry>
                 </row>
                 <row rowsep="1">
-                   <entry namest="role">ebidbot-admin</entry>
+                   <entry namest="role">eleague-clubcoord</entry>
                    <entry namest="desc">
-                        these users will be able to perform management and test functions on eBidbot
+                        Authorized to create teams, provide contacts for the teams, 
+                        and assign them to divisions.
                         </entry>
                 </row>
                 <row rowsep="1">
-                   <entry namest="role">ebidbot-user</entry>
+                   <entry namest="role">eleague-divcoord</entry>
                    <entry namest="desc">
-                        these users can and manage their orders
+                        Authorized to report scores.
+                        </entry>
+                </row>
+                <row rowsep="1">
+                   <entry namest="role">eclub-admin</entry>
+                   <entry namest="desc">
+                        Authorized to run ClubTestUtil operations.
+                        </entry>
+                </row>
+                <row rowsep="1">
+                   <entry namest="role">eclub-member</entry>
+                   <entry namest="desc">
+                        Authorized to obtain team rosters and
+                        update contact and role information.
+                        </entry>
+                </row>
+                <row rowsep="1">
+                   <entry namest="role">eclub-coord</entry>
+                   <entry namest="desc">
+                        Authorized to create teams and assign players, 
+                        coaches, and managers.
                         </entry>
                 </row>
             </tbody>
@@ -189,35 +235,97 @@
             <tbody>
                 <row rowsep="1">
                    <entry namest="user">known</entry>
-                   <entry namest="roles">(no roles)</entry>
+                   <entry namest="roles">
+                   (no roles)
+                   </entry>
+                </row>
+                <row rowsep="1">
+                   <entry namest="user">eleaguesys1</entry>
+                   <entry namest="roles">
+                    eleague-sys
+                   </entry>
+                </row>
+                <row rowsep="1">
+                   <entry namest="user">eclubsys1</entry>
+                   <entry namest="roles">
+                    eleague-user
+                   </entry>
                 </row>
                 <row rowsep="1">
                    <entry namest="user">admin1</entry>
-                   <entry namest="roles">esales-admin</entry>
+                   <entry namest="roles">
+                    eleague-admin,eclub-admin
+                   </entry>
                 </row>
                 <row rowsep="1">
-                   <entry namest="user">admin2</entry>
-                   <entry namest="roles">ebidbot-admin</entry>
-                </row>
-                <row rowsep="1">
-                   <entry namest="user">syssales1</entry>
-                   <entry namest="roles">esales-sys</entry>
-                </row>
-                <row rowsep="1">
-                   <entry namest="user">sysbidbot1</entry>
-                   <entry namest="roles">esales-trusted</entry>
-                </row>
-                <row rowsep="1">
-                   <entry namest="user">user1</entry>
-                   <entry namest="roles">esales-user</entry>
+                   <entry namest="user">lmtucker</entry>
+                   <entry namest="roles">
+                    eleague-coord
+                   </entry>
                 </row>
                 <row rowsep="1">
                    <entry namest="user">user2</entry>
-                   <entry namest="roles">esales-user</entry>
+                   <entry namest="roles">
+                    eleague-clubcoord,eclub-coord,eclub-member
+                   </entry>
                 </row>
                 <row rowsep="1">
                    <entry namest="user">user3</entry>
-                   <entry namest="roles">esales-user,bidbot-user</entry>
+                   <entry namest="roles">
+                    eclub-member
+                   </entry>
+                </row>
+                <row rowsep="1">
+                   <entry namest="user">jtflynn</entry>
+                   <entry namest="roles">
+                    eleague-divcoord
+                   </entry>
+                </row>
+            </tbody>
+            </tgroup>
+        </table>    
+
+        <para>
+        Based on the test data, the following are some other logins that may 
+        be useful...
+        </para>
+
+        <table>
+            <title>Other Users/Roles</title>
+            <tgroup cols='2' align='left' colsep='1' rowsep='0'>
+            <colspec colname="roles"/>
+            <colspec colname="users"/>
+            <thead>
+                <row>
+                  <entry>Role</entry>
+                  <entry>Users</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                   <entry namest="role">eleague-clubcoord</entry>
+                   <entry namest="users">
+                    tbswanson,
+                    kdromero,
+                    sthart,
+                    lmfuller,
+                    rgrobbins,
+                    gchamilton,
+                    avschultz,
+                    jcbell,
+                    user4
+                   </entry>
+                </row>
+                <row rowsep="1">
+                   <entry namest="role">eleague-divcoord</entry>
+                   <entry namest="users">
+                    jddavidson,
+                    whlee,
+                    pjjimenez,
+                    ksharrison,
+                    acrussell,
+                    ckriley5687
+                   </entry>
                 </row>
             </tbody>
             </tgroup>
@@ -244,28 +352,19 @@
         </para>
 
         <para>
-            eBidbot will run-as an esales-trusted user and pass the userId 
-            for the eSales bidder with the placed bid.
+            For asynchronous activity, we will implement a Schedule Topic where 
+            eLeague will publish messages related to team schedules. 
+            eClub will subscribe to the topic using a Message Driven 
+            Bean to keep members up to date on schedule changes.
+            A stand-alone client will also be used to subscribe to schedule
+            events. A topic will have to be added to your JMS Server within
+            JBoss. You will have to design the type, structure, and payload of
+            the messages sent on that topic.
         </para>
 
         <para>
-            For some asynchronous activity, we will implement an Auction
-            Topic with eSales that will be used to provide updates to auction
-            information. eBidbot will listen to this topic using a Message
-            Driven Bean to keep orders up to date and to specifically know
-            when they are closed. A stand-alone client will also be used to
-            subscribe to auction events. The topic(s) will be pre-defined
-            in your application server along with users and roles. However,
-            you will have to design the type, structure, and payload of the
-            messages on the topic(s).
-        </para>
-
-        <para>
-            eSales and eBidbot will use EJB Timers to help perform
-            periodic business logic, like checking for completed auctions
-            or making bids.
+          eLeague will use EJB Timers to send out schedule reminders.
         </para>
             
     </section>
 </chapter>
-  

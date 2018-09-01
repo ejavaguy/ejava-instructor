@@ -12,9 +12,9 @@
     </section>
 
     <section id="esport-project3-tech-salesaccess">
-        <title>eSales Access Restrictions</title>
+        <title>eLeague Access Restrictions</title>
         <para>
-            Enhance eSales with access restrictions.
+            Enhance eLeague with access restrictions.
         </para>
         <orderedlist spacing="compact">
             <listitem><para>
@@ -47,9 +47,9 @@
     </section>
 
     <section id="esport-project3-tech-salesclient">
-        <title>eSales RMI client Authentication</title>
+        <title>eLeague RMI client Authentication</title>
         <para>
-            Extend your existing eSales RMI Test project and any RMI client(s) to
+            Extend your existing eLeague RMI Test project and any RMI client(s) to
             address new authentication requirements.
         </para>
         <orderedlist spacing="compact">
@@ -70,9 +70,9 @@
     </section>
 
     <section id="esport-project3-tech-bidaccess">
-        <title>eBidbot Access Restrictions</title>
+        <title>eClub Access Restrictions</title>
         <para>
-            Enhance eBidbot with access restrictions.
+            Enhance eClub with access restrictions.
         </para>
         <orderedlist spacing="compact">
             <listitem><para>
@@ -105,9 +105,9 @@
     </section>
 
     <section id="esport-project3-tech-bidclient">
-        <title>eBidbot RMI client Authentication</title>
+        <title>eClub RMI client Authentication</title>
         <para>
-            Extend your existing eBidbot RMI Test project and any RMI
+            Extend your existing eClub RMI Test project and any RMI
             client(s) to address new authentication requirements.
         </para>
         <orderedlist spacing="compact">
@@ -119,7 +119,7 @@
             <listitem><para>
                 Add a new unit test that verifies the access controls of the
                 protected and open methods. Same comment as above -- after
-                fixing proper access to eBidbot you should have at least
+                fixing proper access to eClub you should have at least
                 one test that demonstrates how the application is preventing
                 unauthorized access.
                 </para>
@@ -129,9 +129,9 @@
 
 
     <section id="esport-project3-tech-saleswar">
-        <title>eSalesWAR Access Restrictions</title>
+        <title>eLeagueWAR Access Restrictions</title>
         <para>
-            Enhance eSalesWAR with access restrictions.
+            Enhance eLeagueWAR with access restrictions.
         </para>
         <orderedlist spacing="compact">
             <listitem><para>
@@ -155,9 +155,9 @@
     </section>
 
     <section id="esport-project3-tech-bidwar">
-        <title>eBidbotWAR Access Restrictions</title>
+        <title>eClubWAR Access Restrictions</title>
         <para>
-            Enhance eBidbotWAR with access restrictions.
+            Enhance eClubWAR with access restrictions.
         </para>
         <orderedlist spacing="compact">
             <listitem><para>
@@ -172,7 +172,7 @@
                 </listitem>
             <listitem><para>
                 Permit only users to only ask the EJB tier for information that
-                is associated with their login. For example, a eBidbot
+                is associated with their login. For example, a eClub
                 user should not see an option to reset the database or see 
                 another users' account.
                 </para>
@@ -211,13 +211,13 @@
     </section>
 
     <section id="esport-project3-tech-salespublish">
-        <title>eSales JMS Publisher</title>
+        <title>eLeague JMS Publisher</title>
         <figure>
-            <title>eSales Async</title>
+            <title>eLeague Async</title>
             <graphic scalefit="1" fileref="images/esport-async.jpg"/>
         </figure>
         <para>
-            Extend your eSales implementations to publish a JMS message
+            Extend your eLeague implementations to publish a JMS message
             to a topic whenever information for an auction changes.
         </para>
         <orderedlist spacing="compact">
@@ -232,7 +232,7 @@
                 </para>
                 </listitem>
             <listitem><para>
-                Have your eSales EJBs publish JMS Messages to the topic when the 
+                Have your eLeague EJBs publish JMS Messages to the topic when the 
                 Auction changes state (created, bid, close).
                 </para>
                 </listitem>
@@ -240,7 +240,7 @@
     </section>
 
     <section id="esport-project3-tech-bidjavase">
-        <title>eBidbot JavaSE Subscriber </title>
+        <title>eClub JavaSE Subscriber </title>
         <para>
             Add a Java SE JMS subscriber to consume events about Auctions 
             pertaining to a specific category.
@@ -266,9 +266,9 @@
 
 
     <section id="esport-project3-tech-bidmdb">
-        <title>eBidbot MDB Subscriber</title>
+        <title>eClub MDB Subscriber</title>
         <para>
-            Implement a Message Driven Bean within eBidbot to subscribe to auction closed events.
+            Implement a Message Driven Bean within eClub to subscribe to auction closed events.
         </para>
         <orderedlist spacing="compact">
             <listitem><para>
@@ -283,16 +283,16 @@
     </section>
 
     <section id="esport-project3-tech-salestimer">
-        <title>eSales EJBTimer</title>
+        <title>eLeague EJBTimer</title>
         <para>
-            Implement an EJB Timer that will allow eSales to automatically wake-up and expire auctions.
+            Implement an EJB Timer that will allow eLeague to automatically wake-up and expire auctions.
         </para>
     </section>
 
     <section id="esport-project3-tech-bidtimer">
-        <title>eBidbot EJBTimer</title>
+        <title>eClub EJBTimer</title>
         <para>
-            Implement an EJB Timer that will allow eBidbot to periodically wake-up and check on the open auctions that it has bid orders for.
+            Implement an EJB Timer that will allow eClub to periodically wake-up and check on the open auctions that it has bid orders for.
         </para>
     </section>
 </chapter>

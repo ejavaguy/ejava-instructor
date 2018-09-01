@@ -15,13 +15,13 @@
     <orderedlist spacing="compact">
         <listitem><para>
             Provide JUnit IT tests that verify the EJB functionality of 
-            eSales accessed through its remote interface using new
+            eLeague accessed through its remote interface using new
             access control restrictions.
             </para> </listitem>
         <listitem><para>
             Provide JUnit IT tests that verify the EJB functionality of 
-            eBidbot using its new access control restrictions and ability
-            to authenticate with eSales.
+            eClub using its new access control restrictions and ability
+            to authenticate with eLeague.
             </para> </listitem>
         <listitem><para>
             Provide a JUnit IT tests that demonstrates the functionality of the 
@@ -40,22 +40,22 @@
             </para>
             <orderedlist spacing="compact">
                 <listitem><para>
-                    eSales initializes the EJB Timer to check for expired auctions
+                    eLeague initializes the EJB Timer to check for expired auctions
                     </para> </listitem>
                 <listitem><para>
-                    eBidbot initializes the EJB Timer to check auctions associated with its bids.
+                    eClub initializes the EJB Timer to check auctions associated with its bids.
                     </para> </listitem>
                 <listitem><para>
-                    admin1 resets all eSales tables (using the eSalesTestUtilEJB)
+                    admin1 resets all eLeague tables (using the eLeagueTestUtilEJB)
                     </para> </listitem>
                 <listitem><para>
-                    admin1 populates the eSales tables (using the ESalesIngestor)
+                    admin1 populates the eLeague tables (using the ESalesIngestor)
                     </para> </listitem>
                 <listitem><para>
-                    admin2 resets the eBidbot tables (using the EBidbotTestUtilEJB)
+                    admin2 resets the eClub tables (using the EBidbotTestUtilEJB)
                     </para> </listitem>
                 <listitem><para>
-                    admin2 populates the eBidbot tables (using the EBidTestUtilEJB) if necessary. Suggest adding account for user3 at this point.
+                    admin2 populates the eClub tables (using the EBidTestUtilEJB) if necessary. Suggest adding account for user3 at this point.
                     </para> </listitem>
                 <listitem><para>
                     user1 creates auction
@@ -76,43 +76,43 @@
                     user3 views the current status of the auction that was bid by user2
                     </para> </listitem>
                 <listitem><para>
-                    user3 places order with eBidbot
+                    user3 places order with eClub
                     </para> </listitem>
                 <listitem><para>
-                    eBidbot EJB wakes up from an EJB Timer
+                    eClub EJB wakes up from an EJB Timer
                     </para> </listitem>
                 <listitem><para>
-                    eBidbot EJB places bid for user3
+                    eClub EJB places bid for user3
                     </para> </listitem>
                 <listitem><para>
                     user2 places another bid on auction
                     </para> </listitem>
                 <listitem><para>
-                    eBidbot EJB wakes up again from an EJBTimer
+                    eClub EJB wakes up again from an EJBTimer
                     </para> </listitem>
                 <listitem><para>
-                    eBidbot EJB sees they have been raised and places another bid for user3
+                    eClub EJB sees they have been raised and places another bid for user3
                     </para> </listitem>
                 <listitem><para>
-                    eSales EJB wakes up from an EJBTimer and closes the auction
+                    eLeague EJB wakes up from an EJBTimer and closes the auction
                     </para> </listitem>
                 <listitem><para>
-                    eSales EJB publishes a message to the topic that informs everyone of the closing and that user3 has win.
+                    eLeague EJB publishes a message to the topic that informs everyone of the closing and that user3 has win.
                     </para> </listitem>
                 <listitem><para>
-                    The eBidbot MDB receives the message and updates the order.
+                    The eClub MDB receives the message and updates the order.
                     </para> </listitem>
                 <listitem><para>
                     The stand-alone client recieves the message if it matches their JMS selector for a specific category.
                     </para> </listitem>
                 <listitem><para>
-                    user3 checks their order with eBidbot and finds out they won
+                    user3 checks their order with eClub and finds out they won
                     </para> </listitem>
             </orderedlist>
         </listitem>
     </orderedlist>
     <figure>
-        <title>eMarket Full Sequence</title>
+        <title>eSport Full Sequence</title>
         <graphic scalefit="1" fileref="images/esport-full-sequence.jpg"/>
     </figure>
 </chapter>
