@@ -195,9 +195,9 @@
 
             <variablelist spacing="compact">
                 <varlistentry>
-                    <term><filename>OrgMgmtEJB</filename></term>
+                    <term><filename>OrgMgmt/OrgMgmtImpl</filename></term>
                     <listitem><para>
-                        [[A]] OrganizationMgmt/OrganizationMgmtImpl - update this 
+                        Update this 
                         business logic interface and implementation to be able to obtain
                         team schedule and divisional standings for a team from eLeague.
                         This implementation may return the eLeague DTO classes if desired.
@@ -219,9 +219,9 @@
             <para>
                 Create an EJB tier to host your eClub business logic and
                 data access tiers. To provide practice in alternative deployments,
-                it is a requirement that this EJB either be implemented as part 
+                it is a requirement that this EJB component either be implemented as part 
                 of the implementation module, as part of the WAR module, or 
-                part of a combined implementation/EJB/WAR module. Either way, the
+                part of a combined implementation EJB+WAR module. Either way, the
                 eClub EJBs must ultimately be deployed using a WAR.
                 The EJB(s) provided will have the
                 necessary dependency injection and initialization for the business
@@ -271,14 +271,14 @@
                 serialization of the entity class and Lazy-Load issues that 
                 can occur during post-transaction marshalling of the entity class.
             </para>
-            <para>
-              <title></title>
+            <tip>
+              <title>No need for remote client library for eClub</title>
               <para>The only remote client of eClub is the eClub remote test 
               and this can be implemented within the WAR module to keep things
               simple. That should mean there is no need to create a remote client 
               archive to complete this assignment. That was not the case for 
               eLeague.</para>
-            </para>
+            </tip>
         </section>
     </section>
 
@@ -436,9 +436,8 @@
 
         <orderedlist spacing="compact">
             <listitem><para>
-                Transaction Scope - all session bean update methods in these two
-                applications should require a transaction. All session bean read-only
-                methods should support a transaction.
+                Transaction Scope - all session bean methods in these two
+                applications should require a transaction unless otherwise justified.
                 </para></listitem>
             <listitem><para>
                 Transaction Integrity - Create a demonstration of

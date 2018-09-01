@@ -37,62 +37,62 @@
             </para>
             <orderedlist spacing="compact">
                 <listitem><para>
-                    reset all eLeague tables (using the LeagueTestUtilEJB)
+                    Reset all eLeague tables (using the LeagueTestUtilEJB)
                     </para> </listitem>
                 <listitem><para>
-                    populate the eLeague tables (using the LeagueIngestor)
+                    Populate the eLeague tables (using the LeagueIngestor)
                     </para> </listitem>
                 <listitem><para>
-                    create a Club in eLeague (using the LeagueMgmtEJB; rep=user2)
+                    Create a Club in eLeague (using the LeagueMgmtEJB; rep=user2)
                     </para> </listitem>
                 <listitem><para>
-                    add Venue for Club in eLeague (using ClubMgmtEJB)
+                    Add Venue for Club in eLeague (using ClubMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    create Parent in eClub (using MemberMgmtEJB; loginId=user3)
+                    Create Parent in eClub (using MemberMgmtEJB; loginId=user3)
                     </para> </listitem>
                 <listitem><para>
-                    create Player in eClub (using MemberMgmtEJB)
+                    Create Player in eClub (using MemberMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    add a Coach role in eClub (using MemberMgmtEJB)
+                    Add a Coach role in eClub (using MemberMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    create a Team in eClub (using OrgMgmtEJB)
+                    Create a Team in eClub (using OrgMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    assign Players to a Team in eClub (using OrgMgmtEJB)
+                    Assign Players to a Team in eClub (using OrgMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    assign Coach to a Team in eClub (using OrgMgmtEJB)
+                    Assign Coach to a Team in eClub (using OrgMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    assign Manager to a Team in eClub (using OrgMgmtEJB)
+                    Assign Manager to a Team in eClub (using OrgMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    show team roster in eClub (using OrgMgmtEJB)
+                    Show team roster in eClub (using OrgMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    add a Team for Club in eLeague (using ClubMgmtEJB)
+                    Add a Team for Club in eLeague (using ClubMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    [[a]] add a contact for a Team eLeague (using ClubMgmtEJB)
+                    Add a contact for a Team eLeague (using ClubMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    [[a]] assign a Team to an existing Division eLeague (using
+                    Assign a Team to an existing Division eLeague (using
                     ClubMgmtEJB; division=U13-A, refid="Division-845")
                     </para> </listitem>
                 <listitem><para>
-                    [[a]] schedule a Season eLeague (using ContestMgmtEJB)
+                    Schedule a Season eLeague (using ContestMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    [[a]] show a Team Schedule in eClub (using OrgMgmtEJB)
+                    Show a Team Schedule in eClub (using OrgMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    [[a]] report a Score in eLeague (using ContestMgmtEJB)
+                    Report a Score in eLeague (using ContestMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    [[a]] show Division Standings in eLeague (using LeagueMgmtEJB)
+                    Show Division Standings in eLeague (using LeagueMgmtEJB)
                     </para> </listitem>
             </orderedlist>
 

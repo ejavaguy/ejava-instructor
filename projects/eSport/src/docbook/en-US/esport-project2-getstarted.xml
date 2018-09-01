@@ -8,11 +8,11 @@
         point for your overall application. It assumes you already have either
         a consolidated Impl -or- a BO, DAO, and BLImpl set of projects in
         place from Project 1. You will not have the option of consolidating
-        the EJB, WAR, EAR, and RMI Test into a single project for eLeague. They must be
+        the EJB, WAR, EAR, and remote Test into a single project for eLeague. They must be
         implemented as separate projects with proper dependencies between
         them declared. You *do* have the option of merging all modules
         into a single WAR module for eClub or many of the alternatives
-        as long as eBidbit is deployed as a WAR.
+        as long as eClub is deployed as a WAR.
     </para>
 
     <figure>
