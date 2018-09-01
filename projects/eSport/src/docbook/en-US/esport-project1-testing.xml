@@ -14,14 +14,18 @@
     <orderedlist spacing="compact">
         <listitem><para>
             Provide a JUnit test for your business objects (BOs) that
-            test the manipulation of the data. An example test might be
-            to try adding a bid to a closed auction.  These tests should
-            be packaged with the BOs.  There should be a separate project
-            and test for both eSales and eBidbot.  It is anticipated that
-            these tests will be a minimal demonstration of understanding.
+            test the manipulation of data. An example test might be to 
+            
+            try forming a contest between teams in separate divisions or schedule
+            a contest that conflicts with a team and/or venue schedule. 
+
+            These tests should be packaged with the BOs.  There should be a 
+            separate project and test for both eLeague and eClub.  
+            It is anticipated that these tests will be a minimal demonstration 
+            of understanding.
             </para> </listitem>
         <listitem><para>
-            Provide a JUnit test for your eSales and eBidbot JPA DAOs. This
+            Provide a JUnit test for your eLeague and eClub JPA DAOs. This
             should test the implementation for the required CRUD operations
             for each type of object. It is understood that some of the operations
             will be handled by cascades, so you might not have a set of methods
@@ -37,81 +41,96 @@
             </para> </listitem>
         <listitem><para>
             Provide a set of JUnit test programs to verify the following
-            end-to-end scenario in eSales.  This test should be implemented as
+            end-to-end scenario in eLeague.  This test should be implemented as
             a JUnit test and packaged with the business logic implementation.
             </para>
             <orderedlist spacing="compact">
                 <listitem><para>
-                    reset (using SalesTestUtilImpl) -- reset the esales 
+                    reset (using LeagueTestUtil) -- reset the eLeague 
                         database to an initial starting state.
                     </para> </listitem>
                 <listitem><para>
-                    ingest data (using Ingestor) -- ingest the full XML test
+                    ingest data (using LeagueIngestor) -- ingest the full XML test
                         data file.
                     </para> </listitem>
                 <listitem><para>
-                    createAccount for seller, buyer1, and buyer2 (using
-                    AccountMgmtImpl)
+                    createClub (using LeagueMgmtImpl)
                     </para> </listitem>
                 <listitem><para>
-                    createAuction for seller (using SellerMgmtImpl)
+                    addVenue (using ClubMgmtImpl)
                     </para> </listitem>
                 <listitem><para>
-                    getUserAuctions for seller (using SellerMgmtImpl)
+                    addTeam (using ClubMgmtImpl)
                     </para> </listitem>
                 <listitem><para>
-                    getAuction using SellerMgmtImpl) -- i.e., for a specific 
-                      auction.
+                    updateContact for team (using ClubMgmtImpl)
                     </para> </listitem>
                 <listitem><para>
-                    getOpenAuctions (using BuyerMgmtImpl) -- i.e., page
-                      through open auctions.
+                    assignTeamDivision (using ClubMgmtImpl) - divisions already
+                    exist for current/next season within the test data.
                     </para> </listitem>
                 <listitem><para>
-                    placeBid for buyer1 (using BuyerMgmtImpl)
+                    scheduleSeason (using ContestMgmtImpl)
                     </para> </listitem>
                 <listitem><para>
-                    placeBid for buyer2 (using BuyerMgmtImpl)
+                    getDivisions (using LeagueMgmtImpl)
                     </para> </listitem>
                 <listitem><para>
-                    getAuction (using BuyerMgmtImpl) -- i.e., showing auction
-                        has bids associated.
+                    getDivisionStandings (using LeagueMgmtImpl)
                     </para> </listitem>
                 <listitem><para>
-                    closeAuction (using AuctionMgmtImpl) -- i.e., winner
-                        declared and no more bids should be accepted.
+                    getTeam with schedule and results (using LeagueMgmtImpl)
+                    </para> </listitem>
+                <listitem><para>
+                    reportScore (using ContestMgmtImpl)
+                    </para> </listitem>
+                <listitem><para>
+                    getTeam with schedule and results (using LeagueMgmtImpl)
+                    </para> </listitem>
+                <listitem><para>
+                    getDivisionStandings (using LeagueMgmtImpl)
                     </para> </listitem>
             </orderedlist>
         </listitem>
         <listitem><para>
             Provide a set of JUnit test programs to verify the following
-            end-to-end scenario in eBidbot.  This test should be implemented as
+            end-to-end scenario in eClub.  This test should be implemented as
             a JUnit test and packaged with the business logic implementation.
+            Note that it is anticipated that you may only have time to create
+            one team, with one player, manager, parent, and coach for the club.
             </para> 
             <orderedlist spacing="compact">
                 <listitem><para>
-                  reset (using BidbotTestUtilImpl) -- reset the bidbot
+                  reset (using OrganizationTestUtil) -- reset the organization
                       database to an initial starting state.
                     </para> </listitem>
                 <listitem><para>
-                  place order (using OrderMgmtImpl) -- i.e., create a record
-                      within bidbot that indicates the sale and maximum bid.
-                      This may require some stubbing in project 1.
+                  createParent (MemberMgmtImpl)
                     </para> </listitem>
                 <listitem><para>
-                  place bid (using OrderMgmtImpl) -- i.e., place a bid
-                      that is higher than the current bid for an open auction but
-                      less than the order maximum. This will require some stubbing
-                      for project1.
+                  createPlayer (MemberMgmtImpl)
                     </para> </listitem>
                 <listitem><para>
-                  end order (using OrderMgmtImpl) -- i.e., complete order
-                      processing once auction has closed and note if won.
-                      This will require some stubbing in project1.
+                  addCoachRole (MemberMgmtImpl)
                     </para> </listitem>
                 <listitem><para>
-                  get order status (using OrderMgmtImpl) -- i.e., did user win 
-                      or not.
+                  createTeam (using OrganizationMgmtImpl)
+                    </para> </listitem>
+                <listitem><para>
+                  assignPlayers (using OrganizationMgmtImpl)
+                    </para> </listitem>
+                <listitem><para>
+                  assignCoach (using OrganizationMgmtImpl)
+                    </para> </listitem>
+                <listitem><para>
+                  assignManager (using OrganizationMgmtImpl)
+                    </para> </listitem>
+                <listitem><para>
+                  getTeamRoster (using OrganizationMgmtImpl)
+                    </para> </listitem>
+                <listitem><para>
+                  getTeamSchedule (using OrganizationMgmtImpl and later calls
+                  to eLeague in follow-on project)
                     </para> </listitem>
             </orderedlist>
         </listitem>

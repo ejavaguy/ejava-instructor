@@ -182,7 +182,7 @@
             to initially populate your applications and be the source
             of data for the ingest requirement. To use the data, you will ingest 
             using a parser supplied by the instructor. There is a sample thread
-            in the projects/eSport/eSales directory that shows how to use the 
+            in the projects/eSport/eLeague directory that shows how to use the 
             parser as well as other aspects technology within the project.  
         </para>
   
@@ -246,39 +246,40 @@
         <title>Assembly Overview</title>
         <para>
             Since the work is for separate applications, we will need to establish
-            two separate application projects for this work; eSales and eBidbot.
+            two separate application projects for this work; eLeague and eClub.
             The development can physically share resources (e.g., same database
             and application server), but should be easily separated. It is
-            suggested that you form a root for the overall eMarket work to
+            suggested that you form a root for the overall eSport work to
             coordinate integration testing, and then group the lower-level
-            work under two child projects; eSales and eBidbot.  See some
+            work under two mid-level projects; eLeague and eClub.  See some
             suggested project layouts at the bottom of this specification.  A
-            <ulink url="https://github.com/ejavaguy/ejava-student/tree/master/projects/eMarket">
-            sample set of projects</ulink> that implement a thin eSales thread has
-            been made available. Please ignore the TestData sub-project when
+            <ulink url="https://github.com/ejavaguy/ejava-student/tree/master/projects/eSport/eLeague">
+            sample set of projects</ulink> that implement a thin eLeague thread has
+            been made available. Please ignore the sibling eSportData project when
             using the example to craft your source tree. You will depend on
-            projects within that tree -- not re-implement them and not copy
+            projects within the sibling data tree -- not re-implement them and not copy
             them.  See the Getting Started section towards the end of this 
             specification for a more detailed sample project layout.
         </para>
 
-        <note>
+        <tip>
+            <title>Inherit from course dependency/pom.xml or create own</title>
             <para>
                 You will likely copy significant portions of the thin thread
                 example and other class examples into your project. Be aware that
                 the thin thread and other example pom.xml files inherit from 
-                the class root project that provides dependencyManagement and 
+                the class root project that provide dependencyManagement and 
                 pluginManagement duties. You will either need to also inherit from
-                the dependencies/pom.xml or compensate by re-defining the management
+                the course dependencies/pom.xml or compensate by re-defining the management
                 sections in the root pom.xml of your project.
             </para>
-        </note>
+        </tip>
   
         <para>
             Since students in the class will be producing parallel implementations for
             the applications and submitting them for evaluation, it is asked
             that you come up with unique names for your artifacts. This could
-            be done by replacing the "e" in eMarket, eSales, and eBidbot with a
+            be done by replacing the "e" in eSport, eLeague, and eClub with a
             unique name that corresponds to your newsgroup or college login
             (ex.  jcsMarket, jcsSales, jcsBidbot). You should also use this same pattern for
             java packages (ex. jcs.sales, jcs.bitbot), DB tables (e.g., JCS_), etc.

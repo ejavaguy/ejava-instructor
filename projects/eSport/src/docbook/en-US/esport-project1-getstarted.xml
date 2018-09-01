@@ -17,15 +17,15 @@
 
     <note>
         <para>
-            All "e"Market, "e"Sales, and "e"Bidbot names
+            All "e"Sport, "e"League, and "e"Club names
             should be changed to your specific name mangler. The same type of
             modification needs to occur for the java package names.
         </para>
     </note>
     <note>
         <para>
-            Other than a README, it is not anticipated that you
-            will have any artifacts at the root layer. It should be
+            Other than a README, it is not anticipated that you will have 
+            other artifacts at the root layer. The root pom.xml should be
             used only as a convenience wrapper to perform goals across both
             projects. The root project can also be used for common property, 
             dependencyManagement, and pluginManagement defintions. All 
@@ -37,14 +37,14 @@
         <figure>
             <title>Single Module Approach Candidate Module Structure</title>
 <programlisting language=""><![CDATA[
-eMarket
-|-- eSales
-|   +--eSalesImpl
+eSport
+|-- eLeague
+|   +--eLeagueImpl
 |   |   |-- pom.xml
 |   |   `-- src
 |   |       |-- main
 |   |       |   |-- java
-|   |       |   |   `-- esales
+|   |       |   |   `-- eleague
 |   |       |   |       |-- bo
 |   |       |   |       |-- dao
 |   |       |   |       |-- jpa
@@ -52,11 +52,12 @@ eMarket
 |   |       |   |       |-- blimpl
 |   |       |   `-- resources
 |   |       |       `-- ddl
-|   |       |           |-- eSales-create.ddl
-|   |       |           `-- eSales-drop.ddl
+|   |       |           |-- eLeague-create.ddl
+|   |       |           |-- eLeague-drop.ddl
+|   |       |           `-- (eLeague-tuning.ddl or within create)
 |   |       `-- test
 |   |           |-- java
-|   |           |   `-- esales
+|   |           |   `-- eleague
 |   |           |       |-- bo
 |   |           |       |-- dao
 |   |           |       `-- bl
@@ -65,23 +66,24 @@ eMarket
 |   |               `-- META-INF
 |   |                  `-- persistence.xml
 |   `-- pom.xml
-|-- eBidbot
-|   +--eBidbotImpl
+|-- eClub
+|   +--eClubImpl
 |   |   |-- pom.xml
 |   |   `-- src
 |   |       |-- main
 |   |       |   |-- java
-|   |       |   |   `-- ebidbot
+|   |       |   |   `-- eclub
 |   |       |   |       |-- bo
 |   |       |   |       |-- dao
 |   |       |   |       |-- bl
 |   |       |   `-- resources
 |   |       |       `-- ddl
-|   |       |           |-- eBidbot-create.ddl
-|   |       |           `-- eBidbot-drop.ddl
+|   |       |           |-- eClub-create.ddl
+|   |       |           |-- eClub-drop.ddl
+|   |       |           `-- (eClub-tuning.ddl or within create)
 |   |       `-- test
 |   |           |-- java
-|   |           |   `-- ebidbot
+|   |           |   `-- eclub
 |   |           |       |-- bo
 |   |           |       |-- dao
 |   |           |       |-- bl
@@ -97,60 +99,74 @@ eMarket
         <figure>
             <title>Multi-Module Approach Candidate Module Structure</title>
 <programlisting language=""><![CDATA[
-eSales
-|-- eSales
-|   +--eSalesBO
+eLeague
+|-- eLeague
+|   +--eLeagueBO
 |   |   |-- pom.xml
 |   |   `-- src
 |   |       |-- main
 |   |       |   `-- java
-|   |       |       `-- esales
+|   |       |       `-- eleague
 |   |       |           |-- bo
 |   |       |           `-- bl
 |   |       `-- test
 |   |           |-- java
-|   |           |   `-- esales
+|   |           |   `-- eleague
 |   |           |       `-- bo
 |   |           `-- resources
 |   |               `log4j.xml
-|   +--eSalesDAO
+|   +--eLeagueDAO
 |   |   |-- pom.xml
 |   |   `-- src
 |   |       |-- main
 |   |       |   |-- java
-|   |       |   |   `-- esales
+|   |       |   |   `-- eleague
 |   |       |   |       |-- dao
 |   |       |   |       `-- jpa
 |   |       |   `-- resources
 |   |       |       `-- ddl
-|   |       |           |-- eSales-create.ddl
-|   |       |           `-- eSales-drop.ddl
+|   |       |           |-- eLeague-create.ddl
+|   |       |           `-- eLeague-drop.ddl
+|   |       |           `-- (eLeague-tuning.ddl or within create)
 |   |       `-- test
 |   |           |-- java
-|   |           |   `-- esales
+|   |           |   `-- eleague
 |   |           |       `-- dao
 |   |           `-- resources
 |   |               |-- log4j.xml
 |   |               `-- META-INF
 |   |                  `-- persistence.xml
-|   +--eSalesBLImpl
+|   +--eLeagueBLImpl
 |   |   |-- pom.xml
 |   |   `-- src
 |   |       |-- main
 |   |       |   `-- java
-|   |       |       `-- esales
+|   |       |       `-- eleague
 |   |       |           `-- blimpl
 |   |       `-- test
 |   |           |-- java
-|   |           |   `-- esales
+|   |           |   `-- eleague
 |   |           |       `-- bl
 |   |           `-- resources
 |   |               `-- log4j.xml
 |   `-- pom.xml
-|-- eBidbot
+|-- eClub
 |  ("it is simple" keep to a single module as shown above)
 `-- pom.xml
 ]]></programlisting>                        
         </figure>
+        <tip>
+          <title>Project 1 persistence.xml definitions are for test</title>
+          <para>
+            Since the work of project 1 will be deployed to the application
+            server in follow-on projects, the persistence.xml definitions 
+            created in project 1 should be considered strictly for test and 
+            should be placed in the "src/test" tree to prevent it from 
+            being deployed to the application server. It is also suggested
+            that if your persistence unit is called "X", the persistence 
+            unit name for project 1 in the "src/test" tree be called "X-test"
+            to avoid confusion of what is intended to be used.
+          </para>
+        </tip>
 </chapter>
   
