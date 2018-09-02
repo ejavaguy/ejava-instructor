@@ -71,32 +71,6 @@
         </para>
 
         <table>
-            <title>HTTPS Keystore(s)</title>
-            <tgroup cols='2' align='left' colsep='1' rowsep='0'>
-            <colspec colname="file"/>
-            <colspec colname="desc"/>
-            <thead>
-                <row>
-                  <entry>File</entry>
-                  <entry>Description</entry>
-                </row>
-            </thead>
-            <tbody>
-                <row rowsep="1">
-                   <entry namest="file">
-                        ${jboss.server.config.dir}/application.keystore
-                        </entry>
-                   <entry namest="desc">
-                        Self-signed JKS keystore with server certificate. 
-                        Also also used as client trustStore during testing.
-                        </entry>
-                </row>
-            </tbody>
-            </tgroup>
-        </table>    
-
-
-        <table>
             <title>User Credential Files</title>
             <tgroup cols='2' align='left' colsep='1' rowsep='0'>
             <colspec colname="file"/>
@@ -129,7 +103,7 @@
         </table>    
 
         <para>
-            We are going to have a couple types of users. Some of the users will
+            We are going to have several types of user roles. Some of the users will
             have zero, one, or more of these roles. Because of the static nature of
             our authentication, all users will have a login configured before
             the application is even deployed to the server.
@@ -217,8 +191,8 @@
 
         <para>
             If a user has a login for one application, they will use the same
-            account to access the other application (e.g., user3 might have
-            both esales-user and ebidbot-user roles).
+            account to access the other application 
+            (e.g., user1 might have both eclub-coord and eleague-clubcoord roles).
         </para>
 
         <table>
@@ -347,9 +321,54 @@
 
         <para>
             Some actions are open to any users; authenticated or not.
-            Authentication will be performed using a JNDI login.  All users
-            will have a password of "password1!".
+            Authentication will be performed using a JNDI login for RMI, 
+            BASIC for HTTP web services, and FORM for Web UIs.
+            All users will have a password of "password1!".
         </para>
+
+        <para>
+          We will use HTTPS to provide confidentiality between our client and server
+          for communications.  The server has a keystore for identity. The JUnit tests 
+          can conveniently use that as a trustStore through the base path
+          defined by the "jboss.home" property.
+        </para>
+
+<programlisting language=""><![CDATA[
+# build/dependencies/pom.xml
+
+<java.truststore>${jboss.home}/standalone/configuration/application.keystore</java.truststore>
+...
+<plugin>
+    <artifactId>maven-failsafe-plugin</artifactId>
+    <configuration>
+        <systemPropertyVariables>
+            <javax.net.ssl.trustStore>${java.truststore}</javax.net.ssl.trustStore>
+]]></programlisting>                        
+
+        <table>
+            <title>HTTPS Keystore(s)</title>
+            <tgroup cols='2' align='left' colsep='1' rowsep='0'>
+            <colspec colname="file"/>
+            <colspec colname="desc"/>
+            <thead>
+                <row>
+                  <entry>File</entry>
+                  <entry>Description</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                   <entry namest="file">
+                        ${jboss.server.config.dir}/application.keystore
+                        </entry>
+                   <entry namest="desc">
+                        Self-signed JKS keystore with server certificate. 
+                        Also also used as client trustStore during testing.
+                        </entry>
+                </row>
+            </tbody>
+            </tgroup>
+        </table>    
 
         <para>
             For asynchronous activity, we will implement a Schedule Topic where 

@@ -11,7 +11,7 @@
         </para>
     </section>
 
-    <section id="esport-project3-tech-salesaccess">
+    <section id="esport-project3-tech-leagueaccess">
         <title>eLeague Access Restrictions</title>
         <para>
             Enhance eLeague with access restrictions.
@@ -27,29 +27,56 @@
                 </para>
                 <orderedlist spacing="compact">
                     <listitem><para>
-                        Only users with the eleague-user role can access account information
-                        but only for their authenticated identity. Derive this information from 
-                        their login. (i.e., user1 logs in and may only access user1's account as 
-                        "my account". They do not specify which account they access.
+                        Administrators may run the test utility functions.
                         </para>
                         </listitem>
                     <listitem><para>
-                        Only users with the eleague-admin role may run the test utility functions.
+                        League Coordinators may create clubs, seasons, and
+                    divisions. They may also schedule contests and perform duties
+                    normally performed by club and division coordinators -- like
+                    report scores.
                         </para>
                         </listitem>
                     <listitem><para>
-                        Anonymous users may access Auction information.
+                        Club Coordinators may create venues, teams, and
+                    assign teams to divisions.
+                        </para>
+                        </listitem>
+                    <listitem><para>
+                        Division coordinators may report scores.
                         </para>
                         </listitem>
                 </orderedlist>
                 </listitem>
+            <listitem><para>
+                Perform additional programmatic security checks to verify 
+                the right user is accessing the appropriate information.
+                </para>
+                <orderedlist spacing="compact">
+                    <listitem><para>
+                        Club coordinators may only manage teams and venues
+                        associated with their club.
+                        </para>
+                        </listitem>
+                    <listitem><para>
+                        Division coordinators may only report scores for contests 
+                        in their assigned division. Note that the League Coordinator
+                        should be able to report a score for any division.
+                        </para>
+                        </listitem>
+                </orderedlist>
+                </listitem>
+            <listitem><para>
+                Allow any user to perform read operations.
+                </para>
+                </listitem>
         </orderedlist>
     </section>
 
-    <section id="esport-project3-tech-salesclient">
+    <section id="esport-project3-tech-leagueclient">
         <title>eLeague RMI client Authentication</title>
         <para>
-            Extend your existing eLeague RMI Test project and any RMI client(s) to
+            Extend your existing eLeague remote Test project and any remote client(s) to
             address new authentication requirements.
         </para>
         <orderedlist spacing="compact">
@@ -69,7 +96,7 @@
         </orderedlist>
     </section>
 
-    <section id="esport-project3-tech-bidaccess">
+    <section id="esport-project3-tech-clubaccess">
         <title>eClub Access Restrictions</title>
         <para>
             Enhance eClub with access restrictions.
@@ -85,29 +112,40 @@
                 </para>
                 <orderedlist spacing="compact">
                     <listitem><para>
-                        Only users with the eclub-user role may access OrderMgmt
-                        (once their account is created).
+                        Administrators may run the test utility functions.
                         </para>
                         </listitem>
                     <listitem><para>
-                        Only users with the bidbot-admin role may run the test utility functions.
+                        Members may update contact information and 
+                        obtain roster information.
+                        </para>
+                        </listitem>
+                    <listitem><para>
+                        Organization coordinators may create teams and
+                        assign players, coaches, and managers.
                         </para>
                         </listitem>
                 </orderedlist>
                 </listitem>
             <listitem><para>
-                run-as an eleague-trusted user when making bids on behalf of a user. 
-                This may require the use of a "helper" EJB to encapsulate the scope
-                of the run-as role/identity
+                Perform additional programmatic security checks to verify 
+                the right user is accessing the appropriate information.
                 </para>
+                <orderedlist spacing="compact">
+                    <listitem><para>
+                        Members are accessing rosters for teams they are
+                        associated with.
+                        </para>
+                        </listitem>
+                </orderedlist>
                 </listitem>
         </orderedlist>
     </section>
 
-    <section id="esport-project3-tech-bidclient">
+    <section id="esport-project3-tech-clubclient">
         <title>eClub RMI client Authentication</title>
         <para>
-            Extend your existing eClub RMI Test project and any RMI
+            Extend your existing eClub remote Test project and any remote
             client(s) to address new authentication requirements.
         </para>
         <orderedlist spacing="compact">
@@ -128,7 +166,7 @@
     </section>
 
 
-    <section id="esport-project3-tech-saleswar">
+    <section id="esport-project3-tech-leaguewar">
         <title>eLeagueWAR Access Restrictions</title>
         <para>
             Enhance eLeagueWAR with access restrictions.
@@ -141,20 +179,21 @@
             <listitem><para>
                 Restrict access beyond the main page to users with
                 the appropriate roles. You may use FORM or BASIC authentication.
-                (I suggest FORM for easy logout/login as new user).
+                (I suggest FORM for easier logout/login as new user).
                 </para>
                 </listitem>
             <listitem><para>
                 Permit only users to only ask the EJB tier for
-                information that is associated with their login. For example, an 
-                eleague-user/non esales-trusted user should only be allowed to enter 
-                a bid for the account they authenticated against.
+                information that is associated with their login. For example,
+                a Club Coordinator should not have to tell the Web UI what
+                club they are managing. It should be derived from their identity
+                and information in the database.
                 </para>
                 </listitem>
         </orderedlist>
     </section>
 
-    <section id="esport-project3-tech-bidwar">
+    <section id="esport-project3-tech-clubwar">
         <title>eClubWAR Access Restrictions</title>
         <para>
             Enhance eClubWAR with access restrictions.
@@ -167,14 +206,15 @@
             <listitem><para>
                 Restrict access beyond the main page to users with
                 the appropriate roles. You may use FORM or BASIC authentication.
-                (I suggest FORM for easy logout).
+                (I suggest FORM for easier logout).
                 </para>
                 </listitem>
             <listitem><para>
                 Permit only users to only ask the EJB tier for information that
-                is associated with their login. For example, a eClub
-                user should not see an option to reset the database or see 
-                another users' account.
+                is associated with their login. For example, a Member should not
+                have to tell the Web UI what team they are associated with. It
+                should be derived from their identity and information in the
+                database.
                 </para>
                 </listitem>
         </orderedlist>
@@ -210,46 +250,49 @@
         </orderedlist>
     </section>
 
-    <section id="esport-project3-tech-salespublish">
+    <section id="esport-project3-tech-leaguepublish">
         <title>eLeague JMS Publisher</title>
         <figure>
             <title>eLeague Async</title>
             <graphic scalefit="1" fileref="images/esport-async.jpg"/>
         </figure>
         <para>
-            Extend your eLeague implementations to publish a JMS message
-            to a topic whenever information for an auction changes.
+          Extend your eLeague EJB implementations to publish changes to 
+          Contests.
+
+
         </para>
         <orderedlist spacing="compact">
             <listitem><para>
-                Use the esport-eleague-auction topic (JNDI name: topic/ejava/projects/emarket/esales-auction)
+                Use the esport-eleague-contests topic (JNDI name: topic/ejava/projects/esport/eleague-contests)
                 </para>
                 </listitem>
             <listitem><para>
                 Design your JMS Message. You can use any JMS Type and JMS/custom
                 properties you wish.  However, know that some subscribers will
-                be filtering on such things as the category or state of an auction.
+                be filtering on such things as the impacted team or type of event.
                 </para>
                 </listitem>
             <listitem><para>
-                Have your eLeague EJBs publish JMS Messages to the topic when the 
-                Auction changes state (created, bid, close).
+                Have your eLeague EJBs publish JMS Messages to the topic when
+                a Contest changes state (created, canceled, completed).
                 </para>
                 </listitem>
         </orderedlist>
     </section>
 
-    <section id="esport-project3-tech-bidjavase">
+    <section id="esport-project3-tech-clubjavase">
         <title>eClub JavaSE Subscriber </title>
         <para>
-            Add a Java SE JMS subscriber to consume events about Auctions 
-            pertaining to a specific category.
+            Add a Java SE JMS subscriber eLeague to consume events about
+            Contests pertaining to a specific team.
         </para>
         <orderedlist spacing="compact">
             <listitem><para>
-                Implement a Java SE JMS subscriber that listens for Auctions with 
-                a category matching a JMS Selector. This must be a JMS selector, not 
-                client-side Java logic.
+                Implement a Java SE JMS subscriber that listens for Schedule
+                messages with a team identifier matching a JMS Selector.
+                This must be a JMS selector, not client-side Java logic. All
+                this client has to do is log the information from the message.
                 </para>
                 </listitem>
             <listitem><para>
@@ -265,10 +308,16 @@
     </section>
 
 
-    <section id="esport-project3-tech-bidmdb">
+    <section id="esport-project3-tech-clubmdb">
         <title>eClub MDB Subscriber</title>
         <para>
-            Implement a Message Driven Bean within eClub to subscribe to auction closed events.
+            Implement a Message Driven Bean within eClub to subscribe to 
+            contests that are new, rescheduled, or reminders; but not completed 
+            (i.e. it should have a selector that causes the MDB to not be told about
+            scores being reported).
+            [Note:] The ability to reschedule a contest was not part of 
+            the functional requirements and need not be implemented at this time.
+            Just account for the future event in your selector.
         </para>
         <orderedlist spacing="compact">
             <listitem><para>
@@ -276,23 +325,24 @@
                 </para>
                 </listitem>
             <listitem><para>
-                Update any orders as being closed and with results based on the contents of the JMS message.
+                Obtain the e-mail address for each individual associated with
+                the team effected by the event. Print a textual message and the
+                address list to the log. You do not have to physically send an
+                e-mail as a part of this project.
                 </para>
                 </listitem>
         </orderedlist>
     </section>
 
-    <section id="esport-project3-tech-salestimer">
+    <section id="esport-project3-tech-leaguetimer">
         <title>eLeague EJBTimer</title>
         <para>
-            Implement an EJB Timer that will allow eLeague to automatically wake-up and expire auctions.
-        </para>
-    </section>
-
-    <section id="esport-project3-tech-bidtimer">
-        <title>eClub EJBTimer</title>
-        <para>
-            Implement an EJB Timer that will allow eClub to periodically wake-up and check on the open auctions that it has bid orders for.
+            Implement an EJB Timer that will allow eLeague to automatically
+            wake-up and send out schedule reminders for contests that have not yet
+            finished. Depending on the provided test data, you might want to limit
+            the number of reminders sent. The main goal of this requirement is
+            that you make use of an EJBTimer and that you trigger the MDB logic
+            in eClub.
         </para>
     </section>
 </chapter>

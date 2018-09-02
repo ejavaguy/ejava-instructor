@@ -40,73 +40,109 @@
             </para>
             <orderedlist spacing="compact">
                 <listitem><para>
-                    eLeague initializes the EJB Timer to check for expired auctions
+                    The applications deploy and/or started
+                    </para> 
+                    <itemizedlist>
+                      <listitem><para>
+                          eLeagueEJB sets a timer for schedule reminders 
+                          </para> </listitem>
+                      <listitem><para>
+                          eClubEJB subscribes to pending contest events.
+                          </para> </listitem>
+                      <listitem><para>
+                          The eLeague Java SE LeagueListener subscribes for events
+                          related to a specific team.
+                          </para> </listitem>
+                    </itemizedlist>
+                    </listitem>
+                <listitem><para>
                     </para> </listitem>
                 <listitem><para>
-                    eClub initializes the EJB Timer to check auctions associated with its bids.
+                    admin1 resets all eLeague tables (using the LeagueTestUtilEJB)
                     </para> </listitem>
                 <listitem><para>
-                    admin1 resets all eLeague tables (using the eLeagueTestUtilEJB)
+                    admin1 populates the eLeague tables (using the LeagueIngestor)
                     </para> </listitem>
                 <listitem><para>
-                    admin1 populates the eLeague tables (using the ESalesIngestor)
+                    admin1 resets the eClub tables (using the ClubTestUtilEJB)
                     </para> </listitem>
                 <listitem><para>
-                    admin2 resets the eClub tables (using the EBidbotTestUtilEJB)
+                    admin1 populates the eClub tables (using the ClubTestUtilEJB) if anything necessary.
                     </para> </listitem>
                 <listitem><para>
-                    admin2 populates the eClub tables (using the EBidTestUtilEJB) if necessary. Suggest adding account for user3 at this point.
+                    user1(lmtucker) creates a Club in eLeague (using the LeagueMgmtEJB; rep=user2)
                     </para> </listitem>
                 <listitem><para>
-                    user1 creates auction
+                    user2 adds Venue for Club in eLeague (using ClubMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    user2 gets a list of open auctions
+                    user3 creates Parent in eClub (using MemberMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    user2 places bid on an auction
+                    user3 creates Player in eClub (using MemberMgmtEJB) for their child
                     </para> </listitem>
                 <listitem><para>
-                    user2 views the current status of the auction they are bidding on
+                    user3 adds a Coach role in eClub (using MemberMgmtEJB) to
+                    their identity
                     </para> </listitem>
                 <listitem><para>
-                    user3 gets a list of open auctions
+                    user2 creates a Team in eClub (using OrgMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    user3 views the current status of the auction that was bid by user2
+                    user2 assigns Players to a Team in eClub (using OrgMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    user3 places order with eClub
+                    user2 assigns Coach to a Team in eClub (using OrgMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    eClub EJB wakes up from an EJB Timer
+                    user2 assigns Manager to a Team in eClub (using OrgMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    eClub EJB places bid for user3
+                    user3 views their team roster in eClub (using OrgMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    user2 places another bid on auction
+                    user2 adds a Team for Club in eLeague (using ClubMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    eClub EJB wakes up again from an EJBTimer
+                    user2 adds a contact for a Team eLeague (using ClubMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    eClub EJB sees they have been raised and places another bid for user3
+                    user2 assigns a Team to an existing Division eLeague
+                    (using ClubMgmtEJB; division=U13-A, refid="Division-845")
                     </para> </listitem>
                 <listitem><para>
-                    eLeague EJB wakes up from an EJBTimer and closes the auction
+                    user1(lmtucker) schedules a Season eLeague (using ContestMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    eLeague EJB publishes a message to the topic that informs everyone of the closing and that user3 has win.
+                    ContestMgmtEJB publishes schedule events to Schedule Topic
                     </para> </listitem>
                 <listitem><para>
-                    The eClub MDB receives the message and updates the order.
+                    LeagueSubscriber receives messages related to its team. It
+                    prints the contents of the message.
                     </para> </listitem>
                 <listitem><para>
-                    The stand-alone client recieves the message if it matches their JMS selector for a specific category.
+                    LeagueListenerMDB receives messages related to unfinished
+                    contests. It obtains the e-mail addresses for members associated
+                    with the team references in the message. It logs the message and
+                    e-mail addresses.
                     </para> </listitem>
                 <listitem><para>
-                    user3 checks their order with eClub and finds out they won
+                    anonymous users views Team Schedule in eClub (using OrgMgmtEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    EJBTimer fires a callback in ContestMgmtEJB
+                    </para> </listitem>
+                <listitem><para>
+                    ContestMgmtEJB publishes reminder messages to the Schedule
+                    Topic (same message processing occurs in LeagueSubscriber and
+                    LeagueListerMDB).
+                    </para> </listitem>
+                <listitem><para>
+                    Division coordinator(jtflynn) reports 
+                    a Score in eLeague involving our club team (using ContestMgmtEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    anonymous user views Division Standings in eLeague (using LeagueMgmtEJB)
                     </para> </listitem>
             </orderedlist>
         </listitem>
