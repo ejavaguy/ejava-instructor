@@ -932,6 +932,12 @@
                 </para>
                 <variablelist spacing="compact">
                     <varlistentry>
+                        <term><filename>id:int</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
                         <term><filename>roleName</filename></term>
                         <listitem><para>
                           Enum(UNKNOWN, MANAGER, COACH)
@@ -940,6 +946,12 @@
 
                     <varlistentry>
                         <term><filename>contact:Contact</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>team:Team</filename></term>
                         <listitem><para>
                         </para></listitem>
                     </varlistentry>
@@ -1125,14 +1137,9 @@
                     </varlistentry>
 
                     <varlistentry>
-                        <term><filename>homeGames:Collection&lt;Contest&gt;</filename></term>
+                        <term><filename>contests:List&lt;Contest&gt;</filename></term>
                         <listitem><para>
-                        </para></listitem>
-                    </varlistentry>
-
-                    <varlistentry>
-                        <term><filename>awayGames:Collection&lt;Contest&gt;</filename></term>
-                        <listitem><para>
+                        A list of contests, possibly ordered by date.
                         </para></listitem>
                     </varlistentry>
 
@@ -1175,14 +1182,21 @@
                 </para>
                 <variablelist spacing="compact">
                     <varlistentry>
+                        <term><filename>id:int</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
                         <term><filename>season:Season</filename></term>
                         <listitem><para>
                         </para></listitem>
                     </varlistentry>
 
                     <varlistentry>
-                        <term><filename>group:String</filename></term>
+                        <term><filename>name:String</filename></term>
                         <listitem><para>
+                        (has been referred to as "group" at times)
                         </para></listitem>
                     </varlistentry>
 
@@ -1205,7 +1219,40 @@
                     </varlistentry>
 
                     <varlistentry>
-                        <term><filename>teams:Collection&lt;TeamSeason&gt;</filename></term>
+                        <term><filename>teams:List&lt;TeamSeason&gt;</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </section>
+
+            <section id="esport-project1-tech-leaguebo-season">
+                <title>Season</title>
+                <para>
+                  Design a class that represents play for a perion of 
+                  time when contests will be held.
+                </para>
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>id:int</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>name:String</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>startDate:Date</filename></term>
+                        <listitem><para>
+                        </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>endDate:Date</filename></term>
                         <listitem><para>
                         </para></listitem>
                     </varlistentry>
@@ -1229,13 +1276,6 @@
                     <varlistentry>
                         <term><filename>id:int</filename></term>
                         <listitem><para>
-                        </para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>date:Date (or integrated in with startTime)</filename></term>
-                        <listitem><para>
-                          Callers will want something they can use to provide 
-                          the user with day-of-week, month, day output.
                         </para></listitem>
                     </varlistentry>
                     <varlistentry>
@@ -1342,20 +1382,16 @@
                     </varlistentry>
 
                     <varlistentry>
-                        <term><filename>lastName:String</filename></term>
+                        <term><filename>parents:List&lt;Individual&gt;</filename></term>
                         <listitem><para>
+                          Zero or more parents
                         </para></listitem>
                     </varlistentry>
 
                     <varlistentry>
-                        <term><filename>parents:Collection&lt;Individual&gt;</filename></term>
+                        <term><filename>children:List&lt;Individual&gt;</filename></term>
                         <listitem><para>
-                        </para></listitem>
-                    </varlistentry>
-
-                    <varlistentry>
-                        <term><filename>children:Collection&lt;Individual&gt;</filename></term>
-                        <listitem><para>
+                          Zero or more children
                         </para></listitem>
                     </varlistentry>
                 </variablelist>
@@ -1369,31 +1405,35 @@
                 </para>
                 <variablelist spacing="compact">
                     <varlistentry>
-                        <term><filename>jerseyNo:int</filename></term>
+                        <term><filename>jerseyNo:Integer</filename></term>
                         <listitem><para>
+                          Jersey numbers are not assigned right away.
                         </para></listitem>
                     </varlistentry>
 
                     <varlistentry>
                         <term><filename>position:String</filename></term>
                         <listitem><para>
+                          Position is not assigned right away and can be changed.
                         </para></listitem>
                     </varlistentry>
 
                     <varlistentry>
                         <term><filename>dob:Date</filename></term>
                         <listitem><para>
+                          Player's date of birth.
                         </para></listitem>
                     </varlistentry>
 
                     <varlistentry>
                         <term><filename>individual:Individual</filename></term>
                         <listitem><para>
+                          The player's identity
                         </para></listitem>
                     </varlistentry>
 
                     <varlistentry>
-                        <term><filename>team:Team</filename></term>
+                        <term><filename>team:ClubTeam</filename></term>
                         <listitem><para>
                           Keep players to a single team for simplicity.
                         </para></listitem>
@@ -1423,11 +1463,12 @@
                     <varlistentry>
                         <term><filename>individual:Individual</filename></term>
                         <listitem><para>
+                          Coach's identity.
                         </para></listitem>
                     </varlistentry>
 
                     <varlistentry>
-                        <term><filename>team:Team</filename></term>
+                        <term><filename>team:ClubTeam</filename></term>
                         <listitem><para>
                           Keep coach to a single team for simplicity.
                         </para></listitem>
@@ -1436,10 +1477,11 @@
             </section>
 
             <section id="esport-project1-tech-clubbo-team">
-                <title>Team</title>
+                <title>ClubTeam</title>
                 <para>
                   Design a class that encapsulates information for
-                  a team.
+                  a team. You can call it "Team", but there is already a class
+                  called "Team" in eLeague and may get confusing.
                 </para>
                 <variablelist spacing="compact">
                     <varlistentry>
@@ -1455,23 +1497,27 @@
                     <varlistentry>
                         <term><filename>league:String</filename></term>
                         <listitem><para>
+                          Identifier for league participating with. Not used.
                         </para></listitem>
                     </varlistentry>
                     <varlistentry>
-                        <term><filename>group:String</filename></term>
+                        <term><filename>levelName:String</filename></term>
                         <listitem><para>
+                          Descriptive name of league's division level. Not used.
                         </para></listitem>
                     </varlistentry>
                     <varlistentry>
-                        <term><filename>level:String</filename></term>
+                        <term><filename>level:Integer</filename></term>
                         <listitem><para>
+                          Competitive level team wishes to participate at or 
+                          is participating at. Not used.
                         </para></listitem>
                     </varlistentry>
                     <varlistentry>
                         <term><filename>leagueTeamId:Integer</filename></term>
                         <listitem><para>
                           A key value that identifies the team within the 
-                          eLeague system.
+                          eLeague system. ** This is used **
                         </para></listitem>
                     </varlistentry>
                     <varlistentry>
@@ -1485,7 +1531,7 @@
                         </para></listitem>
                     </varlistentry>
                     <varlistentry>
-                        <term><filename>players:Collection&lt;Player&gt;</filename></term>
+                        <term><filename>players:List&lt;Player&gt;</filename></term>
                         <listitem><para>
                         </para></listitem>
                     </varlistentry>
@@ -1670,12 +1716,6 @@
                         </para>
                         <orderedlist spacing="compact">
                             <listitem><para>
-                              createClub - league coordinators will need to create
-                              new clubs for the league. Once the club has been created,
-                              ClubMgmt can be used to perform management of the club
-                              details.
-                                </para> </listitem>
-                            <listitem><para>
                               addSeason - league coordinators will need to create a
                               new season for the league. The league cannot have 2 or
                               more concurrent seasons and will know the most current
@@ -1688,15 +1728,24 @@
                               a season.
                                 </para> </listitem>
                             <listitem><para>
-                              updateContact - leagues will need to update their primary
-                              and division points of contact.
-                                </para> </listitem>
-                            <listitem><para>
                               getDivisions - users will need to know which divisions
                               exist for the most current season.  There will also need
                               to be the capability to get historical information for
                               previous seasons.
                                 </para> </listitem>
+
+                            <listitem><para>
+                              createClub - league coordinators will need to create
+                              new clubs for the league. Once the club has been created,
+                              ClubMgmt can be used to perform management of the club
+                              details.
+                                </para> </listitem>
+                            <listitem><para>
+                              assignTeamDivision - clubs will have to assign their
+                              teams to divisions after the league has created them
+                              for an upcoming season.
+                                </para> </listitem>
+
                             <listitem><para>
                               getDivisionStandings - users will want to get divisional
                               standings information for the most current season. This
@@ -1739,16 +1788,7 @@
                               added first and then later assigned to divisions.
                                 </para> </listitem>
                             <listitem><para>
-                              assignTeamDivision - clubs will have to assign their
-                              teams to divisions after the league has created them
-                              for an upcoming season.
-                                </para> </listitem>
-                            <listitem><para>
-                              updateTeam - teams will need to be able to assign
-                              points of contact  
-                                </para> </listitem>
-                            <listitem><para>
-                              updateContact - clubs and teams will need to update
+                              updateTeamContact - clubs and teams will need to update
                               points of contact information.
                                 </para> </listitem>
                         </orderedlist>
@@ -1872,12 +1912,16 @@
                                 addCoachRole - coaches will need to be able to register 
                                 with the club. It is common that a coach is also a parent.
                                 </para> </listitem>
+                            <listitem><para>
+                                getIndividual, Player, and Coach - created individuals will
+                                need to be retrieved.
+                                </para> </listitem>
                         </orderedlist>
                     </listitem>
                 </varlistentry>
 
                 <varlistentry>
-                    <term><filename>OrganizationMgmt/OrganizationMgmtImpl</filename></term>
+                    <term><filename>OrgMgmt/OrgMgmtImpl</filename></term>
                     <listitem><para>
                         Encapsulate the 
                         actions required to create teams and get team information. Some

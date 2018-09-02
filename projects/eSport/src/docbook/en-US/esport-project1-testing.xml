@@ -66,7 +66,7 @@
                     updateContact for team (using ClubMgmtImpl)
                     </para> </listitem>
                 <listitem><para>
-                    assignTeamDivision (using ClubMgmtImpl) - divisions already
+                    assignTeamDivision (using LeagueMgmtImpl) - divisions already
                     exist for current/next season within the test data.
                     </para> </listitem>
                 <listitem><para>
@@ -105,32 +105,33 @@
                       database to an initial starting state.
                     </para> </listitem>
                 <listitem><para>
-                  createParent (MemberMgmtImpl)
+                  createParent (MemberMgmtImpl) - parent depicted as Individual
                     </para> </listitem>
                 <listitem><para>
                   createPlayer (MemberMgmtImpl)
                     </para> </listitem>
                 <listitem><para>
-                  addCoachRole (MemberMgmtImpl)
+                  createCoach (MemberMgmtImpl)
                     </para> </listitem>
                 <listitem><para>
-                  createTeam (using OrganizationMgmtImpl)
+                  createTeam (using OrgMgmtImpl)
                     </para> </listitem>
                 <listitem><para>
-                  assignPlayers (using OrganizationMgmtImpl)
+                  assignPlayers (using OrgMgmtImpl)
                     </para> </listitem>
                 <listitem><para>
-                  assignCoach (using OrganizationMgmtImpl)
+                  assignCoach (using OrgMgmtImpl)
                     </para> </listitem>
                 <listitem><para>
-                  assignManager (using OrganizationMgmtImpl)
+                  assignManager (using OrgMgmtImpl)
                     </para> </listitem>
                 <listitem><para>
-                  getTeamRoster (using OrganizationMgmtImpl)
+                  getTeamRoster (using OrgMgmtImpl)
                     </para> </listitem>
                 <listitem><para>
-                  getTeamSchedule (using OrganizationMgmtImpl and later calls
-                  to eLeague in follow-on project)
+                  getTeamSchedule (using OrgMgmtImpl) - this will later
+                    call eLeague for Contest information, but for now simply returns
+                    an empty list.
                     </para> </listitem>
             </orderedlist>
         </listitem>
