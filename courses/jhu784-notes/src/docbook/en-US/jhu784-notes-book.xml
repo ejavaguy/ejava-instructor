@@ -63,9 +63,7 @@
     <xi:include href="jhu784-syllabus-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="javaee-intro-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="devenv-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <!--
-    <xi:include href="emarket-project-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    -->
+    <xi:include href="esport-project-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="business-logic-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="jpa-dao-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="jpa-entitymgr-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />

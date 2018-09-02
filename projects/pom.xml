@@ -26,5 +26,6 @@
     <modules>
         <module>eDataShare</module>
         <module>eMarket</module>
+        <module>eSport</module>
     </modules>
 </project>

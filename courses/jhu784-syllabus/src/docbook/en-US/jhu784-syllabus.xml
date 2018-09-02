@@ -59,7 +59,7 @@
               <entry namest="comment"><para><ulink url="../html/jpa-entitymgr-ex.html">Exercise: Entity Manager Exercise</ulink></para></entry>
             </row>
             <row rowsep="1">
-              <entry namest="comment"><para>Project Startup/Sanity Check due by Sun, 8am Sep21</para></entry>
+              <entry namest="comment"><para>Project 0 Startup/Sanity Check due by Sun, 8am Sep21</para></entry>
             </row>
 
             <row rowsep="1">
@@ -100,9 +100,9 @@
             </row>
             <row rowsep="1">
                 <!-- 
-              <entry namest="comment"><link linkend="emarket-project1-part">Project 1</link> due by Sun, 8am Oct14</entry>
-                 -->
               <entry namest="comment">Project 1 - due by Sun, 8am Oct14</entry>
+                 -->
+              <entry namest="comment"><link linkend="esport-project1-part">Project 1</link> due by Sun, 8am Oct14</entry>
             </row>
             <row rowsep="1">
               <entry namest="topic"><para><link linkend="jpa-tuning">JPA/SQL Tuning</link></para></entry>

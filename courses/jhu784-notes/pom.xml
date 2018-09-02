@@ -162,14 +162,14 @@
             <version>${project.version}</version>
             <classifier>docsrc</classifier>
         </dependency>
+        -->
 
         <dependency>
             <groupId>info.ejava.docs.projects</groupId>
-            <artifactId>emarket-project</artifactId>
+            <artifactId>esport-project</artifactId>
             <version>${project.version}</version>
             <classifier>docsrc</classifier>
         </dependency>
-        -->
     </dependencies>
 
     <build>
