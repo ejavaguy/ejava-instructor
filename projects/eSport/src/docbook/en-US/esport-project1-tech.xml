@@ -1201,14 +1201,9 @@
                     </varlistentry>
 
                     <varlistentry>
-                        <term><filename>level:String</filename></term>
+                        <term><filename>level:int</filename></term>
                         <listitem><para>
-                        </para></listitem>
-                    </varlistentry>
-
-                    <varlistentry>
-                        <term><filename>ranking:int</filename></term>
-                        <listitem><para>
+                        Used to determine competitive level. May have been referred to as "ranking" at times.
                         </para></listitem>
                     </varlistentry>
 
