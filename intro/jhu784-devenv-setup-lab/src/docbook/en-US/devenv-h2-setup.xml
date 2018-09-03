@@ -72,7 +72,7 @@
             <listitem><para>Connect to URL <ulink url="http://127.0.1.1:8082">http://127.0.1.1:8082</ulink>
                 from a browser</para>
             </listitem>
-            <listitem><para>Use JDBC URL: jdbc:h2:tcp://127.0.0.1:9092/h2db/ejava;LOCK_MODE=0</para></listitem>
+            <listitem><para>Use JDBC URL: jdbc:h2:tcp://127.0.0.1:9092/./h2db/ejava;LOCK_MODE=0</para></listitem>
             <listitem><para>Log in as user "sa" and empty password</para></listitem>
         </itemizedlist>
         <note>
@@ -123,7 +123,7 @@
     <id>h2srv</id>
     <properties>
           <jdbc.driver>org.h2.Driver</jdbc.driver>
-          <jdbc.url>jdbc:h2:tcp://${db.host}:9092/~/h2db/ejava</jdbc.url>
+          <jdbc.url>jdbc:h2:tcp://${db.host}:9092/./h2db/ejava</jdbc.url>
           <jdbc.user>sa</jdbc.user>
           <jdbc.password/>
           <hibernate.dialect>
@@ -154,7 +154,7 @@
             </listitem>
             
             <listitem><para>to</para>
-        <programlisting language="xml"><![CDATA[<connection-url>jdbc:h2:tcp://${jboss.bind.address:127.0.0.1}:9092/~/h2db/ejava</connection-url>
+        <programlisting language="xml"><![CDATA[<connection-url>jdbc:h2:tcp://${jboss.bind.address:127.0.0.1}:9092/./h2db/ejava</connection-url>
         ...
                     <security>
                         <user-name>sa</user-name>
