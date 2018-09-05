@@ -66,7 +66,7 @@
 
                 <listitem>            
                     <para>Specify an active profile in settings.xml</para>
-                    <programlisting language=""><![CDATA[<activeProfiles>
+                    <programlisting language="xml"><![CDATA[<activeProfiles>
     <activeProfile>wildfly13</activeProfile>
     <activeProfile>h2db</activeProfile>
 </activeProfiles>]]></programlisting>                

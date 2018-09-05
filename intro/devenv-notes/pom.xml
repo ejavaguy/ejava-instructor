@@ -17,7 +17,7 @@
     
     <properties>
        <doc.base>devenv-book</doc.base>
-       <content.version>v2018-08-14</content.version>
+       <content.version>v2018-09-04</content.version>
     </properties>
 
     <build>
