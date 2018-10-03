@@ -56,8 +56,6 @@
                     </itemizedlist>
                     </listitem>
                 <listitem><para>
-                    </para> </listitem>
-                <listitem><para>
                     admin1 resets all eLeague tables (using the LeagueTestUtilEJB)
                     </para> </listitem>
                 <listitem><para>
