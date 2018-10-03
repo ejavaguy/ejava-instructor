@@ -37,7 +37,7 @@
                                 <listitem><para>Value, ResultClass, and Entity Queries</para></listitem>
                                 <listitem><para>Typed Queries</para></listitem>
                                 <listitem><para>Dynamic and Named Queries</para></listitem>
-                                <listitem><para>Single and Multiple Results</para></listitem>
+                                <listitem><para>Single, Multiple, and Stream Results</para></listitem>
                                 <listitem><para>Parameters</para></listitem>
                                 <listitem><para>Paging</para></listitem>
                                 <listitem><para>Locking</para></listitem>

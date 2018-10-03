@@ -14,7 +14,7 @@
     
     <properties>
        <doc.base>jpa-query-book</doc.base>
-       <content.version>v2018-09-18</content.version>
+       <content.version>v2018-10-02</content.version>
     </properties>
 
     <build>

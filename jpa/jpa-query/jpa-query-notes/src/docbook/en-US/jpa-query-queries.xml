@@ -90,7 +90,7 @@ catch (NonUniqueResultException ex) { ... }
 List<Clerk> clerks = query.getResultList();
 assertTrue("unexpected number of clerks:" + clerks.size(), clerks.size() > 1);
 for(Clerk c : clerks) {
-    log.info("found clerk:" + c);
+    logger.info("found clerk: {}", c);
 }]]></programlisting>
 
 <programlisting language=""><![CDATA[select
@@ -122,11 +122,15 @@ where clerk0_.LAST_NAME='Pep'
 <programlisting language="java"><![CDATA[TypedQuery<Customer> query = em.createQuery(
         "select c from Customer as c", 
         Customer.class);
-List<Customer> results = query.getResultList();
-for (Customer result : results) {
-    log.info("found=" + result);
+
+Stream<Customer> s = query.getResultStream();
+Map<String, Customer> resultMap = s.collect(
+        Collectors.toMap(c->c.getFirstName()+c.getLastName(), c->c ));
+
+for (Entry<String, Customer> result : resultMap.entrySet()) {
+    logger.info("found={}", result);
 }
-int rows = results.size();
+int rows = resultMap.size();
 assertTrue("unexpected number of customers", rows > 0);
 ]]></programlisting>
 
@@ -166,7 +170,7 @@ query.setParameter("lastName", "inhat");
 
 Customer customer = query.getSingleResult();
 assertNotNull(customer);
-log.info("found customer for param names:" + customer);
+logger.info("found customer for param names: {}", customer);
 ]]></programlisting>
 
 <programlisting language=""><![CDATA[select
@@ -196,7 +200,7 @@ List<Customer> customers = query.getResultList();
 assertTrue("unexpected number of customers:" + customers.size(),
         customers.size() == 2);
 for(Customer c : customers) {
-    log.info("found customer for param position:" + c);
+    logger.info("found customer for param position: {}", c);
 }
 ]]></programlisting>                        
 
@@ -225,7 +229,7 @@ TypedQuery<Clerk> query = em.createQuery(
 query.setParameter("date", hireDate.getTime(), TemporalType.DATE);
 
 Clerk clerk = query.getSingleResult();
-log.info("found clerk by date(" + hireDate.getTime() + "):" + clerk);
+logger.info("found clerk by date({}): {}", hireDate.getTime(), clerk);
 ]]></programlisting>
 
 <programlisting language=""><![CDATA[    select
@@ -257,7 +261,7 @@ for(int i=0; i<2; i++) {
                             .setFirstResult(i)
                             .getResultList();
     for(Sale s: sales) {
-        log.info("found sale in page(" + i + "):" + s);
+        logger.info("found sale in page({}): {}", i, s);
         em.detach(s); //we are done with this
     }
 }]]></programlisting>
@@ -483,7 +487,7 @@ List<Object[]> rows = em.createNamedQuery("Customer.getCustomerRows")
         .setParameter(1, "cat")
         .getResultList();
 assertEquals("unexpected customers found", 1, rows.size());
-log.info("found customer:" + Arrays.toString(rows.get(0)));]]></programlisting>
+logger.info("found customer: {}", Arrays.toString(rows.get(0)));]]></programlisting>
 
 <programlisting language=""><![CDATA[    select * from JPAQL_CUSTOMER c 
     where c.FIRST_NAME = ?
