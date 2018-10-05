@@ -29,12 +29,31 @@ CREATE INDEX EM_AUTO_MAKEMODEL ON EM_AUTO(MAKE, MODEL);]]></programlisting>
         
         <listitem><para>
             Wire this new file into your SQL plugin definition for creating schema. Have it run
-            after your table creates.
+            after your table creates.  Add an 
+            <ulink url="https://www.mojohaus.org/sql-maven-plugin/execute-mojo.html">"orderFile"</ulink>
+            element to the configuration to specify to the plugin that you wish the files be executed 
+            in a specific order.  Otherwise the order will be non-deterministic and the tuning may 
+            get executed before the schema is created.
             </para>
-<programlisting language="xml"><![CDATA[    <includes>
-        <include>main/resources/ddl/**/*create*.ddl</include>
-        <include>main/resources/ddl/**/*tuningadd*.ddl</include>
-    </includes>]]></programlisting>
+<programlisting language="xml"><![CDATA[ <execution>
+    <id>create-db-before-test</id>
+    <phase>process-test-classes</phase>
+    <goals>
+        <goal>execute</goal>
+    </goals>
+    <configuration>
+        <autocommit>true</autocommit>
+        <orderFile>ascending</orderFile>
+        <fileset>
+            <basedir>${basedir}/src</basedir>
+            <includes>
+                <include>main/resources/ddl/**/*create*.ddl</include>
+                <include>main/resources/ddl/**/*tuningadd*.ddl</include>
+            </includes>
+        </fileset>
+        <print>true</print>
+    </configuration>
+</execution>]]></programlisting>
         </listitem>
         
         <listitem><para>
@@ -47,12 +66,23 @@ DROP INDEX EM_AUTO_MAKEMODEL if exists;]]></programlisting>
         
         <listitem><para>
             Wire this new file into your SQL plugin definition for dropping schema. Have it run
-            before your table drops.
+            before your table drops.  Add an 
+            <ulink url="https://www.mojohaus.org/sql-maven-plugin/execute-mojo.html">"orderFile"</ulink>
+            element to the configuration to specify to the plugin that you wish the files be executed 
+            in a specific order. 
             </para>
-<programlisting language="xml"><![CDATA[    <includes>
-        <include>main/resources/ddl/**/*tuningremove*.ddl</include>
-        <include>main/resources/ddl/**/*drop*.ddl</include>
-    </includes>]]></programlisting>
+<programlisting language="xml"><![CDATA[<configuration>
+    <autocommit>true</autocommit>
+    <orderFile>decending</orderFile>
+    <fileset>
+        <basedir>${basedir}/src</basedir>
+        <includes>
+            <include>main/resources/ddl/**/*tuningremove*.ddl</include>
+            <include>main/resources/ddl/**/*drop*.ddl</include>
+        </includes>
+    </fileset>
+    <onError>continue</onError>
+</configuration>]]></programlisting>
         </listitem>
         
         <listitem><para>
