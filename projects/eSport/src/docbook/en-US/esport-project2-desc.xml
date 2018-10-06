@@ -10,7 +10,6 @@
 
         <section id="esport-project2-goals">
             <title>Goals</title>
-            <para></para>
       
             <itemizedlist spacing="compact">
                 <listitem><para>
@@ -21,16 +20,18 @@
                     Deploy data access tier and business logic as an EJB component to server
                     </para> </listitem>
                 <listitem><para>
+                    Configure server-based components (EJB and CDI)
+                    </para> </listitem>
+                <listitem><para>
                     Deploy EJBs using different deployment approaches (EAR and WAR)
                     </para> </listitem>
                 <listitem><para>
-                    Provide a remote interface to business logic
+                    Provide a remote interfaces to business logic using RMI and JAX-RS
                     </para> </listitem>
                 <listitem><para>
-                    Provide integration prototype for Web Tier
+                    Provide integration prototype for Web UI
                     </para> </listitem>
             </itemizedlist>
-            <para></para>
         </section>
         <section id="esport-project2-objectives">
             <title>Objectives</title>
@@ -38,38 +39,46 @@
             <itemizedlist spacing="compact">
                 <listitem><para>
                     Expand the current project development architecture to include EJB,
-                    WAR, EAR, and remote Test sub-projects for eLeague. For eLeague you will have 
-                    separate EJB, WAR, EAR, and remote Test modules. This is being done to 
-                    simulate a complex project option.
+                    WAR, and EAR components and remote Tests for eLeague. For eLeague you 
+                    will have separate EJB, WAR, EAR, and remote Test modules to host 
+                    the new components and test. This is being done to simulate a complex 
+                    project option.
                     </para></listitem>
                 <listitem><para>
-                    Expand the current project development architecture to include EJB,
-                    WAR, and remote Tests for eClub. For eClub you will have a
-                    single WAR for deployment.  You will merge all 
-                    architectural levels into a single WAR module (or a few other options). 
+                    Expand the current project development architecture to include EJB
+                    and WAR components and remote Tests for eClub. There will be a few 
+                    Maven module options for you to take, but in the end all server-side
+                    logic for eClub must be deployed to the server in a single WAR artifact.
                     This is being done to simulate a simple project option.
                     </para></listitem>
                 <listitem><para>
-                    Re-host the data access tiers and initial business logic from 
-                    Project 1 within the new EJB and WEB tiers at component/runtime.
+                    Create and configure the EJB and WEB components with necessary
+                    persistence context (EntityManager), component, and EJB injections.
                     </para></listitem>
                 <listitem><para>
-                    Design the data transfer objects (DTOs) to be used to communicate
-                    with clients using the remote interface. For eLeague you will design 
+                    Deploy the server-side components as part of testing.
+                    </para></listitem>
+                <listitem><para>
+                    Re-host the data access tiers and initial business logic from 
+                    Project 1 within the new EJB and WEB components deployed to the server-side.
+                    </para></listitem>
+                <listitem><para>
+                    Design and implement remote application interfaces (APIs) to server-side 
+                    components using RMI (some) and JAX-RS (mostly).
+                    </para></listitem>
+                <listitem><para>
+                    Design and implement data transfer objects (DTOs) to be used to communicate
+                    with clients using the remote interfaces. For eLeague you will design 
                     a set of DTO classes separate from your BO classes. For eClub
                     you will reuse your BO classes as DTOs.
                     </para></listitem>
                 <listitem><para>
-                    Create the EAR and WAR sub-projects to host/deploy the Java EE components.
+                    Create remote tests that verify functionality and compliance with
+                    requirements using remote EJB interfaces.
                     </para></listitem>
                 <listitem><para>
-                    Create the remote Test sub-project(s) to deploy and run tests using a
-                    remote EJB interface.
-                    </para></listitem>
-                <listitem><para>
-                    Create and test the WAR sub-project to host the user interface.
-                    This component will ultimately be deployed the application server 
-                    and may use local interfaces of the EJB to access business logic. 
+                    Create a browser-based web user interface (UI) that will be deployed 
+                    to the server-side as an basic proof of integration concept.
                     </para></listitem>
             </itemizedlist>
             <para></para>
@@ -82,7 +91,8 @@
             <para>
                 This project and the final project rely heavily on the
                 components from Project 1. You are encouraged to make sure your
-                implementation of Project 1 is sound and well tested prior to doing too
+                implementation of Project 1 is sound and resonably tested (within the 
+                bounds of the end-to-end scenario) prior to doing too
                 much work on Project 2. You should continue to maintain your JUnit
                 tests for the earlier components while working on these higher level
                 tiers.
@@ -92,7 +102,7 @@
             <para>
                 We are continuing a theme that eLeague is complex and requires all 
                 levels of architecture and that eClub is simple and can leverage
-                various shortcuts. The intent it to show how JavaEE can be used 
+                any and all shortcuts. The intent is to show how JavaEE can be used 
                 for projects of different sizes and demands. To inially meet satisfy
                 this requirement, you must ... 
             </para>
@@ -105,54 +115,67 @@
                     </para></listitem>
                 <listitem><para>
                     Implement separate Impl and EJB modules for eLeague and combine
-                    Impl and EJB into a single module for eClub. The combined 
-                    module may be also combined with the eClub WAR.
+                    Impl and EJB into a single module for eClub. The combined Impl
+                    and EJB module may also be combined with the WEB module for eClub WAR.
+                    It is easily possible for you to implement eClub with only a single
+                    WAR module at this time.
                     </para></listitem>
             </orderedlist>
         </note>
 
         <para>
             The project will continue along two parallel paths; eLeague and eClub.
-            However, this time we will add several new project types; EJB, EAR,
-            WAR, and Test. We will add all new project types to eLeague. We will add
-            (or migrate to) the WAR type to eClub. 
-            These new sub-projects will become siblings to your
-            existing eLeague Impl -or- BO, DAO, and BLImpl sub-modules. 
-            For eClub, you have the option of making the WAR a sibling module,
-            the only module, or migrating the existing Impl project to be a WAR project (
-            and remain with a single module for eClub).    
-            The new projects will depend on your legacy work. The remote interface of the EJB
+            However, this time we will add several new Maven project types; EJB, EAR,
+            WAR, and (remote) Test. We will add all new project types to eLeague. We will add
+            (or migrate to) the WAR type to eClub.  These new modules will become siblings 
+            to your existing eLeague Impl -or- BO, DAO, and BLImpl leaf modules. 
+            For eClub, you have the option of:
+        </para>
+            <itemizedlist spacing="compact">
+                <listitem><para>making the WAR a sibling of the existing leaf Impl module
+                    </para> </listitem>
+                <listitem><para>migrating the existing Impl project to be a WAR project (and remain with a single module for eClub)
+                    </para> </listitem>
+                <listitem><para>making the WAR be the only module (i.e., no mid-level parent)
+                    </para> </listitem>
+            </itemizedlist>
+        <para>
+            The new projects will depend on your legacy work. The remote interface of the EJBs
             will also require specific design of what gets externalized to the
             client. The remote clients do not share the same address space we had
-            in Project 1 and we cannot afford to serialize the entire contents
-            of a database full of related information. Data Transfer Objects
-            (DTOs) will be part of the EJB remote interface design.
+            in Project 1 and cannot lazily access relationships. We also cannot afford 
+            to serialize the entire contents of a database full of related information. 
+            Data Transfer Objects (DTOs) will be part of the EJB remote interface design.
         </para>
 
         <para>
             You have finished a significant amount of eLeague during Project 1; the
             O/R mapping and core business logic of a non-trivial business model.
-            You will now host the data access tier and business logic within an
-            EJB component.  This EJB component will supply the EntityManager,
-            control transaction boundaries, provide local interaction for the
-            Web Tier, and a RMI interface for remote clients. Security will be
-            addressed in the next project. To limit the scope of the project, the
-            Web UI requirements will be constrained to a limited number of
-            use cases. You are to deploy eLeague using an EAR and eClub using
-            only a WAR. 
+            You will now host the data access tier and business logic within
+            EJB component(s).  These EJB component(s) will directly supply the 
+            EntityManager, control transaction boundaries, supply a local interface,
+            and other features (like security access control) used in the follow-on 
+            project. These EJB component(s) may directly implement an RMI remote
+            and JAX-RS web interfaces. However, we will focus the bulk of our
+            remote interfaces on modern WEB-based, REST-like, JAX-RS remote 
+            interfaces. So most of the remote access will be provided from the 
+            WEB tier using JAX-RS and a browser-based Web UI.
+            You are to deploy eLeague using an EAR and eClub using a WAR. 
         </para>
 
         <para>
-            eClub will require additional work as well. With a remote interface
-            for eLeague in hand and the ability to either simulate or operate with a
-            live instance, we can now complete the rest of the the business logic
-            that will also be hosted within an EJB tier. We'll try to keep the Web-UI
-            minimal. 
+            The business logic for eClub will require additional work as well. 
+            With a remote interface for eLeague in hand and the ability to either 
+            simulate or operate with a live instance, we can now complete the rest 
+            of the the business logic that will also be hosted within an EJB tier
+            to keep from significantly impacting any tests from project 1. 
+            The testing of eClub can always assume that a local instance of
+            eLeague can be deployed locally at any time.
         </para>
 
         <para>
-            You may develop your Web tier in an alternate environment, such as
-            Jetty. However, it must be submitted as part of the application that
+            You may develop your Web UI in an alternate environment.
+            However, it must be deployed as part of the application that
             runs within JBoss/Wildfly.
         </para>
             
