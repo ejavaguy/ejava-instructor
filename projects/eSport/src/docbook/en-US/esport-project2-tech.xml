@@ -135,313 +135,490 @@
         </section>
     </section>
 
-    <section id="esport-project2-tech-ejbbase">
-        <title>EJB Base Tier</title>
-        <para>
-            Create an EJB tier to host your eLeague persistence unit and 
-            supply a set of EJB components that will provide access to your
-            server-side logic.
-            Each of the EJBs provided will define the necessary @Remote and/or
-            @Local interfaces to expose their associated server-side logic 
-            and integrate them with other EJBs they depend upon.
-            Transaction scope will be added as a part of a separate
-            requirement. Security will be added in the next project. The
-            construction, deployment, initialization, and and initial interfaces 
-            of the EJB will be the focus of this requirement.  
-        </para>
-
-        <section id="esport-project2-tech-ejbbase-league">
-            <title>eLeague Base EJB Tier</title>
-            <figure>
-                <title>eLeague Candidate Base EJB Tier</title>
-                <graphic scalefit="1" fileref="images/eleague-ejb-base.jpg"/>
-            </figure>
-
-        </section>
-
-        <section id="esport-project2-tech-ejbbase-club">
-            <title>EClub Base EJB Tier</title>
-            <figure>
-                <title>eClub Candidate Base EJB Tier</title>
-                <graphic scalefit="1" fileref="images/eclub-ejb-base.jpg"/>
-            </figure>
-        </section>
-    </section>
-
     <section id="esport-project2-tech-ejb">
         <title>EJB Tier</title>
         <para>
-            Create an EJB tier to host your business logic and
-            data access tiers. Each of the EJBs provided will supply the
-            necessary dependency injection and initialization for the business
-            objects. Transaction scope will be added as a part of a separate
-            requirement. Security will be added in the next project. The main
-            construction, deployment, and remote interfaces of the EJB will be
-            the focus of this requirement.  
-        </para>
-        <para>
-            The EJBs will be used to inject and initialize
-            implementation objects and provide a remote interface.
-            The candidate EJBs are shown with possible dependencies between them.
-            @Local interfaces are meant to identify interfaces that can easily support
-            pass by reference and lazily loaded entities. @Remote interfaces are 
-            meant to identify interfaces where calls are likely coming in from 
-            an external context (i.e., pass-by-id or pass-by-value serialization) 
-            and the responses must be complete.
+            Create an EJB tier for both applications to host your server-side, 
+            transactional, and persistence logic.
+            Security will be added in the next project. 
         </para>
 
-        <section id="esport-project2-tech-leagueejb">
-            <title>eLeague EJB Tier</title>
+        <section id="esport-project2-tech-ejbbase">
+            <title>EJB Base Tier</title>
+            <para>
+		The EJB tiers must host your persistence unit and supply
+		a set of EJB components that will provide access
+		to your server-side logic.
+            </para>
+
+            <section id="esport-project2-tech-ejbbase-league">
+                <title>eLeague Base EJB Tier</title>
+                <para>
+                  The eLeague EJB tier must be hosted in a separate EJB module and deployed to 
+                  the server in an EAR. A remote Test module must deploy the EAR as part of 
+                  its integration testing (IT).
+                </para>
+
+                <figure>
+                    <title>eLeague Candidate Base EJB Tier</title>
+                    <graphic scalefit="1" fileref="images/eleague-ejb-base.jpg"/>
+                </figure>
+
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>LeagueTestUtilEJB</filename></term>
+                        <listitem><para>
+                            This candidate support EJB will primarily host the LeagueTestUtilImpl 
+                            business logic to support remote testing requirements. 
+                            Its biggest role is to perform database initialization and
+                            ingest.
+                            It can be the target of early "hello world" test calls 
+                            without poluting your primary application classes.
+                            </para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>ClubMgmtEJB</filename></term>
+                        <listitem><para>
+                            This candidate EJB will primarily host the ClubMgmtImpl business logic
+                            where clubs can define their Teams and Venues.
+                            </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>LeagueMgmtEJB</filename></term>
+                        <listitem><para>
+                            This candidate EJB will primarily host the LeagueMgmtImpl business logic
+                            where the seasons and divisions are managed. 
+                            </para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>ContestMgmtEJB</filename></term>
+                        <listitem><para>
+                            This candidate EJB will primarily host the ContestMgmtImpl business logic
+                            where day-to-day contests are managed. 
+                            </para></listitem>
+                    </varlistentry>
+                </variablelist>
+
+            </section>
+
+            <section id="esport-project2-tech-ejbbase-club">
+                <title>EClub Base EJB Tier</title>
+                <para>
+                  The eClub EJB tier may be part of a separate module but must be deployed within a WAR. 
+                  The WAR module must deploy the WAR as part of its integration testing (IT).
+
+                  Note that the candidate EJBs in this case are shown to be the 
+                  Impls from project 1 turned into EJBs. This is to highlight that EJBs are just 
+                  annotated POJOs (plain old Java objects) and this approach is a simplification 
+                  of implementation over the eLeague approach.
+                </para>
+
+                <figure>
+                    <title>eClub Candidate Base EJB Tier</title>
+                    <graphic scalefit="1" fileref="images/eclub-ejb-base.jpg"/>
+                </figure>
+
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>ClubTestUtil</filename></term>
+                        <listitem><para>
+                            This candidate support EJB will primarily host the ClubTestUtilImpl 
+                            business logic to support remote testing requirements. 
+                            Its biggest role is to perform database initialization.
+                            It can be the target of early "hello world" test calls 
+                            without poluting your primary application classes.
+                            </para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>MemberMgmtEJB</filename></term>
+                        <listitem><para>
+                            This candidate EJB will primarily host the MemberMgmtImpl business logic
+                            where people assiciated with the Club can sign up and provide their 
+                            identity information.
+                            </para></listitem>
+                    </varlistentry>
+
+                    <varlistentry>
+                        <term><filename>OrgMgmtEJB</filename></term>
+                        <listitem><para>
+                            This candidate EJB will primarily host the LeagueMgmtImpl business logic
+                            where the seasons and divisions are managed. 
+                            </para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </section>
+        </section>
+
+        <section id="esport-project2-tech-ejbtier">
+            <title>EJB Business </title>
+            <para>
+                The EJB tier must host your business logic and data access tiers. 
+                The EJBs must define injections and initialize
+                implementation objects and provide a remote interface.
+                Transaction scope will be added as a part of a separate requirement. 
+            </para>
+            <para>
+                The candidate EJBs are shown with possible dependencies between them.
+                @Local interfaces are meant to identify interfaces that can easily support
+                pass by reference and lazily loaded entities. @Remote interfaces are 
+                meant to identify interfaces where calls are likely coming from 
+                an external context (i.e., pass-by-id or pass-by-value serialization) 
+                and the responses must be complete. Each @Local interface could be 
+                the interface defined by the Impls.
+            </para>
+
+            <section id="esport-project2-tech-ejbtier-league">
+                <title>eLeague EJB Tier</title>
+                <figure>
+                    <title>eLeague Candidate EJB Tier</title>
+                    <graphic scalefit="1" fileref="images/eleague-ejbtier.jpg"/>
+                </figure>
+
+                <itemizedlist spacing="compact">
+                    <listitem><para>
+                        Each of the EJB components will need to expose targeted
+                        behavior required to complete the end-to-end scenario.
+                        </para></listitem>
+                    <listitem><para>
+                        The candidate ClubMgmtEJB may need to support calls from LeagueMgmt to form
+                        seasons for its teams.
+                        </para></listitem>
+                    <listitem><para></para>
+                        The candidate LeagueMgmtEJB may need to support calls from ContestMgmt to manage 
+                        season contests.
+                        </listitem>
+                </itemizedlist>
+            </section>
+        </section>
+
+        <section id="esport-project2-tech-ejbtier-club">
+            <title>eClub EJB Tier</title>
             <figure>
-                <title>eLeague Candidate EJB Tier</title>
-                <graphic scalefit="1" fileref="images/eleague-ejbtier.jpg"/>
-            </figure>
-
-            <variablelist spacing="compact">
-                <varlistentry>
-                    <term><filename>LeagueTestUtilEJB</filename></term>
-                    <listitem><para>
-                        This candidate support EJB will primarily host the LeagueTestUtilImpl 
-                        business logic to support remote testing requirements. 
-                        Its biggest role is to perform database initialization and
-                        ingest.
-                        It can be the target of early "hello world" test calls 
-                        without poluting your primary application classes.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                    <term><filename>ClubMgmtEJB</filename></term>
-                    <listitem><para>
-                        This candidate EJB will primarily host the ClubMgmtImpl business logic.
-
-                        This EJB will need to support calls from LeagueMgmt to form
-                        seasons for its teams as well as support remote callers using
-                        its core functionality.
-                        </para></listitem>
-                </varlistentry>
-
-                <varlistentry>
-                    <term><filename>LeagueMgmtEJB</filename></term>
-                    <listitem><para>
-                        This candidate EJB will primarily host the LeagueMgmtImpl business logic. 
-
-                        This EJB will need to support calls from ContestMgmt to manage 
-                        season contests as well as support remote callers using its
-                        core functionality.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                    <term><filename>ContestMgmtEJB</filename></term>
-                    <listitem><para>
-                        This candidate EJB will primarily host the ContestMgmtImpl business logic. 
-                        
-                        This EJB will need to support remote callers accessing its core functionality.
-                        </para></listitem>
-                </varlistentry>
-            </variablelist>
-        </section>
-
-        <section id="esport-project2-tech-leaguedto">
-            <title>eLeague DTOs</title>
-            <para>
-                Create a set of Data Transfer Objects (DTOs) to serialize the state of the
-                business objects between the EJB and client when using the remote
-                interface. 
-            </para>
-            <figure>
-                <title>eLeague Candidate DTOs</title>
-                <graphic scalefit="1" fileref="images/eleague-dtos.jpg"/>
-            </figure>
-
-            <para>
-                Remember that there can be more than 1 DTO to represent
-                the same information related to a business object. For example,
-                collections might contain summary information only
-                and a single result might contain full details. The following is
-                only provided as a reasonable starting point.
-            </para>
-            <variablelist spacing="compact">
-                <varlistentry>
-                    <term><filename>ContactDTO</filename></term>
-                    <listitem><para>
-                        This class is meant to hold contact
-                        information. This is primarily made up of Contact and
-                        TeamContactRole business object information.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                    <term><filename>TeamDTO</filename></term>
-                    <listitem><para>
-                        This class is meant to hold team information
-                        relative to the current season. This is primarily made up
-                        of Team and TeamSeason business object information and the
-                        sum of wins/losses/ties.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                    <term><filename>ContestDTO</filename></term>
-                    <listitem><para>
-                        This class is meant to hold contest
-                        information relative to a specific team. This is primarily
-                        made up of Contest business object information.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                    <term><filename>DivisionStandingDTO</filename></term>
-                    <listitem><para>
-                        This class is meant to hold an 
-                        ordered list of TeamDTOs according to the team's rank within
-                        the division. This is primarily made up of Season and Division
-                        business object information and the result of comparing 
-                        team results within the division.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                    <term><filename>VenueDTO</filename></term>
-                    <listitem><para>
-                        This class is used to represent a summary
-                        of the Venue business object information. As an example of
-                        this, the address is expressed as a String rather than an
-                        embedded object.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                    <term><filename>AddressDTO</filename></term>
-                    <listitem><para>
-                        This class is meant to represent the 
-                        Addess of a Venue, but is only used when setting the address
-                        of a Venue. 
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                    <term><filename>ClubDTO</filename></term>
-                    <listitem><para>
-                        This class is meant to hold the Club
-                        information, which includes Venues and Teams. However, team
-                        schedules are not necessary when used within this context.
-                        </para></listitem>
-                </varlistentry>
-            </variablelist>
-        </section>
-
-        <section id="esport-project2-tech-leagueear">
-            <title>eLeague EAR Deployment</title>
-            <para>
-                Create an EAR to host the eLeague server-side
-                components; including the EJB component just developed.
-            </para>
-        </section>
-
-        <section id="esport-project2-tech-leaguermitest">
-            <title>eLeague Remote Test</title>
-            <para>
-                Create a Test project that will deploy the EAR to the
-                application server and run through a set of JUnit test using the
-                remote interface of the EJBs. 
-            </para>
-        </section>
-
-
-        <section id="esport-project2-tech-clubbl">
-            <title>eClub/eLeague Business Logic Integration</title>
-            <para>
-                Complete and test the eClub business logic using the remote
-                interface of eLeague. The diagram below shows the business logic within
-                the context of the EJB Tier implemented as a part of a separate
-                requirement.
-            </para>
-
-            <figure>
-                <title>eClub Candidate Business Logic and EJB Tiers</title>
+                <title>eClub Candidate EJB Tier</title>
                 <graphic scalefit="1" fileref="images/eclub-ejbtier.jpg"/>
             </figure>
 
-            <variablelist spacing="compact">
-                <varlistentry>
-                    <term><filename>OrgMgmt/OrgMgmtImpl</filename></term>
-                    <listitem><para>
-                        Update this 
-                        business logic interface and implementation to be able to obtain
-                        team schedule and divisional standings for a team from eLeague.
-                        This implementation may return the eLeague DTO classes if desired.
-                        </para></listitem>
-                </varlistentry>
-            </variablelist>
+            <itemizedlist spacing="compact">
+                <listitem><para>
+                    Each of the EJB components will need to expose targeted
+                    behavior required to complete the end-to-end scenario.
+                    </para></listitem>
+                <listitem><para>
+                    The candidate OrgMgmtEJB may need to make remote calls to eLeague and eLeague has 
+                    been depicted as providing a client module for such use.
+                    </para></listitem>
+            </itemizedlist>
         </section>
 
-        <section id="esport-project2-tech-clubwar">
-            <title>eClub WAR Deployment</title>
+        <section id="esport-project2-tech-remote">
+            <title>Remote Interfaces</title>
             <para>
-                Create a WAR module to host the eClub server-side
-                components and the remote tests for the WAR/EJB components.
+              Remote interface to the two applications will be demonstrated using two 
+              technologies: Java Remote Method Invocation (RMI) and HTTP/REST-like
+              (using JAX-RS). Any data transferred using either will be part of the 
+              Data Transfer Objects (DTOs). DTOs used with RMI will need to be Serializable.
+              DTOs used with JAX-RS will need to be marshaled as XML or JSON.
             </para>
+            <para>
+              DTOs and and any classes written to support the remote interface will
+              be placed in a JAR module that can be easily used by clients. Since
+              eClub does not have any clients and we want to limit its complexity --
+              only eLeague will require a separate client module to host these classes.
+            </para>
+
+            <section id="esport-project2-tech-remote-rmi">
+                <title>RMI Remote Interface</title>
+                <para>
+                  We will limit our required use of RMI to eLeague and only to the eLeagueTestUtilEJB.
+                  This interface will be made accessible to remote clients of the application
+                  server using JNDI.
+                </para>
+                <figure>
+                    <title>eLeague RMI Interface</title>
+                    <graphic scalefit="1" fileref="images/eleague-remote-rmi.jpg"/>
+                </figure>
+
+                <orderedlist spacing="compact">
+                    <listitem><para>
+                        The commands to reset and populate the database must be accessible
+                        to a remote client using RMI.
+                        </para></listitem>
+                </orderedlist>
+            </section>
+
+            <section id="esport-project2-tech-remote-rs">
+                <title>JAX-RS Interfaces</title>
+                <para>
+                  The primary focus for implementing remote interfaces will be HTTP/REST-like
+                  interfaces using JAX-RS (server and client APIs). The EJBs already provide 
+                  an injectable component to complete the desired functionality. It is intended that 
+                  you add a set of one or more classes that expose access to this functionality
+                  using JAX-RS.
+                </para>
+                <para>
+                  A candidate set of resource collection URIs is shown below. Add a {resourceId}
+                  to address a specific resource from the collection. Add an additional property 
+                  name or query parameter to address a specific property of the resource.
+                  Use the appropriate verb (GET, POST, PUT, DELETE), query parameters, and payloads 
+                  to make the intended requests. Make use of appropriate status codes 
+                  (e.g, 200, 201, 400, 404, and 500) to communicate the results.
+                </para>
+                <para>
+                  There is no requirement that you specifically make use of the specific 
+                  URIs listed or break root level resources into separate JAX-RS classes. 
+                  It is your choice.  It is suggested that all URIs be exposed under the "/api" 
+                  root URI for the targeted application context. The details here are provided
+                  as concrete suggestions. In the end, the primary requirement for remote
+                  interfaces is:
+                </para>
+
+                <orderedlist spacing="compact">
+                    <listitem><para>
+                        All server-side methods methods invoked remotely by the end-to-end
+                        scenario (excluding reset() and populate() for eLeague) must be accessed through
+                        HTTP/REST-like interfaces implemented with JAX-RS.
+                        </para></listitem>
+                </orderedlist>
+
+                <section id="esport-project2-tech-remote-rs-league">
+                    <title>eLeague JAX-RS Interfaces</title>
+                    <para>
+                      The diagram below shows an abstract JAX-RS layer that should be deployed
+                      as one or more classes in the WAR. Since eLeague is required to have separate 
+                      DTO classes from BO classes -- you will need to create a mapping capability
+                      from DTOs to BOs for request payloads and BOs to DTOs for response payloads.
+                    </para>
+
+                    <figure>
+                        <title>eLeague JAX-RS Resources</title>
+                        <graphic scalefit="1" fileref="images/eleague-remote-rs.jpg"/>
+                    </figure>
+
+                    <para>
+                      The following is a list of candidate URIs for eLeague that 
+                      could be exposed below "/api". 
+                    </para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>clubs - clubs in league</para></listitem>
+                        <listitem><para>clubs/{clubId}/venues -- venues for club</para></listitem>
+                        <listitem><para>clubs/{clubId}/teams -- teams for club</para></listitem>
+                        <listitem><para>contests - contests in league</para></listitem>
+                        <listitem><para>divisions - divisions in league uniquely identifiable outside of season</para></listitem>
+                        <listitem><para>divisions/{divisionId}/teams - team seasons within division</para></listitem>
+                        <listitem><para>seasons - seasons in league</para></listitem>
+                        <listitem><para>teams - teams within league uniquely identifiable outside of club</para></listitem>
+                        <listitem><para>tests - open-ended base resource to support testing</para></listitem>
+                    </itemizedlist>
+
+                </section>
+
+                <section id="esport-project2-tech-remote-rs-club">
+                    <title>eClub JAX-RS Interfaces</title>
+                    <para>
+                      The diagram below shows an abstract JAX-RS layer that should be deployed
+                      as one or more classes in the WAR. Since eClub is required to reuse BOs as
+                      DTOs, you will not need to perform different class mapping. However, to 
+                      cleans the BO of persistence parasites and to reduce information expressed,
+                      you may need to create POJO copies of the BOs when going between the DTO 
+                      and BO roles.
+                    </para>
+
+                    <figure>
+                        <title>eLeague JAX-RS Resources</title>
+                        <graphic scalefit="1" fileref="images/eclub-remote-rs.jpg"/>
+                    </figure>
+
+                    <para>
+                      The following is a list of candidate URIs for eClub that 
+                      could be exposed below "/api". 
+                    </para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>members/parents - parents in org</para></listitem>
+                        <listitem><para>members/players -- players in org</para></listitem>
+                        <listitem><para>members/coaches -- coaches in org</para></listitem>
+                        <listitem><para>teams -- teams in org</para></listitem>
+                        <listitem><para>teams/{teamId}/players -- players on team</para></listitem>
+                        <listitem><para>teams/{teamId}/coaches -- coaches for team</para></listitem>
+                        <listitem><para>teams/{teamId}/managers - managers for team</para></listitem>
+                        <listitem><para>tests - open-ended base resource to support testing</para></listitem>
+                    </itemizedlist>
+                </section>
+            </section>
+
+            <section id="esport-project2-tech-remote-dto">
+                <title>Data Transfer Objects (DTOs)</title>
+                <para>
+                  Create or identify classes that will express information passed between
+                  client and server within the remote interfaces. 
+                </para>
+
+                <orderedlist spacing="compact">
+                    <listitem><para>
+                        DTO classes passed between client and server using RMI interfaces
+                        must be Java Serializable.
+                        </para></listitem>
+                    <listitem><para>
+                        DTO class state passed between client and server using the JAX-RS
+                        interfaces must be either marshaled using XML or JSON.
+                        </para></listitem>
+                </orderedlist>
+
+                <para>
+                  XML marshaling should be implemented with JAXB. JSON marshalling can be 
+                  implemented with JSONB, but it is recommended to use jackson since JSONB
+                  is not supported in Wildfly until we reach JavaEE 8 compliance. Client-side
+                  JSONB and server-side jackson will work 95% of the time -- but there are 
+                  some differences.
+                </para>
+
+                <section id="esport-project2-tech-remote-dto-league">
+                    <title>eLeague DTOs</title>
+                    <para>
+                      eLeague will be implemented using separate DTO and BO classes to 
+                      maintain separation between client interface and implementation.
+                    </para>
+
+                    <orderedlist spacing="compact">
+                        <listitem><para>
+                            eLeague DTO classes must be a distinct set of classes specifically
+                            designed to pass data between client and server.
+                            </para></listitem>
+                        <listitem><para>
+                            eLeague BO/entity classes may not be used as DTOs.
+                            </para></listitem>
+                    </orderedlist>
+
+                    <para>
+                      The following is a list of candidate DTOs including an ErrorDTO that can 
+                      be used to express server-side error responses. Requests likely have most
+                      of the same BO data filled in. Responses likely are redacted down to only 
+                      what is necessary to express an ID and possibly its name. e.g., when 
+                      listing the location for a Contest the ID and name of the related Venue should
+                      be sufficient. If they want more information about the Venue -- that can 
+                      be a request of the venues resource and not the related contest.
+                    </para>
+
+                    <itemizedlist spacing="compact">
+                        <listitem><para>
+                            AddressDTO
+                            </para></listitem>
+                        <listitem><para>
+                            ClubDTO
+                            </para></listitem>
+                        <listitem><para>
+                            ContactDTO
+                            </para></listitem>
+                        <listitem><para>
+                            ContestDTO
+                            </para></listitem>
+                        <listitem><para>
+                            DivisionDTO
+                            </para></listitem>
+                        <listitem><para>
+                            DivisionsDTO
+                            </para></listitem>
+                        <listitem><para>
+                            ErrorDTO
+                            </para></listitem>
+                        <listitem><para>
+                            TeamContactDTO
+                            </para></listitem>
+                        <listitem><para>
+                            TeamDTO
+                            </para></listitem>
+                        <listitem><para>
+                            TeamSeasonDTO
+                            </para></listitem>
+                        <listitem><para>
+                            VenueDTO
+                            </para></listitem>
+                    </itemizedlist>
+
+                </section>
+                <section id="esport-project2-tech-remote-dto-club">
+                    <title>eClub DTOs</title>
+                    <para>
+                      eClub will be implemented with dual use of BO classes as DTO and 
+                      entity purposes to demonstrate a more simplistic approach.
+                    </para>
+
+                    <orderedlist spacing="compact">
+                        <listitem><para>
+                            eClub BO/entity classes must be re-used as DTOs.
+                            </para></listitem>
+                    </orderedlist>
+                </section>
+            </section>
+
+            <section id="esport-project2-tech-remote-client">
+                <title>Remote Client</title>
+                <para>
+                  For ease of client access (including IT tests), you will write a 
+                  JAX-RS Client helper class that encapsulates the URI paths, methods,
+                  query parameters and payloads of all HTTP/REST-like requests and
+                  also encapsulates determining the status and extracting any result
+                  payload.
+                </para>
+
+                <section id="esport-project2-tech-remote-client-league">
+                    <title>eLeague Remote Client</title>
+                    <para>
+                      Most of our external client calls to eLeague will be accomplished
+                      through JAX-RS and will use DTO classes. For that reason, we will
+                      need to package the client classes in a separate module for use in
+                      eClub and in any IT tests within eLeague.
+                    </para>
+
+                    <figure>
+                        <title>eLeague Client</title>
+                        <graphic scalefit="1" fileref="images/eleague-remote-client.jpg"/>
+                    </figure>
+
+                    <orderedlist spacing="compact">
+                        <listitem><para>
+                            eLeague shall provide a class that uses the JAX-RS Client 
+                            API to make HTTP/REST-like calls to eLeague.
+                            </para></listitem>
+                        <listitem><para>
+                            eLeague shall provide a separate client module that contains
+                            the JAX-RS Client class and interface DTOs.
+                            </para></listitem>
+                    </orderedlist>
+                </section>
+
+                <section id="esport-project2-tech-remote-client-club">
+                    <title>eClub Remote Client</title>
+                    <para>
+                      There is no explicit requirement for an eClub Remote client since this
+                      application has no external application clients within the scope of the 
+                      project. However, you may find it helpful to still write a JAX-RS client
+                      class for use with IT tests like the end-to-end scenario.
+                    </para>
+                </section>
+
+            </section>
         </section>
 
-        <section id="esport-project2-tech-clubejb">
-            <title>eClub EJB Tier</title>
+        <section id="esport-project2-tech-integration">
+            <title>eClub/eLeague Integration</title>
             <para>
-                Create an EJB tier to host your eClub business logic and
-                data access tiers. To provide practice in alternative deployments,
-                it is a requirement that this EJB component either be implemented as part 
-                of the implementation module, as part of the WAR module, or 
-                part of a combined implementation EJB+WAR module. Either way, the
-                eClub EJBs must ultimately be deployed using a WAR.
-                The EJB(s) provided will have the
-                necessary dependency injection and initialization for the business
-                objects. Transaction scope will be added as a part of a separate
-                requirement. Security will be added in the next project. The main
-                construction, deployment, and remote interfaces of the EJB will be
-                the focus of this requirement. 
+                A placeholder step was included in project 1 that we could not yet complete
+                because eLeague did not have a remote interface at that time. Now that 
+                eLeague has a remote interface to use (for eClub development and testing
+                as well), we can implement getting the team season for a member of eClub.
+            </para>
+            <para>
+                eClub and eLeague manage independent concepts of a team and their IDs are
+                different. eClub must maintain not only its internal ID but also the ID
+                used by eLeague so that users of eClub can easily locate information for 
+                their team.
             </para>
 
-            <variablelist spacing="compact">
-                <varlistentry>
-                    <term><filename>OrgMgmtEJB</filename></term>
-                    <listitem><para>
-                        This EJB will primarily host the 
-                        OrganizationMgmtImpl business logic. A remote interface 
-                        and bean implementation will need to be designed for this EJB.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                    <term><filename>MemberMgmtEJB</filename></term>
-                    <listitem><para>
-                        This EJB will primarily host the 
-                        MemberMgmtImpl business logic. A remote interface and bean
-                        implementation will need to be designed for this EJB.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                    <term><filename>ClubTestUtilEJB</filename></term>
-                    <listitem><para>
-                        This support EJB will primarily
-                        host the ClubTestUtilImpl business logic to support
-                        remote testing requirements. A remote interface and bean
-                        implementation will need to be designed for this EJB.
-                        </para></listitem>
-                </varlistentry>
-            </variablelist>
-        </section>
-
-        <section id="esport-project2-tech-clubdto">
-            <title>eClub DTOs</title>
-            <para>
-                The DTOs are be used to serialize the state of the
-                business objects between the EJB and client when using the remote
-                interface. However, with care, business objects can be directly
-                used as DTOs. You are required to re-use the entity classes 
-                as DTOs in this application. That means you must account for 
-                serialization of the entity class and Lazy-Load issues that 
-                can occur during post-transaction marshalling of the entity class.
-            </para>
-            <tip>
-              <title>No need for remote client library for eClub</title>
-              <para>The only remote client of eClub is the eClub remote test 
-              and this can be implemented within the WAR module to keep things
-              simple. That should mean there is no need to create a remote client 
-              archive to complete this assignment. That was not the case for 
-              eLeague.</para>
-            </tip>
+            <figure>
+                <title>eClub/eLeague Integration </title>
+                <graphic scalefit="1" fileref="images/eclub-integration.jpg"/>
+            </figure>
         </section>
     </section>
 
@@ -450,35 +627,21 @@
     <section id="esport-project2-tech-webui">
         <title>Web UI</title>
         <para>
-            Add separate Web UIs (WARs) to both applications to demonstrate
-            integration between the Web UI and EJB Tiers.
+            Add separate server-side Web UI(s) to demonstrate integration between the Web UI and EJB Tiers.
+            To meet this requirement -- you only have to implement *ONE* of the following in 
+            either eLeague or eClub.
         </para>
-
         <tip>
-           <para> 
-                In order to save development time and better leverage the 
-                work you have already performed in the remote interface testing,
-                you may use the remote interfaces between your WAR and EJB 
-                components even though local interfaces would be more efficient
-                when deployed within the same EAR or WAR. This is being done 
-                to cut down on the amount of project work for class. You would
-                ideally use the local interfaces when possible. You should 
-                already be using the local interfaces between EJBs.
-           </para> 
+          <title>Web UI does not replace remote interface/IT test requirement</title>
+          <para>
+              The requirement for the Web UI is a single action (display a page, make a request, and 
+              display results).  You can implement more actions, but all the steps in the end-to-end 
+              must still be implemented using remote interfaces and automatically tested with JUnit.
+          </para>
         </tip>
-        
+
         <section id="esport-project2-tech-leagueweb">
             <title>eLeague Web UI</title>
-            <para>
-                Add a Web UI to the eLeague application. This may use EJB local
-                or remote interfaces. The WAR for the Web UI must be deployed
-                as part of the eLeague EAR. The Web UI must have the following
-                functionality. 
-                Note that the test data will already have a current season, divisions,
-                other clubs, teams, etc. We will just be adding eClub information 
-                to that information prior to the season being scheduled.
-            </para>
-
             <itemizedlist spacing="compact">
                 <listitem><para>Test Admin</para>
                     <orderedlist spacing="compact">
@@ -533,14 +696,6 @@
 
         <section id="esport-project2-tech-clubwebui">
             <title>eClub WEB UI Tier</title>
-            <para>
-                Add a Web UI to the eClub application (i.e., to the WAR you
-                have already created for the EJBs). This may use the EJB local or
-                remote interfaces. The WAR for the Web UI must be deployed solo --
-                containing the EJBs and Impls. The Web UI must have the following
-                functionality.
-            </para>
-
             <itemizedlist spacing="compact">
                 <listitem><para>Test Admin</para>
                     <orderedlist spacing="compact">

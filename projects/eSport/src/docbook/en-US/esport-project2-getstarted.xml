@@ -7,9 +7,9 @@
         The following sketch of directory structure can be used as a starting
         point for your overall application. It assumes you already have either
         a consolidated Impl -or- a BO, DAO, and BLImpl set of projects in
-        place from Project 1. You will not have the option of consolidating
-        the EJB, WAR, EAR, and remote Test into a single project for eLeague. They must be
-        implemented as separate projects with proper dependencies between
+        place from Project 1. You will *not* have the option of consolidating
+        the EJB, WAR, EAR, Client and remote Test into a single project for eLeague. 
+        They must be implemented as separate projects with proper dependencies between
         them declared. You *do* have the option of merging all modules
         into a single WAR module for eClub or many of the alternatives
         as long as eClub is deployed as a WAR.
@@ -26,7 +26,7 @@
     |   |   `-- src
     |   |       `-- main
     |   |           |-- java
-    |   |           |   `-- esales
+    |   |           |   `-- eleague
     |   |           |       `-- ejb
     |   |           `-- resources
     |   |               `-- META-INF
@@ -39,7 +39,8 @@
     |   |   `-- src
     |   |       `-- main
     |   |           |-- java
-    |   |           |   `-- esales
+    |   |           |   `-- eleague
+    |   |           |       |-- rs
     |   |           |       `-- web
     |   |           |-- resources
     |   |           `-- webapp
@@ -47,8 +48,20 @@
     |   |               |   |-- beans.xml
     |   |               |   |-- web.xml
     |   |               |   |-- (jboss-web.xml)
-    |   |               |   `-- content
+    |   |               |   `-- (content)
     |   |               `-- index.jsp
+    |   |-- eLeagueClient
+    |   |   |-- pom.xml
+    |   |   `-- src
+    |   |       |-- main
+    |   |       |   `-- java
+    |   |       |       `-- eleague
+    |   |       |           |-- dto
+    |   |       |           `-- client
+    |   |       `-- test
+    |   |           `-- java
+    |   |               `-- eleague
+    |   |                   `-- dto
     |   |-- eLeagueEAR
     |   |   `-- pom.xml
     |   |-- eLeagueTest
@@ -56,10 +69,12 @@
     |   |   `-- src
     |   |       `-- test
     |   |           |-- java
-    |   |           |   `-- esales
-    |   |           |       `-- ejbclient
+    |   |           |   `-- eleague
+    |   |           |       |-- rmi
+    |   |           |       `-- rs
     |   |           `-- resources
-    |   |               `-- jndi.properties
+    |   |               |-- jndi.properties
+    |   |               `-- log4j.xml
     |   `-- pom.xml
     |-- eClub (many options)
     |   |-- (eClubEJB -- could be merged with or separate from WAR)
@@ -68,9 +83,12 @@
     |   |   `-- src
     |   |       +-- main
     |   |       |   |-- java
-    |   |       |   |   `-- ebidbot
-    |   |       |   |       +-- ejb
-    |   |       |   |       `-- web
+    |   |       |   |   `-- eclub
+    |   |       |   |       +-- bo
+    |   |       |   |       +-- bl (or ejb)
+    |   |       |   |       +-- client
+    |   |       |   |       +-- rs
+    |   |       |   |       `-- ui
     |   |       |   |-- resources
     |   |       |   |   `-- META-INF
     |   |       |   |       |-- persistence.xml
@@ -85,8 +103,12 @@
     |   |       |       `-- index.jsp
     |   |       `-- test
     |   |           |-- java
-    |   |           |   `-- ebidbot
-    |   |           |       `-- ejbclient (*IT.java)
+    |   |           |   `-- eclub
+    |   |           |       |-- ...
+    |   |           |       |-- bl
+    |   |           |       |   `-- eClubEndToEndTest.java
+    |   |           |       `-- client (*IT.java)
+    |   |           |           `-- eSportEndToEndIT.java
     |   |           `-- resources
     |   |               `-- jndi.properties
     |   `-- pom.xml

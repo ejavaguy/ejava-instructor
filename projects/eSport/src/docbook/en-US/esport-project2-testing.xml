@@ -4,52 +4,76 @@
 <chapter id="esport-project2-testing">
     <title>Project 2 Testing</title>
 
-    <note>
+    <tip>
         <para>
             The end-to-end scenario will test your end-to-end application in a 
             "happy path" scenario. Any white-box or black-box testing of alternate
             and error paths would be appropriate to put in the separate unit and IT tests.
         </para>
-    </note>
+    </tip>
 
     <orderedlist spacing="compact">
         <listitem><para>
-            Provide JUnit tests that verify the EJB functionality of
-            eLeague accessed through its remote interface. This will also test the
-            DTOs. These tests should be packaged in the eLeague RMI Test project.
+            Provide a JUnit integration test that verifies the eLeagueEAR can be deployed
+            to the server, including successful deployment of the persistence unit
+            and contained EJBs.
             </para> </listitem>
         <listitem><para>
-            Provide JUnit tests that verify the extra business logic
-            functionality of eClub interfacing with eLeague. These tests may
-            be placed either with the business logic project or where you 
-            test the remote interfaces.
+            Provide a JUnit unit test that verifies successul marshaling and demarshaling 
+            of an eLeague DTO class using Java Serialization. You may create a DTO class
+            specifically for this test if none of your DTOs are used in your RMI interface.
             </para> </listitem>
         <listitem><para>
-            Provide JUnit tests that verify the EJB functionality of
-            eClub accessed through its remote interface. This will also test
-            its use of DTOs. Theses tests should be packaged in the eClub
-            WAR (or optional RMI Test) project.
+            Provide a JUnit integration test that verifies a successful JNDI lookup
+            and RMI communication with an eLeagueEJB.
             </para> </listitem>
         <listitem><para>
-            Perform an end-to-end use case to do the following. This must be 
-            demonstrated in an automated JUnit test and then be manually
-            implementable using the Web UI.
+            Provide a JUnit unit test that verifies successul marshaling and demarshaling 
+            of an eLeague DTO class to/from XML or JSON.
+            </para> </listitem>
+        <listitem><para>
+            Provide a JUnit integration test that verifies a successful HTTP communication 
+            with an eLeagueEJB.
+            </para> </listitem>
+        <listitem><para>
+            Create a single JUnit integration test case (e.g., eSportEndToEndIT) with a single 
+            @Test method that walks the two applications through the following end-to-end 
+            scenario. You may create a separate IT test in eLeague while developing the eLeague 
+            portions but the final end-to-end scenario should be placed in eClub since eClub 
+            depends on eLeague.
             </para>
             <orderedlist spacing="compact">
+                <listitem><para>
+                    Deploy the applications
+                    </para> </listitem>
+                    <!-- admin1 -->
                 <listitem><para>
                     Reset all eLeague tables (using the LeagueTestUtilEJB)
                     </para> </listitem>
                 <listitem><para>
-                    Populate the eLeague tables (using the LeagueIngestor)
+                    Populate the eLeague tables (using LeagueTestUtilEJB and the LeagueIngestor)
                     </para> </listitem>
                 <listitem><para>
-                    Create a Club in eLeague (using the LeagueMgmtEJB; rep=user2)
+                    Reset all eClub tables (using the ClubTestUtilEJB)
+                    </para> </listitem>
+                <listitem><para>
+                    Populate the eClub tables (using ClubTestUtilEJB) *if* anything necessary
+                    </para> </listitem>
+
+
+                    <!-- lmtucker -->
+                <listitem><para>
+                    Create a Club in eLeague (using the LeagueMgmtEJB). Assign the club representative
+                    to have the login of "user2"
                     </para> </listitem>
                 <listitem><para>
                     Add Venue for Club in eLeague (using ClubMgmtEJB)
                     </para> </listitem>
+
+
+                    <!-- user3 -->
                 <listitem><para>
-                    Create Parent in eClub (using MemberMgmtEJB; loginId=user3)
+                    Create Parent in eClub (using MemberMgmtEJB). Assign this user login of "user3".
                     </para> </listitem>
                 <listitem><para>
                     Create Player in eClub (using MemberMgmtEJB)
@@ -57,6 +81,8 @@
                 <listitem><para>
                     Add a Coach role in eClub (using MemberMgmtEJB)
                     </para> </listitem>
+
+                  <!-- user2 -->
                 <listitem><para>
                     Create a Team in eClub (using OrgMgmtEJB)
                     </para> </listitem>
@@ -69,9 +95,14 @@
                 <listitem><para>
                     Assign Manager to a Team in eClub (using OrgMgmtEJB)
                     </para> </listitem>
+
+                  <!-- user3 -->
                 <listitem><para>
                     Show team roster in eClub (using OrgMgmtEJB)
                     </para> </listitem>
+
+
+                  <!-- user2 -->
                 <listitem><para>
                     Add a Team for Club in eLeague (using ClubMgmtEJB)
                     </para> </listitem>
@@ -82,29 +113,50 @@
                     Assign a Team to an existing Division eLeague (using
                     ClubMgmtEJB; division=U13-A, refid="Division-845")
                     </para> </listitem>
+
+
+                  <!-- lmtucker -->
                 <listitem><para>
                     Schedule a Season eLeague (using ContestMgmtEJB)
                     </para> </listitem>
+
+                <listitem><para>
+                    Project 3 placeholder
+                    </para> </listitem>
+                <listitem><para>
+                    Project 3 placeholder
+                    </para> </listitem>
+
+                  <!-- anonymous -->
                 <listitem><para>
                     Show a Team Schedule in eClub (using OrgMgmtEJB)
                     </para> </listitem>
+
+
+                <listitem><para>
+                    Project 3 placeholder
+                    </para> </listitem>
+                <listitem><para>
+                    Project 3 placeholder
+                    </para> </listitem>
+
+                  <!-- jtflynn -->
                 <listitem><para>
                     Report a Score in eLeague (using ContestMgmtEJB)
                     </para> </listitem>
+
+                  <!-- anonymous -->
                 <listitem><para>
                     Show Division Standings in eLeague (using LeagueMgmtEJB)
                     </para> </listitem>
             </orderedlist>
 
             <note>
+              <title>Sport End to End Scenario is demonstrated using single IT @Test</title>
               <para>
                 To be clear. The above scenario should be both automated with a
-                single JUnit test and then repeated with interactive Web UI actions. 
-                It is suggested that you start by implementing the JUnit version
-                first and then begin the Web UI in backwards sequence order (i.e.,
-                implement the Web UI for "show Division Standings in eLeague" first),
-                using a copy of the full JUnit implementation that you remove one
-                step at a time.
+                single JUnit test. Any Web UI actions you implement can augment 
+                these actions but not replace them.
               </para>
             </note>
 
