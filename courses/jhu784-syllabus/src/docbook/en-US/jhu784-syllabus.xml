@@ -242,6 +242,14 @@
                 <entry namest="topic"><para><link linkend="javaee-interceptors">JavaEE Interceptors</link></para></entry>
                 -->
             </row>
+
+            <row rowsep="1">
+                <entry namest="session">***</entry>
+                <entry namest="date">Nov09</entry>
+                <entry namest="topic"><para>EP Drop/Audit Deadline</para></entry>
+                <entry namest="comment"><para><ulink url="https://ep.jhu.edu/student-services/academic-services/academic-calendar">
+                EP Acedemic Calendar</ulink></para></entry>
+            </row>
             
             <row rowsep="1">
                 <entry namest="session">12</entry>
