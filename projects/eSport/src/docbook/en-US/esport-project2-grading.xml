@@ -4,36 +4,154 @@
 <chapter id="esport-project2-grading">
     <title>Project 2 Grading</title>
     <para>
-        Your project will be graded on completeness and quality of product. In
-        order for you to receive full credit in each area, it must be a)
-        complete, b) done well, and c) tested.  The breakdown of grading 
-        will be as follows:
+        Your project will be graded primarily on the demonstration ability to implement
+        concepts covered in this portion of the course. A perfect score will need to 
+        implement the full end-to-end scenario. A passing score will need to make sure
+        to cover the grading criteria outlined below within the partial end-to-end 
+        implemented.
     </para>
     <itemizedlist spacing="compact">
         <listitem><para>
-            README provided that describes where each requirement satisfied: 10pts
+            README provided that describes where each requirement satisfied and describes the non-obvious: 10pts
             </para></listitem>
+
         <listitem><para>
-            Projects cleanly builds with Maven: 15pts
-            </para></listitem>
+            Projects cleanly builds with Maven and deploys required modules: 12pts
+            </para>
+            <itemizedlist spacing="compact">
+              <listitem><para>
+                  Project cleanly builds the required modules (JAR, EJB, WAR, and EAR) with Maven: 3pts
+                  </para></listitem>
+              <listitem><para>
+                  Build automatically deploys the applications to the server for IT tests: 3pts
+                  </para></listitem>
+              <listitem><para>
+                  Project successfully deploys a persistence unit within an EJB and WAR modules: 3pts
+                  </para></listitem>
+              <listitem><para>
+                  Project successfully deploys EJBs within an EAR and WAR modules: 3pts
+                  </para></listitem>
+            </itemizedlist>
+            </listitem>
+
         <listitem><para>
             Project 1 functionality: 10pts
-            </para></listitem>
+            </para>
+            <itemizedlist spacing="compact">
+              <listitem><para>
+                  JPA entity mappings correct: 8pts
+                  </para></listitem>
+              <listitem><para>
+                  Project 1 end-to-end unit tests still exist: 2pts
+                  </para></listitem>
+            </itemizedlist>
+            </listitem>
+
         <listitem><para>
-            EJB Tier, remote interface, and EAR deployment: 25pts
-            </para></listitem>
+            EJB Tier: 15pts
+            </para>
+            <itemizedlist spacing="compact">
+              <listitem><para>
+                  Demonstrated ability to configure EJB with necessary resources and/or dependencies: 5pts
+                  </para></listitem>
+              <listitem><para>
+                  Demonstrated ability to complete a call from the remote client to the database and back: 5pts
+                  </para></listitem>
+              <listitem><para>
+                  Correct use of stateless constructs: 5pts
+                  </para></listitem>
+            </itemizedlist>
+            </listitem>
+
         <listitem><para>
-            WAR/EJB deployment: 10pts
-            </para> </listitem>
+            RMI Interface: 9pts
+            </para>
+            <itemizedlist spacing="compact">
+              <listitem><para>
+                  Demonstrated ability to define a @Remote interface and expose using JNDI: 3pts
+                  </para></listitem>
+              <listitem><para>
+                  Demonstrated ability to lookup a @Remote interface using JNDI: 3pts
+                  </para></listitem>
+              <listitem><para>
+                  Demonstrated ability to invoke an EJB method using RMI: 3pts
+                  </para></listitem>
+            </itemizedlist>
+            </listitem>
+
+        <listitem><para>
+            JAX-RS Interface: 17pts
+            </para>
+            <itemizedlist spacing="compact">
+              <listitem><para>
+                  Demonstrated ability to marshal and demarshal payloads from/to XML or JSON into/from DTO classes: 5pts
+                  </para></listitem>
+              <listitem><para>
+                  Demonstrated ability to define an HTTP resource endpoint: 5pts
+                  </para>
+                  <itemizedlist spacing="compact">
+                    <listitem><para>
+                        Demonstrated ability to define a resource URI path.
+                        </para></listitem>
+                    <listitem><para>
+                        Demonstrated ability to use HTTP methods properly with respect to actions performed.
+                        </para></listitem>
+                    <listitem><para>
+                        Demonstrated ability to map an input method parameter from URI and query parameters.
+                        </para></listitem>
+                    <listitem><para>
+                        Demonstrated ability to use status codes properly with respect to result status.
+                        </para></listitem>
+                  </itemizedlist>
+                  </listitem>
+              <listitem><para>
+                  Demonstrated ability to implement a JAX-RS client interface and invoke an HTTP resource endpoint: 5pts
+                  </para></listitem>
+              <listitem><para>
+                  Demonstrated ability inject an EJB into a JAX-RS class and delegate implementation to the EJB: 2pts
+                  </para></listitem>
+            </itemizedlist>
+            </listitem>
+
         <listitem><para>
             Web UI integration: 10pts
-            </para></listitem>
+            </para>
+            <itemizedlist spacing="compact">
+              <listitem><para>
+                  Implementation of a browser-based, server-side Web UI: 3pts
+                  </para></listitem>
+              <listitem><para>
+                  Demonstrated ability to inject an EJB into the Servlet class to implement functionality behind the Web UI: 2pts
+                  </para></listitem>
+              <listitem><para>
+                  Implementation of at least one entire use case from prompt, request, action, and response: 5pts
+                  </para></listitem>
+            </itemizedlist>
+            </listitem>
+
         <listitem><para>
-            Transactions: 10pts
-            </para></listitem>
+            Transactions: 7pts
+            </para>
+            <itemizedlist spacing="compact">
+              <listitem><para>
+                  Explicit transaction attribute defined: 2pts
+                  </para></listitem>
+              <listitem><para>
+                  Proper demonstration of data flushed to DB being rolled back: 5pts
+                  </para></listitem>
+            </itemizedlist>
+            </listitem>
+
         <listitem><para>
             End-to-end Integration Test: 10pts
-            </para></listitem>
+            </para>
+            <itemizedlist spacing="compact">
+              <listitem><para>
+                  Clean, easy to follow, sequence of steps through the end-to-end flow demonstrated: 10pts
+                  </para></listitem>
+            </itemizedlist>
+            </listitem>
+
     </itemizedlist>
 
     <para>
