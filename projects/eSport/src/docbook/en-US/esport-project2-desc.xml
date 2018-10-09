@@ -20,13 +20,16 @@
                     Deploy data access tier and business logic as an EJB component to server
                     </para> </listitem>
                 <listitem><para>
-                    Configure server-based components (EJB and CDI)
+                    Configure server-based components
                     </para> </listitem>
                 <listitem><para>
                     Deploy EJBs using different deployment approaches (EAR and WAR)
                     </para> </listitem>
                 <listitem><para>
                     Provide a remote interfaces to business logic using RMI and JAX-RS
+                    </para> </listitem>
+                <listitem><para>
+                    Define transaction boundaries using the EJB container
                     </para> </listitem>
                 <listitem><para>
                     Provide integration prototype for Web UI
@@ -61,6 +64,10 @@
                 <listitem><para>
                     Re-host the data access tiers and initial business logic from 
                     Project 1 within the new EJB and WEB components deployed to the server-side.
+                    </para></listitem>
+                <listitem><para>
+                    Design and implement transactional behavior of business methods using
+                    explicit EJB annotations.
                     </para></listitem>
                 <listitem><para>
                     Design and implement remote application interfaces (APIs) to server-side 
@@ -126,7 +133,7 @@
         <para>
             The project will continue along two parallel paths; eLeague and eClub.
             However, this time we will add several new Maven project types; EJB, EAR,
-            WAR, and (remote) Test. We will add all new project types to eLeague. We will add
+            WAR, Client (library) and (remote) Test. We will add all new project types to eLeague. We will add
             (or migrate to) the WAR type to eClub.  These new modules will become siblings 
             to your existing eLeague Impl -or- BO, DAO, and BLImpl leaf modules. 
             For eClub, you have the option of:
@@ -158,7 +165,7 @@
             project. These EJB component(s) may directly implement an RMI remote
             and JAX-RS web interfaces. However, we will focus the bulk of our
             remote interfaces on modern WEB-based, REST-like, JAX-RS remote 
-            interfaces. So most of the remote access will be provided from the 
+            interfaces. Most of the remote access will be provided from the 
             WEB tier using JAX-RS and a browser-based Web UI.
             You are to deploy eLeague using an EAR and eClub using a WAR. 
         </para>
