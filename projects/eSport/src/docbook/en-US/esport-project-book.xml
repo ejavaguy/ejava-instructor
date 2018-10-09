@@ -43,6 +43,7 @@
         <xi:include href="esport-project2-testing.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
         <xi:include href="esport-project2-grading.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     </part>
+    <!--
     <part id="esport-project3-part">
         <title>Project 3</title>
         <xi:include href="esport-project3-desc.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
@@ -50,6 +51,5 @@
         <xi:include href="esport-project3-testing.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
         <xi:include href="esport-project3-grading.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     </part>
-    <!--
     -->
 </book>
