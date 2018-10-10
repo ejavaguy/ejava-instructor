@@ -12,11 +12,11 @@
     </para>
     <itemizedlist spacing="compact">
         <listitem><para>
-            README provided that describes where each requirement satisfied and describes the non-obvious: 10pts
+            README provided that describes where each requirement satisfied and describes the non-obvious: 10pts total
             </para></listitem>
 
         <listitem><para>
-            Projects cleanly builds with Maven and deploys required modules: 12pts
+            Projects cleanly builds with Maven and deploys required modules: 12pts total
             </para>
             <itemizedlist spacing="compact">
               <listitem><para>
@@ -35,7 +35,7 @@
             </listitem>
 
         <listitem><para>
-            Project 1 functionality: 10pts
+            Project 1 functionality: 10pts total
             </para>
             <itemizedlist spacing="compact">
               <listitem><para>
@@ -48,7 +48,7 @@
             </listitem>
 
         <listitem><para>
-            EJB Tier: 15pts
+            EJB Tier: 15pts total
             </para>
             <itemizedlist spacing="compact">
               <listitem><para>
@@ -64,7 +64,7 @@
             </listitem>
 
         <listitem><para>
-            RMI Interface: 9pts
+            RMI Interface: 9pts total
             </para>
             <itemizedlist spacing="compact">
               <listitem><para>
@@ -80,7 +80,7 @@
             </listitem>
 
         <listitem><para>
-            JAX-RS Interface: 17pts
+            JAX-RS Interface: 17pts total
             </para>
             <itemizedlist spacing="compact">
               <listitem><para>
@@ -114,7 +114,7 @@
             </listitem>
 
         <listitem><para>
-            Web UI integration: 10pts
+            Web UI integration: 10pts total
             </para>
             <itemizedlist spacing="compact">
               <listitem><para>
@@ -130,7 +130,7 @@
             </listitem>
 
         <listitem><para>
-            Transactions: 7pts
+            Transactions: 7pts total
             </para>
             <itemizedlist spacing="compact">
               <listitem><para>
@@ -143,7 +143,7 @@
             </listitem>
 
         <listitem><para>
-            End-to-end Integration Test: 10pts
+            End-to-end Integration Test: 10pts total
             </para>
             <itemizedlist spacing="compact">
               <listitem><para>
@@ -268,7 +268,7 @@
                 </row>                        
                 <row rowsep="1">
                   <entry namest="area">
-                    You have methods that will only work in a @Local interface a part of your @Remote interface
+                    You have methods that will only work in a @Local interface as part of your @Remote interface
                     </entry>
                   <entry namest="points">2</entry>
                 </row>                        

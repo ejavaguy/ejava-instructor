@@ -4,6 +4,22 @@
 <chapter id="esport-project2-tech">
     <title>Project 2 Technical Details</title>
 
+    <tip>
+      <para>
+        It may be helpful to browse the grading criteria at the end of this assignment
+        before reading through the specifications. This will give you a better idea of 
+        what has to be completed to achieve a passing grade.  A perfect score for the 
+        assignment will require that the entire specification be implemented. A passing 
+        score will require the demonstration of understanding of specific concepts covered.
+        You can conceivably do well in the grading if you tackle each of the technical 
+        areas at least once. Example: Don't focus so much on completing the steps of 
+        the end-to-end that you ignore the transaction and Web UI aspects of the assignment.
+        Of course, the opposite is true. Don't ignore the end-to-end scenario and demonstrate
+        functionality in a vacuum. The end-to-end scenario should provide plenty of chances
+        to demonstrate required technical parts of this assignment.
+      </para>
+    </tip>
+
     <section id="esport-project2-tech-impl">
         <title>Data Tier and Business Logic Support</title>
         <para>
@@ -180,7 +196,7 @@
                         <term><filename>ClubMgmtEJB</filename></term>
                         <listitem><para>
                             This candidate EJB will primarily host the ClubMgmtImpl business logic
-                            where clubs can define their Teams and Venues.
+                            where clubs can define their Teams and Venues in eLeague.
                             </para></listitem>
                     </varlistentry>
 
@@ -203,7 +219,7 @@
             </section>
 
             <section id="esport-project2-tech-ejbbase-club">
-                <title>EClub Base EJB Tier</title>
+                <title>eClub Base EJB Tier</title>
                 <para>
                   The eClub EJB tier may be part of a separate module but must be deployed within a WAR. 
                   The WAR module must deploy the WAR as part of its integration testing (IT).
@@ -242,12 +258,24 @@
                     <varlistentry>
                         <term><filename>OrgMgmtEJB</filename></term>
                         <listitem><para>
-                            This candidate EJB will primarily host the LeagueMgmtImpl business logic
+                            This candidate EJB will primarily host the OrgMgmtImpl business logic
                             where the seasons and divisions are managed. 
                             </para></listitem>
                     </varlistentry>
                 </variablelist>
             </section>
+
+            <note>
+              <para>
+                Note the difference in how the two approaches addressed
+                the EJB hosting the BLImpl business logic. In the first/more complex case -- the
+                EJB and BLImpl were separate classes with the EJB delegating to the BLImpl class.
+                This allowed us to highlight what the EJB is adding to the solution.
+                In the later/simpler case, the BLImpl became an EJB. This allows us to highlight
+                how the EJB can contain our business logic can be subject to normal POJO unit 
+                tests if desired.
+              </para>
+            </note>
         </section>
 
         <section id="esport-project2-tech-ejbtier">
@@ -256,6 +284,9 @@
                 The EJB tier must host your business logic and data access tiers. 
                 The EJBs must define injections and initialize
                 implementation objects and provide a remote interface.
+                Configuration and initialization can be via deployment descriptors,
+                brute force/manual code in @PostConstructs, or indirectly using CDI.
+                It is your choice.
                 Transaction scope will be added as a part of a separate requirement. 
             </para>
             <para>
@@ -317,7 +348,7 @@
               Remote interface to the two applications will be demonstrated using two 
               technologies: Java Remote Method Invocation (RMI) and HTTP/REST-like
               (using JAX-RS). Any data transferred using either will be part of the 
-              Data Transfer Objects (DTOs). DTOs used with RMI will need to be Serializable.
+              Data Transfer Objects (DTOs). DTOs used with RMI will need to be Java Serializable.
               DTOs used with JAX-RS will need to be marshaled as XML or JSON.
             </para>
             <para>
@@ -341,7 +372,7 @@
 
                 <orderedlist spacing="compact">
                     <listitem><para>
-                        The commands to reset and populate the database must be accessible
+                        The commands to reset and populate the eLeague database must be accessible
                         to a remote client using RMI.
                         </para></listitem>
                 </orderedlist>
@@ -420,8 +451,8 @@
                       as one or more classes in the WAR. Since eClub is required to reuse BOs as
                       DTOs, you will not need to perform different class mapping. However, to 
                       cleans the BO of persistence parasites and to reduce information expressed,
-                      you may need to create POJO copies of the BOs when going between the DTO 
-                      and BO roles.
+                      you may need to create POJO copies of the BOs when going from the BO to DTO 
+                      role.
                     </para>
 
                     <figure>
@@ -466,11 +497,16 @@
 
                 <para>
                   XML marshaling should be implemented with JAXB. JSON marshalling can be 
-                  implemented with JSONB, but it is recommended to use jackson since JSONB
+                  implemented with JSONB, but it is recommended to use jackson2 since JSONB
                   is not supported in Wildfly until we reach JavaEE 8 compliance. Client-side
                   JSONB and server-side jackson will work 95% of the time -- but there are 
                   some differences.
                 </para>
+<programlisting language=""><![CDATA[<!-- JSON wiring for RESTEasy JAX-RS provider (javaee7)-->
+<dependency>
+  <groupId>org.jboss.resteasy</groupId>
+  <artifactId>resteasy-jackson2-provider</artifactId>
+</dependency>]]></programlisting>                        
 
                 <section id="esport-project2-tech-remote-dto-league">
                     <title>eLeague DTOs</title>
