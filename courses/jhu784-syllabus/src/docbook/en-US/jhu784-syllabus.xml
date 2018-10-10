@@ -98,18 +98,29 @@
             <row rowsep="1">
               <entry namest="comment"><para><ulink url="../html/jpa-queryex.html">Exercise: JPA Query Exercise</ulink></para></entry>
             </row>
-            <row rowsep="1">
                 <!-- 
+            <row rowsep="1">
               <entry namest="comment">Project 1 - due by Sun, 8am Oct14</entry>
-                 -->
               <entry namest="comment"><link linkend="esport-project1-part">Project 1</link> due by Sun, 8am Oct14</entry>
             </row>
+                 -->
             <row rowsep="1">
               <entry namest="topic"><para><link linkend="jpa-tuning">JPA/SQL Tuning</link></para></entry>
+            </row>
+
+            <row rowsep="1">
+                <entry namest="session">7</entry>
+                <entry namest="date">Oct10</entry>
+                <entry namest="topic"><para>Open Topics</para></entry>
+                <entry namest="comment"><link linkend="esport-project1-part">Project 1</link> preview due by Sun, 8am Oct14*</entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="comment"><link linkend="esport-project1-part">Project 1</link> officially due by Sun, 8am Oct21*</entry>
             </row>
         </tbody>
         </tgroup>
     </table>    
+    <para>* One week extension only applies if preview is turned in by due date and 1:1 session completed.</para>
 
 
     <table>
@@ -129,8 +140,8 @@
         </thead>
         <tbody>
             <row rowsep="1">
-                <entry namest="session">7</entry>
-                <entry namest="date">Oct10</entry>
+                <entry namest="session">8</entry>
+                <entry namest="date">Oct17</entry>
                 <entry namest="topic"><para><link linkend="ejb-intro">EJB Introduction</link></para></entry>
                 <entry namest="comment"><para>Rubinger &amp; Burke: Ch 5-7</para></entry>
             </row>
@@ -143,8 +154,8 @@
             </row>
             
             <row rowsep="1">
-                <entry namest="session">8</entry>
-                <entry namest="date">Oct17</entry>
+                <entry namest="session">9</entry>
+                <entry namest="date">Oct24</entry>
                 <entry namest="topic"><para>Configuring EJBs using ENC and JNDI</para></entry>
                 <!--
                 <entry namest="topic"><para><link linkend="enc-config">Configuring EJBs using ENC and JNDI</link></para></entry>
@@ -165,8 +176,8 @@
             
 
             <row rowsep="1">
-                <entry namest="session">9</entry>
-                <entry namest="date">Oct24</entry>
+                <entry namest="session">10</entry>
+                <entry namest="date">Oct31</entry>
                 <entry namest="topic"><para>EJB/Server-Side JPA Topics</para></entry>
                 <!--
                 <entry namest="topic"><para><link linkend="ejb-jpa">EJB/Server-Side JPA Topics</link></para></entry>
@@ -183,8 +194,8 @@
 
             
             <row rowsep="1">
-                <entry namest="session">10</entry>
-                <entry namest="date">Oct31</entry>
+                <entry namest="session">11</entry>
+                <entry namest="date">Nov07</entry>
                 <entry namest="topic"><para>Web-enabled Services</para></entry>
                 <!-- 
                 <entry namest="topic"><para><link linkend="webtier">Web/UI Applications</link> <ulink url="../ppt/webTier.ppt">slides</ulink></para></entry>
@@ -199,11 +210,19 @@
                 <entry namest="topic"><para><link linkend="ejb-jaxrs">Web-enabled EJBs with JAX-RS</link></para></entry>
                 -->
             </row>
+
+            <row rowsep="1">
+                <entry namest="session">***</entry>
+                <entry namest="date">Nov09</entry>
+                <entry namest="topic"><para>EP Drop/Audit Deadline</para></entry>
+                <entry namest="comment"><para><ulink url="https://ep.jhu.edu/student-services/academic-services/academic-calendar">
+                EP Acedemic Calendar</ulink></para></entry>
+            </row>
             <row rowsep="1">
                 <!-- 
-              <entry namest="comment"><link linkend="emarket-project2-part">Project 2</link> due by Sun, 8am Nov15</entry>
+              <entry namest="comment"><link linkend="esport-project2-part">Project 2</link> due by Sun, 8am Nov15</entry>
                  -->
-              <entry namest="comment">Project 2 - due by Sun, 8am Nov11</entry>
+              <entry namest="comment">Project 2 - due by Sun, 8am Nov18</entry>
             </row>
         </tbody>
         </tgroup>
@@ -227,8 +246,8 @@
         </thead>
         <tbody>
             <row rowsep="1">
-                <entry namest="session">11</entry>
-                <entry namest="date">Nov07</entry>
+                <entry namest="session">12</entry>
+                <entry namest="date">Nov14</entry>
                 <entry namest="topic"><para>JavaEE Security</para></entry>
                 <!--
                 <entry namest="topic"><para><link linkend="javaee-security">JavaEE Security</link></para></entry>
@@ -244,23 +263,6 @@
             </row>
 
             <row rowsep="1">
-                <entry namest="session">***</entry>
-                <entry namest="date">Nov09</entry>
-                <entry namest="topic"><para>EP Drop/Audit Deadline</para></entry>
-                <entry namest="comment"><para><ulink url="https://ep.jhu.edu/student-services/academic-services/academic-calendar">
-                EP Acedemic Calendar</ulink></para></entry>
-            </row>
-            
-            <row rowsep="1">
-                <entry namest="session">12</entry>
-                <entry namest="date">Nov14</entry>
-                <entry namest="topic"><para>JMS Core</para></entry>
-                <!--
-                <entry namest="topic"><para><ulink url="../ppt/jmsCore.ppt">JMS Core</ulink></para></entry>
-                -->
-            </row>
-
-            <row rowsep="1">
                 <entry namest="session"></entry>
                 <entry namest="date">Nov21</entry>
                 <entry namest="topic">Thanksgiving Break (no class)</entry>
@@ -270,6 +272,15 @@
             <row rowsep="1">
                 <entry namest="session">13</entry>
                 <entry namest="date">Nov28</entry>
+                <entry namest="topic"><para>JMS Core</para></entry>
+                <!--
+                <entry namest="topic"><para><ulink url="../ppt/jmsCore.ppt">JMS Core</ulink></para></entry>
+                -->
+            </row>
+
+            <row rowsep="1">
+                <entry namest="session">13</entry>
+                <entry namest="date">Dec05</entry>
                 <entry namest="topic"><para>EJB and JMS</para></entry>
                 <!--
                 <entry namest="topic"><para><ulink url="../ppt/asyncEJB.ppt">EJB and JMS</ulink></para></entry>
@@ -284,16 +295,18 @@
                 <entry namest="session"/>
                 <entry namest="topic">EJB Timers</entry>
             </row>
+            <row rowsep="1">
+              <entry namest="comment">Project 3 - due by Sun, 8am Dec09</entry>
+            </row>
 
+                <!--
             <row rowsep="1">
                 <entry namest="session">14</entry>
                 <entry namest="date">Dec05</entry>
                 <entry namest="topic">Complete Final Project (no class)</entry>
-                <!--
               <entry namest="comment"><link linkend="emarket-project3-part">Project 3</link> due by Wed evening/midnight, Dec09</entry>
-              -->
-              <entry namest="comment">Project 3 - due by Wed evening/midnight, Dec05</entry>
             </row>
+              -->
         </tbody>
         </tgroup>
     </table>    
