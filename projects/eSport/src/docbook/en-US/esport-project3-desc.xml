@@ -59,15 +59,18 @@
         </para>
 
         <para>
-            Java EE defines authentication and authorization to be independent
+            JavaEE defines authentication and authorization to be independent
             of the overall API and capability. JBoss and other application
-            servers provide simple, default mechanisms that are easy to
-            demonstrate and more sophisticated mechanisms that are realistic for
-            deployments that require no change to the JavaEE-compliant application code.  
+            servers provide default mechanisms behind the scenes to implement 
+            these features -- that can make it simple and easy to demonstrate. 
+            A switch to more realistic and sophisticated mechanisms should
+            require no change to the JavaEE-compliant application code.  
             We will use the simple, default/"other" security-domain defined
             within the standard JBoss installation. This uses the RealmUsersRoles
             login-module -- which is powered by two property files supplied and
-            pre-populated by the course server files from ejava-wildfly.
+            pre-populated by the course server files from ejava-wildflyXXXX
+            in your course examples source tree. You unzipped this file into
+            your application server configuration as part of course setup.
         </para>
 
         <table>
@@ -102,6 +105,19 @@
             </tgroup>
         </table>    
 
+        <note>
+          <title>jboss.server.config.dir</title>
+          <para>
+            ${jboss.server.config.dir} is a reference to an internal JBoss variable that references
+            the "standalone/configuration" directory.
+<programlisting language=""><![CDATA[
+$ ls standalone/configuration/application*.properties
+standalone/configuration/application-roles.properties    
+standalone/configuration/application-users.properties
+]]></programlisting>                        
+          </para>
+        </note>
+
         <para>
             We are going to have several types of user roles. Some of the users will
             have zero, one, or more of these roles. Because of the static nature of
@@ -122,7 +138,7 @@
             </thead>
             <tbody>
                 <row rowsep="1">
-                   <entry namest="role">anonymous</entry>
+                   <entry namest="role">(anonymous)</entry>
                    <entry namest="desc">
                         These users can view standings and schedules in league
                         </entry>
@@ -192,7 +208,7 @@
         <para>
             If a user has a login for one application, they will use the same
             account to access the other application 
-            (e.g., user1 might have both eclub-coord and eleague-clubcoord roles).
+            (e.g., user2 might have both eclub-coord and eleague-clubcoord roles).
         </para>
 
         <table>
@@ -202,7 +218,7 @@
             <colspec colname="roles"/>
             <thead>
                 <row>
-                  <entry>User</entry>
+                  <entry>User Login</entry>
                   <entry>Roles</entry>
                 </row>
             </thead>
@@ -261,7 +277,9 @@
 
         <para>
         Based on the test data, the following are some other logins that may 
-        be useful...
+        be useful. They have been added to your users and roles property
+        files and are referencs either in the ingested XML file or part of 
+        the end-to-end demonstration steps.
         </para>
 
         <table>
@@ -308,12 +326,15 @@
         <note>
             <para>
             To clarify, your application will have a static set of
-            logins and will ingest a set of accounts. A user with a
-            login and no account can login, but won't be able to do
-            anything meaningful. A user with an account and no login
-            won't be able to access the system. Normally the login would
-            be created at the same time as the account. Except for your
-            JBoss configuration and your "Create Account" logic, no other
+            logins and will dynamically ingest a set of Contacts or Members
+            at runtime. A user with a
+            login and no Contact/Member can login, but won't be able to do
+            anything meaningful to them personally. A user with a Contact/Member 
+            defined and no login won't be able to access the protected 
+            areas of the system. 
+            Normally the login would be created at the same time the 
+            Contact/Member is added.  Except for your
+            JBoss configuration and your add user logic, no other
             part of your project should be aware of this tradeoff made
             for class project simplicity.
             </para>
@@ -333,7 +354,7 @@
           defined by the "jboss.home" property.
         </para>
 
-<programlisting language=""><![CDATA[
+<programlisting language="xml"><![CDATA[
 # build/dependencies/pom.xml
 
 <java.truststore>${jboss.home}/standalone/configuration/application.keystore</java.truststore>
@@ -343,7 +364,7 @@
     <configuration>
         <systemPropertyVariables>
             <javax.net.ssl.trustStore>${java.truststore}</javax.net.ssl.trustStore>
-]]></programlisting>                        
+]]></programlisting>
 
         <table>
             <title>HTTPS Keystore(s)</title>
@@ -370,16 +391,45 @@
             </tgroup>
         </table>    
 
+        <note>
+          <title>jboss.home</title>
+          <para>
+            jboss.home is a property you should define in your "$HOME/.m2/settings.xml"
+            file and have it reference your installation directory for JBoss/Wildfly.
+          </para>
+<programlisting language="xml"><![CDATA[
+# .m2/settings.xml
+
+    <profiles>
+        <profile>
+            <id>wildfly13</id>
+            <properties>
+                <jboss.home>.../apps/wildfly-13.0.0.Final</jboss.home>
+            </properties>
+        </profile>
+    ...
+    <activeProfiles>
+      <activeProfile>wildfly13</activeProfile>
+      <activeProfile>h2db</activeProfile>
+    </activeProfiles>
+]]></programlisting>
+        </note>
+
         <para>
-            For asynchronous activity, we will implement a Schedule Topic where 
+            For asynchronous activity, we will implement a Schedule JMS Topic where 
             eLeague will publish messages related to team schedules. 
             eClub will subscribe to the topic using a Message Driven 
             Bean to keep members up to date on schedule changes.
-            A stand-alone client will also be used to subscribe to schedule
-            events. A topic will have to be added to your JMS Server within
-            JBoss. You will have to design the type, structure, and payload of
+            The JMS topic has already been added to your JMS Server within
+            JBoss and has been assigned both an internal and external JNDI name. 
+            You will have to design the type, structure, and payload of
             the messages sent on that topic.
         </para>
+
+<programlisting language="xml"><![CDATA[<jms-topic name="esport-eleague-contests" 
+     entries="java:/topic/ejava/projects/esport/eleague-contests 
+              java:jboss/exported/topic/ejava/projects/esport/eleague-contests"/>
+]]></programlisting>
 
         <para>
           eLeague will use EJB Timers to send out schedule reminders.

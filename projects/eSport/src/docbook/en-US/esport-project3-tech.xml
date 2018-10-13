@@ -18,34 +18,45 @@
         </para>
         <orderedlist spacing="compact">
             <listitem><para>
-                Assign the EJB to the "other" security domain
+                Assign the EJBs and WARs to the "other" security domain
                 </para>
                 </listitem>
+            <listitem><para>
+                Restrict access to WEB URIs in WARS
+                </para>
+
+                <orderedlist spacing="compact">
+                    <listitem><para>
+                        All API calls must allow authentication.
+                        </para></listitem>
+                    <listitem><para>
+                        Use BASIC login-config for API calls.
+                        </para></listitem>
+                    <listitem><para>
+                        Use of CONFIDENTIAL (HTTPS) is not required for this project
+                        can should be easily added if you have time.
+                        </para></listitem>
+                </orderedlist>
+                </listitem>
+
             <listitem><para>
                 Restrict access to the EJB methods to appropriate read/write roles
                 using declarative security.
                 </para>
                 <orderedlist spacing="compact">
                     <listitem><para>
-                        Administrators may run the test utility functions.
-                        </para>
-                        </listitem>
+                        Administrators may run the test utility functions like reset() and populate().
+                        </para></listitem>
                     <listitem><para>
-                        League Coordinators may create clubs, seasons, and
-                    divisions. They may also schedule contests and perform duties
-                    normally performed by club and division coordinators -- like
-                    report scores.
-                        </para>
-                        </listitem>
+                        League Coordinators may create clubs, seasons, and divisions as well as schedule contests.
+                        They may also perform duties normally performed by club and division coordinators -- like report scores.
+                        </para></listitem>
                     <listitem><para>
-                        Club Coordinators may create venues, teams, and
-                    assign teams to divisions.
-                        </para>
-                        </listitem>
+                        Club Coordinators may create venues, teams, and assign teams to divisions 
+                        </para></listitem>
                     <listitem><para>
-                        Division coordinators may report scores.
-                        </para>
-                        </listitem>
+                        Division coordinators may report scores
+                        </para></listitem>
                 </orderedlist>
                 </listitem>
             <listitem><para>
@@ -56,41 +67,20 @@
                     <listitem><para>
                         Club coordinators may only manage teams and venues
                         associated with their club.
-                        </para>
-                        </listitem>
+                        </para></listitem>
                     <listitem><para>
                         Division coordinators may only report scores for contests 
                         in their assigned division. Note that the League Coordinator
                         should be able to report a score for any division.
-                        </para>
-                        </listitem>
+                        </para></listitem>
+                    <listitem><para>
+                        League coordinators may report scores for any division without
+                        being the coordinator for that division.
+                        </para></listitem>
                 </orderedlist>
                 </listitem>
             <listitem><para>
                 Allow any user to perform read operations.
-                </para>
-                </listitem>
-        </orderedlist>
-    </section>
-
-    <section id="esport-project3-tech-leagueclient">
-        <title>eLeague RMI client Authentication</title>
-        <para>
-            Extend your existing eLeague remote Test project and any remote client(s) to
-            address new authentication requirements.
-        </para>
-        <orderedlist spacing="compact">
-            <listitem><para>
-                Add a valid login to your existing tests to re-enable them under
-                the newly secure environment.
-                </para>
-                </listitem>
-            <listitem><para>
-                Add a new unit test that verifies the access controls of the
-                protected and open methods. This means that -- after fixing access
-                issues in the previous bullet -- you purposely attempt to violate
-                access restrictions from a new JUnit test to show a test of 
-                access control.
                 </para>
                 </listitem>
         </orderedlist>
@@ -103,7 +93,7 @@
         </para>
         <orderedlist spacing="compact">
             <listitem><para>
-                Assign the EJB to the "other" security domain.
+                Assign the EJB and WARS to the "other" security domain.
                 </para>
                 </listitem>
             <listitem><para>
@@ -112,17 +102,17 @@
                 </para>
                 <orderedlist spacing="compact">
                     <listitem><para>
-                        Administrators may run the test utility functions.
+                        Administrators may run the test utility functions like reset().
+                        </para>
+                        </listitem>
+                    <listitem><para>
+                        Organization coordinators may create teams and members/roles. They 
+                        can also assign players, coaches, and managers to teams.
                         </para>
                         </listitem>
                     <listitem><para>
                         Members may update contact information and 
                         obtain roster information.
-                        </para>
-                        </listitem>
-                    <listitem><para>
-                        Organization coordinators may create teams and
-                        assign players, coaches, and managers.
                         </para>
                         </listitem>
                 </orderedlist>
@@ -142,34 +132,51 @@
         </orderedlist>
     </section>
 
-    <section id="esport-project3-tech-clubclient">
-        <title>eClub RMI client Authentication</title>
+
+    <section id="esport-project3-tech-client">
+        <title>Remote Client Authentication</title>
         <para>
-            Extend your existing eClub remote Test project and any remote
-            client(s) to address new authentication requirements.
+            Extend your existing client code to optionally accept credentials.
         </para>
         <orderedlist spacing="compact">
             <listitem><para>
-                Add a valid login to your existing tests to re-enable them under 
-                the new secure environment.
+                For RMI -- add security principal and credential properties
+                to your JNDI lookup.
+                </para></listitem>
+            <listitem><para>
+                For JAX-RS -- add a "Basic" Authentication header (ideally 
+                using a JAX-RS ClientRequestFilter) to each HTTP(S) request.
+                </para></listitem>
+        </orderedlist>
+    </section>
+
+    <section id="esport-project3-tech-remotetest">
+        <title>Remote Test Authentication</title>
+        <para>
+            Extend your existing remote Test project to address new authentication requirements.
+        </para>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                Add a valid login to your existing tests to re-enable them under
+                the newly secure environment.
                 </para>
                 </listitem>
             <listitem><para>
                 Add a new unit test that verifies the access controls of the
-                protected and open methods. Same comment as above -- after
-                fixing proper access to eClub you should have at least
-                one test that demonstrates how the application is preventing
-                unauthorized access.
+                protected and open methods. This means that -- after fixing access
+                issues in the previous bullet -- you purposely attempt to violate
+                access restrictions from a new JUnit test to show a test of 
+                access control.
                 </para>
                 </listitem>
         </orderedlist>
     </section>
 
-
-    <section id="esport-project3-tech-leaguewar">
-        <title>eLeagueWAR Access Restrictions</title>
+    <section id="esport-project3-tech-webui">
+        <title>eLeague Web-UI Access Restrictions</title>
         <para>
-            Enhance eLeagueWAR with access restrictions.
+            Enhance Web-UIs with authentication and access restrictions for any 
+            use case you implement requiring access control.
         </para>
         <orderedlist spacing="compact">
             <listitem><para>
@@ -179,7 +186,6 @@
             <listitem><para>
                 Restrict access beyond the main page to users with
                 the appropriate roles. You may use FORM or BASIC authentication.
-                (I suggest FORM for easier logout/login as new user).
                 </para>
                 </listitem>
             <listitem><para>
@@ -191,33 +197,20 @@
                 </para>
                 </listitem>
         </orderedlist>
-    </section>
 
-    <section id="esport-project3-tech-clubwar">
-        <title>eClubWAR Access Restrictions</title>
-        <para>
-            Enhance eClubWAR with access restrictions.
-        </para>
-        <orderedlist spacing="compact">
-            <listitem><para>
-                Assign the WAR to the "other" security domain.
-                </para>
-                </listitem>
-            <listitem><para>
-                Restrict access beyond the main page to users with
-                the appropriate roles. You may use FORM or BASIC authentication.
-                (I suggest FORM for easier logout).
-                </para>
-                </listitem>
-            <listitem><para>
-                Permit only users to only ask the EJB tier for information that
-                is associated with their login. For example, a Member should not
-                have to tell the Web UI what team they are associated with. It
-                should be derived from their identity and information in the
-                database.
-                </para>
-                </listitem>
-        </orderedlist>
+        <note>
+          <title>BASIC does not support logout/login well</title>
+          <para>
+            Co-hosting the Web-UI and API in the same WAR will restrict you
+            to using the same authentication mechanism for both. Since we 
+            are suggesting use of BASIC for API calls -- we would use BASIC
+            for the Web-UI as well. That works except the use of BASIC and the 
+            way the HTTP protocol and browsers work -- it makes it hard to 
+            logout to change identity. Keeping the project within scope --
+            this may limit the number of steps you implement with Web-UI
+            for the end-to-end scenario.
+          </para>
+        </note>
     </section>
 
     <section id="esport-project3-tech-interceptors">
@@ -250,89 +243,85 @@
         </orderedlist>
     </section>
 
-    <section id="esport-project3-tech-leaguepublish">
-        <title>eLeague JMS Publisher</title>
+    <section id="esport-project3-tech-jms">
+        <title>eSport JMS</title>
+        <para>
+          In this portion of the project we are going to send and receive
+          a JMS message using publish/subscribe JMS techniques.
+        </para>
         <figure>
-            <title>eLeague Async</title>
+            <title>eSport Async</title>
             <graphic scalefit="1" fileref="images/esport-async.jpg"/>
         </figure>
-        <para>
-          Extend your eLeague EJB implementations to publish changes to 
-          Contests.
 
+        <section id="esport-project3-tech-async-publish">
+            <title>eLeague JMS Publisher</title>
+            <para>
+              Extend your eLeague EJB implementation to publish JMS messages whenever
+              a Contest is scheduled, changes (e.g., scores posted), or for whatever
+              reason the application has for notifying subscribers. 
+              You may want to place an artificial limit on 
+              the number of messages sent to help keep from being unnecessarily
+              overwhelmed in the development environment. 
+              You can decide on any thresholds used.
+            </para>
+            <orderedlist spacing="compact">
+                <listitem><para>
+                    Use the esport-eleague-contests topic 
+                    (JNDI names: java:/topic/ejava/projects/esport/eleague-contests and
+                    java:jboss/exported/topic/ejava/projects/esport/eleague-contests)
+                    </para>
+                    </listitem>
+                <listitem><para>
+                    Design your JMS Message. You can use any JMS Type and JMS/custom
+                    properties you wish.  However, know that some subscribers will
+                    be filtering on such things as the impacted club, team, or type of event.
+                    </para>
+                    </listitem>
+                <listitem><para>
+                    Have your eLeague EJBs publish JMS Messages to the topic when
+                    a Contest changes state (created, canceled, completed).
+                    </para>
+                    </listitem>
+            </orderedlist>
 
-        </para>
-        <orderedlist spacing="compact">
-            <listitem><para>
-                Use the esport-eleague-contests topic (JNDI name: topic/ejava/projects/esport/eleague-contests)
-                </para>
-                </listitem>
-            <listitem><para>
-                Design your JMS Message. You can use any JMS Type and JMS/custom
-                properties you wish.  However, know that some subscribers will
-                be filtering on such things as the impacted team or type of event.
-                </para>
-                </listitem>
-            <listitem><para>
-                Have your eLeague EJBs publish JMS Messages to the topic when
-                a Contest changes state (created, canceled, completed).
-                </para>
-                </listitem>
-        </orderedlist>
+            <note>
+              <para>
+                This means that there are several reasons for a Contest to be sent
+                and that reason should be a selectable part of the overall message
+                properties.
+              </para>
+            </note>
+        </section>
+
+        <section id="esport-project3-tech-async-subscribe">
+            <title>eClub MDB Subscriber</title>
+            <para>
+                Implement a Message Driven Bean within eClub to subscribe to 
+                contests that are new, rescheduled, or reminders; but not completed 
+                (i.e. it should have a selector that causes the MDB to not be told about
+                scores being reported) that invole the specific club.
+                [Note:] The ability to reschedule a contest was not part of 
+                the functional requirements and need not be implemented at this time.
+                Just account for the future event and the relevance to the club in your selector.
+            </para>
+            <orderedlist spacing="compact">
+                <listitem><para>
+                    Use a JMS Selector for the MDB to limit the types of messages consumed.
+                    </para>
+                    </listitem>
+                <listitem><para>
+                    Obtain the e-mail address for each individual associated with
+                    the team effected by the event. Print a textual message and the
+                    address list to the log. You do not have to physically send an
+                    e-mail as a part of this project.
+                    </para>
+                    </listitem>
+            </orderedlist>
+        </section>
+
     </section>
 
-    <section id="esport-project3-tech-clubjavase">
-        <title>eClub JavaSE Subscriber </title>
-        <para>
-            Add a Java SE JMS subscriber eLeague to consume events about
-            Contests pertaining to a specific team.
-        </para>
-        <orderedlist spacing="compact">
-            <listitem><para>
-                Implement a Java SE JMS subscriber that listens for Schedule
-                messages with a team identifier matching a JMS Selector.
-                This must be a JMS selector, not client-side Java logic. All
-                this client has to do is log the information from the message.
-                </para>
-                </listitem>
-            <listitem><para>
-                Simply print the fact that the process was called and the
-                contents reported in the message.
-                </para>
-                </listitem>
-            <listitem><para>
-                You must launch this subscriber using an Ant wrapper script.
-                </para>
-                </listitem>
-        </orderedlist>
-    </section>
-
-
-    <section id="esport-project3-tech-clubmdb">
-        <title>eClub MDB Subscriber</title>
-        <para>
-            Implement a Message Driven Bean within eClub to subscribe to 
-            contests that are new, rescheduled, or reminders; but not completed 
-            (i.e. it should have a selector that causes the MDB to not be told about
-            scores being reported).
-            [Note:] The ability to reschedule a contest was not part of 
-            the functional requirements and need not be implemented at this time.
-            Just account for the future event in your selector.
-        </para>
-        <orderedlist spacing="compact">
-            <listitem><para>
-                Use a JMS Selector for the MDB to limit the types of messages consumed.
-                </para>
-                </listitem>
-            <listitem><para>
-                Obtain the e-mail address for each individual associated with
-                the team effected by the event. Print a textual message and the
-                address list to the log. You do not have to physically send an
-                e-mail as a part of this project.
-                </para>
-                </listitem>
-        </orderedlist>
-    </section>
 
     <section id="esport-project3-tech-leaguetimer">
         <title>eLeague EJBTimer</title>
@@ -343,6 +332,12 @@
             the number of reminders sent. The main goal of this requirement is
             that you make use of an EJBTimer and that you trigger the MDB logic
             in eClub.
+        </para>
+        <para>
+            Your timer can be declarative or programmatic. However, the programmatic 
+            approach is recommended so that -- with a remote interface -- your 
+            IT integration test can have control over when the events should start
+            and end.
         </para>
     </section>
 </chapter>
