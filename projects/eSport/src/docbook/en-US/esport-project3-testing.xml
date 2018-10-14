@@ -16,27 +16,63 @@
         <listitem><para>
             Provide JUnit IT tests that verify the EJB functionality of 
             eLeague accessed through its remote interface using new
-            access control restrictions.
-            </para> </listitem>
+            access control restrictions.  The test should demonstrate that 
+            authentication and access control is in place for this 
+            EAR-based deployed application and status is properly conveyed
+            to the caller.  For both RMI and JAX-RS, there should be:
+            </para> 
+            <orderedlist spacing="compact">
+                <listitem><para>
+                    An example successful call of an access controlled resource
+                    using an authorized user properly authenticated
+                    </para> </listitem>
+                <listitem><para>
+                    An example unsuccessful call (using the same call as above) 
+                    of an access controlled resource
+                    using an unauthorized user
+                    </para> </listitem>
+                <listitem><para>
+                    Proper indication to the caller that the caller was or was 
+                    not authorized to make the call (e.g., exception thrown or 
+                    status returned)
+                    </para> </listitem>
+            </orderedlist>
+        </listitem>
         <listitem><para>
             Provide JUnit IT tests that verify the EJB functionality of 
             eClub using its new access control restrictions and ability
-            to authenticate with eLeague.
+            to authenticate with eLeague. The test should demonstrate that 
+            authentication and access control is in place for this 
+            WAR-based deployed application.
             </para> </listitem>
         <listitem><para>
             Provide a JUnit IT tests that demonstrates the functionality of the 
-            JavaEE interceptor/validator.
-            </para> </listitem>
+            JavaEE interceptor/validator. This should include:
+            </para> 
+            <orderedlist spacing="compact">
+                <listitem><para>
+                    An example successful call using a valid DTO instance successfully
+                    validated by the interceptor/validator code.
+                    </para> </listitem>
+                <listitem><para>
+                    An example unsuccessful call (using the same call as above) 
+                    using an invalid DTO instance rejected by the interceptor/validator
+                    code. Validation must be performed with the Validation API,
+                    must be done within an Interceptor, and cannot be performed within
+                    the core Java logic within the called EJB.
+                    </para> </listitem>
+            </orderedlist>
+            </listitem>
         <listitem><para>
             Implement the scripted use case below as an automated JUnit test and
-            manually accessed script through the Web UI. All command
-            line implementations must be wrapped in an Ant runtime script to
-            encapsulate the classpath details in a portable manner (see the
-            class jmsNotifier project for an example of using an Ant runtime script).
-            The full JSE subscriber need not be part of the automated end-to-end
-            JUnit test. The JUnit test/module must be delivered in a state that can 
-            be executed in a debugger -- whether directly within Eclipse or using a 
-            remote debugging session.
+            a selected portion manually accessed through the Web UI.
+            The JUnit test/module must be delivered in a state that can 
+            be executed in a debugger -- whether directly within Eclipse (ideally) 
+            or using a remote debugging session to a Maven command-line build.
+            </para>
+            <para>
+              Since this end-to-end test spans both applications the most likely 
+              place to host is within eClub.
             </para>
             <orderedlist spacing="compact">
                 <listitem><para>
@@ -49,94 +85,92 @@
                       <listitem><para>
                           eClubEJB subscribes to pending contest events.
                           </para> </listitem>
-                      <listitem><para>
-                          The eLeague Java SE LeagueListener subscribes for events
-                          related to a specific team.
-                          </para> </listitem>
                     </itemizedlist>
                     </listitem>
                 <listitem><para>
-                    admin1 resets all eLeague tables (using the LeagueTestUtilEJB)
+                    An eleague-admin (admin1) resets all eLeague tables (using the LeagueTestUtilEJB)
                     </para> </listitem>
                 <listitem><para>
-                    admin1 populates the eLeague tables (using the LeagueIngestor)
+                    An eleague-admin (admin1) populates the eLeague tables (using the LeagueIngestor)
                     </para> </listitem>
                 <listitem><para>
-                    admin1 resets the eClub tables (using the ClubTestUtilEJB)
+                    An eclub-admin (admin1) resets the eClub tables (using the ClubTestUtilEJB)
                     </para> </listitem>
                 <listitem><para>
-                    admin1 populates the eClub tables (using the ClubTestUtilEJB) if anything necessary.
+                    An eclub-admin (admin1) populates the eClub tables (using the ClubTestUtilEJB) if anything necessary.
                     </para> </listitem>
                 <listitem><para>
-                    user1(lmtucker) creates a Club in eLeague (using the LeagueMgmtEJB; rep=user2)
+                    The league coordinator(lmtucker) creates a Club in eLeague (using the LeagueMgmtEJB). 
+                    League coordinator assigns the club representative (whoever you call them) to 
+                    have the login of "user2" to match a login pre-defined in your Wildfly Server.
+                    This login has multiple roles assigned spanning both applications.
                     </para> </listitem>
                 <listitem><para>
-                    user2 adds Venue for Club in eLeague (using ClubMgmtEJB)
+                    The eleague-clubcoord (user2) adds Venue for Club in eLeague (using ClubMgmtEJB). The 
+                    "user2" login has been pre-defined to have the role "eclub-coord".
                     </para> </listitem>
                 <listitem><para>
-                    user3 creates Parent in eClub (using MemberMgmtEJB)
+                    An eclub-member (user3) creates Parent in eClub (using MemberMgmtEJB). "user3" is a login 
+                    pre-defined in your Wildfly Server with the role "eclub-member".
                     </para> </listitem>
                 <listitem><para>
-                    user3 creates Player in eClub (using MemberMgmtEJB) for their child
+                    An eclub-member (user3) creates Player in eClub (using MemberMgmtEJB) for their child
                     </para> </listitem>
                 <listitem><para>
-                    user3 adds a Coach role in eClub (using MemberMgmtEJB) to
+                    An eclub-member (user3) adds a Coach role in eClub (using MemberMgmtEJB) to
                     their identity
                     </para> </listitem>
                 <listitem><para>
-                    user2 creates a Team in eClub (using OrgMgmtEJB)
+                    The eclub-coord (user2) creates a Team in eClub (using OrgMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    user2 assigns Players to a Team in eClub (using OrgMgmtEJB)
+                    The eclub-coord(user2) assigns Players to a Team in eClub (using OrgMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    user2 assigns Coach to a Team in eClub (using OrgMgmtEJB)
+                    The eclub-coord(user2) assigns Coach to a Team in eClub (using OrgMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    user2 assigns Manager to a Team in eClub (using OrgMgmtEJB)
+                    The eclub-coord(user2) assigns Manager to a Team in eClub (using OrgMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    user3 views their team roster in eClub (using OrgMgmtEJB)
+                    An eclub-member(user3) views their team roster in eClub (using OrgMgmtEJB)
+                    </para> </listitem>
+
+                <listitem><para>
+                    An eleague-clubcoord (user2) adds a Team for Club in eLeague (using ClubMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    user2 adds a Team for Club in eLeague (using ClubMgmtEJB)
+                    An eleague-clubcoord (user2) adds a contact for a Team eLeague (using ClubMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    user2 adds a contact for a Team eLeague (using ClubMgmtEJB)
-                    </para> </listitem>
-                <listitem><para>
-                    user2 assigns a Team to an existing Division eLeague
+                    An eleague-clubcoord (user2) assigns a Team to an existing Division eLeague
                     (using ClubMgmtEJB; division=U13-A, refid="Division-845")
                     </para> </listitem>
                 <listitem><para>
-                    user1(lmtucker) schedules a Season eLeague (using ContestMgmtEJB)
+                    The eleague-coord (lmtucker) schedules a Season eLeague (using ContestMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
-                    ContestMgmtEJB publishes schedule events to Schedule Topic
+                    eLeague (eleague-sys) (thru ContestMgmtEJB) publishes schedule events to Schedule Topic
                     </para> </listitem>
                 <listitem><para>
-                    LeagueSubscriber receives messages related to its team. It
-                    prints the contents of the message.
-                    </para> </listitem>
-                <listitem><para>
-                    LeagueListenerMDB receives messages related to unfinished
+                    eClub (eclub-sys) (using LeagueListenerMDB) receives messages related to unfinished
                     contests. It obtains the e-mail addresses for members associated
-                    with the team references in the message. It logs the message and
+                    with the team referenced in the message. It logs the message and
                     e-mail addresses.
                     </para> </listitem>
                 <listitem><para>
-                    anonymous users views Team Schedule in eClub (using OrgMgmtEJB)
+                    anonymous users views Team Schedule in eClub (using OrgMgmtEJB). eClub (eclub-sys)
+                    contacts eLeague (using LeagueMgmtEJB) for team season associated with eClub's team.
                     </para> </listitem>
                 <listitem><para>
-                    EJBTimer fires a callback in ContestMgmtEJB
+                    EJB Timer fires a callback in eLeague (using ContestMgmtEJB (eleague-sys))
                     </para> </listitem>
                 <listitem><para>
-                    ContestMgmtEJB publishes reminder messages to the Schedule
-                    Topic (same message processing occurs in LeagueSubscriber and
-                    LeagueListerMDB).
+                    eLeague (eleague-sys) (using ContestMgmtEJB) publishes reminder messages 
+                    to the Schedule Topic (and received in eClub using LeagueListenerMDB).
                     </para> </listitem>
                 <listitem><para>
-                    Division coordinator(jtflynn) reports 
+                    The eleague-coord (jtflynn) (for division=U13-A, refid="Division-845") reports 
                     a Score in eLeague involving our club team (using ContestMgmtEJB)
                     </para> </listitem>
                 <listitem><para>
