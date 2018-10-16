@@ -934,7 +934,8 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
                 <listitem><para>
                     Restart the server.
                     </para>
-<programlisting language=""><![CDATA[wildfly-8.1.0.Final]$ ./bin/standalone.sh 
+<programlisting language=""><![CDATA[
+wildfly-13.0.0.Final]$ ./bin/standalone.sh 
 ...
 ]]></programlisting>
                     </listitem>
