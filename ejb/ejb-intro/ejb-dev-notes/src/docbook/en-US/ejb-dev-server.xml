@@ -111,17 +111,13 @@ public class GreeterEJB implements Greeter {
                 <title>Start Standalone Server at Shell</title>
 <programlisting language=""><![CDATA[wildfly-13.0.0.Final$ ./bin/standalone.sh -c standalone.xml 
 =========================================================================
-
   JBoss Bootstrap Environment
-
   JBOSS_HOME: /Users/jim/apps/wildfly-13.0.0.Final
-
   JAVA: java
-
-  JAVA_OPTS:  -server -Xms64m -Xmx512m -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.byteman -Djava.awt.headless=true
-
+  JAVA_OPTS:  -server -Xms64m -Xmx512m -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m 
+    -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.byteman 
+    -Djava.awt.headless=true
 =========================================================================
-
 10:14:01,139 INFO  [org.jboss.modules] (main) JBoss Modules version 1.8.5.Final
 10:14:01,372 INFO  [org.jboss.msc] (main) JBoss MSC version 1.4.2.Final
 10:14:01,379 INFO  [org.jboss.threads] (main) JBoss Threads version 2.3.2.Final
