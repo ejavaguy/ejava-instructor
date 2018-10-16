@@ -111,7 +111,7 @@
             <row rowsep="1">
                 <entry namest="session">7</entry>
                 <entry namest="date">Oct10</entry>
-                <entry namest="topic"><para>Open Topics</para></entry>
+                <entry namest="topic"><para>Project 1 Topics</para></entry>
                 <entry namest="comment"><link linkend="esport-project1-part">Project 1</link> preview due by Sun, 8am Oct14*</entry>
             </row>
             <row rowsep="1">
@@ -142,42 +142,45 @@
             <row rowsep="1">
                 <entry namest="session">8</entry>
                 <entry namest="date">Oct17</entry>
+                <entry namest="topic"><para>Project 1 Topics</para></entry>
+            </row>
+            <row rowsep="1">
                 <entry namest="topic"><para><link linkend="ejb-intro">EJB Introduction</link></para></entry>
                 <entry namest="comment"><para>Rubinger &amp; Burke: Ch 5-7</para></entry>
             </row>
             <row rowsep="1">
-                <entry namest="topic"><para><link linkend="ejb-basic">Basic Session EJB</link></para></entry>
+                <entry namest="comment"><para><ulink url="../html/ejb-basic-lab.html">Exercise: Basic EJB Development</ulink></para></entry>
             </row>
             
             <row rowsep="1">
                 <entry namest="session">9</entry>
                 <entry namest="date">Oct24</entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic"><para><link linkend="ejb-basic">Basic Session EJB</link></para></entry>
+            </row>
+            <row rowsep="1">
                 <entry namest="topic"><para><link linkend="ejb-dev">EJB Development Scenarios</link></para></entry>
-                <entry namest="comment"><para><ulink url="../html/ejb-basic-lab.html">Exercise: Basic EJB Development</ulink></para></entry>
             </row>
-            <row rowsep="1">
-                <entry namest="topic"><para>Configuring EJBs using ENC and JNDI</para></entry>
-                <!--
-                <entry namest="topic"><para><link linkend="enc-config">Configuring EJBs using ENC and JNDI</link></para></entry>
-                -->
-                <entry namest="comment"><para>Rubinger &amp; Burke: Ch 16</para></entry>
-            </row>
-            <!--
-            <row rowsep="1">
-                <entry namest="comment"><para><ulink url="../html/encconfig-lab.html">Exercise: JNDI/ENC Configuration</ulink></para></entry>
-            </row>
-            -->
-            <row rowsep="1">
-                <entry namest="topic"><para>CDI</para></entry>
-                <!--
-                <entry namest="topic"><para><link linkend="cdi-config">CDI</link></para></entry>
-                -->
-            </row>
-            
+
 
             <row rowsep="1">
                 <entry namest="session">10</entry>
                 <entry namest="date">Oct31</entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic"><para>Configuring EJBs using EJB and CDI Injection</para></entry>
+                <!--
+                <entry namest="topic"><para><link linkend="enc-config">Configuring EJBs using ENC and JNDI</link></para></entry>
+                <entry namest="comment"><para><ulink url="../html/encconfig-lab.html">Exercise: JNDI/ENC Configuration</ulink></para></entry>
+                -->
+                <entry namest="comment"><para>Rubinger &amp; Burke: Ch 16</para></entry>
+            </row>
+                <!--
+                <entry namest="topic"><para><link linkend="cdi-config">CDI</link></para></entry>
+                -->
+
+            <row rowsep="1">
                 <entry namest="topic"><para>EJB/Server-Side JPA Topics</para></entry>
                 <!--
                 <entry namest="topic"><para><link linkend="ejb-jpa">EJB/Server-Side JPA Topics</link></para></entry>
@@ -192,23 +195,28 @@
                 <entry namest="comment"><para>Rubinger &amp; Burke: Ch 17</para></entry>
             </row>
 
-            
             <row rowsep="1">
                 <entry namest="session">11</entry>
                 <entry namest="date">Nov07</entry>
-                <entry namest="topic"><para>Web-enabled Services</para></entry>
-                <!-- 
-                <entry namest="topic"><para><link linkend="webtier">Web/UI Applications</link> <ulink url="../ppt/webTier.ppt">slides</ulink></para></entry>
-                 -->
-            </row>
-            <row rowsep="1">
-                <entry namest="topic"><para>Java XML and JSON Binding</para></entry>
             </row>
             <row rowsep="1">
                 <entry namest="topic"><para>Web-enabled EJBs with JAX-RS</para></entry>
                 <!--
                 <entry namest="topic"><para><link linkend="ejb-jaxrs">Web-enabled EJBs with JAX-RS</link></para></entry>
                 -->
+            </row>
+            <row rowsep="1">
+                <entry namest="topic"><para>Web-UI integration</para></entry>
+                <!-- 
+                <entry namest="topic"><para><link linkend="webtier">Web/UI Applications</link> <ulink url="../ppt/webTier.ppt">slides</ulink></para></entry>
+                 -->
+            </row>
+
+            <row rowsep="1">
+                <!-- 
+              <entry namest="comment"><link linkend="esport-project2-part">Project 2</link> due by Sun, 8am Nov15</entry>
+                 -->
+              <entry namest="comment">Project 2 - due by Sun, 8am Nov18</entry>
             </row>
 
             <row rowsep="1">
@@ -217,12 +225,6 @@
                 <entry namest="topic"><para>EP Drop/Audit Deadline</para></entry>
                 <entry namest="comment"><para><ulink url="https://ep.jhu.edu/student-services/academic-services/academic-calendar">
                 EP Acedemic Calendar</ulink></para></entry>
-            </row>
-            <row rowsep="1">
-                <!-- 
-              <entry namest="comment"><link linkend="esport-project2-part">Project 2</link> due by Sun, 8am Nov15</entry>
-                 -->
-              <entry namest="comment">Project 2 - due by Sun, 8am Nov18</entry>
             </row>
         </tbody>
         </tgroup>
@@ -248,6 +250,8 @@
             <row rowsep="1">
                 <entry namest="session">12</entry>
                 <entry namest="date">Nov14</entry>
+            </row>
+            <row rowsep="1">
                 <entry namest="topic"><para>JavaEE Security</para></entry>
                 <!--
                 <entry namest="topic"><para><link linkend="javaee-security">JavaEE Security</link></para></entry>
@@ -272,20 +276,19 @@
             <row rowsep="1">
                 <entry namest="session">13</entry>
                 <entry namest="date">Nov28</entry>
-                <entry namest="topic"><para>JMS Core</para></entry>
+            </row>
+            <row rowsep="1">
+                <entry namest="topic"><para>JMS</para></entry>
+                <entry namest="comment"><para>Rubinger &amp; Burke: Ch 8 &amp; 19</para></entry>
                 <!--
                 <entry namest="topic"><para><ulink url="../ppt/jmsCore.ppt">JMS Core</ulink></para></entry>
+                <entry namest="topic"><para><ulink url="../ppt/asyncEJB.ppt">EJB and JMS</ulink></para></entry>
                 -->
             </row>
 
             <row rowsep="1">
-                <entry namest="session">13</entry>
+                <entry namest="session">14</entry>
                 <entry namest="date">Dec05</entry>
-                <entry namest="topic"><para>EJB and JMS</para></entry>
-                <!--
-                <entry namest="topic"><para><ulink url="../ppt/asyncEJB.ppt">EJB and JMS</ulink></para></entry>
-                -->
-                <entry namest="comment"><para>Rubinger &amp; Burke: Ch 8 &amp; 19</para></entry>
             </row>
             <row rowsep="1">
                 <entry namest="session"/>
