@@ -63,7 +63,10 @@
 java.naming.factory.initial=...
 java.naming.factory.url.pkgs=...
 java.naming.provider.url=...
+#java.naming.security.principal=...
+#java.naming.security.credentials=...
 ]]></programlisting>
+                <para>Security properties shown here for completeness. Can be statically defined.</para>
                 </listitem>
                 
                 <listitem><para>Get InitialContext to server JNDI tree</para>
@@ -92,11 +95,11 @@ java.naming.provider.url=...
             <section id="ejb-basic-it-ejbaccess-remoting-jndi">
                 <title>JBoss Remoting jndi.properties</title>
 <programlisting language=""><![CDATA[
-java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
+java.naming.factory.initial=org.wildfly.naming.client.WildFlyInitialContextFactory
 java.naming.factory.url.pkgs=
 java.naming.provider.url=http-remoting://127.0.0.1:8080
-#java.naming.security.principal=
-#java.naming.security.credentials=
+#java.naming.security.principal=known
+#java.naming.security.credentials=password1!
 ]]></programlisting>
               <itemizedlist spacing="compact">
                   <listitem><para>Credentials are strictly for JNDI lookups</para></listitem>
@@ -110,6 +113,9 @@ java.naming.provider.url=http-remoting://127.0.0.1:8080
                     <listitem><para>ejb-basic-ejb/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote</para></listitem>
                     <listitem><para>ejb-basic-war/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote</para></listitem>
                     <listitem><para>ejb-basic-ear/ejb-basic-ejb/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote</para></listitem>
+                </itemizedlist>
+                <itemizedlist spacing="compact">
+                    <listitem><para>ejb-basic-war/WebGreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote</para></listitem>
                 </itemizedlist>
             </section>
             
@@ -130,10 +136,21 @@ java.naming.provider.url=http-remoting://127.0.0.1:8080
 <programlisting language=""><![CDATA[
 #java.naming.factory.initial
 java.naming.factory.url.pkgs=org.jboss.ejb.client.naming
-java.naming.provider.url=http-remoting://127.0.0.1:8080]]></programlisting>
+java.naming.provider.url=http-remoting://127.0.0.1:8080
+]]></programlisting>
                 <itemizedlist spacing="compact">
                     <listitem><para><code>java.naming.factory.initial</code> can be anything legal and not blank</para></listitem>
                 </itemizedlist>                
+                <tip>
+                    <title>WildFlyInitialContextFactory now handles both Remoting and EJB Client</title>
+                    <para>
+                      The WildFlyInitialContextFactory can handle both Remoting and EJB Client 
+                      JNDI setup with the same jndi.properties configuration. The specific 
+                      extension shown above was necessary in past versions and only shown here 
+                      as an example to show more details of how the "ejb:" prefix and 
+                      "java.naming.factory.url.pkgs" is being used.
+                    </para>
+                </tip>
                 <tip>
                     <title>EJB Client has additional communication details</title>
                     <para>EJB Client contains other details like alternate URLs, authentication configuration,
@@ -149,6 +166,9 @@ java.naming.provider.url=http-remoting://127.0.0.1:8080]]></programlisting>
                     <listitem><para>ejb:/ejb-basic-ejb/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote</para></listitem>
                     <listitem><para>ejb:/ejb-basic-war/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote</para></listitem>
                     <listitem><para>ejb:ejb-basic-ear/ejb-basic-ejb/GreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote</para></listitem>
+                </itemizedlist>
+                <itemizedlist spacing="compact">
+                    <listitem><para>ejb:/ejb-basic-war/WebGreeterEJB!info.ejava.examples.ejb.basic.ejb.GreeterRemote</para></listitem>
                 </itemizedlist>
                 <note>
                     <title>Add ?stateful to EJB Client Stateful Session EJB JNDI Names</title>
@@ -226,7 +246,8 @@ java.naming.provider.url=http-remoting://localhost:8080
                 WildFlyInitialContextFactory</ulink>. The following is a bit easier to remember and configure.
                 </para>
 
-<programlisting language=""><![CDATA[java.naming.factory.initial=org.wildfly.naming.client.WildFlyInitialContextFactory
+<programlisting language=""><![CDATA[
+java.naming.factory.initial=org.wildfly.naming.client.WildFlyInitialContextFactory
 java.naming.factory.url.pkgs=
 java.naming.provider.url=http-remoting://localhost:8080
 ]]></programlisting>

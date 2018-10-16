@@ -60,7 +60,6 @@ public interface Greeter {
                 <listitem><para>All types conveniently defined using Serializable types at this point to permit use of remote interface in future</para></listitem>
             </itemizedlist>
         </section>
-        
 
         <section id="ejb-basic-pojo-class-dto">
             <title>Serializable DTO</title>
@@ -89,6 +88,24 @@ public interface Greeter {
                 <listitem><para>Checked exceptions used to report business rule failures</para></listitem>
                 <listitem><para>Unchecked exceptions used to report infrastructure issues</para></listitem>
             </itemizedlist>
+        
+        <tip>
+          <title>Design Expressive Error Responses/Exceptions</title>
+          <para>
+            When designing exceptions or response codes for POJO business
+            methods -- it would be good to include the concept of:
+          </para>
+          <itemizedlist spacing="compact">
+              <listitem><para>Not Found -- one or more of the targets of the action could not be found</para></listitem>
+              <listitem><para>Bad Request -- nothing will improve if same request issued again</para></listitem>
+              <listitem><para>Internal Error -- nothing wrong with request and may be succesful at a later date</para></listitem>
+          </itemizedlist>
+          <para>
+            Also attempt to include specifics about the failed request to include IDs and parameters in question.
+            This information is very valuable in determining whether the client or server is at fault and 
+            to more quickly determine the specific error and how it can be resolved.
+          </para>
+        </tip>
         </section>
     </section>
 

@@ -70,6 +70,24 @@ public class GreeterEJB implements GreeterRemote {]]></programlisting>
 public class GreeterEJB implements Greeter {]]></programlisting>                        
                 </listitem>
             </itemizedlist>
+
+            <tip>
+              <title>Treat Remote interfaces as Transaction edge</title>
+              <para>
+                Calling an interface a @Remote can mean a few things -- but it does not
+                have to mean the direct caller is remote. It is recommended that you keep a separate
+                definition of @Remote from @Local interfaces to be able to focus on the semantics of
+                the data passed in and returned when implementing each interface. 
+                Remote interfaces should be designed
+                to referenced entities by ID and to pass fully realized entities 
+                -- within the scope of the method intent -- by value.
+                Local interfaces can pass lazily-loaded entities by reference.
+                Remote method implementations could leverage sibling 
+                Local interface methods for most of their implementation. This allows Local
+                interface EJBs to work fast-and-loose --avoiding excessive lookups -- 
+                while providing Remote interfaces at the transaction edge.
+              </para>
+            </tip>
         </section>
 
         <section id="ejb-basic-ejb-class-callbacks">
@@ -317,7 +335,7 @@ JNDI bindings for session bean named GreeterEJB in deployment unit deployment "e
     <section id="ejb-basic-ejb-summary">
        <title>Summary</title>
         <itemizedlist spacing="compact">
-            <listitem><para>Added necessary aspects to POJO to make it an EJB</para>
+            <listitem><para>Added necessary aspects to POJO business logic to make it an EJB</para>
                 <itemizedlist spacing="compact">
                     <listitem><para>Annotated class as @Stateless</para></listitem>
                     <listitem><para>Annotated remote interface as @Remote</para></listitem>

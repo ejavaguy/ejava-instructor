@@ -129,14 +129,26 @@ java:module/WebGreeterEJB
             <artifactId>ejb-basic-ejb</artifactId>
             <version>${project.version}</version>
             <type>ejb</type>
+            <scope>compile</scope>
         </dependency>     
     </dependencies>
-
 
     <build>
         <finalName>ejb-basic-war</finalName>
     </build>
 </project>]]></programlisting>
+
+  <warning>
+    <title>This example is for naked WAR deployment</title>
+    <para>
+      If the WAR is ever deployed within an EAR with a sibling EJB as its dependency
+      -- the scope of the dependency should be defined as "provided" and not "compile".
+      The "compile" scope will always deploy named artifacts (and their dependencies) within
+      the WEB-INF/lib directory of the WAR. If the EAR is deploying them as well -- you will
+      end up with duplicate deployments (one from the EAR and one from the WAR) and will
+      eventally fail.
+    </para>
+  </warning>
 
             <para>Support for embedded EJB development will require standard POJO and EJB dependencies</para>
 <programlisting language="xml"><![CDATA[        <!-- for embedded code/EJBs -->

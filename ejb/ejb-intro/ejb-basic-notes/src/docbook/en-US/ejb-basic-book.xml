@@ -23,10 +23,10 @@
         <section id="ejb-basic-goals">
             <title>Goals</title>
             <itemizedlist spacing="compact">
-                <listitem><para>Show how EJBs build on POJO concepts</para></listitem>
+                <listitem><para>Show how EJBs build on POJO business logic concepts</para></listitem>
                 <listitem><para>Create and deploy a basic EJB (without resource requirements or other dependencies)</para></listitem>
-                <listitem><para>Show different deployment options</para></listitem>
-                <listitem><para>Show how to access the EJB</para></listitem>
+                <listitem><para>Show different EJB deployment options</para></listitem>
+                <listitem><para>Show how to access the EJB via a native EJB remote interface</para></listitem>
                 <listitem><para>Create an integration test for the EJB</para></listitem>
             </itemizedlist>
         </section>
