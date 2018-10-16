@@ -4,49 +4,180 @@
 <chapter id="esport-project3-grading">
     <title>Project 3 Grading</title>
     <para>
-        Your project will be graded on completeness and quality of product. In
-        order for you to receive full credit in each area, it must be a)
-        complete, b) done well, and c) tested.  The breakdown of grading 
-        will be as follows:
+        Your project will be graded primarily on the demonstration ability to implement
+        concepts covered in this portion of the course. A perfect score will need to 
+        implement the full end-to-end scenario. A passing score will need to make sure
+        to cover the grading criteria outlined below within the partial end-to-end 
+        implemented.
     </para>
 
     <itemizedlist spacing="compact">
         <listitem><para>
-            README provided that describes where each requirement satisfied: 10pts
+            README provided that describes where each requirement satisfied and describes the non-obvious: 10pts total
             </para></listitem>
+
         <listitem><para>
-            Projects cleanly builds with Maven: 15pts
-            </para></listitem>
+            Projects cleanly builds with Maven and deploys required modules: 10pts total
+            </para>
+            <itemizedlist spacing="compact">
+              <listitem><para>
+                  Project cleanly builds the required modules (JAR, EJB, WAR, and EAR) with Maven: 5pts
+                  </para></listitem>
+              <listitem><para>
+                  Tests are based on provided Wildfly configuration files (no rogue users): 3pts
+                  </para></listitem>
+              <listitem><para>
+                  Server-side tests do not rely on DB residue from unit tests: 2pts
+                  </para></listitem>
+            </itemizedlist>
+            </listitem>
+
         <listitem><para>
-            Project 1 and 2 functionality: 5pts
-            </para></listitem>
+            Project 1 and 2 functionality: 5pts total
+            </para>
+            </listitem>
+
+
         <listitem><para>
-            Client Security Login: 10pts
-            </para></listitem>
+            Client Security Login: 10pts total
+            </para>
+            <itemizedlist spacing="compact">
+              <listitem><para>
+                  Demonstrated ability to authenticate a client call using JNDI and RMI: 3pts
+                  </para></listitem>
+              <listitem><para>
+                  Demonstrated ability to detect that a client RMI call was unauthorized: 2pts
+                  </para></listitem>
+              <listitem><para>
+                  Demonstrated ability to authenticate a client call using HTTP and JAX-RS: 3pts
+                  </para></listitem>
+              <listitem><para>
+                  Demonstrated ability to detect that a client JAX-RS call was unauthorized: 2pts
+                  </para></listitem>
+            </itemizedlist>
+            </listitem>
+
         <listitem><para>
-            EJB Security: 10pts
-            </para> </listitem>
+            EJB Security: 10pts total
+            </para>
+            <itemizedlist spacing="compact">
+              <listitem><para>
+                  Demonstrated use of declarative EJB access restrictions: 2pts
+                  </para></listitem>
+              <listitem><para>
+                  Demonstrated use of programmatic EJB access restrictions: 2pts
+                  </para></listitem>
+              <listitem><para>
+                  Demonstrated acceptance of an authenticated and authorized caller: 2pts
+                  </para></listitem>
+              <listitem><para>
+                  Demonstrated ability to determine the authenticated identity of an EJB caller: 2pts
+                  </para></listitem>
+              <listitem><para>
+                  Demonstrated denial of an unauthorized caller: 2pts
+                  </para></listitem>
+            </itemizedlist>
+            </listitem>
+
         <listitem><para>
-            WAR Security: 10pts
-            </para></listitem>
+            WAR Security: 10pts total
+            </para>
+            <itemizedlist spacing="compact">
+              <listitem><para>
+                  Demonstrated ability to have an HTTP URI client caller identity authenticated: 5pts
+                  </para></listitem>
+              <listitem><para>
+                  Demonstrated proper denial of an unauthorized HTTP URI client caller: 5pts
+                  </para></listitem>
+            </itemizedlist>
+            </listitem>
+
         <listitem><para>
-            EJB JMS Publisher: 5pts
-            </para></listitem>
+            JavaEE Interceptors/Validator: 10pts total
+            </para>
+            <itemizedlist spacing="compact">
+              <listitem><para>
+                  Demonstrated ability to configure a JavaEE Interceptor around an EJB call: 4pts
+                  </para></listitem>
+              <listitem><para>
+                  Demonstrated ability to isolate the business and DAO logic from DTO validation: 3pts
+                  </para></listitem>
+              <listitem><para>
+                  Demonstrated denial of a call containing an DTO failing javax.validation: 3pts
+                  </para></listitem>
+            </itemizedlist>
+            </listitem>
+
         <listitem><para>
-            EJB MDB Subscriber: 5pts
-            </para></listitem>
+            JMS Message: 5pts total
+            </para>
+            <itemizedlist spacing="compact">
+              <listitem><para>
+                  Demonstrated ability to design JMS message to carry a portable payload: 3pts
+                  </para></listitem>
+              <listitem><para>
+                  Demonstrated ability to design a JMS message to be filtered by a selector: 2pts
+                  </para></listitem>
+            </itemizedlist>
+            </listitem>
+
         <listitem><para>
-            Java SE JMS Listener: 5pts
-            </para></listitem>
+            EJB JMS Publisher: 5pts total
+            </para>
+            <itemizedlist spacing="compact">
+              <listitem><para>
+                  Demonstrated ability to inject JMS resources: 2pts
+                  </para></listitem>
+              <listitem><para>
+                  Demonstrated ability to construct a JMS message: 1pts
+                  </para></listitem>
+              <listitem><para>
+                  Demonstrated ability to publish a JMS message: 2pts
+                  </para></listitem>
+            </itemizedlist>
+            </listitem>
+
         <listitem><para>
-            JavaEE Interceptors/Validator: 5pts
-            </para></listitem>
+            EJB MDB Subscriber: 5pts total
+            </para>
+            <itemizedlist spacing="compact">
+              <listitem><para>
+                  Demonstrated ability to receive a JMS message using an MDB: 2pts
+                  </para></listitem>
+              <listitem><para>
+                  Demonstrated ability to configure an MDB to filter JMS messages based on a selector: 2pts
+                  </para></listitem>
+              <listitem><para>
+                  Demonstrated ability to extract a portable payload from a JMS message: 1pts
+                  </para></listitem>
+            </itemizedlist>
+            </listitem>
+
         <listitem><para>
-            EJB Timers: 10pts
-            </para></listitem>
+            EJB Timers: 10pts total
+            </para>
+            <itemizedlist spacing="compact">
+              <listitem><para>
+                  Demonstrated ability to declare an EJB callback method for a timer: 2pts
+                  </para></listitem>
+              <listitem><para>
+                  Demonstrated ability to define a timer to callback an EJB method: 5pts
+                  </para></listitem>
+              <listitem><para>
+                  Demonstrated ability to complete an EJB Timer callback: 3pts
+                  </para></listitem>
+            </itemizedlist>
+            </listitem>
+
         <listitem><para>
-            End-to-End Integration Test: 10pts
-            </para></listitem>
+            End-to-End Integration Test: 10pts total
+            </para>
+            <itemizedlist spacing="compact">
+              <listitem><para>
+                  Clean, easy to follow, sequence of steps through the end-to-end flow demonstrated: 10pts
+                  </para></listitem>
+            </itemizedlist>
+            </listitem>
     </itemizedlist>
 
 
@@ -151,12 +282,14 @@
                 </row>
             </thead>
             <tbody>
+                <!--
                 <row rowsep="1">
                   <entry namest="area">
                     Fine, but too many fine-grain logins.
                     </entry>
                   <entry namest="points">0</entry>
                 </row>                        
+                -->
             </tbody>
         </tgroup>
 

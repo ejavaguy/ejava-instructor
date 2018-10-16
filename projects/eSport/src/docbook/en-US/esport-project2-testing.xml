@@ -8,7 +8,8 @@
         <para>
             The end-to-end scenario will test your end-to-end application in a 
             "happy path" scenario. Any white-box or black-box testing of alternate
-            and error paths would be appropriate to put in the separate unit and IT tests.
+            and error paths would be appropriate to put in the separate unit 
+            and IT test cases.
         </para>
     </tip>
 

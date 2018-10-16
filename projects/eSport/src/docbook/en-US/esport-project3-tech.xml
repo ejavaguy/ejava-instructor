@@ -34,7 +34,7 @@
                         </para></listitem>
                     <listitem><para>
                         Use of CONFIDENTIAL (HTTPS) is not required for this project
-                        can should be easily added if you have time.
+                        but can be easily added if you have time.
                         </para></listitem>
                 </orderedlist>
                 </listitem>
@@ -83,6 +83,12 @@
                 Allow any user to perform read operations.
                 </para>
                 </listitem>
+            <listitem><para>
+                Use Run-As to assign application code a role sufficient to 
+                complete its required actions when there is no calling client
+                identity.
+                </para>
+                </listitem>
         </orderedlist>
     </section>
 
@@ -129,6 +135,12 @@
                         </listitem>
                 </orderedlist>
                 </listitem>
+            <listitem><para>
+                Use Run-As to assign application code a role sufficient to 
+                complete its required actions when there is no calling client
+                identity.
+                </para>
+                </listitem>
         </orderedlist>
     </section>
 
@@ -137,15 +149,18 @@
         <title>Remote Client Authentication</title>
         <para>
             Extend your existing client code to optionally accept credentials.
+            No credentials provided should invoke a remote method/URI as an 
+            anonymous user. Credentials provided should invoke a remote 
+            method/URI using the identity associated with the credentials.
         </para>
         <orderedlist spacing="compact">
             <listitem><para>
-                For RMI -- add security principal and credential properties
-                to your JNDI lookup.
+                For RMI -- dynamically add security principal and credential 
+                properties to your runtime JNDI lookup.
                 </para></listitem>
             <listitem><para>
-                For JAX-RS -- add a "Basic" Authentication header (ideally 
-                using a JAX-RS ClientRequestFilter) to each HTTP(S) request.
+                For JAX-RS -- dynamically add a "Basic" Authentication header 
+                (ideally using a JAX-RS ClientRequestFilter) to each HTTP(S) request.
                 </para></listitem>
         </orderedlist>
     </section>
@@ -162,11 +177,16 @@
                 </para>
                 </listitem>
             <listitem><para>
-                Add a new unit test that verifies the access controls of the
+                Add a new unit test case that verifies the access controls of the
                 protected and open methods. This means that -- after fixing access
                 issues in the previous bullet -- you purposely attempt to violate
                 access restrictions from a new JUnit test to show a test of 
                 access control.
+                </para>
+                <para>
+                Please see the 
+                <link linkend="esport-project3-grading">grading criteria</link> 
+                to identify specific scenarios your JUnit tests should address in this area.
                 </para>
                 </listitem>
         </orderedlist>
@@ -176,7 +196,9 @@
         <title>eLeague Web-UI Access Restrictions</title>
         <para>
             Enhance Web-UIs with authentication and access restrictions for any 
-            use case you implement requiring access control.
+            use case you implement requiring access control. Note that your selected
+            use case may not require an authenticated user -- which would render
+            this section not relevant.
         </para>
         <orderedlist spacing="compact">
             <listitem><para>
@@ -204,7 +226,7 @@
             Co-hosting the Web-UI and API in the same WAR will restrict you
             to using the same authentication mechanism for both. Since we 
             are suggesting use of BASIC for API calls -- we would use BASIC
-            for the Web-UI as well. That works except the use of BASIC and the 
+            for the Web-UI as well. That functionally works except the use of BASIC and the 
             way the HTTP protocol and browsers work -- it makes it hard to 
             logout to change identity. Keeping the project within scope --
             this may limit the number of steps you implement with Web-UI
@@ -273,8 +295,15 @@
                     </para>
                     </listitem>
                 <listitem><para>
-                    Design your JMS Message. You can use any JMS Type and JMS/custom
-                    properties you wish.  However, know that some subscribers will
+                    Design your JMS Message to carry a portable payload. 
+                    You can use any JMS Type you wish. However, know that subscribers 
+                    will not likely have your implementation JARs with Entity classes.
+                    Use of DTO classes works well here.
+                    </para>
+                    </listitem>
+                <listitem><para>
+                    Design your JMS Message to be filterable using a JMS selector. 
+                    You can use any properties you wish.  However, know that some subscribers will
                     be filtering on such things as the impacted club, team, or type of event.
                     </para>
                     </listitem>
@@ -288,8 +317,8 @@
             <note>
               <para>
                 This means that there are several reasons for a Contest to be sent
-                and that reason should be a selectable part of the overall message
-                properties.
+                and that reason should be a filterable part of the overall message
+                properties using a JMS selector.
               </para>
             </note>
         </section>
@@ -313,8 +342,13 @@
                 <listitem><para>
                     Obtain the e-mail address for each individual associated with
                     the team effected by the event. Print a textual message and the
-                    address list to the log. You do not have to physically send an
-                    e-mail as a part of this project.
+                    address list to the server log. 
+                    </para>
+                    <para>
+                    You do not have to physically send an e-mail as a part of this assignment.
+                    The key point of this requirement is for your MDB to be able to 
+                    succesfully access a protected EJB method without a calling client 
+                    context present.
                     </para>
                     </listitem>
             </orderedlist>
@@ -330,8 +364,8 @@
             wake-up and send out schedule reminders for contests that have not yet
             finished. Depending on the provided test data, you might want to limit
             the number of reminders sent. The main goal of this requirement is
-            that you make use of an EJBTimer and that you trigger the MDB logic
-            in eClub.
+            that you make use of an EJBTimer and that you trigger the 
+            JMS filtered MDB logic in eClub.
         </para>
         <para>
             Your timer can be declarative or programmatic. However, the programmatic 

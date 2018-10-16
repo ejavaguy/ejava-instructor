@@ -8,7 +8,8 @@
         <para>
             The end-to-end scenario will test your end-to-end application in a 
             "happy path" scenario. Any white-box or black-box testing of alternate
-            and error paths would be appropriate to put in the separate unit and IT tests.
+            and error paths would be appropriate to put in the separate unit 
+            and IT test cases.
         </para>
     </note>
 
@@ -18,18 +19,20 @@
             eLeague accessed through its remote interface using new
             access control restrictions.  The test should demonstrate that 
             authentication and access control is in place for this 
-            EAR-based deployed application and status is properly conveyed
-            to the caller.  For both RMI and JAX-RS, there should be:
+            EAR-based deployed application, the authenticated identity
+            of the caller can be accessed by the server-side code,
+            and status of the call is properly conveyed to the caller.  
+            For both RMI and JAX-RS, there should be:
             </para> 
             <orderedlist spacing="compact">
                 <listitem><para>
                     An example successful call of an access controlled resource
-                    using an authorized user properly authenticated
+                    using an authorized user properly authenticated and verified
+                    to be the correct value.
                     </para> </listitem>
                 <listitem><para>
                     An example unsuccessful call (using the same call as above) 
-                    of an access controlled resource
-                    using an unauthorized user
+                    of an access controlled resource using an unauthorized user
                     </para> </listitem>
                 <listitem><para>
                     Proper indication to the caller that the caller was or was 
@@ -41,10 +44,12 @@
         <listitem><para>
             Provide JUnit IT tests that verify the EJB functionality of 
             eClub using its new access control restrictions and ability
-            to authenticate with eLeague. The test should demonstrate that 
+            to authenticate (if necessary) with eLeague. The test should demonstrate that 
             authentication and access control is in place for this 
-            WAR-based deployed application.
-            </para> </listitem>
+            WAR-based deployed application. This is similar to above --
+            except must be demonstrated with eClub.
+            </para> 
+            </listitem>
         <listitem><para>
             Provide a JUnit IT tests that demonstrates the functionality of the 
             JavaEE interceptor/validator. This should include:
@@ -60,6 +65,10 @@
                     code. Validation must be performed with the Validation API,
                     must be done within an Interceptor, and cannot be performed within
                     the core Java logic within the called EJB.
+                    </para> </listitem>
+                <listitem><para>
+                    An example of the caller receiving an indication of whether
+                    the call was rejected for security or validation reasons.
                     </para> </listitem>
             </orderedlist>
             </listitem>

@@ -31,18 +31,21 @@
                     Re-use the eLeague and eClub implementations from projects 1 and 2.
                     </para></listitem>
                 <listitem><para>
-                    Define access controls and implement authentication mechanisms for 
-                    applications.
+                    Implement authentication and access restrictions for EJB methods 
+                    and WEB URIs thru declarative and programmatic APIs.
                     </para></listitem>
                 <listitem><para>
-                    Implement DTO validation using interceptors
+                    Implement authentication for RMI and HTTP(s) clients.
                     </para></listitem>
                 <listitem><para>
-                    Implement a publish/subscribe capability between eLeague, eClub,
-                    and stand-alone client applications.
+                    Implement DTO validation using interceptors.
                     </para></listitem>
                 <listitem><para>
-                    Trigger certain behaviors based on timers.
+                    Implement a filterable, publish/subscribe capability with portable
+                    payloads between applications.
+                    </para></listitem>
+                <listitem><para>
+                    Schedule and invoke certain behavior based on an EJB timer.
                     </para></listitem>
             </itemizedlist>
             <para></para>
@@ -64,13 +67,15 @@
             servers provide default mechanisms behind the scenes to implement 
             these features -- that can make it simple and easy to demonstrate. 
             A switch to more realistic and sophisticated mechanisms should
-            require no change to the JavaEE-compliant application code.  
-            We will use the simple, default/"other" security-domain defined
+            require no change to JavaEE-compliant application code.  
+            We will use the simple, default "other" security-domain defined
             within the standard JBoss installation. This uses the RealmUsersRoles
             login-module -- which is powered by two property files supplied and
-            pre-populated by the course server files from ejava-wildflyXXXX
+            pre-populated by the course server files from ejava-wildfly(version)
             in your course examples source tree. You unzipped this file into
-            your application server configuration as part of course setup.
+            your application server configuration as part of course setup
+            and it would be wise to repeat that to make sure your server configuration
+            is up to date with any changes added since then.
         </para>
 
         <table>
@@ -121,8 +126,8 @@ standalone/configuration/application-users.properties
         <para>
             We are going to have several types of user roles. Some of the users will
             have zero, one, or more of these roles. Because of the static nature of
-            our authentication, all users will have a login configured before
-            the application is even deployed to the server.
+            our demonstration authentication solution, all users will have a login 
+            configured before the application is even deployed to the server.
         </para>
 
         <table>
@@ -208,7 +213,14 @@ standalone/configuration/application-users.properties
         <para>
             If a user has a login for one application, they will use the same
             account to access the other application 
-            (e.g., user2 might have both eclub-coord and eleague-clubcoord roles).
+            (e.g., user2 has both eleague-clubcoord and eclub-coord roles).
+        </para>
+        <para>
+            The "sys" accounts are meant to be used by the application code
+            when actions taken require an authenticated user but there is 
+            no caller context (e.g., async callbacks) or the identity of the 
+            incoming caller is not appropriate for the outgoing call being 
+            triggered (e.g., elevated permission access).
         </para>
 
         <table>
@@ -326,9 +338,10 @@ standalone/configuration/application-users.properties
         <note>
             <para>
             To clarify, your application will have a static set of
-            logins and will dynamically ingest a set of Contacts or Members
-            at runtime. A user with a
-            login and no Contact/Member can login, but won't be able to do
+            logins and will dynamically ingest a set of Contacts at scenario
+            startup. More Contacts and Members will be added during the
+            scenario.  A user with a login and no Contact/Member info
+            within the database can login, but won't be able to do
             anything meaningful to them personally. A user with a Contact/Member 
             defined and no login won't be able to access the protected 
             areas of the system. 
@@ -348,14 +361,14 @@ standalone/configuration/application-users.properties
         </para>
 
         <para>
-          We will use HTTPS to provide confidentiality between our client and server
-          for communications.  The server has a keystore for identity. The JUnit tests 
+          We will optionally (for the assignment) use HTTPS to provide 
+          confidentiality between our client and server for communications.  
+          The server has a keystore for identity. The JUnit tests 
           can conveniently use that as a trustStore through the base path
           defined by the "jboss.home" property.
         </para>
 
-<programlisting language="xml"><![CDATA[
-# build/dependencies/pom.xml
+<programlisting language="xml"><![CDATA[# build/dependencies/pom.xml
 
 <java.truststore>${jboss.home}/standalone/configuration/application.keystore</java.truststore>
 ...
@@ -415,15 +428,32 @@ standalone/configuration/application-users.properties
 ]]></programlisting>
         </note>
 
+        <tip>
+          <title>SSL and/or HTTPS is not a assignment requirement</title>
+          <para>
+            Although essential in securing communications, SSL and/or HTTPS is
+            not a requirement for implmenting this assignment. The instructions
+            above are provided for students wishing to satisfy a key but 
+            not very noticeable portion of a secure interface.
+          </para>
+        </tip>
+
+
         <para>
             For asynchronous activity, we will implement a Schedule JMS Topic where 
             eLeague will publish messages related to team schedules. 
             eClub will subscribe to the topic using a Message Driven 
-            Bean to keep members up to date on schedule changes.
+            Bean (MDB) to keep members up to date on schedule changes.
             The JMS topic has already been added to your JMS Server within
             JBoss and has been assigned both an internal and external JNDI name. 
-            You will have to design the type, structure, and payload of
-            the messages sent on that topic.
+            You will have to design the message type, message properties,
+            and payload of the messages sent on that topic in order that the
+            message carries a partable payload and can be filtered for 
+            subscriber-specific criteria via a JMS selector.
+            Your DTOs already express a portable expression of data.
+            Each club will only want to process messages for their teams
+            and only events that impact upcoming schedules (i.e., not
+            scores of completed Contests).
         </para>
 
 <programlisting language="xml"><![CDATA[<jms-topic name="esport-eleague-contests" 
@@ -432,7 +462,8 @@ standalone/configuration/application-users.properties
 ]]></programlisting>
 
         <para>
-          eLeague will use EJB Timers to send out schedule reminders.
+          eLeague will use EJB Timers to send out schedule reminders
+          for upcoming Contests.
         </para>
             
     </section>
