@@ -76,6 +76,17 @@
                 </itemizedlist>                   
             </section>
         </section>
+
+        <tip>
+          <title>POJO Business Logic is an example of Session Facade Pattern</title>
+          <para>
+            You have already implemented the Session Facade Pattern with your
+            POJO business logic from previous work. There is nothing magical about
+            server-side EJBs over POJO business logic, relative to the Session Facade
+            Pattern, except for the enhanced ability to implement remote, transactional, 
+            secure, and load-balanced behavior without impacting the focus on the business.
+          </para>
+        </tip>
     </section>
     
         <section id="ejb-intro-why-pattern-remotefacade">
@@ -96,7 +107,7 @@
                 
                 <figure>
                     <title>Remote Facade Problem</title>
-                    <graphic scale="50" fileref="images/ejb-intro-remote-facade-problem.png"/>
+                    <graphic scalefit="1" fileref="images/ejb-intro-remote-facade-problem.png"/>
                 </figure>
             </section>
         

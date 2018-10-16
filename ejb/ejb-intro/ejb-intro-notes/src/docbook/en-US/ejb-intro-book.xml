@@ -37,11 +37,17 @@
             <itemizedlist spacing="compact">
                 <listitem><para>State reasons for/against adding an EJB to a JavaEE application</para></listitem>
                 <listitem><para>State the four different types of EJBs and reasons for/against using each</para></listitem>
-                <listitem><para>State the three different built-in interface types and when to/not-to use each</para></listitem>
+                <listitem><para>State the three different built-in EJB interface types and when to/not-to use each</para></listitem>
                 <listitem><para>State the three different deployment options and when to/not-to use each</para></listitem>
             </itemizedlist>
         </section>
+        <note>
+          <para>
+            Web integration adds an additional HTTP/REST-capable interface to EJB.
+          </para>
+        </note>
     </preface>
+
 
     <xi:include href="ejb-intro-why.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-intro-ejb.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />

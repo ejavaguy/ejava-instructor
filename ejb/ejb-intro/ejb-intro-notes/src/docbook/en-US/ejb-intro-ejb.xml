@@ -147,11 +147,20 @@ public class HotelMgmtEJB implements HotelMgmtRemote, HotelMgmtLocal {
 			        </itemizedlist>
 	            </listitem>
                 <listitem><para>Methods take in a set of parameters and return a result</para></listitem>
-	            <listitem><para>Maintains implementation state</para>
+	            <listitem><para>May maintain implementation state when pooled</para>
 			        <itemizedlist spacing="compact">
-			            <listitem><para>example: DataSource</para></listitem>
-			            <listitem><para>example: JMS connections</para></listitem>
-                        <listitem><para>example: References to other EJBs</para></listitem>
+			            <listitem><para>
+                                      example: DataSource, JMS resources, references to other EJBs
+                                      </para></listitem>
+			            <listitem><para>
+                                      Not the default behavior. Only an option when number of instances needed 
+                                      is limited and initialization is expensive
+                                      </para></listitem>
+			            <listitem><para>
+                                      In no case should business state ever be maintained outside of
+                                      the scope of a method or a back-end database or other stateful
+                                      resource.
+                                      </para></listitem>
 			        </itemizedlist>
 	            </listitem>
 	            <listitem><para>Examples:</para>
@@ -300,8 +309,8 @@ public class StatsEJB implements StatsLocal, StatsRemote {
         
 	    <section id="ejb-intro-ejb-mdb">
 	        <title>Message Driven EJB (MDB)</title>
-            <figure>
-                <title>Example Message Driven EJB</title>
+                <figure>
+                    <title>Example Message Driven EJB</title>
 <programlisting language="java"><![CDATA[
 @javax.ejb.MessageDriven(activationConfig={
         @javax.ejb.ActivationConfigProperty(
@@ -326,16 +335,21 @@ public class BuyerMDB implements MessageListener {
        ...
     }
 }]]></programlisting>
-            </figure>
+                </figure>
             
-	        <itemizedlist spacing="compact">
-	            <listitem><para>Used to receive JMS messages</para></listitem>
-	            <listitem><para>Similar to Stateless EJB, but with no callable interface</para></listitem>
-	            <listitem><para>Typically provides a JMS facade for injected Session EJBs</para></listitem>
+            <itemizedlist spacing="compact">
+                <listitem><para>Used to receive JMS messages</para></listitem>
+                <listitem><para>Similar to Stateless EJB, but with no callable interface</para></listitem>
+                <listitem><para>Typically provides a JMS facade for injected Session EJBs</para></listitem>
                 <listitem><para>Good for implementing a JMS interface facade to business logic</para></listitem>
                 <listitem><para>Unable to be called outside the scope of a JMS/JCA call -- should delegate to Session EJBs</para></listitem>
-                <listitem><para>Has no client context (i.e., anonymous)</para></listitem>
-	        </itemizedlist>
+                <listitem><para>Has no client context (i.e., anonymous)</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Can be assigned access roles using @javax.annotation.security.RunAs
+                           to be permitted to invoke methods of protected EJBs</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
 	    </section>
     </section>
     
@@ -356,7 +370,7 @@ public class BuyerMDB implements MessageListener {
             <itemizedlist spacing="compact">
                 <listitem><para>Pure POJO</para></listitem>
                 <listitem><para>No ties to EJB</para></listitem>
-                <listitem><para>No sense of local or remote</para></listitem>
+                <listitem><para>No sense of local or remote -- just local</para></listitem>
             </itemizedlist>
         </section>    
 
@@ -488,8 +502,9 @@ public class ProductsResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @JsonbAnnotation  //helps trigger JSON-B response marshaling when DTO also JAXB
     public Response updateProduct(@PathParam("id") int id, 
-            @JsonbProperty Product product  //annotation helps trigger JSON-B request demarshaling when DTO also JAXB
-         ) {
+       @JsonbProperty Product product  //annotation helps trigger JSON-B 
+                                       //request demarshaling when DTO also JAXB
+       ) {
         logger.debug("{} {}", request.getMethod(), uriInfo.getAbsolutePath());
 
         try {
@@ -567,7 +582,7 @@ public class ProductsResource {
 			            <listitem><para>Ideal use for No-interface Session EJB</para></listitem>
 			        </itemizedlist>
 	            </listitem>
-	            <listitem><para>Eliminates need for EAR in some cases</para></listitem>
+	            <listitem><para>Eliminates need for EAR in many cases</para></listitem>
 	        </itemizedlist>
 	    </section>
 
