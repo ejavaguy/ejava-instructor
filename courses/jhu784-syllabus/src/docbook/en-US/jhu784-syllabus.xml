@@ -169,16 +169,18 @@
                 <entry namest="date">Oct31</entry>
             </row>
             <row rowsep="1">
-                <entry namest="topic"><para>Configuring EJBs using EJB and CDI Injection</para></entry>
-                <!--
                 <entry namest="topic"><para><link linkend="enc-config">Configuring EJBs using ENC and JNDI</link></para></entry>
+                <!--
                 <entry namest="comment"><para><ulink url="../html/encconfig-lab.html">Exercise: JNDI/ENC Configuration</ulink></para></entry>
                 -->
                 <entry namest="comment"><para>Rubinger &amp; Burke: Ch 16</para></entry>
             </row>
+            <row>
+                <entry namest="topic"><para>Configuring EJBs and more with CDI</para></entry>
                 <!--
                 <entry namest="topic"><para><link linkend="cdi-config">CDI</link></para></entry>
                 -->
+            </row>
 
             <row rowsep="1">
                 <entry namest="topic"><para>EJB/Server-Side JPA Topics</para></entry>
