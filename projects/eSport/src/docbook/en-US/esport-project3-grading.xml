@@ -282,14 +282,11 @@
                 </row>
             </thead>
             <tbody>
-                <!--
                 <row rowsep="1">
                   <entry namest="area">
-                    Fine, but too many fine-grain logins.
                     </entry>
-                  <entry namest="points">0</entry>
+                  <entry namest="points"></entry>
                 </row>                        
-                -->
             </tbody>
         </tgroup>
 
