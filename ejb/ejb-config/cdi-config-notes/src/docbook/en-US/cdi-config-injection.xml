@@ -6,18 +6,20 @@
 
     <section id="cdi-config-injection-pfield">
         <title>Producer Field</title>
-<programlisting language="java"><![CDATA[	public class SchedulerResources {
-	    @PersistenceContext(unitName="jndidemo")-->-+
-	    @Produces                                   |
-	    @JndiDemo                                   |
- +-<----public EntityManager em; <------------------+
+<programlisting language="java"><![CDATA[       public class CdiDemoConfig {
+            @Produces
+            @CdiDemo
+            @PersistenceContext(unitName="cdi-config")-->-+
+ +-<--------public EntityManager em; <--------------------+
  |	
- |	@Stateless
- |	public class TrainSchedulerEJB 
- |	    extends SchedulerBase implements TrainSchedulerRemote {
- |	    
- |      @Inject @JndiDemo
- `----->private EntityManager em;]]></programlisting>
+ |      public class ProjectsDaoImpl implements ProjectsDao {
+ |          private EntityManager em;
+ |          
+ +--------> @PersistenceContext @CdiDemo
+            public void setEntityManager(EntityManager em) {
+                this.em = em;
+            }
+]]></programlisting>
         <itemizedlist spacing="compact">
             <listitem><para>Public field used as injection source</para></listitem>
             <listitem><para>Useful when no behavior is required</para></listitem>
@@ -26,31 +28,26 @@
 
     <section id="cdi-config-injection-pmethod">
         <title>Producer Method</title>
-<programlisting language="java"><![CDATA[	public class DAOFactory {
-	    @PersistenceContext(unitName="ejbcdi-sales")
-	    @Produces
-	    public EntityManager em;
-	    
-	    @Produces
-	    @Dependent
- +-<----public UserMgmtDAO getUserMgmtDAO(EntityManager em, Validator validator) {
- |	        UserMgmtDAO dao = new UserMgmtDAO();
- |	        dao.setEntityManager(em);
- |	        dao.setValidator(validator);
- |	        return dao;
- |	    }
- |	
- |	@Stateless
- |	public class UserMgmtEJB implements UserMgmtLocal {
- |	    @Inject
- `----->private UserMgmtDAO dao;]]></programlisting>
+<programlisting language="java"><![CDATA[            @Produces
+            @CdiDemo
+ +-<------  public JobsDao jobsDao(@CdiDemo EntityManager em) {
+ |              JobsDaoImpl impl = new JobsDaoImpl();
+ |              impl.setEntityManager(em);
+ |              return impl;
+ |          }
+ |	    
+ |          @Stateless
+ |          @Remote(JobsMgmtRemote.class)
+ |          public class JobsMgmtEJB implements JobsMgmtRemote {
+ |              @Inject @CdiDemo
+ +---------->   private JobsDao jobDao;
+ ]]></programlisting>
         
         <itemizedlist spacing="compact">
             <listitem><para>Injection type was not ambiguous - no @Qualifier required</para></listitem>
             <listitem><para>Method called by container</para></listitem>
             <listitem><para>Method declares parameters for what it needs to build product</para></listitem>
             <listitem><para>Method parameters automatically injected</para></listitem>
-            <listitem><para>@Dependent allows injection point to determine scope for the bean (e.g., request, session, etc.)</para></listitem>
         </itemizedlist>                   
     </section>
 
@@ -61,7 +58,6 @@
             <title>JNDI Resource Lookup</title>
 <programlisting language="java"><![CDATA[    @Resource(lookup="java:jboss/datasources/ExampleDS")
     @Produces
-    @JndiDemo
     public DataSource ds;]]></programlisting>
         </figure>
         <itemizedlist spacing="compact">
@@ -71,7 +67,7 @@
         <figure>
             <title>String Resource</title>
 <programlisting language="java"><![CDATA[    @Produces
-    @JndiDemo
+    @CdiDemo
     public String message="Hello CDI!!!";]]></programlisting>
         </figure>
         <itemizedlist spacing="compact">
@@ -91,8 +87,8 @@
  |	    @Inject @Any
  `----> protected Instance<Scheduler> anyCook;
 	    protected Scheduler cook2;      |
-	                +-------------------+
-                    v 
+                        +-------------------+
+                        v 
         cook2 = anyCook.select(new CookQualifier()).get();]]></programlisting>
 <programlisting language="java"><![CDATA[public class CookQualifier extends javax.enterprise.util.AnnotationLiteral<Cook>{}]]></programlisting>
         <itemizedlist spacing="compact">

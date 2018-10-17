@@ -25,11 +25,11 @@
         
         <figure>
             <title>Beans</title>
-<programlisting language="java"><![CDATA[@Named
-public class JPASchedulerDAOImpl extends JPADAOBase<Task> implements SchedulerDAO {
+<programlisting language="java"><![CDATA[public class ProjectsDaoImpl implements ProjectsDao {
 ]]></programlisting>            
 <programlisting language="java"><![CDATA[@Stateless
-public class CookEJB extends SchedulerBase implements CookLocal {
+@Remote(TasksMgmtRemote.class)
+public class TasksMgmtEJB implements TasksMgmtRemote {
 ]]></programlisting>            
         </figure>
         <itemizedlist spacing="compact">
@@ -40,7 +40,8 @@ public class CookEJB extends SchedulerBase implements CookLocal {
         <figure>
             <title>Injection</title>
 <programlisting language="java"><![CDATA[@Inject
-protected Scheduler cook; ]]></programlisting>            
+private ProjectsDao projectsDao;
+]]></programlisting>            
         </figure>
         <itemizedlist spacing="compact">
             <listitem><para>Type-safe, Java-based container injection</para></listitem>
@@ -50,11 +51,13 @@ protected Scheduler cook; ]]></programlisting>
         
         <figure>
             <title>Qualifiers and Qualified Injection</title>
-<programlisting language="java"><![CDATA[@Inject @Cook
-protected Scheduler cook; ]]></programlisting>            
-<programlisting language="java"><![CDATA[@Stateless
-@Cook
-public class CookEJB extends SchedulerBase implements CookLocal {]]></programlisting>            
+<programlisting language="java"><![CDATA[@Inject @CdiDemo
+private JobsDao jobDao;
+]]></programlisting>            
+<programlisting language="java"><![CDATA[@Produces
+@CdiDemo
+JobsDao jobsDao(@CdiDemo EntityManager em) {
+]]></programlisting>            
         </figure>
         <itemizedlist spacing="compact">
             <listitem><para>@Annotation qualifier specializes injection type to remove ambiguity</para></listitem>
@@ -62,7 +65,7 @@ public class CookEJB extends SchedulerBase implements CookLocal {]]></programlis
         
         <figure>
             <title>Qualifier Annotations</title>
-<programlisting language="java"><![CDATA[package ejava.examples.jndidemo;
+<programlisting language="java"><![CDATA[package ejava.examples.cdiconfig;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -73,7 +76,7 @@ import javax.inject.Qualifier;
 @Qualifier
 @Retention(RUNTIME)
 @Target({METHOD, FIELD, PARAMETER, TYPE})
-public @interface Cook {
+public @interface CdiDemo {
 }]]></programlisting>            
         </figure>
         <itemizedlist spacing="compact">
@@ -163,13 +166,13 @@ public @interface Cook {
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
      xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/beans_1_1.xsd">
    <scan>
-      <exclude name="info.ejava.examples.ejb.cdisales.dao.UserMgmtDAO"/>
+      <exclude name="fully qualified classname"/>
    </scan>
 </beans>]]></programlisting>
         </figure>
         <itemizedlist spacing="compact">
             <listitem><para>Can be blank or empty</para></listitem>
-            <listitem><para>Example shows XML alternative to using @Veto - which makes a bean unavailable for injection</para></listitem>
+            <listitem><para>Example shows XML alternative to using @Vetoed - which makes a bean unavailable for injection</para></listitem>
         </itemizedlist>
 
 

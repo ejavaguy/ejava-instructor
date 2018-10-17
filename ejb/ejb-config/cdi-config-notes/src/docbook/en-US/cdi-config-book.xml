@@ -3,7 +3,7 @@
     "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <book id="cdi-config">
     <bookinfo>
-        <title>Context and Dependency Injection (CDI)</title>
+        <title>Context and Dependency Injection (CDI) Configuration</title>
         <issuenum>${content.version}</issuenum>
         <pubdate>${docbook.pubdate}</pubdate>
         <copyright>
