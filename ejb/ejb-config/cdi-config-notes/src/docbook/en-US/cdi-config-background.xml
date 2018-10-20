@@ -23,7 +23,7 @@
     <section id="cdi-config-background-concept">
         <title>Injection Concept</title>
         
-        <figure>
+        <section id="cdi-config-background-concept-beans">
             <title>Beans</title>
 <programlisting language="java"><![CDATA[public class ProjectsDaoImpl implements ProjectsDao {
 ]]></programlisting>            
@@ -31,25 +31,58 @@
 @Remote(TasksMgmtRemote.class)
 public class TasksMgmtEJB implements TasksMgmtRemote {
 ]]></programlisting>            
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>Beans can be simple POJOs, EJBs, Servlets, etc.</para></listitem>
-            <listitem><para>CDI Beans generalize behavior provided by larger frameworks</para></listitem>
-        </itemizedlist>
+            <itemizedlist spacing="compact">
+                <listitem><para>Beans can be simple POJOs, EJBs, Servlets, etc.</para></listitem>
+                <listitem><para>CDI Beans generalize behavior provided by larger frameworks</para></listitem>
+            </itemizedlist>
+        </section>
         
-        <figure>
+        <section id="cdi-config-background-concept-injection">
             <title>Injection</title>
 <programlisting language="java"><![CDATA[@Inject
 private ProjectsDao projectsDao;
 ]]></programlisting>            
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>Type-safe, Java-based container injection</para></listitem>
-            <listitem><para>Container will match injection point with managed bean of requested type</para></listitem>
-            <listitem><para>Error if container finds multiple classes satisfying requested type</para></listitem>
-        </itemizedlist>
+            <itemizedlist spacing="compact">
+                <listitem><para>Type-safe, Java-based container injection</para></listitem>
+                <listitem><para>Container will match injection point with managed bean of requested type</para></listitem>
+                <listitem><para>Ambiguity error if container finds multiple classes satisfying requested type</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="cdi-config-background-concept-amiguity">
+            <title>Ambiguity Error</title>
+<programlisting language="java"><![CDATA[@Stateless
+@Remote(JobsMgmtRemote.class)
+public class JobsMgmtEJB implements JobsMgmtRemote {
+    @Inject
+    private JobsDao jobDao;     i                       //<== injection target
+]]></programlisting>            
+
+<programlisting language="java"><![CDATA[public class JobsDaoImpl implements JobsDao {           //<== candidate 1 a bean of type
+]]></programlisting>            
+
+<programlisting language="java"><![CDATA[public class CdiDemoConfig {
+    @Produces
+    public JobsDao jobsDao(@CdiDemo EntityManager em) { //<== candidate 2 - a producer of type
+]]></programlisting>            
+
+<programlisting language="java"><![CDATA[Caused by: org.jboss.weld.exceptions.DeploymentException: WELD-001409: 
+        Ambiguous dependencies for type JobsDao with qualifiers @Default
+at injection point [BackedAnnotatedField] 
+   @Inject private ejava.examples.cdiconfig.ejb.JobsMgmtEJB.jobDao
+at ejava.examples.cdiconfig.ejb.JobsMgmtEJB.jobDao(JobsMgmtEJB.java:0)
+Possible dependencies:
+- Managed Bean [class ejava.examples.cdiconfig.dao.JobsDaoImpl] with qualifiers [@Any @Default],
+- Producer Method [JobsDao] with qualifiers [@Any @Default] declared as [[BackedAnnotatedMethod] 
+  @Produces public ejava.examples.cdiconfig.CdiDemoConfig.jobsDao(@CdiDemo EntityManager)]
+]]></programlisting>            
+            <itemizedlist spacing="compact">
+                <listitem><para>Two or more sources of the target injection type</para></listitem>
+                <listitem><para>Ambiguity can be resolved through use of @Alternatives, @Priority, and qualifiers</para></listitem>
+            </itemizedlist>
+        </section>
         
-        <figure>
+        <section id="cdi-config-background-concept-qualinject">
             <title>Qualifiers and Qualified Injection</title>
 <programlisting language="java"><![CDATA[@Inject @CdiDemo
 private JobsDao jobDao;
@@ -58,13 +91,13 @@ private JobsDao jobDao;
 @CdiDemo
 JobsDao jobsDao(@CdiDemo EntityManager em) {
 ]]></programlisting>            
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>@Annotation qualifier specializes injection type to remove ambiguity</para></listitem>
-        </itemizedlist>
+            <itemizedlist spacing="compact">
+                <listitem><para>@Annotation qualifier specializes injection type to remove ambiguity</para></listitem>
+            </itemizedlist>
+        </section>
         
-        <figure>
-            <title>Qualifier Annotations</title>
+        <section id="cdi-config-background-concept-qualifier">
+            <title>Qualifier Annotation</title>
 <programlisting language="java"><![CDATA[package ejava.examples.cdiconfig;
 
 import java.lang.annotation.Retention;
@@ -78,75 +111,76 @@ import javax.inject.Qualifier;
 @Target({METHOD, FIELD, PARAMETER, TYPE})
 public @interface CdiDemo {
 }]]></programlisting>            
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>java.lang.annoation</para>
-                <variablelist spacing="compact">
-                    <varlistentry>
-                        <term><filename>@Retention</filename></term>
-                        <listitem><para>how long the class is retained (default=CLASS)</para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>RententionPolict</filename></term>
-                        <listitem><para></para>
-                            <itemizedlist spacing="compact">
-                                <listitem><para>CLASS - annotation recorded in class file but not available at runtime</para></listitem>
-                                <listitem><para>RUNTIME - annotation recorded in class and available at runtime</para></listitem>
-                                <listitem><para>SOURCE - annotation discarded by compiler</para></listitem>
-                            </itemizedlist>                
-                        </listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>@Target</filename></term>
-                        <listitem><para>kind of Java construct the annotation applies to</para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>ElementType</filename></term>
-                        <listitem><para></para>
-                            <itemizedlist spacing="compact">
-                                <listitem><para>TYPE</para></listitem>
-                                <listitem><para>FIELD</para></listitem>
-                                <listitem><para>METHOD</para></listitem>
-                                <listitem><para>PARAMETER</para></listitem>
-                                <listitem><para>(more)</para></listitem>
-                            </itemizedlist>                
-                        </listitem>
-                    </varlistentry>
-                </variablelist>
-            </listitem>
-            <listitem><para>javax.inject (JSR-330)</para>
-                <variablelist spacing="compact">
-                    <varlistentry>
-                        <term><filename>@Inject</filename></term>
-                        <listitem><para>an injection target</para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>@Named</filename></term>
-                        <listitem><para>string qualifier (for JSPs, etc. to reference bean using text)</para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>@Qualifier</filename></term>
-                        <listitem><para>identifies qualifier annotations</para></listitem>
-                    </varlistentry>
-                </variablelist>
-            </listitem>
-            <listitem><para>javax.enterprise.inject (JSR-299)</para>
-                <variablelist spacing="compact">
-                    <varlistentry>
-                        <term><filename>@Produces</filename></term>
-                        <listitem><para>an injection source</para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>@Any</filename></term>
-                        <listitem><para>no qualifiers</para></listitem>
-                    </varlistentry>
-                    <varlistentry>
-                        <term><filename>Instance&lt;Bean&gt;</filename></term>
-                        <listitem><para>runtime source of type Bean</para></listitem>
-                    </varlistentry>
-                </variablelist>
-            </listitem>
-        </itemizedlist>
+          <itemizedlist spacing="compact">
+              <listitem><para>java.lang.annoation</para>
+              
+                  <variablelist spacing="compact">
+                      <varlistentry>
+                          <term><filename>@Retention</filename></term>
+                          <listitem><para>how long the class is retained (default=CLASS)</para></listitem>
+                      </varlistentry>
+                      <varlistentry>
+                          <term><filename>RententionPolict</filename></term>
+                          <listitem><para></para>
+                              <itemizedlist spacing="compact">
+                                  <listitem><para>CLASS - annotation recorded in class file but not available at runtime</para></listitem>
+                                  <listitem><para>RUNTIME - annotation recorded in class and available at runtime</para></listitem>
+                                  <listitem><para>SOURCE - annotation discarded by compiler</para></listitem>
+                              </itemizedlist>                
+                          </listitem>
+                      </varlistentry>
+                      <varlistentry>
+                          <term><filename>@Target</filename></term>
+                          <listitem><para>kind of Java construct the annotation applies to</para></listitem>
+                      </varlistentry>
+                      <varlistentry>
+                          <term><filename>ElementType</filename></term>
+                          <listitem><para></para>
+                              <itemizedlist spacing="compact">
+                                  <listitem><para>TYPE</para></listitem>
+                                  <listitem><para>FIELD</para></listitem>
+                                  <listitem><para>METHOD</para></listitem>
+                                  <listitem><para>PARAMETER</para></listitem>
+                                  <listitem><para>(more)</para></listitem>
+                              </itemizedlist>                
+                          </listitem>
+                      </varlistentry>
+                  </variablelist>
+              </listitem>
+              <listitem><para>javax.inject (JSR-330)</para>
+                  <variablelist spacing="compact">
+                      <varlistentry>
+                          <term><filename>@Inject</filename></term>
+                          <listitem><para>an injection target</para></listitem>
+                      </varlistentry>
+                      <varlistentry>
+                          <term><filename>@Named</filename></term>
+                          <listitem><para>string qualifier (for JSPs, etc. to reference bean using text)</para></listitem>
+                      </varlistentry>
+                      <varlistentry>
+                          <term><filename>@Qualifier</filename></term>
+                          <listitem><para>identifies qualifier annotations</para></listitem>
+                      </varlistentry>
+                  </variablelist>
+              </listitem>
+              <listitem><para>javax.enterprise.inject (JSR-299)</para>
+                  <variablelist spacing="compact">
+                      <varlistentry>
+                          <term><filename>@Produces</filename></term>
+                          <listitem><para>an injection source</para></listitem>
+                      </varlistentry>
+                      <varlistentry>
+                          <term><filename>@Any</filename></term>
+                          <listitem><para>no qualifiers</para></listitem>
+                      </varlistentry>
+                      <varlistentry>
+                          <term><filename>Instance&lt;Bean&gt;</filename></term>
+                          <listitem><para>runtime source of type Bean</para></listitem>
+                      </varlistentry>
+                  </variablelist>
+              </listitem>
+          </itemizedlist>
+        </section>
     </section>
     
     <section id="cdi-config-background-beans">
@@ -158,7 +192,7 @@ public @interface CdiDemo {
             <listitem><para>WEB-INF/beans.xml for WARs</para></listitem>
         </itemizedlist>
 
-        <figure>
+        <section id="cdi-config-background-beans-beansxml">
             <title>beans.xml</title>
 <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <beans bean-discovery-mode="all" version="1.1"
@@ -168,12 +202,16 @@ public @interface CdiDemo {
    <scan>
       <exclude name="fully qualified classname"/>
    </scan>
+   <alternatives>
+      <class>...</class>
+   </alternatives>
 </beans>]]></programlisting>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>Can be blank or empty</para></listitem>
-            <listitem><para>Example shows XML alternative to using @Vetoed - which makes a bean unavailable for injection</para></listitem>
-        </itemizedlist>
+            <itemizedlist spacing="compact">
+                <listitem><para>Can be blank or empty</para></listitem>
+                <listitem><para>Example shows XML alternative to using @Vetoed - which makes a bean unavailable for injection</para></listitem>
+                <listitem><para>Example shows enabling an @Alternative for application</para></listitem>
+            </itemizedlist>
+        </section>
 
 
     </section>
@@ -190,4 +228,3 @@ public @interface CdiDemo {
     </section>
 
 </chapter>
-  

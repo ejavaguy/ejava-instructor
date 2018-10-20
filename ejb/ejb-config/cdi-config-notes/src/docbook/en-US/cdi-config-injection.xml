@@ -51,43 +51,43 @@
         </itemizedlist>                   
     </section>
 
-    <section id="cdi-config-injection-lookup">
+    <section id="cdi-config-injection-producers">
         <title>Other Producers</title>
         
-        <figure>
-            <title>JNDI Resource Lookup</title>
+        <section id="cdi-config-injection-producers-jndi">
+            <title>Example JNDI Resource Lookup Producer</title>
 <programlisting language="java"><![CDATA[    @Resource(lookup="java:jboss/datasources/ExampleDS")
     @Produces
     public DataSource ds;]]></programlisting>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>Injection source populated from a JNDI lookup</para></listitem>
-        </itemizedlist>                   
+            <itemizedlist spacing="compact">
+                <listitem><para>Injection source populated from a JNDI lookup</para></listitem>
+            </itemizedlist>                   
+        </section>
         
-        <figure>
-            <title>String Resource</title>
+        <section id="cdi-config-injection-producers-string">
+            <title>Example String Resource Producer</title>
 <programlisting language="java"><![CDATA[    @Produces
     @CdiDemo
     public String message="Hello CDI!!!";]]></programlisting>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>Injection source populated from hard coded value. Could be changed to method.</para></listitem>
-        </itemizedlist>                   
+            <itemizedlist spacing="compact">
+                <listitem><para>Injection source populated from hard coded value. Could be changed to method.</para></listitem>
+            </itemizedlist>                   
+        </section>
     </section>
 
     <section id="cdi-config-injection-any">
         <title>@Any Instance</title>
-<programlisting language="java"><![CDATA[	    @EJB(lookup="java:app/jndiDemoEJB/CookEJB!ejava.examples.jndidemo.ejb.CookLocal")
-	    @Produces                                            |
-	    @Cook                                                |
- +---<--public Scheduler cook; <-----------------------------+
- |	
- |	@Stateless
- |	public class TrainSchedulerEJB 
+<programlisting language="java"><![CDATA[        @EJB(lookup="java:app/jndiDemoEJB/CookEJB!ejava.examples.jndidemo.ejb.CookLocal")
+        @Produces                                        |
+        @Cook                                            |
+ +---<--public Scheduler cook; <-------------------------+
+ |
+ |      @Stateless
+ |      public class TrainSchedulerEJB 
  |	    @Inject @Any
  `----> protected Instance<Scheduler> anyCook;
-	    protected Scheduler cook2;      |
-                        +-------------------+
+        protected Scheduler cook2;      |
+                        +---------------+
                         v 
         cook2 = anyCook.select(new CookQualifier()).get();]]></programlisting>
 <programlisting language="java"><![CDATA[public class CookQualifier extends javax.enterprise.util.AnnotationLiteral<Cook>{}]]></programlisting>

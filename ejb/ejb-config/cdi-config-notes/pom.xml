@@ -17,7 +17,7 @@
     
     <properties>
        <doc.base>cdi-config-book</doc.base>
-       <content.version>v2018-10-16</content.version>
+       <content.version>v2018-10-20</content.version>
     </properties>
 
     <build>
