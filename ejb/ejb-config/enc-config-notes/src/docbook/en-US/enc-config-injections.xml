@@ -1,0 +1,183 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="enc-config-injection">
+    <title>Injecting Specific EJB Resources without ENC</title>
+    <para>
+      This chapter focuses on injecting relevant resources into an EJB using modern
+      injection techniques. From the points made in the previous chapter -- you know
+      that there are more tedious and verbose techniques from the older EJB specs
+      that pre-date @Annotations and ease-of-use enhancements. They will not be
+      included here.
+    </para>
+
+    <section id="enc-config-injection-session">
+        <title>Injecting EJB SessionContext</title>
+        <para>Inject a Resource to locate information from Container</para>
+
+<programlisting language="java"><![CDATA[private @Resource SessionContext ctx;
+]]></programlisting>
+
+        <itemizedlist spacing="compact">
+            <listitem><para>
+                </para>ctx.lookup("...")</listitem>                        
+            <listitem><para>
+                </para>ctx.getCallerPrincipal()</listitem>                        
+            <listitem><para>
+                </para>ctx.getRollbackOnly()</listitem>                        
+        </itemizedlist>
+    </section>
+    
+    <section id="enc-config-injection-jdbc">
+        <title>Injecting JDBC Resources</title>
+        <para>Inject a pool of database connections</para>
+
+        <itemizedlist spacing="compact">
+            <listitem><para>From JNDI lookup using 100% annotation-based</para>
+<programlisting language="java"><![CDATA[@Resource(lookup="java:jboss/datasources/ExampleDS")
+private DataSource ds1;]]></programlisting>
+            </listitem>                        
+
+            <listitem><para>From ENC using annotations</para>
+<programlisting language="java"><![CDATA[@Resource(name="jdbc/ds3")
+private DataSource ds3;]]></programlisting>                        
+            </listitem>
+        </itemizedlist>
+    </section>
+    
+    <section id="enc-config-injection-jpa">
+        <title>Injecting JPA Resources</title>
+        <para>Inject access to the Persistence Unit</para>
+
+        <itemizedlist spacing="compact">
+
+            <listitem><para>From persistence-unit name using 100% annotation-based</para>
+<programlisting language="java"><![CDATA[@PersistenceContext(unitName="enc-config")
+private EntityManager em1;
+@PersistenceUnit(unitName="enc-config")
+private EntityManagerFactory emf1;]]></programlisting>
+            </listitem>                        
+
+            <listitem><para>From ENC using annotations</para>
+<programlisting language="java"><![CDATA[@PersistenceContext(name="jpa/em3")
+private EntityManager em3;
+@PersistenceUnit(name="jpa/emf3")
+private EntityManagerFactory emf3;]]></programlisting>                        
+                <tip>
+                    <title>Use unitName for persistence unit name</title>
+                    <para>Use <code>unitName</code> and not <code>name</code>
+                    when specifying the name of the persistence unit. <code>name</code>
+                    is for the ENC name.</para>
+                </tip>
+            </listitem>
+        </itemizedlist>
+    </section>
+        
+
+    <section id="enc-config-injection-ejb">
+        <title>Injecting EJB Resources</title>
+        <para>Inject access to other EJBs</para>
+
+        <itemizedlist spacing="compact">
+            <listitem><para>From type matching using 100% annotations</para>
+<programlisting language="java"><![CDATA[@EJB
+private InjectedTypedLocal ejb9a;
+@EJB
+private InjectedTypedRemote ejb9b;
+@EJB
+private InjectedEJB ejb1;
+]]></programlisting>
+              <itemizedlist spacing="compact">
+                <listitem><para>
+                  Container is able to locate a single component that implements injected variable type
+                  </para></listitem>
+                <listitem><para>
+                    Last example is an example of a No Interface, @LocalBean EJB
+                  </para>
+                  <para>
+                    No Interface is common technique for "helper" EJBs that implement a container-managed 
+                    boundary (e.g., security @RunAs or transaction REQUIRES_NEW)
+                  </para></listitem>
+              </itemizedlist>
+            </listitem>
+
+            <listitem><para>From type matching with Local/Remote ambiguities</para>
+<programlisting language="java"><![CDATA[@EJB
+private InjectedTyped ejb10;
+//DeploymentUnitProcessingException: WFLYEJB0406: 
+//No EJB found with interface of type 'ejava.ejb.examples.encconfig.ejb.InjectedTyped'
+]]></programlisting>
+<programlisting language="java"><![CDATA[@EJB(beanInterface=InjectedTypedLocal.class)
+private InjectedTyped ejb10a;
+@EJB(beanInterface=InjectedTypedRemote.class)
+private InjectedTyped ejb10b;    
+]]></programlisting>
+              <itemizedlist spacing="compact">
+                <listitem><para>
+                  Example shows @Local and @Remote extending from common InjectedTyped interface
+                  that presents a problem trying to use the base interface type.
+                  </para></listitem>
+              </itemizedlist>
+            </listitem>
+
+            <listitem><para>From JNDI lookup using 100% annotations</para>
+              <para>
+                lookup is referencing a specific component using 
+                <ulink url="https://docs.oracle.com/cd/E19798-01/821-1841/girgn/index.html">Portable JNDI Syntax</ulink>
+              </para>
+              <itemizedlist spacing="compact">
+                <listitem><para>Global definition valid locally from outside the application. EAR may or
+                  may not apply.
+                  </para>
+<programlisting language="java"><![CDATA[java:global[/application name]/module name/enterprise bean name[/interface name]
+]]></programlisting>
+<programlisting language="java"><![CDATA[@EJB(lookup="java:global/enc-config-example-ejb/InjectedEJB!ejava.ejb.examples.encconfig.ejb.InjectedEJB")
+private InjectedEJB ejb3;
+@EJB(lookup="java:global/enc-config-example-ejb/InjectedEJB")
+private InjectedEJB ejb6;
+]]></programlisting>
+                </listitem>
+
+                <listitem><para>Application definition valid locally from within the application
+                  </para>
+<programlisting language="java"><![CDATA[java:app[/module name]/enterprise bean name[/interface name]
+]]></programlisting>
+<programlisting language="java"><![CDATA[@EJB(lookup="java:app/enc-config-example-ejb/InjectedEJB!ejava.ejb.examples.encconfig.ejb.InjectedEJB")
+private InjectedEJB ejb4;
+@EJB(lookup="java:app/enc-config-example-ejb/InjectedEJB")
+private InjectedEJB ejb7;
+]]></programlisting>
+                </listitem>
+                <listitem><para>Module definition valid locally with within same module
+                  java:module/enterprise bean name/[interface name]
+                  </para>
+<programlisting language="java"><![CDATA[java:module/enterprise bean name/[interface name]
+]]></programlisting>
+<programlisting language="java"><![CDATA[@EJB(lookup="java:module/InjectedEJB!ejava.ejb.examples.encconfig.ejb.InjectedEJB")
+private InjectedEJB ejb5;
+@EJB(lookup="java:module/InjectedEJB")
+private InjectedEJB ejb8;
+]]></programlisting>
+                  </listitem>
+              </itemizedlist>
+            </listitem>                        
+
+            <listitem><para>From ENC using annotations</para>
+<programlisting language="java"><![CDATA[@EJB(name="ejb/ejb2")
+private InjectedEJB ejb2;]]></programlisting>                        
+            </listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="enc-config-injection-summary">
+       <title>Summary</title>
+        <itemizedlist spacing="compact">
+        <listitem><para>Inject EJB SessionContext</para></listitem>
+        <listitem><para>Inject JDBC DataSource</para></listitem>
+        <listitem><para>Inject EntityManager</para></listitem>
+        <listitem><para>Inject EntityManagerFactory</para></listitem>
+        <listitem><para>Inject EJB</para></listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  

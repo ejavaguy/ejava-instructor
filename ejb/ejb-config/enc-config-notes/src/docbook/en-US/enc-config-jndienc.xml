@@ -24,7 +24,7 @@ try {
 }]]></programlisting>                        
             </listitem>
             <listitem><para>Lookups are passed a JNDI name</para></listitem>
-            <listitem><para>JNDI name have prefixes that can given them special meaning</para>
+            <listitem><para>JNDI name have prefixes that can give them special meaning</para>
                 <itemizedlist spacing="compact">
                     <listitem><para>(no prefix) - global namespace (available remotely)</para></listitem>
                     <listitem><para>java: - namespace available only within JVM</para></listitem>
@@ -109,11 +109,25 @@ Object object = jndi.lookup(jndiName);]]></programlisting>
 Object object = ctx.lookup(encname);]]></programlisting>                        
             </listitem>
             <listitem><para>Populated into ENC using</para>
+                <note>
+                  <para>
+                    The only reason to purposely populate the ENC is to support ENC lookups. 
+                    Purposely populating the ENC is not necessary for alternate injection techniques.
+                  </para>
+                </note>
                 <itemizedlist spacing="compact">
                     <listitem><para>Annotations</para>
                     
 <programlisting language="java"><![CDATA[@Resource(lookup="java:jboss/datasources/ExampleDS", name="jdbc/ds2")
 private DataSource ds2;]]></programlisting>
+                    <para>
+                      The annotation is looking up the 
+                      potentially non-portable, local (java:) JNDI name from the global
+                      JNDI tree and making it available in the ENC (java:comp/env) in addition to
+                      injecting it into the Java variable. The later addition of the "lookup"
+                      annotation attribute (which may use a vendor-specific JNDI name) to injections 
+                      in the EJB spec made configuring simple cases simple.
+                    </para>
                         
                     </listitem>                    
                     <listitem><para>XML using META-INF/ejb-jar.xml</para>
@@ -123,6 +137,15 @@ private DataSource ds2;]]></programlisting>
     <res-type>javax.sql.DataSource</res-type>
     <lookup-name>java:jboss/datasources/ExampleDS</lookup-name>
 </resource-ref>]]></programlisting>
+                    <para>
+                      The standard EJB deployment descriptor is looking up the 
+                      potentially non-portable, local (java:) JNDI name from the global
+                      JNDI tree and making it available in the ENC (java:comp/env)
+                      The later addition of the "lookup-name" 
+                      XML attribute (which may use a vendor-specific JNDI name)
+                      in the EJB spec eliminated the need for vendor-specific
+                      deployment descriptors for simple cases like this.
+                    </para>
                         
                     </listitem>
                     <listitem><para>XML using META-INF/jboss-ejb3.xml</para>
@@ -131,20 +154,60 @@ private DataSource ds2;]]></programlisting>
     <res-ref-name>jdbc/ds3</res-ref-name>
     <jndi-name>java:jboss/datasources/ExampleDS</jndi-name>
 </resource-ref>]]></programlisting>
+                    <para>
+                      The vendor-specific EJB deployment descriptor is looking up the 
+                      potentially non-portable, local (java:) JNDI name from the global
+                      JNDI tree and making it available in the ENC (java:comp/env)
+                      This is where potentially non-portable JNDI names had to be
+                      supplied in the original EJB specs.
+                    </para>
                         
                     </listitem>
                 </itemizedlist>
             </listitem>
             <listitem><para>Injected into EJB using</para>
+                <note>
+                  <para>
+                    In these cases, we are purposely injecting the resource directly 
+                    into the variable without a concern for the ENC.
+                  </para>
+                </note>
+
                 <itemizedlist spacing="compact">
                     <listitem><para>Annotations without ENC</para>
 <programlisting language="java"><![CDATA[@Resource(lookup="java:jboss/datasources/ExampleDS")
 private DataSource ds1;]]></programlisting>                        
+                    <itemizedlist spacing="compact">
+                      <listitem><para>
+                        Performing the injection into the Java field 100% within the code
+                        </para></listitem>
+                      <listitem><para>
+                        Good for quick cases where developer knows the JNDI name of the
+                        resource and wants it injected into the variable
+                        </para></listitem>
+                      <listitem><para>
+                        Code must be updated whenever the JNDI name of the resource changes
+                        </para></listitem>
+                    </itemizedlist>
                     </listitem>
+
                     <listitem><para>Annotations with populated ENC</para>
 <programlisting language="java"><![CDATA[@Resource(name="jdbc/ds3")
 private DataSource ds3;]]></programlisting>                        
+                    <itemizedlist spacing="compact">
+                      <listitem><para>
+                        Performing the injection into the Java field using a portable 
+                        ENC reference (java:comp/env/jdbc/ds3)
+                        </para></listitem>
+                      <listitem><para>
+                        Adds a requirement for ENC to be populated
+                        </para></listitem>
+                      <listitem><para>
+                        Code is portable and only ENC setup mechanism must be ported
+                        </para></listitem>
+                    </itemizedlist>
                     </listitem>
+
                     <listitem><para>XML using META-INF/ejb-jar.xml</para>
 <programlisting language="xml"><![CDATA[<resource-ref>
     <res-ref-name>jdbc/ds1</res-ref-name>
@@ -155,28 +218,48 @@ private DataSource ds3;]]></programlisting>
     </injection-target>
     <lookup-name>java:jboss/datasources/ExampleDS</lookup-name>
 </resource-ref>]]></programlisting>                        
+                    <itemizedlist spacing="compact">
+                      <listitem><para>
+                        Populates the ENC (java:comp/env/jdbc/ds1) as before
+                        </para></listitem>
+                      <listitem><para>
+                        Also performs injection into the EJB Java field using a standard
+                        XML deployment descriptor
+                        </para></listitem>
+                      <listitem><para>
+                        EJB code is portable. Just the descriptor needs updating on change.
+                        </para></listitem>
+                      <listitem><para>
+                        Injections are fairly basic. e.g., cannot inject into an object embedded
+                        within the EJB or define a global injection rule.
+                        </para></listitem>
+                    </itemizedlist>
                     </listitem>
                 </itemizedlist>
             </listitem>
             
             <listitem><para>Perform actions on injected resources after injection
                 complete using <code>@PostConstruct</code></para>
-<programlisting language="java"><![CDATA[@Resource(name="jdbc/ds3")
-private DataSource ds3;
+<programlisting language="java"><![CDATA[@Resource(lookup="java:jboss/datasources/ExampleDS")
+private DataSource ds1;
+private SomeDao someDao;
 
 @PostConstruct
 public void init() {
-    ds3...
+    //ds1 already injected -or-
+    ds1 = (DataSource)ctx.lookup("jdbc/ds1"); //-or-
+    ds1 = (DataSource)jndi.lookup("java:comp/env/jdbc/ds1"); //-or-
+
+    someDao = new SomeDaoImpl(ds1);
 ...    
 }]]></programlisting>
-                        
-            </listitem>
-        </itemizedlist>
                 <para>Call Order:</para>
                 <orderedlist>
                     <listitem><para>Properties are injected</para></listitem>
                     <listitem><para>@PostConstruct is invoked</para></listitem>
                 </orderedlist>
+            </listitem>
+        </itemizedlist>
     </section>
         
     <section id="enc-config-jndienc-summary">
@@ -185,11 +268,11 @@ public void init() {
             <listitem><para>Java Naming and Directory Interface (JNDI)</para></listitem>
             <listitem><para>Global Naming Context</para>
                 <orderedlist>
-                    <listitem><para>Remote</para></listitem>
-                    <listitem><para>Local</para></listitem>
+                    <listitem><para>Remote - available both internal and external to application server</para></listitem>
+                    <listitem><para>Local (java:) - only available within the application server</para></listitem>
                 </orderedlist>
             </listitem>
-            <listitem><para>ENC Naming Context</para></listitem>
+            <listitem><para>ENC Naming Context (java:comp/env) - local naming context for (EJB) component</para></listitem>
         </itemizedlist>
     </section>    
 </chapter>
