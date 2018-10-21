@@ -17,7 +17,7 @@
     
     <properties>
        <doc.base>jhu784-notes-book</doc.base>
-       <content.version>v2018-08-21</content.version>
+       <content.version>v2018-10-21</content.version>
     </properties>
 
     <dependencies>
@@ -113,13 +113,19 @@
             <classifier>docsrc</classifier>
         </dependency>
 
-        <!--
         <dependency>
             <groupId>info.ejava.docs.ejb</groupId>
             <artifactId>enc-config-notes</artifactId>
             <version>${project.version}</version>
             <classifier>docsrc</classifier>
         </dependency>
+        <dependency>
+            <groupId>info.ejava.docs.ejb</groupId>
+            <artifactId>cdi-config-notes</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+        <!--
         <dependency>
             <groupId>info.ejava.docs.ejb</groupId>
             <artifactId>ejb-jpa-notes</artifactId>
@@ -135,12 +141,6 @@
         <dependency>
             <groupId>info.ejava.docs.ejb</groupId>
             <artifactId>webtier-notes</artifactId>
-            <version>${project.version}</version>
-            <classifier>docsrc</classifier>
-        </dependency>
-        <dependency>
-            <groupId>info.ejava.docs.ejb</groupId>
-            <artifactId>cdi-config-notes</artifactId>
             <version>${project.version}</version>
             <classifier>docsrc</classifier>
         </dependency>
