@@ -103,7 +103,8 @@ Tests run: 10, Failures: 0, Errors: 0, Skipped: 10
             The overall project is a six (6) module project with one(1) parent 
             and five (5) child modules; impl, ejb, ear, war, and test. 
         </para>
-        <figure>
+        
+        <section id="ejb-jpaex-start-exercise-ide-modules">
             <title>Exercise Modules</title>
 <programlisting language=""><![CDATA[jpatickets-labex
                                                                                                                                                                                           
@@ -142,22 +143,22 @@ Tests run: 10, Failures: 0, Errors: 0, Skipped: 10
 |           `-- resources
 
 `-- pom.xml]]></programlisting>
-        </figure>
+            <para>
+                The Impl module provides the business objects (BOs), data access objects (DAOs),
+                and business logic for the application. The BOs are mapped to the database using
+                JPA, the DAOs implement the details of accessing the BOs in the database. The
+                business logic handles any logic issues above the data tier (minimal in this case).
+                The impl module contains a JPA persistence unit and test infrastructure that we 
+                will want to use for reference when deploying one to the server-side. There are two main interfaces
+                to the business logic; VenueMgmt and EventMgmt. The EJB tier simply needs to instantiate
+                this logic, inject the objects with required resource dependencies (i.e., a persistence 
+                context/EntityManager), provide remote and local access, and define transaction semantics
+                to the container. You will not need to modify this module during the exercise but may be
+                asked to look through it.
+            </para>
+        </section>
 
-        <para>
-            The Impl module provides the business objects (BOs), data access objects (DAOs),
-            and business logic for the application. The BOs are mapped to the database using
-            JPA, the DAOs implement the details of accessing the BOs in the database. The
-            business logic handles any logic issues above the data tier (minimal in this case).
-            The impl module contains a JPA persistence unit and test infrastructure that we 
-            will want to use for reference when deploying one to the server-side. There are two main interfaces
-            to the business logic; VenueMgmt and EventMgmt. The EJB tier simply needs to instantiate
-            this logic, inject the objects with required resource dependencies (i.e., a persistence 
-            context/EntityManager), provide remote and local access, and define transaction semantics
-            to the container. You will not need to modify this module during the exercise but may be
-            asked to look through it.
-        </para>
-        <figure>
+        <section id="ejb-jpaex-start-exercise-ide-implsrc">
             <title>Impl Module Source Tree</title>
 <programlisting language=""><![CDATA[jpatickets-labex/jpatickets-labex-impl/
 |-- pom.xml
@@ -198,19 +199,19 @@ Tests run: 10, Failures: 0, Errors: 0, Skipped: 10
             |-- log4j.properties
             `-- META-INF
                 `-- persistence.xml]]></programlisting>
-        </figure>
+            <para>
+                The EJB contains two primary EJBs for the exercise (VenueMgmtEJB and EventMgmtEJB)
+                and a third/fourth EJB we will not address (TicketsInitEJB and TicketsInitTxEJB).
+                I refer to it as a third/fourth EJB because logically "TickitInit" is one logical
+                EJB that has been split into two physical EJBs.  TicketInitEJB is the remote facade
+                for IT clients to initiate a DB reset. TicketInitTxEJB is an EJB that wraps drop()
+                and create() schema into separate transactions. It happens to use BEAN managed transactions
+                for those actions. You will primarily be working with the VenueMgmt and EventMgmt EJBs
+                and the persistence unit that will be defined in META-INF/persistence.xml
+            </para>
+        </section>
 
-        <para>
-            The EJB contains two primary EJBs for the exercise (VenueMgmtEJB and EventMgmtEJB)
-            and a third/fourth EJB we will not address (TicketsInitEJB and TicketsInitTxEJB).
-            I refer to it as a third/fourth EJB because logically "TickitInit" is one logical
-            EJB that has been split into two physical EJBs.  TicketInitEJB is the remote facade
-            for IT clients to initiate a DB reset. TicketInitTxEJB is an EJB that wraps drop()
-            and create() schema into separate transactions. It happens to use BEAN managed transactions
-            for those actions. You will primarily be working with the VenueMgmt and EventMgmt EJBs
-            and the persistence unit that will be defined in META-INF/persistence.xml
-        </para>
-        <figure>
+        <section id="ejb-jpaex-start-exercise-ide-ejbsrc">
             <title>EJB Module Source Tree</title>
 <programlisting language=""><![CDATA[jpatickets-labex/jpatickets-labex-ejb/
 |-- pom.xml
@@ -233,17 +234,16 @@ Tests run: 10, Failures: 0, Errors: 0, Skipped: 10
         `-- resources
             `-- META-INF
                 `-- persistence.xml]]></programlisting>
-            
-        </figure>
-
-        <para>
-            The EAR module contains no source other than a pom.xml. It is exclusively
-            used to deploy the EJB to the server with its Impl module dependency. 
-            When identifying the entity classes in the EAR-deployed EJB persistence.xml
-            as a "jar-file", it will be important to know the path of the Impl module
-            within the EAR.           
-        </para>        
-        <figure>
+            <para>
+                The EAR module contains no source other than a pom.xml. It is exclusively
+                used to deploy the EJB to the server with its Impl module dependency. 
+                When identifying the entity classes in the EAR-deployed EJB persistence.xml
+                as a "jar-file", it will be important to know the path of the Impl module
+                within the EAR.           
+            </para>        
+        </section>
+        
+        <section id="ejb-jpaex-start-exercise-ide-earsrc">        
             <title>EAR Module Source and Deployable Artifact Tree</title>
 <programlisting language=""><![CDATA[jpatickets-labex/jpatickets-labex-ear/
 `-- pom.xml]]></programlisting>
@@ -253,15 +253,16 @@ Tests run: 10, Failures: 0, Errors: 0, Skipped: 10
 |   `-- jpatickets-labex-impl-4.0.0-SNAPSHOT.jar
 `-- META-INF
     `-- application.xml]]></programlisting>
-        </figure>
+            <para>
+                The WAR module is provide to demonstrate persistent unit deployment 
+                through an imported EJB and an embedded persistence.xml. It is strictly
+                being used as a deployment platform and does not contain a user 
+                interface.
+            </para>                
+        </section>
 
-        <para>
-            The WAR module is provide to demonstrate persistent unit deployment 
-            through an imported EJB and an embedded persistence.xml. It is strictly
-            being used as a deployment platform and does not container a user 
-            interface.
-        </para>                
-       <figure>
+
+        <section id="ejb-jpaex-start-exercise-ide-warsrc">        
            <title>WAR Module Source Tree</title>
 <programlisting language=""><![CDATA[jpatickets-labex-war/src/
 `-- main
@@ -277,16 +278,17 @@ Tests run: 10, Failures: 0, Errors: 0, Skipped: 10
     `-- webapp-filtered                                                                                                                                                                                            
         `-- WEB-INF                                                                                                                                                                                                
             `-- jboss-web.xml]]></programlisting>
-        </figure>
+            <para>
+                The RMI IT Test module is used to deploy the EAR and WAR and initiate 
+                tests within the exercise. When you start the exercise most/all of the 
+                @Tests have been deactivated with an @Ignore. You will turn them on to
+                expose issues with the implementation and then implement a fix. At the
+                end of the exercise all @Tests should be enabled and passing.
+            </para>
+        </section>
    
-        <para>
-            The RMI IT Test module is used to deploy the EAR and WAR and initiate 
-            tests within the exercise. When you start the exercise most/all of the 
-            @Tests have been deactivated with an @Ignore. You will turn them on to
-            expose issues with the implementation and then implement a fix. At the
-            end of the exercise all @Tests should be enabled and passing.
-        </para>
-        <figure>
+        
+        <section id="ejb-jpaex-start-exercise-ide-clientsrc">
             <title>RMI IT Test Module Source Tree</title>
 <programlisting language=""><![CDATA[jpatickets-labex-test/src/                                                                                                                                                                                        
 `-- test                                                                                                                                                                                                           
@@ -302,7 +304,7 @@ Tests run: 10, Failures: 0, Errors: 0, Skipped: 10
         |-- jboss-ejb-client.properties
         |-- jndi.properties
         `-- log4j.xml]]></programlisting>
-   </figure>
+        </section>
     </section>
     
     <section id="ejb-jpaex-start-summary">

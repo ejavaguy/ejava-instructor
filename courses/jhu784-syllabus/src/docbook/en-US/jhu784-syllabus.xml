@@ -181,10 +181,7 @@
 
             <row rowsep="1">
                 <entry namest="topic"><para><link linkend="ejb-jpa">EJB/Server-Side JPA Topics</link></para></entry>
-                <!--
-                <entry namest="topic"><para>EJB/Server-Side JPA Topics</para></entry>
                 <entry namest="comment"><para><ulink url="../html/ejb-jpa-lab.html">Exercise: JPA/EJB Remote Interfaces</ulink></para></entry>
-                -->
             </row>
             <row rowsep="1">
                 <entry namest="topic"><para>EJB Transactions</para></entry>

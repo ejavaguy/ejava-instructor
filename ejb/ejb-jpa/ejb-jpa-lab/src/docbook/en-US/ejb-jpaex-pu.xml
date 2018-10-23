@@ -103,7 +103,7 @@ Tests run: 10, Failures: 0, Errors: 1, Skipped: 9
                     <ulink url="http://docs.oracle.com/javaee/7/api/javax/persistence/PersistenceContext.html">@PersistenceContext</ulink> 
                     defines the injection of an EntityManager. Both express the persistence unit name with the 
                     "unitName" attribute. The "name" attribute is used for JNDI ENC
-                    injection. We will be defining out injections direct without going
+                    injection. We will be defining our injections direct without going
                     through the indirection of the ENC.
                 </para>
                 <para>
@@ -350,6 +350,27 @@ Unknown entity: org.myorg.jpatickets.bo.Venue
     <jar-file>lib/jpatickets-labex-impl-${project.version}.jar</jar-file>
 </persistence-unit>]]></programlisting>
                 </figure>
+                <tip>
+                    <title>Explicitly name Entity classes if still unknown</title>
+                    <para>
+                    While doing a quick dry-run of this exercise, I noticed that I could 
+                    not get this step to work as planned and am not currently sure why broken.
+                    If this is not working for you -- please update to the following. There
+                    will be a later step that asks you to that exact edit for a separate
+                    reason when using WARs.
+                    </para>
+<programlisting language="xml"><![CDATA[<persistence-unit name="jpatickets-labex">
+    <jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
+    <!-- 
+    <jar-file>lib/jpatickets-labex-impl-${project.version}.jar</jar-file>
+     -->
+    <class>org.myorg.jpatickets.bo.Venue</class>
+    <class>org.myorg.jpatickets.bo.Address</class>
+    <class>org.myorg.jpatickets.bo.Seat</class>
+    <class>org.myorg.jpatickets.bo.Event</class>
+    <class>org.myorg.jpatickets.bo.Ticket</class>
+</persistence-unit>]]></programlisting>
+                </tip>
             </listitem>
             
             <listitem><para>Add some debug output from the persistence unit.</para>

@@ -17,7 +17,7 @@
     
     <properties>
        <doc.base>jhu784-lab-book</doc.base>
-       <content.version>v2018-08-21</content.version>
+       <content.version>v2018-10-23</content.version>
     </properties>
 
     <dependencies>
@@ -64,16 +64,16 @@
             <version>${project.version}</version>
             <classifier>docsrc</classifier>
         </dependency>
+        <dependency>
+            <groupId>info.ejava.docs.ejb</groupId>
+            <artifactId>ejb-jpa-lab</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
         <!--
         <dependency>
             <groupId>info.ejava.docs.ejb</groupId>
             <artifactId>enc-config-lab</artifactId>
-            <version>${project.version}</version>
-            <classifier>docsrc</classifier>
-        </dependency>
-        <dependency>
-            <groupId>info.ejava.docs.ejb</groupId>
-            <artifactId>ejb-jpa-lab</artifactId>
             <version>${project.version}</version>
             <classifier>docsrc</classifier>
         </dependency>

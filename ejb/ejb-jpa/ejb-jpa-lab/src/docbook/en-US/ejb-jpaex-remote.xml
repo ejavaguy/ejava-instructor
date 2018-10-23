@@ -1,7 +1,7 @@
 <!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="ejb-jpaex-chapter">
+<chapter id="ejb-jpaex-remote">
     <title>Remote Interface Issues</title>
     <para>
         In this chapter we are going to focus on identifying issues that occur
@@ -204,9 +204,9 @@ public Event getEvent(int id) {
                 </para>
 
                 <figure>
-                    <title>Add Provider Artifact to Client Classpath/Dependencies</title>
+                    <title>Provider Artifact Dependency Management</title>
 <programlisting language="xml"><![CDATA[<properties>
-    <hibernate-entitymanager.version>4.3.4.Final</hibernate-entitymanager.version>
+    <hibernate-entitymanager.version>5.3.1.Final</hibernate-entitymanager.version>
 </properties>
 <dependencyManagement>
     <dependency>
