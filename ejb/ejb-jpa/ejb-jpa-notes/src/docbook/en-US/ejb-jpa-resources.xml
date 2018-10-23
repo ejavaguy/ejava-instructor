@@ -5,14 +5,12 @@
     <title>Server-side Resources</title>
     
     <section id="ejb-jpa-resources-datasource">
-        <title>SQL DataSource (defined in Server)</title>
+        <title>SQL DataSource (defined in Server - standalone.xml)</title>
         <itemizedlist spacing="compact">
             <listitem><para>Physical connections to database are placed into a pool</para></listitem>
-            <listitem><para>Logical connections are borrowed and returned from the pool</para></listitem>
+            <listitem><para>Logical connections are borrowed and returned from/to the pool</para></listitem>
         </itemizedlist>
         
-        <figure>
-           <title>Server SQL DataSource (standalone.xml)</title>
 <programlisting language="xml"><![CDATA[<subsystem xmlns="urn:jboss:domain:datasources:1.0">
     <datasources>
         <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true">
@@ -20,7 +18,7 @@
             <driver>h2</driver>
             <security>
                 <user-name>sa</user-name>
-                <password>sa</password>
+                <password></password>
             </security>
         </datasource>
         <drivers>
@@ -30,24 +28,28 @@
         </drivers>
     </datasources>
 </subsystem>]]></programlisting>                        
-        </figure>
     </section>
     
     <section id="ejb-jpa-resources-persistencexml">
-        <title>Server-side persistence.xml</title>
+        <title>Server-side Persistence Units</title>
         <itemizedlist spacing="compact">
-            <listitem><para>No connection information - use jta-data-source</para></listitem>
-            <listitem><para>Properties included define how to work with DB -- not how to connect</para></listitem>
+            <listitem><para>persistence.xml</para></listitem>
+            <listitem><para>Two transaction types -- one is primary path</para></listitem>
         </itemizedlist>
-        
-        <figure>
-            <title>Server-side persistence.xml</title>
+
+        <section id="ejb-jpa-resources-persistencexml-jta">
+            <title>transaction-type=JTA (default)</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>No connection information - using pool from jta-data-source</para></listitem>
+                <listitem><para>Properties included define how to work with DB -- not how to connect</para></listitem>
+                <listitem><para>Likely the only transaction-type used</para></listitem>
+            </itemizedlist>
 <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <persistence xmlns="http://java.sun.com/xml/ns/persistence"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" version="2.0">
 
-    <persistence-unit name="ejbjpa-hotel">
+    <persistence-unit name="ejbjpa-hotel" transaction-type="JTA">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
 ...
@@ -57,14 +59,74 @@
         </properties>
     </persistence-unit>            
 </persistence>]]></programlisting>
-        </figure>
+        </section>
+
+        <section id="ejb-jpa-resources-persistencexml-rl">
+            <title>transaction-type=RESOURCE_LOCAL</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>No connection pooling</para></listitem>
+                <listitem><para>Propertites include connection information</para></listitem>
+                <listitem><para>Requires bean-managed transactions</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>@TransactionManagement(TransactionManagementType.BEAN)</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>Used for obscure situations - likely rarely used</para></listitem>
+            </itemizedlist>
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" version="2.0">
+
+    <persistence-unit name="ejbjpa-hotel-rl" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+...
+        <properties>
+            <!-- connection properties -->
+            <property name="javax.persistence.jdbc.url" value="${jdbc.url}"/>
+            <property name="javax.persistence.jdbc.driver" value="${jdbc.driver}"/>
+            <property name="javax.persistence.jdbc.user" value="${jdbc.user}"/>
+            <property name="javax.persistence.jdbc.password" value="${jdbc.password}"/>
+            
+            <property name="hibernate.dialect" value="${hibernate.dialect}"/>
+...
+        </properties>
+    </persistence-unit>            
+</persistence>]]></programlisting>
+        </section>
+        <warning>
+          <title>Conform to JavaEE/EJB framework, don't bypass it</title>
+          <para>
+            Use of transaction-type=RESOURCE_LOCAL bypasses a significant portion of what
+            the application server provides (e.g., Connection Resource Pooling, Container
+            Managed Transactions). This should only be used in limited cases and where 
+            the implementation requires. It should not be used because of lack of understanding
+            of how to use the server-side JavaEE/EJB framework.
+          </para>
+        </warning>
+    </section>
+
 
     <section id="ejb-jpa-resources-persistencexml-placement">
         <title>persistence.xml Placement</title>
         
-       <figure>
-           <title>EJB persistence.xml Placement</title>
-<programlisting language=""><![CDATA[enc-config-example-ejb
+        <section id="ejb-jpa-resources-persistencexml-placement-ejb">
+          <title>EJB persistence.xml Placement</title>
+           <itemizedlist spacing="compact">
+               <listitem><para>Deployment</para>
+                   <itemizedlist spacing="compact">
+                       <listitem><para>META-INF/persistence.xml</para></listitem>
+                       <listitem><para>Same location as normal JAR</para></listitem>
+                   </itemizedlist>
+               </listitem>
+               <listitem><para>Source</para>
+                   <itemizedlist spacing="compact">
+                       <listitem><para>src/main/resources/META-INF/persistence.xml</para></listitem>
+                   </itemizedlist>
+               </listitem>
+           </itemizedlist>
+<programlisting language=""><![CDATA[
+enc-config-example-ejb
 |-- ejava
 |   `-- ejb
 |       `-- examples
@@ -79,16 +141,27 @@
 |                   `-- XMLConfiguredEJB.class
 `-- META-INF
     `-- persistence.xml]]></programlisting>
-       </figure>
-       <itemizedlist spacing="compact">
-           <listitem><para>META-INF/persistence.xml</para></listitem>
-           <listitem><para>Same location as normal JAR</para></listitem>
-       </itemizedlist>
+        </section>
 
 
-       <figure>
+        <section id="ejb-jpa-resources-persistencexml-placement-war">
            <title>WAR persistence.xml Placement</title>
-<programlisting language=""><![CDATA[ejb-jpa-example-war
+           <itemizedlist spacing="compact">
+               <listitem><para>Deployment</para>
+                   <itemizedlist spacing="compact">
+                       <listitem><para>WEB-INF/classes/META-INF/persistence.xml</para></listitem>
+                       <listitem><para>Inside JARs within WEB-INF/lib also allowed</para></listitem>
+                   </itemizedlist>
+               </listitem>
+               <listitem><para>Source</para>
+                   <itemizedlist spacing="compact">
+                       <listitem><para>src/main/resources/META-INF/persistence.xml</para></listitem>
+                   </itemizedlist>
+               </listitem>
+           </itemizedlist>
+       
+<programlisting language=""><![CDATA[
+ejb-jpa-example-war
 |-- META-INF
 `-- WEB-INF
     |-- classes
@@ -115,13 +188,8 @@
     `-- lib
         `-- ejb-jpa-example-blimpl-4.0.0-SNAPSHOT.jar
 ]]></programlisting>
-       </figure>
-       <itemizedlist spacing="compact">
-           <listitem><para>WEB-INF/classes/META-INF/persistence.xml</para></listitem>
-           <listitem><para>Inside JARs within WEB-INF/lib also allowed</para></listitem>
-       </itemizedlist>
-       
        </section>
+    </section>
        
     <section id="ejb-jpa-resources-persistencexml-entities">
         <title>Reference External @Entities</title>
@@ -130,16 +198,22 @@
         </itemizedlist>
         
 
-       <figure>
+        <section id="ejb-jpa-resources-persistencexml-entities-ear">
            <title>Reference External @Entities: EAR Deploy</title>
-<programlisting language=""><![CDATA[ejbsessionBankEAR-4.0.0-SNAPSHOT
+           <itemizedlist spacing="compact">
+               <listitem><para>jar-file element able to reference external JAR using a deterministic, portable path in EAR</para></listitem>
+           </itemizedlist>
+
+<programlisting language=""><![CDATA[
+ejbsessionBankEAR-4.0.0-SNAPSHOT
 |-- ejbsessionBankEJB.jar
 |-- ejbsessionBankWAR-4.0.0-SNAPSHOT.war
 |-- lib
 |   |-- ejava-util-4.0.0-SNAPSHOT.jar
 |   `-- ejbsessionBankImpl-4.0.0-SNAPSHOT.jar
 `-- META-INF
-    `-- application.xml]]></programlisting>
+    `-- application.xml
+]]></programlisting>
 <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <persistence xmlns="http://java.sun.com/xml/ns/persistence"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -152,21 +226,30 @@
         <jar-file>lib/ejbsessionBankImpl-4.0.0-SNAPSHOT.jar</jar-file>
         
         <properties>
-            <property name="hibernate.dialect" 
-                value="org.hibernate.dialect.H2Dialect"/>
+            <property name="hibernate.dialect" value="${hibernate.dialect}"/>
 ...
         </properties>
     </persistence-unit>        
 </persistence>]]></programlisting>
-       </figure>
-       <itemizedlist spacing="compact">
-           <listitem><para>jar-file element able to reference external JAR using a deterministic, portable path in EAR</para></listitem>
-           <listitem><para>jar-file element not usable in WARs</para></listitem>
-       </itemizedlist>
+        </section>
 
                 
-       <figure>
+        <section id="ejb-jpa-resources-persistencexml-entities-war">
            <title>Reference External @Entities: WAR Deploy</title>
+           <itemizedlist spacing="compact">
+               <listitem><para>Can automatically locate Entities within WEB-INF classes but within WEB-INF/lib JARs</para></listitem>
+               <listitem><para>Cannot automatically locate Entities within WEB-INF/lib JARs</para></listitem>
+               <listitem><para>jar-file element not usable in WARs</para></listitem>
+           </itemizedlist>
+
+<programlisting language=""><![CDATA[
+ejb-jpa-example-war
+|-- META-INF
+`-- WEB-INF
+...
+    `-- lib
+        `-- ejb-jpa-example-blimpl-5.0.0-SNAPSHOT.jar
+]]></programlisting>
 <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <persistence xmlns="http://java.sun.com/xml/ns/persistence"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -176,27 +259,27 @@
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
 
+        <!-- located in WEB-INF/lib/ejb-jpa-example-blimpl-${project.version}.jar -->
         <class>info.ejava.examples.ejb.ejbjpa.bo.Guest</class>
         <class>info.ejava.examples.ejb.ejbjpa.bo.Room</class>
         <class>info.ejava.examples.ejb.ejbjpa.bo.Floor</class>
 
         <properties>
-            <property name="hibernate.dialect" 
-                value="org.hibernate.dialect.H2Dialect"/>
+            <property name="hibernate.dialect" value="${hibernate.dialect}"/>
 ...
         </properties>
     </persistence-unit>            
 </persistence>]]></programlisting>
-       </figure>
-       <note>
-           <para>
-                There is no need to declare "class" entity references into a properly 
-                configured "jar-file" that is located in the classpath of a deployed EAR. 
-                Use "class" entity references when using a WEB-INF/classes/META-INF deployment 
-                of a WAR -- or if you really need to only include specific entities in the 
-                archive. 
-           </para>
-       </note>
+         <note>
+             <para>
+                  There is no need to declare "class" entity references into a properly 
+                  configured "jar-file" that is located in the classpath of a deployed EAR. 
+                  Use "class" entity references when using a WEB-INF/classes/META-INF deployment 
+                  of a WAR and classes come from externally provided JAR -- 
+                  or if you really need to only include specific entities in the 
+                  archive. 
+             </para>
+         </note>
     
         </section>
     </section>
@@ -206,6 +289,7 @@
        <title>Summary</title>
         <itemizedlist spacing="compact">
             <listitem><para>Replace JDBC ConnectionManager properties with sharable DataSource reference</para></listitem>
+            <listitem><para>Direct use of JDBC ConnectionManager is allowed but not advised</para></listitem>
             <listitem><para>Can replace entity class enumerations with jar-file reference for EAR deploy</para></listitem>
         </itemizedlist>       
     </section>    

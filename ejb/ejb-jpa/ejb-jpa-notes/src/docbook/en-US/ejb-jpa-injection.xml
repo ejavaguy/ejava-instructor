@@ -9,12 +9,15 @@
             <listitem><para>Injected with EntityManager</para>
                 <variablelist spacing="compact">
                     <varlistentry>
-                        <term><filename>Transaction Scoped</filename></term>
+                        <term><filename>Transaction Scoped (default)</filename></term>
                         <listitem>
                             <itemizedlist spacing="compact">
                                 <listitem><para>persistence context only sees a single Tx</para></listitem>
                                 <listitem><para>container injects EntityManager with Tx active</para></listitem>
                             </itemizedlist>            
+<programlisting language="java"><![CDATA[@PersistenceContext(unitName="ejbjpa-hotel", type=PersistenceContextType.TRANSACTION)
+private EntityManager em;
+]]></programlisting>
                         </listitem>
                     </varlistentry>
                     <varlistentry>
@@ -24,6 +27,9 @@
                                 <listitem><para>persistence context may see multiple Tx</para></listitem>
                                 <listitem><para>only relevant for Stateful EJBs</para></listitem>
                             </itemizedlist>            
+<programlisting language="java"><![CDATA[@PersistenceContext(unitName="ejbjpa-hotel", type=PersistenceContextType.EXTENDED)
+private EntityManager em;
+]]></programlisting>
                         </listitem>
                     </varlistentry>
                 </variablelist>
@@ -42,15 +48,17 @@
         
     <section id="ejb-jpa-injection-pc">
         <title>@PersistenceContext Injection</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>@PersistenceContext.unitName is the name used within the persistence.xml</para></listitem>
+            <listitem><para>@PersistenceContext.name would be the ENC name normally defined in ejb-jar.xml</para></listitem>
+        </itemizedlist>
         
-        <figure>
-            <title>@PersistenceContext Injection</title>
 <programlisting language="java"><![CDATA[@Stateless
 public class HotelMgmtEJB implements HotelMgmtRemote, HotelMgmtLocal {
     @PersistenceContext(unitName="ejbjpa-hotel")
     private EntityManager em;
 
-    private HotelDAO dao;                                                                                                                                                                                                                                                                                                                                   
+    private HotelDAO dao;
     private HotelMgmt hotelMgmt; 
     
     @PostConstruct
@@ -61,18 +69,50 @@ public class HotelMgmtEJB implements HotelMgmtRemote, HotelMgmtLocal {
         hotelMgmt = new HotelMgmtImpl();
         ((HotelMgmtImpl)hotelMgmt).setHotelDao(dao);
     }]]></programlisting>
-        </figure>
         <itemizedlist spacing="compact">
-            <listitem><para>@PersistenceContext.unitName is the name used within the persistence.xml</para></listitem>
-            <listitem><para>@PersistenceContext.name would be the ENC name normally defined in ejb-jar.xml</para></listitem>
+            <listitem><para>@PersistenceContext.synchronization</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>
+                      SynchronizationType.SYNCHRONIZED (default) -- EntityManager automatically joined with jtaTransaction
+                      </para></listitem>
+                    <listitem><para>
+                      SynchronizationType.UNSYNCHRONIZED -- EntityManager manually joined with jtaTransaction. Useful
+                      for Stateful Session EJBs where interaction with EntityManager may span multiple client method 
+                      calls.
+                    </para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>
+                @PersistenceContext.type</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>
+                      PersistenceContextType.TRANSACTION (default) - EntityManager transactions automatically 
+                      managed by container and will invoke each root method once per transaction
+                      </para></listitem>
+                    <listitem><para>
+                      PersistenceContextType.EXTENDED - EntityManager transactions may span multiple calls.
+                      Useful for Stateful Session EJBs to retain state during a complete session
+                    </para></listitem>
+                </itemizedlist>
+                </listitem>
         </itemizedlist>
     </section>
     
     <section id="ejb-jpa-injection-pu">
         <title>@PersistenceUnit Injection</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Persistence unit (EntityManagerFactory) being injected from a JTA-managed source</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>i.e., the transaction must be managed at JTA level</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>BEAN-managed transactions means JTA transaction controlled thru injected UserTransaction</para></listitem>
+            <listitem><para>Method programmatically controlling scope of JTA transaction</para></listitem>
+            <listitem><para>
+                em.joinTransaction() called on EntityManager created outside scope of JTA transaction 
+                </para></listitem>
+        </itemizedlist>
         
-        <figure>
-            <title>@PersistenceUnit Injection</title>
 <programlisting language="java"><![CDATA[@Singleton
 @Startup
 @TransactionManagement(TransactionManagementType.BEAN)
@@ -95,19 +135,6 @@ public class HotelInitEJB implements HotelInitRemote {
         em.close();
     }
 }]]></programlisting>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>BEAN-managed transactions means JTA transaction controlled thru injected UserTransaction</para></listitem>
-            <listitem><para>Persistence unit (EntityManagerFactory) being injected from a JTA-managed source</para>
-                <itemizedlist spacing="compact">
-                    <listitem><para>i.e., the transaction must be managed at JTA level</para></listitem>
-                </itemizedlist>
-            </listitem>
-            <listitem><para>Method programmatically controlling scope of JTA transaction</para></listitem>
-            <listitem><para>
-                em.joinTransaction() called on EntityManager created outside scope of JTA transaction 
-                </para></listitem>
-        </itemizedlist>
         
         
     </section>
@@ -120,8 +147,7 @@ public class HotelInitEJB implements HotelInitRemote {
         <itemizedlist spacing="compact">
 
             <listitem><para>Define qualifier annotation</para>
-<programlisting language="java"><![CDATA[
-package ejava.examples.jndidemo;
+<programlisting language="java"><![CDATA[package ejava.examples.jndidemo;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -138,13 +164,12 @@ public @interface JndiDemo {
 
 
             <listitem><para>Define producer of Persistence Context</para>
-<programlisting language="java"><![CDATA[
-import javax.enterprise.inject.Produces;
+<programlisting language="java"><![CDATA[import javax.enterprise.inject.Produces;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 public class SchedulerResources {
-    @PersistenceContext(name="jndidemo") //using ENC-name
+    @PersistenceContext(unitName="jndidemo")
     @Produces
     @JndiDemo
     public EntityManager em;
@@ -152,8 +177,7 @@ public class SchedulerResources {
             </listitem>
 
             <listitem><para>Define injection point</para>
-<programlisting language="java"><![CDATA[
-@Stateless
+<programlisting language="java"><![CDATA[@Stateless
 public class TrainSchedulerEJB 
     extends SchedulerBase implements TrainSchedulerRemote {
 
@@ -162,6 +186,12 @@ public class TrainSchedulerEJB
 ]]></programlisting>                        
             </listitem>
         </itemizedlist>
+
+        <tip>
+          <title>Qualifier not always necessary</title>
+          <para>The Qualifier annotation is only necessary when the deployed application 
+          contains multiple producers of an EntityManager.</para>
+        </tip>
     </section>
 
     <section id="ejb-jpa-injection-summary">
