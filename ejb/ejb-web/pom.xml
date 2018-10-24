@@ -17,9 +17,7 @@
 
     <modules>
         <module>webtier-notes</module>
-        <!--
-        <module>cdi-notes</module>
-        -->
         <module>ejb-jaxrs-notes</module>
+        <module>ejb-jaxrs-notes-old</module>
     </modules>
 </project>

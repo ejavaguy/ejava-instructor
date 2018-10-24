@@ -209,10 +209,7 @@
             </row>
 
             <row rowsep="1">
-                <!-- 
-              <entry namest="comment"><link linkend="esport-project2-part">Project 2</link> due by Sun, 8am Nov15</entry>
-                 -->
-              <entry namest="comment">Project 2 - due by Sun, 8am Nov18</entry>
+              <entry namest="comment"><link linkend="esport-project2-part">Project 2</link> due by Sun, 8am Nov18</entry>
             </row>
 
             <row rowsep="1">
@@ -295,7 +292,7 @@
                 <entry namest="topic">EJB Timers</entry>
             </row>
             <row rowsep="1">
-              <entry namest="comment">Project 3 - due by Sun, 8am Dec09</entry>
+              <entry namest="comment"><link linkend="esport-project3-part">Project 3</link> due by Sun, 8am Dec09</entry>
             </row>
 
                 <!--
@@ -303,7 +300,6 @@
                 <entry namest="session">14</entry>
                 <entry namest="date">Dec05</entry>
                 <entry namest="topic">Complete Final Project (no class)</entry>
-              <entry namest="comment"><link linkend="emarket-project3-part">Project 3</link> due by Wed evening/midnight, Dec09</entry>
             </row>
               -->
         </tbody>
