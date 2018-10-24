@@ -98,7 +98,7 @@
                 <listitem><para>Requires a distributed transaction -- transparent to commands executed</para></listitem>
             </itemizedlist>
             
-            <note>
+            <tip>
                 <title>Avoid Distributed Transactions where Possible</title>
                 <para>
                     Even though JTA transactions allow for the forming of a distributed 
@@ -107,7 +107,7 @@
                     than distributed transactions (multiple resources) and should be the primary
                     goal in transaction design.
                 </para>
-            </note>
+            </tip>
         </section>
 
         <section id="ejbtx-intro-scenario-jmsdb">
@@ -193,7 +193,7 @@
 
         <section id="ejbtx-intro-jta">
             <title>Java Transaction API (JTA)</title>
-            <para>Interface specification between participants in a transaction</para>
+            <para>JTA is the JavaEE interface specification between participants in a transaction</para>
             <itemizedlist spacing="compact">
                 <listitem><para>applications</para></listitem>
                 <listitem><para>resource managers</para></listitem>
@@ -203,9 +203,10 @@
         
         <section id="ejbtx-intro-jts">
             <title>Java Transaction API (JTA) and Java Transaction Service (JTS)</title>
-            <para>Java binding of the CORBA Object Transaction Service (OTS)</para>
+            <para>JTS is the Java binding of the CORBA Object Transaction Service (OTS)</para>
             <itemizedlist spacing="compact">
                 <listitem><para>EJB vendors might implement the JTA using a JTS service implementation</para></listitem>
+                <listitem><para>More complicated than what JTA requires</para></listitem>
             </itemizedlist>
         </section>
     </section>
@@ -216,8 +217,10 @@
         <itemizedlist spacing="compact">
             <listitem><para>Two styles of transaction demarcation</para>
                 <itemizedlist spacing="compact">
-                    <listitem><para>Container-Managed Transactions (declarative)</para></listitem>
-                    <listitem><para>Bean Managed Transactions (programmatic)</para></listitem>
+                    <listitem><para>Container-Managed Transactions (declarative; default)</para>
+                    </listitem>
+                    <listitem><para>Bean Managed Transactions (programmatic)</para>
+                    </listitem>
                 </itemizedlist>
             </listitem>
             <listitem><para>Container and server handle all interaction with resources -- regardless of demarcation style</para></listitem>
@@ -225,9 +228,9 @@
         </itemizedlist>
 
         <section id="ejbtx-intro-container">
-            <title>Container-Managed Transactions</title>
+            <title>Container-Managed Transactions (default)</title>
             <itemizedlist spacing="compact">
-                <listitem><para>Declarative interface to transactions</para></listitem>
+                <listitem><para>Declarative interface for transactions</para></listitem>
                 <listitem><para>Declarative attributes tell container to execute a method</para>
                     <itemizedlist spacing="compact">
                         <listitem><para>within a transaction (MANDATORY, REQUIRED, REQUIRES_NEW, SUPPORTS)</para></listitem>
@@ -268,6 +271,14 @@ public class HotelMgmtEJB implements HotelMgmtRemote, HotelMgmtLocal {
         return hotelMgmt.checkIn(guest, room);
     }]]></programlisting>
             </figure>
+
+            <note>
+              <title>Container manages all aspects of transaction for CMT</title>
+              <para>
+                For Container Managed Transactions (CMT), the transaction management code
+                is in the Container and *not* within the method body of the EJB.
+              </para>
+            </note>
         </section>
 
         <section id="ejbtx-intro-bean">
@@ -316,6 +327,15 @@ public class HotelInitEJB implements HotelInitRemote {
         }
     }]]></programlisting>
             </figure>
+
+            <note>
+              <title>EJB code manages begin/commit aspects of transaction for BMT</title>
+              <para>
+                For Bean Managed Transactions (BMT), the transaction management code
+                is in the EJB method. This adds extra non-business code and
+                even the simplest scenario begins to get complicated.
+              </para>
+            </note>
         </section>
     
     </section>

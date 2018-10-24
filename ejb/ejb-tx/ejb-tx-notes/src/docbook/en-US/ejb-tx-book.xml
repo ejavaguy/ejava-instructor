@@ -41,22 +41,22 @@
             <itemizedlist spacing="compact">
                 <listitem><para>have more understanding of:</para>
                     <itemizedlist spacing="compact">
+                        <listitem><para>Transactions in General</para></listitem>
                         <listitem><para>Transaction Management</para>
                             <itemizedlist spacing="compact">
                                 <listitem><para>Container Managed</para></listitem>
                                 <listitem><para>Bean Managed</para></listitem>
-                                <listitem><para></para></listitem>
                             </itemizedlist>
                         </listitem>
-                        <listitem><para></para></listitem>
-                        <listitem><para></para></listitem>
+                        <listitem><para>Transaction Scope</para></listitem>
                     </itemizedlist>
                 </listitem>
                 <listitem><para>be able to:</para>
                     <itemizedlist spacing="compact">
-                        <listitem><para></para></listitem>
-                        <listitem><para></para></listitem>
-                        <listitem><para></para></listitem>
+                        <listitem><para>Define a Transaction Scope for a Container Managed EJB method</para></listitem>
+                        <listitem><para>Propogate Transaction Scope across Container Managed EJB methods</para></listitem>
+                        <listitem><para>Implement an EJB using Bean Managed Transactions</para></listitem>
+                        <listitem><para>Implement a Stateful Session EJB with transaction callbacks</para></listitem>
                     </itemizedlist>
                 </listitem>
             </itemizedlist>

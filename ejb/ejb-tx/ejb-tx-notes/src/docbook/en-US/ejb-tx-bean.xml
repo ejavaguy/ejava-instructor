@@ -18,7 +18,9 @@
 <programlisting language="java"><![CDATA[@Stateless
 @TransactionManagement(TransactionManagementType.BEAN)
 public class BmtCreateEJB {
-    @PersistenceContext(unitName="ejbtx-warehouse")
+      //synchronization=SynchronizationType.SYNCHRONIZED is the default
+    @PersistenceContext(unitName="ejbtx-warehouse", 
+                        synchronization=SynchronizationType.SYNCHRONIZED)
     private EntityManager em;
     
     @Resource
@@ -27,10 +29,10 @@ public class BmtCreateEJB {
     public Product createProduct(Product product) {
         try {
             txWatcher.watchTransaction(getClass(), super.hashCode());
-            utx.begin();         //<=== manually start Tx
-            em.joinTransaction();
+            utx.begin();          //<=== manually start Tx
+            em.joinTransaction(); //<=== only necessary with UNSYNCHRONIZED
             em.persist(product);
-            utx.commit();        //<=== manually end Tx
+            utx.commit();         //<=== manually end Tx
             logger.debug("createProduct()={}", product);
             return product;
         } catch (Exception ex) {
@@ -42,6 +44,12 @@ public class BmtCreateEJB {
     </figure>
     <itemizedlist spacing="compact">
         <listitem><para>Can inject @PersistenceContext/EntityManager or @PersistenceUnit/EntityManagerFactory</para></listitem>
+        <listitem><para>EntityManager already SYNCHRONIZED with UserTransaction by default</para></listitem>
+        <listitem><para>EntityManager can be manually synchronized using em.joinTransaction()</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Useful in Stateful Session EJBs were may interact with EntityManager over multiple methods</para></listitem>
+            </itemizedlist>
+        </listitem>
     </itemizedlist>
     
     
@@ -86,7 +94,6 @@ public interface javax.transaction.UserTransaction {
                     <listitem><para>Must use Container-Managed REQUIRED scope</para></listitem>
                 </itemizedlist>
             </listitem>
-            <listitem><para></para></listitem>
         </itemizedlist>
     </section>
 

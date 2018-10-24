@@ -61,7 +61,7 @@ public Product createProduct(Product product) {]]></programlisting>
                         <listitem><para>Resource manager(s) called by method are enlisted in caller's transaction context</para></listitem>
                     </itemizedlist>
                 </listitem>
-                <listitem><para>When called without transaction active:</para>
+                <listitem><para>When called without transaction active (or @Asynchronous):</para>
                     <itemizedlist spacing="compact">
                         <listitem><para>New transaction started</para></listitem>
                         <listitem><para>Transaction committed after method returns</para></listitem>
@@ -204,13 +204,13 @@ public void addQuantity(int productId, int quantity) {]]></programlisting>
                 </itemizedlist>
             </listitem>
             <listitem><para>Operate by default in an undefined transaction context</para></listitem>
-            <listitem><para>May be defined with REQUIRES_NEW or NOT_SUPPORTED</para></listitem>
+            <listitem><para>May be defined with REQUIRES_NEW or NOT_SUPPORTED for Stateful and Singleton</para></listitem>
             <listitem><para>Any transactions created during a lifecycle method will not be a part of the client's transaction</para></listitem>
         </itemizedlist>
         
        <figure>
            <title>EJB Lifecycle Methods with Container-Managed Transactions</title>
-<programlisting language="java"><![CDATA[@Stateless
+<programlisting language="java"><![CDATA[@Singleton
 @TransactionManagement(TransactionManagementType.CONTAINER)
 public class WarehouseTxEJB {
 
@@ -278,7 +278,13 @@ public void destroy() {
         <title>EJB Control of Container-Managed Transactions</title>
         <itemizedlist spacing="compact">
              <listitem><para>EJB cannot access transaction</para></listitem>
-             <listitem><para>EJB has no means to commit transaction -- commit managed by container</para></listitem>
+             <listitem><para>EJB has no programatic means to commit transaction -- commit managed by container</para>
+                 <itemizedlist spacing="compact">
+                      <listitem><para>Commits are declarative by method boundaries</para></listitem>
+                      <listitem><para>EJBs may be divided into second helper class to provide fine-grain control of transaction commit</para></listitem>
+                      <listitem><para>No Interface Stateless Session EJBs are good solution for Tx Helper classes</para></listitem>
+                 </itemizedlist>
+             </listitem>
              <listitem><para>EJB can only mark the transaction for rollback -- rollback managed by container</para></listitem>
              <listitem><para>Unchecked exceptions automatically mark the transaction for rollback</para></listitem>
         </itemizedlist>
@@ -294,7 +300,10 @@ public void destroy() {
   void setRollbackOnly() throws java.lang.IllegalStateException;
   boolean getRollbackOnly() throws java.lang.IllegalStateException;
 ...
-}]]></programlisting>
+}
+
+public interface SessionContext extends EJBContext {
+]]></programlisting>
 <programlisting language="java"><![CDATA[@Resource
 SessionContext ctx;
 ...
@@ -411,8 +420,7 @@ public Product createProductAndThrowChecked(Product product)
             
             <figure>
                 <title>Example: Client Triggers Exception and Verifies Data Committed</title>
-<programlisting language="java"><![CDATA[
-Product product = null;
+<programlisting language="java"><![CDATA[Product product = null;
 try {
     warehouse.createProductAndThrowChecked(new Product("thing", 6));
     fail("planned exception not thrown");
