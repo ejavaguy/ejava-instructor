@@ -170,7 +170,7 @@
                 <entry namest="comment"><para>Rubinger &amp; Burke: Ch 16</para></entry>
             </row>
             <row>
-                <entry namest="topic"><para><link linkend="cdi-config">Configuring EJBs and more with CDI</link></para></entry>
+                <entry namest="topic"><para><link linkend="cdi-config">Configuring EJBs using CDI</link></para></entry>
             </row>
 
 
