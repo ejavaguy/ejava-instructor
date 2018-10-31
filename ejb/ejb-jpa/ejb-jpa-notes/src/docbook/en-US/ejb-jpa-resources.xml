@@ -237,7 +237,7 @@ ejbsessionBankEAR-4.0.0-SNAPSHOT
         <section id="ejb-jpa-resources-persistencexml-entities-war">
            <title>Reference External @Entities: WAR Deploy</title>
            <itemizedlist spacing="compact">
-               <listitem><para>Can automatically locate Entities within WEB-INF classes but within WEB-INF/lib JARs</para></listitem>
+               <listitem><para>Can automatically locate Entities within WEB-INF classes</para></listitem>
                <listitem><para>Cannot automatically locate Entities within WEB-INF/lib JARs</para></listitem>
                <listitem><para>jar-file element not usable in WARs</para></listitem>
            </itemizedlist>
