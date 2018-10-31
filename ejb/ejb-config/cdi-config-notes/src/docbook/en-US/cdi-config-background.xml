@@ -120,7 +120,7 @@ public @interface CdiDemo {
                           <listitem><para>how long the class is retained (default=CLASS)</para></listitem>
                       </varlistentry>
                       <varlistentry>
-                          <term><filename>RententionPolict</filename></term>
+                          <term><filename>RententionPolicy</filename></term>
                           <listitem><para></para>
                               <itemizedlist spacing="compact">
                                   <listitem><para>CLASS - annotation recorded in class file but not available at runtime</para></listitem>

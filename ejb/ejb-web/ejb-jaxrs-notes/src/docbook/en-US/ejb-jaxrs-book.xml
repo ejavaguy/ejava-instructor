@@ -3,8 +3,8 @@
     "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <book id="ejb-jaxrs">
     <bookinfo>
-        <title>JAX-RS EJB</title>
-        <subtitle>Web-centric EJB deployment</subtitle>
+        <title>Web-enabled EJBs</title>
+        <subtitle>JAX-RS EJBs</subtitle>
         <issuenum>${content.version}</issuenum>
         <pubdate>${docbook.pubdate}</pubdate>
         <copyright>
@@ -12,8 +12,10 @@
             <holder>${copyright.holder}</holder>
         </copyright>
         <abstract>
-            <para>This presentation contains introductory topics for packaging 
-                EJBs within the web tier and exposing thru RMI and JAX-RS interfaces.
+            <para>
+              This presentation contains introductory topics for exposing and calling
+              server-side behavior using REST-like Web Resource interfaces implemented
+              with JAX-RS, JAXB, and JSONB.
             </para>
         </abstract>
     </bookinfo>
@@ -23,9 +25,18 @@
         <section id="ejb-jaxrs-goals">
             <title>Goals</title>
             <itemizedlist spacing="compact">
-                <listitem><para>Introduce key technology for exposing resources
-                    to the web (JAX-RS and JAXB)</para></listitem>
-                <listitem><para>Introduce flexible EJB deployment (WAR-based)</para></listitem>
+                <listitem><para>
+                    Learn flexible EJB deployment options that enable Web APIs
+                    </para></listitem>
+                <listitem><para>
+                    Expose EJB-based services as Resources through Web Application Programming Interfaces (APIs)
+                    </para></listitem>
+                <listitem><para>
+                    Make client Resource requests of these APIs
+                    </para></listitem>
+                <listitem><para>
+                    Exchange data payloads using common Internet exchange protocols (JSON and XML)
+                    </para></listitem>
             </itemizedlist>
         </section>
 
@@ -35,17 +46,21 @@
             <itemizedlist spacing="compact">
                 <listitem><para>have more understanding of:</para>
                     <itemizedlist spacing="compact">
-                        <listitem><para>flexibility of EJB deployment</para></listitem>
-                        <listitem><para>exposing resources using web-friendly HTTP facades</para></listitem>
-                        <listitem><para>marshaling DTOs using web-friendly representations (XML)</para></listitem>
+                        <listitem><para>Flexibility of EJB deployment</para></listitem>
+                        <listitem><para>Building a Web Resource Facade</para></listitem>
+                        <listitem><para>Building a Web Resource Client</para></listitem>
+                        <listitem><para>How Web Application Programming Interfaces (APIs) align with "REST-like" concepts</para></listitem>
+                        <listitem><para>Implement XML and JSON DTO data exchange</para></listitem>
                     </itemizedlist>
-                </listitem>
+                    </listitem>
                 <listitem><para>be able to:</para>
                     <itemizedlist spacing="compact">
-                        <listitem><para>Deploy an EJB within a WAR</para></listitem>
-                        <listitem><para>Expose an asset or functionality through a (web) resource and URI using JAX-RS</para></listitem>
-                        <listitem><para>Use HTTP methods to interact with resources using JAX-RS</para></listitem>
-                        <listitem><para>Implement representations with XML, JAXB, and JAX-RS</para></listitem>
+                        <listitem><para>Deploy an EJB using several deployment options</para></listitem>
+                        <listitem><para>Design and implement a Web Resource Facade using JAX-RS</para></listitem>
+                        <listitem><para>Implement an Web Resource Client using JAX-RS</para></listitem>
+                        <listitem><para>Design and implement a set of URIs, Methods, and status codes to expose EJB capability as a Web Resource using JAX-RS
+                          </para></listitem>
+                        <listitem><para>Implement Java class marshaling and demarshaling using JAXB and JSONB (and Jackson)</para></listitem>
                     </itemizedlist>
                 </listitem>
             </itemizedlist>
@@ -54,7 +69,10 @@
 
     <toc/>
 
+    <xi:include href="ejb-jaxrs-rest.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <!--
     <xi:include href="ejb-jaxrs-wardeploy.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-jaxrs-resource.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-jaxrs-xmlrep.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    -->
 </book>

@@ -2,22 +2,27 @@
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
 <chapter id="ejb-jaxrs-wardeploy">
-    <title>EJB WAR Deployment</title>
+    <title>EJB WEB Deployments</title>
     <subtitle>Flexible EJB Deployment</subtitle>
     <itemizedlist spacing="compact">
-        <listitem><para>Prior to JavaEE 6</para>
+        <listitem><para>Options</para>
             <itemizedlist spacing="compact">
-                <listitem><para>EJB beans could only be deployed in EJB modules</para></listitem>
-                <listitem><para>EJB modules integrated with WARs using common EAR</para></listitem>
-            </itemizedlist>                   
-        </listitem>
-        <listitem><para>Starting with JavaEE 6</para>
-            <itemizedlist spacing="compact">
-                <listitem><para>EJB beans can be embedded within WAR</para></listitem>
-                <listitem><para>EJB modules can be deployed within WAR</para></listitem>
-            </itemizedlist>                   
+                <listitem><para>Prior to JavaEE 6 - only one option</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>EJB beans could only be deployed in EJB modules</para></listitem>
+                        <listitem><para>EJB modules integrated with WARs using common EAR</para></listitem>
+                    </itemizedlist>                   
+                </listitem>
+                <listitem><para>Starting with JavaEE 6 - added options</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>EJB beans can be embedded within WAR</para></listitem>
+                        <listitem><para>EJB modules can be deployed within WAR</para></listitem>
+                    </itemizedlist>                   
+                </listitem>
+            </itemizedlist>
         </listitem>
     </itemizedlist>
+
 
     <section id="ejb-jaxrs-warstructure">
         <title>WAR Structure</title>

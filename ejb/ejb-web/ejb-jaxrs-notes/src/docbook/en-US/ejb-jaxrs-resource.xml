@@ -2,8 +2,31 @@
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
 <chapter id="ejb-jaxrs-resource">
-    <title>Resources, URI, and Methods</title>
-    <subtitle>Exposing EJB methods to the Web</subtitle>
+    <title>REST-like Concepts</title>
+    <subtitle>Resources, URIs, Methods, Content, and Status Codes</subtitle>
+
+    <section id="ejb-jaxrs-resource-restlike">
+        <title>Representational State Transfer (REST)</title>
+        <title>
+          <footnote id="ejb-jaxrs-resource-rest-wikipedia">
+            <para>
+              <ulink url="http://en.wikipedia.org/wiki/Representational_state_transfer">REST Wikipedia Page</ulink>
+            </para>
+          </footnote>
+        </title>
+        <itemizedlist spacing="compact">
+            <listitem><para>
+                Architectural Style for creating web services
+                </para></listitem>
+            <listitem><para>
+                Provide interoperability between computer systems on the Internet
+                </para>
+                </listitem>
+            <listitem><para>
+                </para>
+                </listitem>
+        </itemizedlist>                   
+    </section>
 
     <section id="ejb-jaxrs-resource-resources">
         <title>Resources</title>
