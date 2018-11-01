@@ -1,0 +1,277 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-jaxrs-restlike">
+    <title>REST-like Concepts</title>
+    <subtitle>Resources, URIs, Methods, Content, and Status Codes</subtitle>
+
+    <section id="ejb-jaxrs-restlike-rest">
+        <title>REST
+          <footnote id="ejb-jaxrs-restlike-rest-wikipedia">
+            <para>
+              <ulink url="http://en.wikipedia.org/wiki/Representational_state_transfer">Representational State Transfer Wikipedia Page</ulink>
+            </para>
+          </footnote>
+        </title>
+        <itemizedlist spacing="compact">
+            <listitem><para>
+                Architectural Style for creating web services
+                </para></listitem>
+            <listitem><para>
+                Provide interoperability between computer systems on the Internet
+                </para>
+                </listitem>
+            <listitem><para>
+                Uses a uniform and predefined set of stateless operations
+                </para>
+                </listitem>
+            <listitem><para>
+                Defined in 2000 by Roy Fielding in his doctoral dissertation that was also used to design HTTP 1.1
+                </para>
+                <footnote id="rest-arch-constraints-footnote">
+                  <para><emphasis>"Architectural Styles and the Design of Network-based Software Architectures. Doctoral dissertation"</emphasis>,
+                  Roy Thomas Fielding, University of California, Irvine, 2000
+                    <ulink url="http://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm">HTML Version</ulink>
+                    </para>
+                </footnote>
+                </listitem>
+        </itemizedlist>                   
+    </section>
+    
+    <section id="ejb-jaxrs-restlike-restlike">
+        <title>"REST-like"</title>
+        <subtitle>"HTTP-based"</subtitle>
+        <itemizedlist spacing="compact">
+            <listitem><para>REST officially contains much more than most designs employ</para></listitem>
+            <listitem><para>"REST-like" architectures are based on a few main principals</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>HTTP Protocol</para></listitem>
+                    <listitem><para>Resources</para></listitem>
+                    <listitem><para>URIs</para></listitem>
+                    <listitem><para>Standard HTTP Method Vocabulary</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Helps leverage HTTP Internet caches</para></listitem>
+                        </itemizedlist>                   
+                    </listitem>
+                    <listitem><para>Standard Content Types</para></listitem>
+                    <listitem><para>Links</para></listitem>
+                </itemizedlist>                   
+            </listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="ejb-jaxrs-restlike-http">
+        <title>HTTP Protocol embraced</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Previous commmunications protocols attempted to be transport agnostic</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>CORBA mapped to HTTP, JMS, etc.</para></listitem>
+                    <listitem><para>Everything with an HTTP POST when mapped to HTTP protocol</para></listitem>
+                    <listitem><para>Other HTTP verbs (e.g., GET, DELETE, PUT, HEAD) not used</para></listitem>
+                    <listitem><para>Bypassed built-in HTTP capabilities (e.g., caching) of the Internet</para></listitem>
+                </itemizedlist>                   
+            </listitem>
+            <listitem><para>REST does not exist outside of the HTTP transport protocol</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Everything is expressed in HTTP-terms</para></listitem>
+                </itemizedlist>                   
+            </listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="ejb-jaxrs-restlike-resources">
+        <title>Resource</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>An asset to be exposed to the web</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Document, set of properties, method, nearly anything</para></listitem>
+                </itemizedlist>                   
+            </listitem>
+            <listitem><para>Web has limited methods but an unlimited number of resources</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>products</para></listitem>
+                    <listitem><para>categories</para></listitem>
+                    <listitem><para>customers</para></listitem>
+                    <listitem><para>todos</para></listitem>
+                </itemizedlist>                   
+            </listitem>
+            <listitem><para>Resources are often nested</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>categories(id).products *</para></listitem>
+                    <listitem><para>customers(id).purchases *</para></listitem>
+                    <listitem><para>todos(id).items *</para></listitem>
+                </itemizedlist>                   
+                <para>* Conceptual representation</para>
+            </listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="ejb-jaxrs-restlike-uris">
+        <title>URIs</title>
+        <subtitle>the "Nouns" of what we are communicating</subtitle>
+        <itemizedlist spacing="compact">
+            <listitem><para>An address to access a particular resource</para></listitem>
+            <listitem><para>Resource collection</para>
+<programlisting language=""><![CDATA[
+/api/products
+/api/categories
+/api/customers
+/api/todo_lists
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>Individual Resource</para>
+<programlisting language=""><![CDATA[
+/api/products/{productId}
+/api/categories/{categoryId}
+/api/customers/{customerId}
+/api/customers/{customerId}/sales
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>Nested Resources</para>
+<programlisting language=""><![CDATA[
+/api/products/{productId}/instructions
+/api/categories/{categoryId}/products
+/api/customers/{customerId}/purchases
+/api/todo_lists/{listName}/todo_items
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>Fully qualified</para>
+<programlisting language=""><![CDATA[
+http://127.0.0.1:8080/jaxrsInventoryWAR/api/products
+http://127.0.0.1:8080/jaxrsInventoryWAR/api/products/1
+http://127.0.0.1:8080/jaxrsInventoryWAR/api/products/1/instructions
+]]></programlisting>
+            </listitem>
+            
+            <listitem><para>May have query parameters</para>
+<programlisting language=""><![CDATA[
+http://127.0.0.1:8080/jaxrsInventoryWAR/api/categories?name=&offset=0&limit=0
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>May have nested path parameters</para>
+<programlisting language=""><![CDATA[
+http://127.0.0.1:8080/jaxrsInventoryWAR/api/products/1
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>URI naming conventions</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Use a plural name for resource collections</para>
+<programlisting language=""><![CDATA[
+/api/todo_lists
+]]></programlisting>
+                    </listitem>
+                    <listitem><para>Use an ID below the plural resource collection to refer to a specific resource</para>
+<programlisting language=""><![CDATA[
+/api/todo_lists/{listName}
+]]></programlisting>
+                    </listitem>
+                </itemizedlist>                   
+            </listitem>
+        </itemizedlist>                   
+
+    </section>
+
+    <section id="ejb-jaxrs-restlike-methods">
+        <title>Methods</title>
+        <subtitle>the "Verbs" of what we are communicating</subtitle>
+        <itemizedlist spacing="compact">
+            <listitem><para>Bounded Set</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>provides "uniform interface" across all resources</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Primary Set of Methods</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>GET - non-destructive read</para></listitem>
+                    <listitem><para>POST - create and other methods</para></listitem>
+                    <listitem><para>PUT - create or update</para></listitem>
+                    <listitem><para>DELETE - delete</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Secondary Set of Methods</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>HEAD - a GET without the data - metadata only</para></listitem>
+                    <listitem><para>OPTIONS - lists which methods supported</para></listitem>
+                </itemizedlist>
+            </listitem>
+
+            <listitem><para>Example: Get Product ID=1</para>
+<programlisting language=""><![CDATA[
+GET http://127.0.0.1:8080/jaxrsInventoryWAR/api/products/1
+]]></programlisting>
+            </listitem>
+        </itemizedlist>
+
+        <section id="ejb-jaxrs-restlike-methods-safety">
+            <title>Method Safety</title>
+            <para>Does it change the state of the resource</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Safe Methods</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>GET</para></listitem>
+                        <listitem><para>HEAD</para></listitem>
+                        <listitem><para>OPTIONS</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>Unsafe Methods</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>POST</para></listitem>
+                        <listitem><para>PUT</para></listitem>
+                        <listitem><para>DELETE</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejb-jaxrs-restlike-methods-omnipotence">
+          <title>Idempotent</title>
+          <itemizedlist spacing="compact">
+              <listitem><para>
+                Design goal for each method implementation -- regardless of "safety"
+                </para></listitem>
+              <listitem><para>
+                Method will result in the same resource ending state no matter how many times executed
+                </para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>POST /api/todo_lists -- create a new and specific TodoList</para></listitem>
+                        <listitem><para>PUT /api/todo_lists/bills -- update/replace existing TodoList</para></listitem>
+                        <listitem><para>DELETE /api/todo_lists/bills</para></listitem>
+                    </itemizedlist>
+                </listitem>
+              <listitem><para>
+                Idempotent methods ....
+                </para></listitem>
+          </itemizedlist>
+        </section>
+    </section>
+    
+    <section id="ejb-jaxrs-restlike-response-codes">
+        <title>Response Codes</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Standardized</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>2xx - success</para></listitem>
+                    <listitem><para>3xx - success/redirect</para></listitem>
+                    <listitem><para>4xx - client error</para></listitem>
+                    <listitem><para>5xx - server error</para></listitem>
+                </itemizedlist>                   
+            </listitem>
+            <listitem><para>Common Set</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>200 - OK</para></listitem>
+                    <listitem><para>201 - CREATED</para></listitem>
+                    <listitem><para>400 - BAD_REQUEST</para></listitem>
+                    <listitem><para>404 - NOT_FOUND</para></listitem>
+                    <listitem><para>500 - INTERNAL_ERROR</para></listitem>
+                </itemizedlist>                   
+            </listitem>
+        </itemizedlist>                   
+    </section>
+
+</chapter>
+  

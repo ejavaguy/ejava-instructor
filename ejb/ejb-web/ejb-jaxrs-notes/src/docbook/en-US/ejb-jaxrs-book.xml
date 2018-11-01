@@ -26,13 +26,10 @@
             <title>Goals</title>
             <itemizedlist spacing="compact">
                 <listitem><para>
-                    Learn flexible EJB deployment options that enable Web APIs
+                    Expose EJB-based services as resources through Web Application Programming Interfaces (APIs)
                     </para></listitem>
                 <listitem><para>
-                    Expose EJB-based services as Resources through Web Application Programming Interfaces (APIs)
-                    </para></listitem>
-                <listitem><para>
-                    Make client Resource requests of these APIs
+                    Make client resource requests of these APIs
                     </para></listitem>
                 <listitem><para>
                     Exchange data payloads using common Internet exchange protocols (JSON and XML)
@@ -46,19 +43,18 @@
             <itemizedlist spacing="compact">
                 <listitem><para>have more understanding of:</para>
                     <itemizedlist spacing="compact">
-                        <listitem><para>Flexibility of EJB deployment</para></listitem>
                         <listitem><para>Building a Web Resource Facade</para></listitem>
                         <listitem><para>Building a Web Resource Client</para></listitem>
-                        <listitem><para>How Web Application Programming Interfaces (APIs) align with "REST-like" concepts</para></listitem>
-                        <listitem><para>Implement XML and JSON DTO data exchange</para></listitem>
+                        <listitem><para>How Web APIs align with "REST-like" concepts</para></listitem>
+                        <listitem><para>Implementing XML and JSON DTO data exchanges</para></listitem>
                     </itemizedlist>
                     </listitem>
                 <listitem><para>be able to:</para>
                     <itemizedlist spacing="compact">
-                        <listitem><para>Deploy an EJB using several deployment options</para></listitem>
                         <listitem><para>Design and implement a Web Resource Facade using JAX-RS</para></listitem>
                         <listitem><para>Implement an Web Resource Client using JAX-RS</para></listitem>
-                        <listitem><para>Design and implement a set of URIs, Methods, and status codes to expose EJB capability as a Web Resource using JAX-RS
+                        <listitem><para>Design and implement a set of URIs, Methods, and status codes 
+                          to expose EJB capability as a Web Resource using JAX-RS
                           </para></listitem>
                         <listitem><para>Implement Java class marshaling and demarshaling using JAXB and JSONB (and Jackson)</para></listitem>
                     </itemizedlist>
@@ -69,7 +65,7 @@
 
     <toc/>
 
-    <xi:include href="ejb-jaxrs-rest.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-jaxrs-restlike.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <!--
     <xi:include href="ejb-jaxrs-wardeploy.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-jaxrs-resource.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
