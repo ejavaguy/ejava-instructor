@@ -27,13 +27,13 @@
                 </listitem>
             <listitem><para>
                 Defined in 2000 by Roy Fielding in his doctoral dissertation that was also used to design HTTP 1.1
+                    <footnote id="rest-arch-constraints-footnote">
+                      <para><emphasis>"Architectural Styles and the Design of Network-based Software Architectures. Doctoral dissertation"</emphasis>,
+                      Roy Thomas Fielding, University of California, Irvine, 2000
+                        <ulink url="http://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm">HTML Version</ulink>
+                        </para>
+                    </footnote>
                 </para>
-                <footnote id="rest-arch-constraints-footnote">
-                  <para><emphasis>"Architectural Styles and the Design of Network-based Software Architectures. Doctoral dissertation"</emphasis>,
-                  Roy Thomas Fielding, University of California, Irvine, 2000
-                    <ulink url="http://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm">HTML Version</ulink>
-                    </para>
-                </footnote>
                 </listitem>
         </itemizedlist>                   
     </section>
@@ -42,8 +42,18 @@
         <title>"REST-like"</title>
         <subtitle>"HTTP-based"</subtitle>
         <itemizedlist spacing="compact">
-            <listitem><para>REST officially contains much more than most designs employ</para></listitem>
-            <listitem><para>"REST-like" architectures are based on a few main principals</para>
+            <listitem><para>REST officially contains much more than most interface designs use</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Leads to some common questions</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>"What is your definition of REST?"</para></listitem>
+                            <listitem><para>"How RESTful are you?"</para></listitem>
+                        </itemizedlist>                   
+                    </listitem>
+                </itemizedlist>                   
+            </listitem>
+
+            <listitem><para>Common "REST-like" architectures are based on a few main principals</para>
                 <itemizedlist spacing="compact">
                     <listitem><para>HTTP Protocol</para></listitem>
                     <listitem><para>Resources</para></listitem>
@@ -54,10 +64,41 @@
                         </itemizedlist>                   
                     </listitem>
                     <listitem><para>Standard Content Types</para></listitem>
-                    <listitem><para>Links</para></listitem>
+                    <listitem><para>Links somewhat used</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Rarely opaque and rarely discovered -- especially within payload body</para></listitem>
+                            <listitem><para>Clients commonly construct URI links from responses and knowledge of API</para></listitem>
+                        </itemizedlist>                   
+                    </listitem>
+                </itemizedlist>                   
+            </listitem>
+
+            <listitem><para>Uncommon REST features adopted</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para><ulink link="https://martinfowler.com/articles/richardsonMaturityModel.html#level3">Hyperlinks</ulink></para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Dynamic discovery of resource capabilities</para></listitem>
+                        </itemizedlist>                   
+                    </listitem>
+                </itemizedlist>                   
+            </listitem>
+
+            <listitem><para><ulink url="https://martinfowler.com/articles/richardsonMaturityModel.html">Richardson MaturityModel</ulink>
+                    <footnote id="ejb-jaxrs-restlike-rest-richardson">
+                      <para>
+                        <ulink url="https://martinfowler.com/articles/richardsonMaturityModel.html">Richardson Maturity Model</ulink>
+                      </para>
+                    </footnote>
+                </para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Level 0 - Using HTTP as soley a transport</para></listitem>
+                    <listitem><para>Level 1 - Using Resources</para></listitem>
+                    <listitem><para>Level 2 - Using HTTP Methods</para></listitem>
+                    <listitem><para>Level 3 - Using Hypermedia Controls</para></listitem>
                 </itemizedlist>                   
             </listitem>
         </itemizedlist>                   
+
     </section>
 
     <section id="ejb-jaxrs-restlike-http">
@@ -66,14 +107,15 @@
             <listitem><para>Previous commmunications protocols attempted to be transport agnostic</para>
                 <itemizedlist spacing="compact">
                     <listitem><para>CORBA mapped to HTTP, JMS, etc.</para></listitem>
-                    <listitem><para>Everything with an HTTP POST when mapped to HTTP protocol</para></listitem>
+                    <listitem><para>Everything used an HTTP POST when mapped to HTTP protocol</para></listitem>
                     <listitem><para>Other HTTP verbs (e.g., GET, DELETE, PUT, HEAD) not used</para></listitem>
                     <listitem><para>Bypassed built-in HTTP capabilities (e.g., caching) of the Internet</para></listitem>
                 </itemizedlist>                   
             </listitem>
-            <listitem><para>REST does not exist outside of the HTTP transport protocol</para>
+            <listitem><para>REST technically does not exist outside of the HTTP transport protocol</para>
                 <itemizedlist spacing="compact">
                     <listitem><para>Everything is expressed in HTTP-terms</para></listitem>
+                    <listitem><para>REST APIs leverage the world's investment into Internet communications</para></listitem>
                 </itemizedlist>                   
             </listitem>
         </itemizedlist>                   
@@ -84,10 +126,14 @@
         <itemizedlist spacing="compact">
             <listitem><para>An asset to be exposed to the web</para>
                 <itemizedlist spacing="compact">
-                    <listitem><para>Document, set of properties, method, nearly anything</para></listitem>
+                    <listitem><para>Document</para></listitem>
+                    <listitem><para>Set of properties</para></listitem>
+                    <listitem><para>Action/Activity -- even verbs can be treated as nouns</para></listitem>
+                    <listitem><para>(nearly anything)</para></listitem>
                 </itemizedlist>                   
             </listitem>
-            <listitem><para>Web has limited methods but an unlimited number of resources</para>
+            <listitem><para>Web has limited number of methods but can have an unlimited number of resources</para></listitem>
+            <listitem><para>Example Resources</para>
                 <itemizedlist spacing="compact">
                     <listitem><para>products</para></listitem>
                     <listitem><para>categories</para></listitem>
@@ -95,11 +141,11 @@
                     <listitem><para>todos</para></listitem>
                 </itemizedlist>                   
             </listitem>
-            <listitem><para>Resources are often nested</para>
+            <listitem><para>Resources can be nested</para>
                 <itemizedlist spacing="compact">
                     <listitem><para>categories(id).products *</para></listitem>
                     <listitem><para>customers(id).purchases *</para></listitem>
-                    <listitem><para>todos(id).items *</para></listitem>
+                    <listitem><para>todos(name).items *</para></listitem>
                 </itemizedlist>                   
                 <para>* Conceptual representation</para>
             </listitem>
@@ -107,11 +153,72 @@
     </section>
 
     <section id="ejb-jaxrs-restlike-uris">
-        <title>URIs</title>
+        <title>Uniform Resource Indentifiersi (URIs)</title>
         <subtitle>the "Nouns" of what we are communicating</subtitle>
+
         <itemizedlist spacing="compact">
-            <listitem><para>An address to access a particular resource</para></listitem>
-            <listitem><para>Resource collection</para>
+            <listitem><para>An address (of varying detail) to access a particular resource</para></listitem>
+            <listitem><para>Technically, URIs can be either URNs or URLs</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Uniform Resource Name
+                            <footnote id="ejb-jaxrs-restlike-urn-wikipedia">
+                              <para>
+                                <ulink url="https://en.wikipedia.org/wiki/Uniform_Resource_Name">URN Wikipedia Page</ulink>
+                              </para>
+                            </footnote>
+                        </para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Resource identity</para></listitem>
+                            <listitem><para>Globally unique</para></listitem>
+                            <listitem><para>Example:</para>
+<programlisting language=""><![CDATA[
+urn:info.ejava.products:1
+<core xmlns="urn:activemq:core">
+]]></programlisting>
+                            </listitem>
+                        </itemizedlist>
+                    </listitem>
+
+                    <listitem><para>Uniform Resource Locator
+                            <footnote id="ejb-jaxrs-restlike-urn-wikipedia">
+                              <para>
+                                <ulink url="https://en.wikipedia.org/wiki/URL">URL Wikipedia Page</ulink>
+                              </para>
+                            </footnote>
+                        </para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Resource's location on a network</para></listitem>
+                            <listitem><para>Contains protocol information</para></listitem>
+                            <listitem><para>Example:</para>
+<programlisting language=""><![CDATA[
+http://127.0.0.1/jaxrsInventoryWAR/api/products/1
+https://127.0.0.1/jaxrsInventoryWAR/api/products/1
+ftp://127.0.0.1/info.ejava.products:1
+]]></programlisting>
+                            </listitem>
+                        </itemizedlist>
+                    </listitem>
+
+                    <listitem><para>Commonly -- URIs are a partial URL</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Commonly lack protocol and physical location</para></listitem>
+                            <listitem><para>Relative to some point in the application</para></listitem>
+                            <listitem><para>Example:</para>
+<programlisting language=""><![CDATA[
+/jaxrsInventoryWAR/api/products/1
+/api/products/1
+products/1
+]]></programlisting>
+                            </listitem>
+                        </itemizedlist>
+                    </listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+
+
+        <itemizedlist spacing="compact">
+            <listitem><para>Example resource collection URI</para>
 <programlisting language=""><![CDATA[
 /api/products
 /api/categories
@@ -120,7 +227,7 @@
 ]]></programlisting>
             </listitem>
 
-            <listitem><para>Individual Resource</para>
+            <listitem><para>Example individual resource URI</para>
 <programlisting language=""><![CDATA[
 /api/products/{productId}
 /api/categories/{categoryId}
@@ -129,7 +236,7 @@
 ]]></programlisting>
             </listitem>
 
-            <listitem><para>Nested Resources</para>
+            <listitem><para>Example nested resources URI</para>
 <programlisting language=""><![CDATA[
 /api/products/{productId}/instructions
 /api/categories/{categoryId}/products
@@ -138,25 +245,25 @@
 ]]></programlisting>
             </listitem>
 
-            <listitem><para>Fully qualified</para>
-<programlisting language=""><![CDATA[
-http://127.0.0.1:8080/jaxrsInventoryWAR/api/products
-http://127.0.0.1:8080/jaxrsInventoryWAR/api/products/1
-http://127.0.0.1:8080/jaxrsInventoryWAR/api/products/1/instructions
-]]></programlisting>
-            </listitem>
-            
-            <listitem><para>May have query parameters</para>
+            <listitem><para>URIs may express variable parameters</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Use query parameters for optional variables</para>
 <programlisting language=""><![CDATA[
 http://127.0.0.1:8080/jaxrsInventoryWAR/api/categories?name=&offset=0&limit=0
 ]]></programlisting>
+                    </listitem>
+
+                    <listitem><para>Nested path parameters may express mandatory variables</para>
+<programlisting language=""><![CDATA[
+http://127.0.0.1:8080/jaxrsInventoryWAR/api/products/{id}
+http://127.0.0.1:8080/jaxrsInventoryWAR/api/products/1
+id=>1
+]]></programlisting>
+                    </listitem>
+                </itemizedlist>
             </listitem>
 
-            <listitem><para>May have nested path parameters</para>
-<programlisting language=""><![CDATA[
-http://127.0.0.1:8080/jaxrsInventoryWAR/api/products/1
-]]></programlisting>
-            </listitem>
+
 
             <listitem><para>URI naming conventions</para>
                 <itemizedlist spacing="compact">
@@ -209,7 +316,7 @@ GET http://127.0.0.1:8080/jaxrsInventoryWAR/api/products/1
 
         <section id="ejb-jaxrs-restlike-methods-safety">
             <title>Method Safety</title>
-            <para>Does it change the state of the resource</para>
+            <para>Does the method change the state of the resource?</para>
             <itemizedlist spacing="compact">
                 <listitem><para>Safe Methods</para>
                     <itemizedlist spacing="compact">
@@ -226,27 +333,70 @@ GET http://127.0.0.1:8080/jaxrsInventoryWAR/api/products/1
                     </itemizedlist>
                 </listitem>
             </itemizedlist>
+
+            <warning>
+                <title>Do not violate default method safety expectations</title>
+                <para>
+                    Internet communications is based upon the above method saftey expectations,
+                    but these are just definitions. You have the power to implement resource methods
+                    any way you wish. 
+                    However, avoid violating these method expectations -- or your API will not be 
+                    immediately understood and will render built-in Internet capabilities
+                    (e.g., caches) useless. The following are examples of what *not* to do:
+                </para>
+<programlisting language=""><![CDATA[
+GET /jaxrsInventoryWAR/api/products/1?command=DELETE
+POST /jaxrsInventoryWAR/api/products/1
+  content: {command:'getProduct'}
+]]></programlisting>
+            </warning>
         </section>
 
         <section id="ejb-jaxrs-restlike-methods-omnipotence">
           <title>Idempotent</title>
           <itemizedlist spacing="compact">
               <listitem><para>
-                Design goal for each method implementation -- regardless of "safety"
-                </para></listitem>
+                  Design goal for each method implementation -- regardless of "safety"
+                  </para></listitem>
               <listitem><para>
-                Method will result in the same resource ending state no matter how many times executed
-                </para>
-                    <itemizedlist spacing="compact">
-                        <listitem><para>POST /api/todo_lists -- create a new and specific TodoList</para></listitem>
-                        <listitem><para>PUT /api/todo_lists/bills -- update/replace existing TodoList</para></listitem>
-                        <listitem><para>DELETE /api/todo_lists/bills</para></listitem>
-                    </itemizedlist>
+                  Method will result in the same resource ending state no matter how many times executed
+                  </para>
+                  <itemizedlist spacing="compact">
+                      <listitem><para>POST /api/todo_lists -- create a new and specific TodoList</para></listitem>
+                      <listitem><para>PUT /api/todo_lists/bills -- update/replace existing TodoList</para></listitem>
+                      <listitem><para>DELETE /api/todo_lists/bills</para></listitem>
+                  </itemizedlist>
                 </listitem>
+
               <listitem><para>
-                Idempotent methods ....
-                </para></listitem>
-          </itemizedlist>
+                  Idempotent methods
+                  </para>
+                  <itemizedlist spacing="compact">
+                      <listitem><para>GET</para></listitem>
+                      <listitem><para>PUT</para></listitem>
+                      <listitem><para>DELETE</para></listitem>
+                      <listitem><para>OPTIONS</para></listitem>
+                      <listitem><para>HEAD</para></listitem>
+                  </itemizedlist>
+                </listitem>
+
+              <listitem><para>
+                  Non-Idempotent method(s)
+                  </para>
+                  <itemizedlist spacing="compact">
+                      <listitem><para>POST</para></listitem>
+                  </itemizedlist>
+                </listitem>
+
+            </itemizedlist>
+            <note>
+                <title>Relationship between Idempotent and browser page refresh warnings?</title>
+                <para>
+                  The standard convention of Internet protocol is that all methods except for POST are assumed
+                  to be idempotent. That means a page refresh for a page obtained from a GET gets immediately 
+                  refreshed and a warning dialogue is displayed if it was the result of a POST. 
+                </para>
+            </note>
         </section>
     </section>
     
@@ -263,15 +413,69 @@ GET http://127.0.0.1:8080/jaxrsInventoryWAR/api/products/1
             </listitem>
             <listitem><para>Common Set</para>
                 <itemizedlist spacing="compact">
-                    <listitem><para>200 - OK</para></listitem>
-                    <listitem><para>201 - CREATED</para></listitem>
-                    <listitem><para>400 - BAD_REQUEST</para></listitem>
-                    <listitem><para>404 - NOT_FOUND</para></listitem>
-                    <listitem><para>500 - INTERNAL_ERROR</para></listitem>
+                    <listitem><para>200 - OK</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>"We achieved what you wanted and might have previously did this"</para></listitem>
+                        </itemizedlist>                   
+                    </listitem>
+                    <listitem><para>201 - CREATED</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>"We did what you asked and a new resource was created"</para></listitem>
+                        </itemizedlist>                   
+                    </listitem>
+                    <listitem><para>204 - NO_CONTENT</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>"Just like a 200 with an empty payload, except the status makes this clear"</para></listitem>
+                        </itemizedlist>                   
+                    </listitem>
+                    <listitem><para>400 - BAD_REQUEST</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>"Your request is invalid and will never be accepted -- stop it"</para></listitem>
+                        </itemizedlist>                   
+                    </listitem>
+                    <listitem><para>401 - UNAUTHORIZED</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>"We need to know who you are before we do this"</para></listitem>
+                        </itemizedlist>                   
+                    </listitem>
+                    <listitem><para>403 - FORBIDDEN</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>"We know who you are and you cannot say what you just said"</para></listitem>
+                        </itemizedlist>                   
+                    </listitem>
+                    <listitem><para>500 - INTERNAL_ERROR</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>"Ouch! Nothing wrong with what you asked for or supplied, but we currently
+                               have issues completing. Try again later and we may have this fixed."</para></listitem>
+                        </itemizedlist>                   
+                    </listitem>
                 </itemizedlist>                   
             </listitem>
         </itemizedlist>                   
     </section>
 
+    <section id="ejb-jaxrs-restlike-links">
+        <title>Links</title>
+        <para>REST-like applications likely stop at providing standard links in HTTP headers</para>
+
+<programlisting language=""><![CDATA[
+POST http://localhost:8080/ejavaTodos/api/todo_lists
+{"name":"My First List"}
+=>Created/201
+Location: http://localhost:8080/ejavaTodos/api/todo_lists/My%20First%20List
+Content-Location: http://localhost:8080/ejavaTodos/api/todo_lists/My%20First%20List
+]]></programlisting>
+
+        <itemizedlist spacing="compact">
+            <listitem><para>Content-Location - direct URL for the data returned in the payload</para>
+            </listitem>
+
+            <listitem><para>Location - a re-direct to a new URL</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Result of a new resource being created</para></listitem>
+                </itemizedlist>                   
+            </listitem>
+        </itemizedlist>                   
+    </section>
 </chapter>
   
