@@ -1,0 +1,171 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-jaxrs-basics">
+    <title>JAX-RS Basics</title>
+
+    <section id="ejb-jaxrs-basics-client">
+        <title>JAX-RS Client Basics</title>
+
+        <orderedlist spacing="compact">
+            <listitem><para>determine the baseUrl for the application</para>
+<programlisting language="java"><![CDATA[String baseHttpUrlString = System.getProperty("url.base.http", "http://localhost:8080");
+]]></programlisting>
+            </listitem>
+            <listitem><para>build a URL to the specific resource</para>
+<programlisting language="java"><![CDATA[URI resourceUrl = javax.ws.rs.core.UriBuilder.fromUri(baseHttpUrlString)
+        //.path("") //using root resource - no need for extra path
+        .build();
+]]></programlisting>
+            </listitem>
+            <listitem><para>construct a JAX-RS client</para>
+<programlisting language="java"><![CDATA[javax.ws.rs.client.Client client = javax.ws.rs.client.ClientBuilder.newClient();
+]]></programlisting>
+            </listitem>
+            <listitem><para>create the WebTarget to represent intended resource</para>
+<programlisting language=""><![CDATA[javax.ws.rs.client.WebTarget target = client.target(resourceUrl);
+]]></programlisting>
+            </listitem>
+            <listitem><para>create an overall request, indicating Acceptable response types</para>
+<programlisting language="java"><![CDATA[javax.ws.rs.client.Invocation.Builder request = target.request(MediaType.TEXT_HTML_TYPE);
+]]></programlisting>
+            </listitem>
+            <listitem><para>create a method-specific request</para>
+<programlisting language="java"><![CDATA[javax.ws.rs.client.Invocation method = request.buildGet();
+]]></programlisting>
+            </listitem>
+            <listitem><para>invoke the request and get an actual response from remote resource</para>
+<programlisting language="java"><![CDATA[javax.ws.rs.core.Response response = method.invoke();
+]]></programlisting>
+            </listitem>
+            <listitem><para>interpret response</para>
+<programlisting language="java"><![CDATA[javax.ws.rs.core.Response.StatusType status = response.getStatusInfo();
+int statusCode = response.getStatus();
+assertEquals("unexpected statusType", Status.OK, status);
+assertEquals("unexpected statusCode", 200, statusCode);
+]]></programlisting>
+            </listitem>
+            <listitem><para>get response entity</para>
+<programlisting language="java"><![CDATA[String content = response.readEntity(String.class);
+
+assertNotEquals("unexpected size", 0, content.length());
+]]></programlisting>
+            </listitem>
+            <listitem><para></para>
+<programlisting language="java"><![CDATA[logger.debug("GET {} => {}/{}", target.getUri(), response.getStatus(), response.getStatusInfo());
+]]></programlisting>
+<programlisting language=""><![CDATA[
+GET http://localhost:8080 => 200/OK
+]]></programlisting>
+            </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="ejb-jaxrs-basics-server">
+        <title>JAX-RS Server Basics</title>
+        <orderedlist spacing="compact">
+            <listitem><para>Declare root URI using class that extends Application</para>
+<programlisting language="java"><![CDATA[import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Application;
+
+@ApplicationPath("api")
+public class TodosApplication extends Application {
+}
+]]></programlisting>
+                  <itemizedlist spacing="compact">
+                      <listitem><para>Root will be accessible under (WAR context-root)/api</para></listitem>
+                  </itemizedlist>
+              </listitem>
+
+            <listitem><para>Declare resource class and its path below root
+            </para>
+<programlisting language="java"><![CDATA[import javax.ws.rs.Path;
+]]></programlisting>
+<programlisting language="java"><![CDATA[@Path("greetings")
+public class GreetingsResource {
+]]></programlisting>
+                  <itemizedlist spacing="compact">
+                      <listitem><para>Resource will be accessible under (WAR context-root)/api/greetings</para></listitem>
+                  </itemizedlist>
+              </listitem>
+
+            <listitem><para>Declare resource method
+            </para>
+<programlisting language="java"><![CDATA[import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+]]></programlisting>
+<programlisting language="java"><![CDATA[@GET
+@Path("hi")
+@Produces(MediaType.TEXT_PLAIN)
+public Response sayHi() {
+   //...
+}
+]]></programlisting>
+                  <itemizedlist spacing="compact">
+                      <listitem><para>Be sure to declare the method as "public" - or else it will quietly fail</para></listitem>
+                      <listitem><para>Resource will be accessible under (WAR context-root)/api/greetings/hi</para></listitem>
+                      <listitem><para>Method will be accessible using GET /api/greetings/hi</para>
+<programlisting language="java"><![CDATA[# client-side
+URI uri = UriBuilder.fromUri(baseTodosUrl)
+                    .path("greetings")
+                    .path("hi")
+                    .build();
+WebTarget target = client.target(uri);
+]]></programlisting>
+                       </listitem>
+                      <listitem><para>Method will be used for all GET URI callers that can Accept "text/plain" content</para>
+<programlisting language="java"><![CDATA[# client-side
+Response response = target.request(MediaType.TEXT_PLAIN_TYPE)
+                          .get();
+]]></programlisting>
+                        </listitem>
+                  </itemizedlist>
+              </listitem>
+
+            <listitem><para>Implement a response</para>
+<programlisting language="java"><![CDATA[public Response sayHi() {
+    String entity = "hi";
+    ResponseBuilder rb = Response.ok(entity);            
+    return rb.build();
+}
+]]></programlisting>
+                  <itemizedlist spacing="compact">
+                      <listitem><para>Response will return a 200/OK status code</para>
+<programlisting language="java"><![CDATA[# client-side
+String greeting = response.readEntity(String.class);
+logger.info("GET {} => {}", target.getUri(), response.getStatusInfo());
+]]></programlisting>
+<programlisting language=""><![CDATA[# client-side
+GET http://localhost:8080/ejavaTodos/api/greetings/hi => OK
+]]></programlisting>
+                        </listitem>
+                      <listitem><para>Response will return a text String using "text/plain" content marshaling</para>
+<programlisting language="java"><![CDATA[# client-side
+String greeting = response.readEntity(String.class);
+logger.info("{}", greeting);
+]]></programlisting>
+<programlisting language=""><![CDATA[# client-side
+hi
+]]></programlisting>
+                       </listitem>
+                  </itemizedlist>
+              </listitem>
+        </orderedlist>
+    </section>
+
+
+    <section id="ejb-jaxrs-basics-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>JAX-RS used to expose resource URI and method</para></listitem>
+            <listitem><para>JAX-RS used to return status code and content</para></listitem>
+            <listitem><para>JAX-RS client used to form request and obtain status and response</para></listitem>
+        </itemizedlist>
+    </section>
+
+</chapter>
+  
