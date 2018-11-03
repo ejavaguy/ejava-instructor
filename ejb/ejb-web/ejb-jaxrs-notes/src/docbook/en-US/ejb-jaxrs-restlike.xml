@@ -153,7 +153,7 @@
     </section>
 
     <section id="ejb-jaxrs-restlike-uris">
-        <title>Uniform Resource Indentifiersi (URIs)</title>
+        <title>Uniform Resource Indentifiers (URIs)</title>
         <subtitle>the "Nouns" of what we are communicating</subtitle>
 
         <itemizedlist spacing="compact">
@@ -476,6 +476,28 @@ Content-Location: http://localhost:8080/ejavaTodos/api/todo_lists/My%20First%20L
                 </itemizedlist>                   
             </listitem>
         </itemizedlist>                   
+    </section>
+
+    <section id="ejb-jaxrs-restlike-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Terms "REST" and "RESTful" have a specific meaning defined by Roy Fielding</para></listitem>
+            <listitem><para>Very few APIs achieve full REST adoption -- but that is OK!!! -- just call it "REST-like" or "HTTP-based"</para></listitem>
+            <listitem><para>Most serious REST-like APIs adopt</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>HTTP</para></listitem>
+                    <listitem><para>Multiple Resources</para></listitem>
+                    <listitem><para>URIs</para></listitem>
+                    <listitem><para>HTTP-compliant use of Methods</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Safety</para></listitem>
+                            <listitem><para>Idempotent</para></listitem>
+                        </itemizedlist>                   
+                    </listitem>
+                    <listitem><para>Minor use of opaque links</para></listitem>
+                </itemizedlist>                   
+            </listitem>
+        </itemizedlist>
     </section>
 </chapter>
   

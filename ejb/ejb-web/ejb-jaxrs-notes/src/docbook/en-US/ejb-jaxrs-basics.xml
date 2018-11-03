@@ -157,6 +157,53 @@ hi
         </orderedlist>
     </section>
 
+    <section id="ejb-jaxrs-basics-maven">
+      <title>JAX-RS Maven Aspects</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>JAX-RS API</para>
+<programlisting language="xml"><![CDATA[<properties>
+    <javax.ws.rs-api.version>2.1</javax.ws.rs-api.version>
+</properties>
+
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+            <version>${javax.ws.rs-api.version}</version>
+        </dependency>
+]]></programlisting>
+<programlisting language="xml"><![CDATA[<dependencies>
+    <dependency>
+        <groupId>javax.ws.rs</groupId>
+        <artifactId>javax.ws.rs-api</artifactId>
+        <scope>provided</scope>
+    </dependency>
+]]></programlisting>
+              </listitem>
+            <listitem><para>Client-Side Provider</para>
+<programlisting language="xml"><![CDATA[<properties>
+    <resteasy.version>3.5.1.Final</resteasy.version>
+
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxrs</artifactId>
+            <version>${resteasy.version}</version>
+        </dependency>       
+]]></programlisting>
+<programlisting language="xml"><![CDATA[<dependency>
+    <groupId>org.jboss.resteasy</groupId>
+    <artifactId>resteasy-client</artifactId>
+    <scope>test</scope>
+</dependency>
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>Additional dependencies will be required when adding structured content to payloads</para></listitem>
+        </itemizedlist>
+    </section>
 
     <section id="ejb-jaxrs-basics-summary">
         <title>Summary</title>
