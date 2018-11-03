@@ -1,0 +1,320 @@
+<!DOCTYPE ejb PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-jaxrs-chapter">
+    <title>JAX-RS/Resource EJB Integration</title>
+    <itemizedlist spacing="compact">
+        <listitem><para></para></listitem>
+        <listitem><para></para></listitem>
+        <listitem><para></para></listitem>
+    </itemizedlist>
+
+    <section id="ejb-jaxrs-ejb-ejb">
+        <title>EJB Injection</title>
+        <para></para>
+        <orderedlist spacing="compact">
+            <listitem><para>Define an EJB to handle the (transactional and non-transactional) business logic</para>
+<programlisting language="java"><![CDATA[# GreetingEJB.java
+import javax.ejb.Stateless;
+]]></programlisting>
+<programlisting language="java"><![CDATA[# GreetingEJB.java
+@Stateless
+public class GreetingEJB {
+}
+]]></programlisting>
+                  <itemizedlist spacing="compact">
+                      <listitem><para>This EJB happens to be a No Interface EJB</para></listitem>
+                      <listitem><para>The class is the interface</para></listitem>
+                  </itemizedlist>
+              </listitem>
+
+            <listitem><para>Inject EJB into JAX-RS Resource class</para>
+<programlisting language="java"><![CDATA[#GreetingsResource.java
+import javax.ejb.EJB;
+]]></programlisting>
+<programlisting language="java"><![CDATA[#GreetingsResource.java
+@Path("greetings")
+public class GreetingsResource {
+    @EJB
+    private GreetingEJB greetingEJB;
+]]></programlisting>
+                  <itemizedlist spacing="compact">
+                      <listitem><para>Container locates and injects component that matches declared interface type</para></listitem>
+                  </itemizedlist>
+              </listitem>
+
+        </orderedlist>
+    </section>
+
+    <section id="ejb-jaxrs-ejb-exceptions">
+        <title>Candidate EJB/Business Tier Exceptions</title>
+        <para>Three (3) key errors for EJB/business methods to report to JAX-RS facade</para>
+
+        <itemizedlist spacing="compact">
+            <listitem><para>Built-in JAX-RS Exceptions not valid for use in @Remote interfaces - embedded Response not Serializable</para></listitem>
+            <listitem><para>Deliberatly used candidate exception names here that are similar but not identical to JAX-RS exceptions names</para></listitem>
+        </itemizedlist>
+
+        <section id="ejb-jaxrs-ejb-exceptions-client">
+            <title>Client Error</title>
+            <para>Request failed because of a client request error</para>
+<programlisting language="java"><![CDATA[public class ClientErrorException extends Exception {
+    public ClientErrorException(String msg) {
+        super(msg);
+    }
+}
+]]></programlisting>
+            <itemizedlist spacing="compact">
+                <listitem><para>Extending a checked exception because these errors generally represent business errors</para></listitem>
+                <listitem><para>Thrown checked exceptions do not automatically rollback transactions</para></listitem>
+            </itemizedlist>
+
+            <itemizedlist spacing="compact">
+                <listitem><para>Not Found Client Error - client identified resource that cannot be found</para>
+<programlisting language="java"><![CDATA[public class ResourceNotFoundException extends Exception {
+    public ResourceNotFoundException(String format, Object...args) {
+        super(String.format(format, args));
+    }
+    public ResourceNotFoundException(String msg) {
+        super(msg);
+    }
+}
+]]></programlisting>
+                      <itemizedlist spacing="compact">
+                          <listitem><para>Make it easy for EJB/business logic to report cause ready to return to caller</para></listitem>
+                      </itemizedlist>
+                  </listitem>
+
+                <listitem><para>Bad Request Error - client provided bad request input</para>
+<programlisting language="java"><![CDATA[public class InvalidRequestException extends ClientErrorException {
+    public InvalidRequestException(String format, Object...args) {
+        super(String.format(format, args));
+    }
+    public InvalidRequestException(String msg) {
+        super(msg);
+    }
+}
+]]></programlisting>
+                  </listitem>
+            </itemizedlist>
+        </section>
+
+
+        <section id="ejb-jaxrs-ejb-exceptions-server">
+            <title>Service Error</title>
+            <para>Request failed because of internal or back-end problem</para>
+
+<programlisting language="java"><![CDATA[public class InternalErrorException extends RuntimeException {
+    public InternalErrorException(String format, Object...args) {
+        super(String.format(format, args));
+    }
+    public InternalErrorException(String msg) {
+        super(msg);
+    }
+    public InternalErrorException(String msg, Throwable ex) {
+        super(msg, ex);
+    }
+}
+]]></programlisting>
+                  <itemizedlist spacing="compact">
+                      <listitem><para>Extends un-checked exception since these errors are generally infrastructure-related</para></listitem>
+                      <listitem><para>Unchecked exceptions automatically rollback current transaction</para></listitem>
+                      <listitem><para>Exception of value to identify the source of error within the server code</para></listitem>
+                  </itemizedlist>
+        </section>
+    </section>
+
+    <section id="ejb-jaxrs-ejb-method">
+        <title>Resource/EJB method</title>
+        <para></para>
+
+        <orderedlist spacing="compact">
+            <listitem><para>Define EJB method</para>
+<programlisting language="java"><![CDATA[# GreetingEJB.java
+public String greet(String name) {
+    return String.format("hello %s", name); //core business code
+}
+]]></programlisting>
+                  <itemizedlist spacing="compact">
+                      <listitem><para>Validates name was provided - reports bad request if missing</para></listitem>
+                      <listitem><para>Implements greeting</para></listitem>
+                      <listitem><para>Catches any infrastructure exceptions and reports internal server error with text message for caller</para></listitem>
+                  </itemizedlist>
+              </listitem>
+
+            <listitem><para>Define Resource method in terms of calling EJB method</para>
+<programlisting language="java"><![CDATA[# GreetingsResource.java
+@GET
+@Path("greet")
+@Produces(MediaType.TEXT_PLAIN)
+public Response greet(@QueryParam("name") String name) {
+    ResponseBuilder rb=null;
+    String entity = greetingEJB.greet(name);
+    rb = Response.ok(entity);
+    return rb.build();
+}
+]]></programlisting>
+                  <itemizedlist spacing="compact">
+                      <listitem><para>Method is accessible at URI /api/greetings/greet</para>
+<programlisting language="java"><![CDATA[# client
+URI uri = UriBuilder.fromUri(baseTodosUrl)
+        .path("greetings")
+        .path("greet")
+        .build();
+WebTarget target = client.target(uri);
+]]></programlisting>
+                        </listitem>
+                      <listitem><para>Method is accessible using GET request and Accepts "text/plain"</para>
+<programlisting language="java"><![CDATA[# client
+Response response = target.request(MediaType.TEXT_PLAIN_TYPE)
+              .get();
+logger.info("GET {} => {}/{}", target.getUri(), response.getStatus(), response.getStatusInfo());
+]]></programlisting>
+                        </listitem>
+
+                      <listitem><para>Resource method parameter mapped from HTTP query parameter -- not yet passed</para></listitem>
+                      <listitem><para>Missing name not yet reported</para>
+<programlisting language=""><![CDATA[# client
+GET http://localhost:8080/ejavaTodos/api/greetings/greet => 200/OK
+hello null
+]]></programlisting>
+                        </listitem>
+
+                  </itemizedlist>
+              </listitem>
+
+            <listitem><para>Add error logic to EJB/business method</para>
+<programlisting language="java"><![CDATA[# GreetingEJB.java
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+]]></programlisting>
+<programlisting language="java"><![CDATA[# GreetingEJB.java
+@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+public String greet(String name) throws InvalidRequestException {
+    try {
+        if (name==null || name.isEmpty()) {
+            throw new InvalidRequestException("Unable to greet, name not supplied");
+        }
+        
+        return String.format("hello %s", name); //core business code
+    } catch (RuntimeException ex) {
+        throw new InternalErrorException("Internal error greeting name[%s]", name);
+    }
+}
+]]></programlisting>
+                  <itemizedlist spacing="compact">
+                      <listitem><para>Validates name was provided - reports bad request if missing</para></listitem>
+                      <listitem><para>Implements greeting</para></listitem>
+                      <listitem><para>Catches any infrastructure exceptions and reports internal server error with text message for caller</para></listitem>
+                  </itemizedlist>
+              </listitem>
+
+            <listitem><para>Add minimal exception handling in resource method</para>
+<programlisting language="java"><![CDATA[# GreetingsResource.java
+@GET
+@Path("greet")
+@Produces(MediaType.TEXT_PLAIN)
+public Response greet(@QueryParam("name") String name) {
+    ResponseBuilder rb=null;
+    try {
+        String entity = greetingEJB.greet(name);
+        rb = Response.ok(entity);
+    } catch (Exception ex) {
+        rb=Response.serverError()
+            .entity(String.format("unexpected error greeting name[%s]", name));
+    }
+    return rb.build();
+}
+]]></programlisting>
+                  <itemizedlist spacing="compact">
+                      <listitem><para></para></listitem>
+                      <listitem><para>Resource method treating all exceptions as Internal Server Error</para>
+<programlisting language="java"><![CDATA[# client
+WebTarget target = client.target(uri);
+Response response = target.request(MediaType.TEXT_PLAIN_TYPE)
+              .get();
+logger.info("GET {} => {}/{}", target.getUri(), response.getStatus(), response.getStatusInfo());
+]]></programlisting>
+<programlisting language=""><![CDATA[
+GET http://localhost:8080/ejavaTodos/api/greetings/greet => 500/Internal Server Error
+unexpected error greeting name[null]
+]]></programlisting>
+                        </listitem>
+                  </itemizedlist>
+              </listitem>
+
+            <listitem><para>Add complete error reporting logic to resource method</para>
+<programlisting language="java"><![CDATA[# GreetingsResource.java
+@GET
+@Path("greet")
+@Produces(MediaType.TEXT_PLAIN)
+public Response greet(@QueryParam("name") String name) {
+    ResponseBuilder rb=null;
+    try {
+        String entity = greetingEJB.greet(name);
+        rb = Response.ok(entity);
+    } catch (InvalidRequestException ex) {
+        rb = Response.status(Status.BAD_REQUEST)
+                .entity(ex.getMessage());
+    } catch (InternalErrorException ex) {
+        rb = Response.status(Status.INTERNAL_SERVER_ERROR)
+                .entity(ex.getMessage());
+    } catch (Exception ex) {
+        rb=Response.serverError()
+            .entity(String.format("unexpected error greeting name[%s]", name));
+    }
+    return rb.build();
+}
+]]></programlisting>
+                  <itemizedlist spacing="compact">
+                      <listitem><para>BAD_REQUEST returned for InvalidRequestException -- passing informative message to caller</para>
+<programlisting language=""><![CDATA[
+GET http://localhost:8080/ejavaTodos/api/greetings/greet => 400/Bad Request
+19:37:49,825 INFO  (GreetingsIT.java:111) -Unable to greet, name not supplied
+]]></programlisting>
+                        </listitem>
+
+                      <listitem><para>Client can correct by adding name query parameter</para>
+<programlisting language="java"><![CDATA[WebTarget target = client.target(uri)
+        .queryParam("name", "ejava");
+Response response = target.request(MediaType.TEXT_PLAIN_TYPE)
+              .get();
+logger.info("GET {} => {}", target.getUri(), response.getStatusInfo());
+String greeting = response.readEntity(String.class);
+logger.info("{}", greeting);
+]]></programlisting>
+<programlisting language=""><![CDATA[
+GET http://localhost:8080/ejavaTodos/api/greetings/greet?name=ejava => OK
+hello ejava
+]]></programlisting>
+                        </listitem>
+                  </itemizedlist>
+              </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="ejb-jaxrs-ejb-4">
+        <title></title>
+        <para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+    </section>
+
+    <section id="ejb-jaxrs-ejb-5">
+        <title></title>
+        <para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+    </section>
+
+    <section id="ejb-jaxrs-ejb-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>
+
+</chapter>
+  
