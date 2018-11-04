@@ -2,7 +2,7 @@
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
 <chapter id="ejb-jaxrs-chapter">
-    <title>JAX-RS/Resource EJB Integration</title>
+    <title>JAX-RS Resource/EJB Integration</title>
     <itemizedlist spacing="compact">
         <listitem><para>Use Web API resource classes as HTTP facades</para></listitem>
         <listitem><para>Inject EJB/business logic components to perform details of work</para></listitem>

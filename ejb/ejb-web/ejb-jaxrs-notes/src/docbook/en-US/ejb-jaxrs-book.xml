@@ -68,7 +68,11 @@
     <xi:include href="ejb-jaxrs-restlike.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-jaxrs-basics.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-jaxrs-ejb.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-jaxrs-content.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <!--
+    <xi:include href="ejb-jaxrs-resources.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+
     <xi:include href="ejb-jaxrs-wardeploy.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-jaxrs-xmlrep.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     -->

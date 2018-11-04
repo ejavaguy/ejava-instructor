@@ -1,0 +1,418 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-jaxrs-content">
+    <title>JAX-RS Content</title>
+    <itemizedlist spacing="compact">
+        <listitem><para>Web content is shared using many standardized
+            <ulink url="https://www.freeformatter.com/mime-types-list.html">MIME Types</ulink></para></listitem>
+        <listitem><para>We will address only 2 of them</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>XML - JAXB support was part of original JAX-RS spec</para></listitem>
+                <listitem><para>JSON - requirement for JSONB support was added to JAX-RS in JavaEE 8</para></listitem>
+                <listitem><para>No other MIME Types are required, but many are provided thru vendor extensions of the standard JAX-RS marshaling/demarshaling framework</para></listitem>
+            </itemizedlist>
+        </listitem>
+        <listitem><para>We will show manual approaches to marshaling/demarshaling first</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>However, content is automatically marshaled/demarshaled by JAX-RS provider</para></listitem>
+                <listitem><para>Manual marshaling/demarshaling approaches mainly useful within debug</para></listitem>
+            </itemizedlist>
+        </listitem>
+        <listitem><para>Sample DTO Class</para>
+<programlisting language=""><![CDATA[public class MessageDTO implements Serializable {
+    private String text;
+
+    public MessageDTO() {}
+    public MessageDTO(String message) {
+        this.text = message;
+    }
+    
+    public String getText() {
+        return text;
+    }
+    public void setText(String text) {
+        this.text = text;
+    }
+    
+    @Override
+    public String toString() {
+        return text;
+    }
+}
+]]></programlisting>
+              <itemizedlist spacing="compact">
+                  <listitem><para>Implements Serializable to be legal for @Remote interfaces</para></listitem>
+                  <listitem><para>Typical JavaBean</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Default CTOR</para></listitem>
+                            <listitem><para>public setters/getters</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+              </itemizedlist>
+          </listitem>
+    </itemizedlist>
+
+    <section id="ejb-jaxrs-content-json">
+        <title>JSON Content</title>
+        <para>JSON is content type most preferred by Javascript UIs</para>
+<programlisting language="json"><![CDATA[
+{"text":"sample text"}
+]]></programlisting>
+
+        <itemizedlist spacing="compact">
+            <listitem><para>Default marshaling/demarshaling is supported without class modifications</para></listitem>
+        </itemizedlist>
+
+        <section id="ejb-jaxrs-content-json-jsonb">
+            <title>JSON-B JSON Marshaling/Demarshaling</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Standard added to JavaEE 8</para></listitem>
+
+                <listitem><para>Start by creating an instance of Jsonb</para>
+<programlisting language="java"><![CDATA[import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
+import javax.json.bind.JsonbConfig;
+]]></programlisting>
+<programlisting language="java"><![CDATA[JsonbConfig config=new JsonbConfig();
+//config.setProperty(JsonbConfig.FORMATTING, true);
+//config.setProperty(JsonbConfig.PROPERTY_NAMING_STRATEGY, PropertyNamingStrategy.LOWER_CASE_WITH_UNDERSCORES);
+//config.setProperty(JsonbConfig.NULL_VALUES, true); //helps us spot fields we don't want
+Jsonb builder = JsonbBuilder.create(config);
+]]></programlisting>
+                  </listitem>
+
+                <listitem><para>Use Jsonb instance to marshal to JSON</para>
+<programlisting language="java"><![CDATA[protected <T> String marshal(T object) {
+    if (object==null) { return ""; }
+    String buffer = builder.toJson(object);
+    return buffer;        
+}
+]]></programlisting>
+                  </listitem>
+
+                <listitem><para>Use Jsonb to demarshal from JSON</para>
+<programlisting language="java"><![CDATA[protected <T> T demarshal(Class<T> type, String buffer)  {
+    T result = (T) builder.fromJson(buffer, type);
+    return result;
+}
+]]></programlisting>
+                  </listitem>
+            </itemizedlist>
+
+            <section id="ejb-jaxrs-content-json-jsonb-annotations">
+              <title>Common Jsonb Annotations</title>
+              <itemizedlist spacing="compact">
+                  <listitem><para>Ignore property</para>
+<programlisting language="java"><![CDATA[@JsonbTransient
+]]></programlisting>
+                  </listitem>
+              </itemizedlist>
+            </section>
+        </section>
+
+        <section id="ejb-jaxrs-content-json-jackson">
+            <title>Jackson JSON Marshaling/Demarshaling</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>JBoss/Wildfly default JSON marshaler prior to JavaEE 8</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Some inconsistencies with JSON-B relative to collections</para></listitem>
+                        <listitem><para>Safest to use same marshaler as server</para></listitem>
+                    </itemizedlist>
+                </listitem>
+
+                <listitem><para>Start by creating an instance of ObjectMapper</para>
+<programlisting language="java"><![CDATA[import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+]]></programlisting>
+<programlisting language="java"><![CDATA[ObjectMapper mapper = new ObjectMapper();
+]]></programlisting>
+                  </listitem>
+
+                <listitem><para>Use ObjectMapper instance to marshal to JSON</para>
+<programlisting language="java"><![CDATA[protected <T> String marshal(T object) 
+        throws JsonGenerationException, JsonMappingException, IOException {
+    StringWriter buffer = new StringWriter();
+    mapper.writeValue(buffer, object);
+    return buffer.toString();
+}
+]]></programlisting>
+                  </listitem>
+
+                <listitem><para>Use ObjectMapper to demarshal from JSON</para>
+<programlisting language="java"><![CDATA[protected <T> T demarshal(Class<T> type, String buffer) 
+        throws JsonParseException, JsonMappingException, IOException {
+    T result = mapper.readValue(buffer, type);
+    return result;
+}
+]]></programlisting>
+                  </listitem>
+            </itemizedlist>
+
+            <section id="ejb-jaxrs-content-json-jackson-annotations">
+              <title>Common Jackson Annotations</title>
+              <itemizedlist spacing="compact">
+                  <listitem><para>Ignore property</para>
+<programlisting language="java"><![CDATA[@JsonIgnore
+]]></programlisting>
+                  </listitem>
+              </itemizedlist>
+            </section>
+        </section>
+
+    </section>
+
+    <section id="ejb-jaxrs-content-xml">
+        <title>XML Content</title>
+        <para></para>
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<message>
+    <text>sample text</text>
+</message>
+]]></programlisting>
+
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:message xmlns:ns2="urn:ejava.jaxrs.todos">
+    <text>sample text</text>
+</ns2:message>
+]]></programlisting>
+
+        <itemizedlist spacing="compact">
+            <listitem><para>JAX-RS JAX-B support has existed since the start of JAX-RS</para></listitem>
+            <listitem><para>XML is much more precise than JSON -- but with precision and tuning comes complication</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Root objects in stream must be annotated as @XmlRootElement</para>
+<programlisting language="java"><![CDATA[import javax.xml.bind.annotation.XmlRootElement;
+]]></programlisting>
+<programlisting language="java"><![CDATA[@XmlRootElement(name="message")
+public class MessageDTO implements Serializable {
+]]></programlisting>
+                    </listitem>
+                    <listitem><para>Element namespaces are very common is XML</para>
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:message xmlns:ns2="urn:ejava.jaxrs.todos">
+    <text>sample text</text>
+</ns2:message>
+]]></programlisting>
+<programlisting language="java"><![CDATA[@XmlRootElement(name="message", namespace="urn:ejava.jaxrs.todos")
+public class MessageDTO implements Serializable {
+]]></programlisting>
+                    </listitem>
+                </itemizedlist>
+            </listitem>
+
+          <listitem><para>Start by creating an instance of JAXBContext appropriate for the specific type</para>
+<programlisting language="java"><![CDATA[import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+]]></programlisting>
+<programlisting language="java"><![CDATA[JAXBContext jbx = JAXBContext.newInstance(object.getClass());
+JAXBContext jbx = JAXBContext.newInstance(type);
+]]></programlisting>
+              </listitem>
+
+            <listitem><para>Use JAXContext instance obtain a Marshaller to marshal to XML</para>
+<programlisting language="java"><![CDATA[import javax.xml.bind.Marshaller;
+]]></programlisting>
+<programlisting language="java"><![CDATA[protected <T> String marshal(T object) throws JAXBException {
+    if (object==null) { return ""; }
+    
+    JAXBContext jbx = JAXBContext.newInstance(object.getClass());
+    
+    Marshaller marshaller = jbx.createMarshaller();
+    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);        
+    StringWriter buffer = new StringWriter();
+    marshaller.marshal(object, buffer);
+    return buffer.toString();        
+}
+]]></programlisting>
+              </listitem>
+
+            <listitem><para>Use JAXBContext instance to obtain an Unmarshaller to demarshal from XML</para>
+<programlisting language="java"><![CDATA[import javax.xml.bind.Unmarshaller;
+]]></programlisting>
+<programlisting language="java"><![CDATA[protected <T> T demarshal(Class<T> type, String buffer) throws JAXBException {
+    if (buffer==null) { return null; }
+    
+    JAXBContext jbx = JAXBContext.newInstance(type);
+    Unmarshaller unmarshaller = jbx.createUnmarshaller();
+    
+    ByteArrayInputStream bis = new ByteArrayInputStream(buffer.getBytes());
+    @SuppressWarnings("unchecked")
+    T result = (T) unmarshaller.unmarshal(bis);
+    return result;
+}
+]]></programlisting>
+              </listitem>
+        </itemizedlist>
+
+        <section id="ejb-jaxrs-content-json-jaxb-annotations">
+          <title>Common JAXB Annotations</title>
+          <itemizedlist spacing="compact">
+              <listitem><para>Ignore property</para>
+<programlisting language="java"><![CDATA[@XmlTransient
+]]></programlisting>
+              </listitem>
+              <listitem><para>Represent as XML attribute (versus a child element)</para>
+<programlisting language="java"><![CDATA[@XmlAttribute
+]]></programlisting>
+              </listitem>
+          </itemizedlist>
+        </section>
+    </section>
+
+    <section id="ejb-jaxrs-content-handling">
+        <title>Content Handling</title>
+
+        <section id="ejb-jaxrs-content-handling-client-send">
+            <title>Client Marshal Request Content</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Pass result of Entity.entity() with target mediaType and annotations to guide marshaling choices</para>
+<programlisting language="java"><![CDATA[import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+]]></programlisting>
+<programlisting language="java"><![CDATA[Response response = target.request(mediaType)
+        .buildPost(Entity.entity(todoList, mediaType, todoList.getClass().getAnnotations()))
+        .invoke();
+]]></programlisting>
+                </listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejb-jaxrs-content-handling-api-rcv">
+            <title>API Receive Request Content</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Provider selects matching URI path method that can accept content type and passes as method parameter</para>
+<programlisting language="java"><![CDATA[import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+]]></programlisting>
+<programlisting language="java"><![CDATA[@POST
+@Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+public Response createTodoList(TodoListDTO todoList) {
+]]></programlisting>
+                </listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejb-jaxrs-content-handling-api-send">
+            <title>API Send Response Content</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Set Response.entity to response payload</para>
+<programlisting language="java"><![CDATA[import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+]]></programlisting>
+<programlisting language="java"><![CDATA[@POST
+@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+public Response createTodoList(TodoListDTO todoList) {
+        TodoListDTO entity = todosMgmt.createTodoList(todoList);
+        URI location = ...
+        ResponseBuilder rb = Response.created(location)                    
+                .contentLocation(location)
+                .entity(entity);
+        return rb.build();
+]]></programlisting>
+                </listitem>
+            </itemizedlist>
+        </section>
+
+
+        <section id="ejb-jaxrs-content-client-rcv">
+            <title>Demarshal Response Content</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Pass Response.readEntity the type of object expected and annotations to guide demarshaling choices</para>
+<programlisting language="java"><![CDATA[import javax.ws.rs.core.Response;
+]]></programlisting>
+<programlisting language="java"><![CDATA[static <T> T getEntity(Response response, Class<T> type) {
+    if (Response.Status.Family.SUCCESSFUL.equals(response.getStatusInfo().getFamily())) {
+        return response.readEntity(type, type.getAnnotations());
+    } else {
+        throw new IllegalStateException(String.format("error response[%d %s]: %s",
+                response.getStatus(),
+                response.getStatusInfo(),
+                response.readEntity(String.class))
+                );
+    }
+}
+]]></programlisting>
+                </listitem>
+            </itemizedlist>
+        </section>
+
+        <para></para>
+    </section>
+
+    <section id="ejb-jaxrs-content-maven">
+        <title>Maven Aspects</title>
+        <para>All low-level content API and implementation dependencies are taken care of by including the 
+              JAX-RS provider content-specific dependencies</para>
+        <itemizedlist spacing="compact">
+            <listitem><para>Jsonb API</para>
+<programlisting language="xml"><![CDATA[<properties>
+        <resteasy.version>3.5.1.Final</resteasy.version>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-json-binding-provider</artifactId>
+                <version>${resteasy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-jackson2-provider</artifactId>
+                <version>${resteasy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-jaxb-provider</artifactId>
+                <version>${resteasy.version}</version>
+            </dependency>            
+]]></programlisting>
+<programlisting language="xml"><![CDATA[<dependencies>
+       <!-- JSON-B JSON wiring for RESTEasy JAX-RS provider (javaee8; highest JSON priority) -->
+       <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-json-binding-provider</artifactId>
+            <scope>test</scope>
+       </dependency>
+        <!-- JSON wiring for RESTEasy JAX-RS provider (javaee7) -->
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jackson2-provider</artifactId>
+            <scope>test</scope>
+       </dependency>
+        <!-- XML impl for RESTEasy JAX-RS provider -->
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxb-provider</artifactId>
+            <scope>test</scope>
+        </dependency>
+]]></programlisting>
+            </listitem>
+        </itemizedlist>
+
+        <tip>
+          <title>Avoid including both Jackson and Jsonb -- pick your solution</title>
+          <para>If you taking a minimalist approach of least configuration and using JavaEE 7 
+                Wildfly -- you will want to use Jackson for JSON marshaling. If you are using
+                JavaEE 8, then you will want to use Jsonb. The two can be used together -- but
+                you must be more aware of the tweaks required to have the provider chose one 
+                over the other.
+          </para>
+        </tip>
+    </section>
+
+    <section id="ejb-jaxrs-content-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>
+
+</chapter>
+  
