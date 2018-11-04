@@ -109,6 +109,74 @@ Jsonb builder = JsonbBuilder.create(config);
                   </listitem>
               </itemizedlist>
             </section>
+
+            <section id="ejb-jaxrs-content-json-jsonb-maven">
+                <title>Jsonb Maven Aspects</title>
+                <para>Direct dependency on API modules useful for pure DTO libraries</para>
+
+                <itemizedlist spacing="compact">
+
+                    <listitem><para>Jsonb API</para>
+<programlisting language="xml"><![CDATA[<properties>
+        <javax.json.bind-api.version>1.0</javax.json.bind-api.version>
+        <jackson.version>2.9.5</jackson.version>
+
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>javax.json.bind</groupId>
+            <artifactId>javax.json.bind-api</artifactId>
+            <version>${javax.json.bind-api.version}</version>
+        </dependency>            
+]]></programlisting>
+<programlisting language="xml"><![CDATA[<dependencies>
+<!-- defines JSON-B entry point e.g., Jsonb and @Annotations -->
+<dependency>
+    <groupId>javax.json.bind</groupId>
+    <artifactId>javax.json.bind-api</artifactId>
+    <scope>provided</scope>
+</dependency>
+]]></programlisting>
+                    </listitem>
+
+                    <listitem><para>Jsonb Provider</para>
+                    <para>Direct dependency on provider modules useful for pure DTO modules with marshaling tests.
+                        JAX-RS provider will automatically bring in these dependencies if part of IT tests.</para>
+
+<programlisting language="xml"><![CDATA[<properties>
+    <glassfish-json.version>1.1.2</glassfish-json.version>
+    <yasson.version>1.0.1</yasson.version>
+
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.eclipse</groupId>
+            <artifactId>yasson</artifactId>
+            <version>${yasson.version}</version>
+        </dependency>              
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.json</artifactId>
+            <version>${glassfish-json.version}</version>
+        </dependency>
+]]></programlisting>
+<programlisting language="xml"><![CDATA[<dependencies>
+    <!-- JSON-B - reference implementation for JSON-B (e.g., JsonBindingProvider) --> 
+    <dependency>
+        <groupId>org.eclipse</groupId>
+        <artifactId>yasson</artifactId>
+        <scope>test</scope>
+    </dependency>              
+    <!-- JSON provider for JSON-B reference implementation - needed by yasson -->
+    <dependency>
+        <groupId>org.glassfish</groupId>
+        <artifactId>javax.json</artifactId>
+        <scope>test</scope>
+    </dependency>
+]]></programlisting>
+                    </listitem>
+                </itemizedlist>
+            </section>
         </section>
 
         <section id="ejb-jaxrs-content-json-jackson">
@@ -159,6 +227,61 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 ]]></programlisting>
                   </listitem>
               </itemizedlist>
+            </section>
+
+
+            <section id="ejb-jaxrs-content-json-jackson-maven">
+                <title>Jackson Maven Aspects</title>
+                <para>Direct dependency on API modules useful for pure DTO libraries</para>
+
+                <itemizedlist spacing="compact">
+
+                    <listitem><para>Jackson API</para>
+<programlisting language="xml"><![CDATA[<properties>
+    <jackson.version>2.9.5</jackson.version>
+
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+]]></programlisting>
+<programlisting language="xml"><![CDATA[<dependencies>
+    <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <scope>provided</scope>
+    </dependency>
+]]></programlisting>
+                    </listitem>
+
+                    <listitem><para>Jackson Provider</para>
+                    <para>Direct dependency on provider modules useful for pure DTO modules with marshaling tests.
+                        JAX-RS provider will automatically bring in these dependencies if part of IT tests.</para>
+
+<programlisting language="xml"><![CDATA[<properties>
+    <jackson.version>2.9.5</jackson.version>
+
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+]]></programlisting>
+<programlisting language="xml"><![CDATA[<dependencies>
+    <!-- core Jackson2 libraries -->
+    <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <scope>test</scope>
+    </dependency>
+]]></programlisting>
+                    </listitem>
+                </itemizedlist>
             </section>
         </section>
 
@@ -260,6 +383,14 @@ JAXBContext jbx = JAXBContext.newInstance(type);
               </listitem>
           </itemizedlist>
         </section>
+
+        <section id="ejb-jaxrs-content-json-jaxb-maven">
+            <title>JAXB Maven Aspects</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>JAXB API - built into Java SE</para></listitem>
+                <listitem><para>JAXB Provider - built into Java SE</para></listitem>
+            </itemizedlist>
+        </section>
     </section>
 
     <section id="ejb-jaxrs-content-handling">
@@ -345,51 +476,52 @@ public Response createTodoList(TodoListDTO todoList) {
     </section>
 
     <section id="ejb-jaxrs-content-maven">
-        <title>Maven Aspects</title>
-        <para>All low-level content API and implementation dependencies are taken care of by including the 
-              JAX-RS provider content-specific dependencies</para>
+        <title>JAX-RS Client Maven Aspects</title>
+        <para>Content providers only necessary for IT tests. Application server will
+              have all API and implementation modules server-side.
+        </para>
         <itemizedlist spacing="compact">
-            <listitem><para>Jsonb API</para>
+            <listitem><para>Content Provider Maven modules</para>
 <programlisting language="xml"><![CDATA[<properties>
-        <resteasy.version>3.5.1.Final</resteasy.version>
+    <resteasy.version>3.5.1.Final</resteasy.version>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-json-binding-provider</artifactId>
-                <version>${resteasy.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-jackson2-provider</artifactId>
-                <version>${resteasy.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-jaxb-provider</artifactId>
-                <version>${resteasy.version}</version>
-            </dependency>            
-]]></programlisting>
-<programlisting language="xml"><![CDATA[<dependencies>
-       <!-- JSON-B JSON wiring for RESTEasy JAX-RS provider (javaee8; highest JSON priority) -->
-       <dependency>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-json-binding-provider</artifactId>
-            <scope>test</scope>
-       </dependency>
-        <!-- JSON wiring for RESTEasy JAX-RS provider (javaee7) -->
+<dependencyManagement>
+    <dependencies>
         <dependency>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-jackson2-provider</artifactId>
-            <scope>test</scope>
-       </dependency>
-        <!-- XML impl for RESTEasy JAX-RS provider -->
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-json-binding-provider</artifactId>
+            <version>${resteasy.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jackson2-provider</artifactId>
+            <version>${resteasy.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxb-provider</artifactId>
-            <scope>test</scope>
-        </dependency>
+            <version>${resteasy.version}</version>
+        </dependency>            
+]]></programlisting>
+<programlisting language="xml"><![CDATA[<dependencies>
+    <!-- JSON-B JSON wiring for RESTEasy JAX-RS provider (javaee8; highest JSON priority) -->
+    <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-json-binding-provider</artifactId>
+        <scope>test</scope>
+    </dependency>
+    <!-- JSON wiring for RESTEasy JAX-RS provider (javaee7) -->
+    <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-jackson2-provider</artifactId>
+        <scope>test</scope>
+    </dependency>
+    <!-- XML impl for RESTEasy JAX-RS provider -->
+    <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-jaxb-provider</artifactId>
+        <scope>test</scope>
+    </dependency>
 ]]></programlisting>
             </listitem>
         </itemizedlist>
@@ -408,9 +540,9 @@ public Response createTodoList(TodoListDTO todoList) {
     <section id="ejb-jaxrs-content-summary">
         <title>Summary</title>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Content marshaled/demarshaled as portable JSON and XML</para></listitem>
+            <listitem><para>JSON-B adopted by JavaEE 8 -- Jackson used by Wildfly in JavaEE 7</para></listitem>
+            <listitem><para>JAX-B is part of JavaSE and part of original requirements for JAX-RS</para></listitem>
         </itemizedlist>
     </section>
 
