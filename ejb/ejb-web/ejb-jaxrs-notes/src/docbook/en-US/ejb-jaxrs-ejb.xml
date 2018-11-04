@@ -4,9 +4,10 @@
 <chapter id="ejb-jaxrs-chapter">
     <title>JAX-RS/Resource EJB Integration</title>
     <itemizedlist spacing="compact">
-        <listitem><para></para></listitem>
-        <listitem><para></para></listitem>
-        <listitem><para></para></listitem>
+        <listitem><para>Use Web API resource classes as HTTP facades</para></listitem>
+        <listitem><para>Inject EJB/business logic components to perform details of work</para></listitem>
+        <listitem><para>Report obvious status from EJB/business logic and error messages</para></listitem>
+        <listitem><para>Report accurate status and error messages from Web API</para></listitem>
     </itemizedlist>
 
     <section id="ejb-jaxrs-ejb-ejb">
@@ -47,17 +48,27 @@ public class GreetingsResource {
     </section>
 
     <section id="ejb-jaxrs-ejb-exceptions">
-        <title>Candidate EJB/Business Tier Exceptions</title>
-        <para>Three (3) key errors for EJB/business methods to report to JAX-RS facade</para>
+        <title>Candidate EJB/Business Tier Exceptions for Web API Status</title>
 
         <itemizedlist spacing="compact">
+            <listitem><para>Web API needs to report accurate status to caller -- especially when there is an error</para></listitem>
+            <listitem><para>EJB interfaces need to make determining that status obvious to detect and easy to report</para></listitem>
+            <listitem><para>Business and lower-levels are in best situation to know the specifics of the error</para></listitem>
+            <listitem><para>Web API should just be in the role of being the facade that reports it</para></listitem>
+            <listitem><para>Use distinct exceptions that map to specific statuses to be returned by the Web API</para></listitem>
             <listitem><para>Built-in JAX-RS Exceptions not valid for use in @Remote interfaces - embedded Response not Serializable</para></listitem>
-            <listitem><para>Deliberatly used candidate exception names here that are similar but not identical to JAX-RS exceptions names</para></listitem>
+            <listitem><para>Deliberatly used candidate exception names here -- similar but not identical to JAX-RS exceptions names</para></listitem>
         </itemizedlist>
 
         <section id="ejb-jaxrs-ejb-exceptions-client">
             <title>Client Error</title>
             <para>Request failed because of a client request error</para>
+
+            <itemizedlist spacing="compact">
+                <listitem><para>Informs caller that "it is them and not the service" that has the problem</para></listitem>
+                <listitem><para>If they keep making the same request -- they will get the same failure result</para></listitem>
+            </itemizedlist>
+
 <programlisting language="java"><![CDATA[public class ClientErrorException extends Exception {
     public ClientErrorException(String msg) {
         super(msg);
@@ -69,8 +80,11 @@ public class GreetingsResource {
                 <listitem><para>Thrown checked exceptions do not automatically rollback transactions</para></listitem>
             </itemizedlist>
 
-            <itemizedlist spacing="compact">
-                <listitem><para>Not Found Client Error - client identified resource that cannot be found</para>
+
+            <section id="ejb-jaxrs-ejb-exceptions-client-notfound">
+                <title>Not Found Client Error</title>
+                <para>client identified resource that cannot be found</para>
+
 <programlisting language="java"><![CDATA[public class ResourceNotFoundException extends Exception {
     public ResourceNotFoundException(String format, Object...args) {
         super(String.format(format, args));
@@ -80,12 +94,20 @@ public class GreetingsResource {
     }
 }
 ]]></programlisting>
-                      <itemizedlist spacing="compact">
-                          <listitem><para>Make it easy for EJB/business logic to report cause ready to return to caller</para></listitem>
-                      </itemizedlist>
-                  </listitem>
 
-                <listitem><para>Bad Request Error - client provided bad request input</para>
+                      <itemizedlist spacing="compact">
+                          <listitem><para>Make it easy for EJB/business logic to report cause ready to return to caller</para>
+<programlisting language="java"><![CDATA[throw new ResourceNotFoundException("listName[%s] not found", listName);
+throw new ResourceNotFoundException("todoList[%s], todoItem[%s] not found", listName, itemName);
+]]></programlisting>
+                          </listitem>
+                      </itemizedlist>
+            </section>
+
+            <section id="ejb-jaxrs-ejb-exceptions-client-badrequest">
+                <title>Bad Request Client Error</title>
+                <para>Caller targeting a resource that cannot be found</para>
+
 <programlisting language="java"><![CDATA[public class InvalidRequestException extends ClientErrorException {
     public InvalidRequestException(String format, Object...args) {
         super(String.format(format, args));
@@ -95,8 +117,10 @@ public class GreetingsResource {
     }
 }
 ]]></programlisting>
-                  </listitem>
-            </itemizedlist>
+
+<programlisting language="java"><![CDATA[throw new InvalidRequestException("Unable to greet, name not supplied");
+]]></programlisting>
+            </section>
         </section>
 
 
@@ -111,15 +135,21 @@ public class GreetingsResource {
     public InternalErrorException(String msg) {
         super(msg);
     }
-    public InternalErrorException(String msg, Throwable ex) {
+    public InternalErrorException(Throwable ex, String msg) {
         super(msg, ex);
+    }
+    public InternalErrorException(Throwable ex, String format, Object...args) {
+        super(String.format(format, args), ex);
     }
 }
 ]]></programlisting>
                   <itemizedlist spacing="compact">
                       <listitem><para>Extends un-checked exception since these errors are generally infrastructure-related</para></listitem>
                       <listitem><para>Unchecked exceptions automatically rollback current transaction</para></listitem>
-                      <listitem><para>Exception of value to identify the source of error within the server code</para></listitem>
+                      <listitem><para>Exception of value to identify the source of error within the server code</para>
+<programlisting language="java"><![CDATA[throw new InternalErrorException("Internal error greeting name[%s]: %s", name, ex);
+]]></programlisting>
+                      </listitem>
                   </itemizedlist>
         </section>
     </section>
@@ -129,16 +159,20 @@ public class GreetingsResource {
         <para></para>
 
         <orderedlist spacing="compact">
-            <listitem><para>Define EJB method</para>
+            <listitem><para>Define basic EJB method</para>
 <programlisting language="java"><![CDATA[# GreetingEJB.java
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+]]></programlisting>
+<programlisting language="java"><![CDATA[# GreetingEJB.java
+@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 public String greet(String name) {
     return String.format("hello %s", name); //core business code
 }
 ]]></programlisting>
                   <itemizedlist spacing="compact">
-                      <listitem><para>Validates name was provided - reports bad request if missing</para></listitem>
                       <listitem><para>Implements greeting</para></listitem>
-                      <listitem><para>Catches any infrastructure exceptions and reports internal server error with text message for caller</para></listitem>
+                      <listitem><para>No transactional behavior -- default for EJBs is REQUIRED</para></listitem>
                   </itemizedlist>
               </listitem>
 
@@ -173,7 +207,7 @@ logger.info("GET {} => {}/{}", target.getUri(), response.getStatus(), response.g
                         </listitem>
 
                       <listitem><para>Resource method parameter mapped from HTTP query parameter -- not yet passed</para></listitem>
-                      <listitem><para>Missing name not yet reported</para>
+                      <listitem><para>Missing name not yet reported in status</para>
 <programlisting language=""><![CDATA[# client
 GET http://localhost:8080/ejavaTodos/api/greetings/greet => 200/OK
 hello null
@@ -184,10 +218,6 @@ hello null
               </listitem>
 
             <listitem><para>Add error logic to EJB/business method</para>
-<programlisting language="java"><![CDATA[# GreetingEJB.java
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-]]></programlisting>
 <programlisting language="java"><![CDATA[# GreetingEJB.java
 @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 public String greet(String name) throws InvalidRequestException {
@@ -227,8 +257,7 @@ public Response greet(@QueryParam("name") String name) {
 }
 ]]></programlisting>
                   <itemizedlist spacing="compact">
-                      <listitem><para></para></listitem>
-                      <listitem><para>Resource method treating all exceptions as Internal Server Error</para>
+                      <listitem><para>Resource method currently treating all exceptions as Internal Server Error</para>
 <programlisting language="java"><![CDATA[# client
 WebTarget target = client.target(uri);
 Response response = target.request(MediaType.TEXT_PLAIN_TYPE)
@@ -293,26 +322,13 @@ hello ejava
         </orderedlist>
     </section>
 
-    <section id="ejb-jaxrs-ejb-4">
-        <title></title>
-        <para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>
-    </section>
-
-    <section id="ejb-jaxrs-ejb-5">
-        <title></title>
-        <para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>
-    </section>
-
     <section id="ejb-jaxrs-ejb-summary">
         <title>Summary</title>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Use Web API resource classes as HTTP facades</para></listitem>
+            <listitem><para>Inject EJB/business logic components to perform details of work</para></listitem>
+            <listitem><para>Report obvious status from EJB/business logic and error messages</para></listitem>
+            <listitem><para>Report accurate status and error messages from Web API</para></listitem>
         </itemizedlist>
     </section>
 
