@@ -2,9 +2,8 @@
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
 <chapter id="ejb-jaxrs-resource">
-    <title></title>
-    <subtitle>Resources, URIs, Methods, Content, and Status Codes</subtitle>
-
+    <title>Resource Examples</title>
+    <subtitle>Method Implementation Examples</subtitle>
 
 
     <section id="ejb-jaxrs-resource-jaxrsclass">
@@ -12,102 +11,378 @@
         <itemizedlist spacing="compact">
             <listitem><para>Annotated with @Path</para></listitem>
             <listitem><para>Injected with implementation details and call context</para></listitem>
-        </itemizedlist>                   
-<programlisting language="java"><![CDATA[
-@Path("/products")
+            <listitem><para>TodoList Example</para>
+<programlisting language="java"><![CDATA[import javax.ejb.EJB;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
+import info.ejava.examples.jaxrs.todos.ejb.TodosMgmtRemote;
+]]></programlisting>
+<programlisting language="java"><![CDATA[import javax.ejb.EJB;
+@Path("todo_lists")
+public class TodoListsResource {
+    @EJB
+    private TodosMgmtRemote todosMgmt;
+    @Context
+    private UriInfo uriInfo;
+    ...
+}
+]]></programlisting>
+            </listitem>
+            <listitem><para>Products Example</para>
+<programlisting language="java"><![CDATA[@Path("products")
 public class ProductsResource {
-    private static final Log log = LogFactory.getLog(ProductsResource.class);
-    @Inject
+    @EJB
     private InventoryMgmtEJB ejb;
     @Context
     private Request request;
     @Context 
     private UriInfo uriInfo;
     ...
-]]></programlisting>
-        
-        <section id="ejb-jaxrs-resource-jaxrsclass-post">
-            <title>JAX-RS Resource POST Method</title>
-            <itemizedlist spacing="compact">
-                <listitem><para>Create new resource or tunnel service</para></listitem>
-                <listitem><para>Returns CREATED and URO of created resource</para></listitem>
-            </itemizedlist>                   
-<programlisting language="java"><![CDATA[
-@POST @Path("")
-@Consumes(MediaType.APPLICATION_XML)
-@Produces(MediaType.APPLICATION_XML)
-public Response addCustomer(Customer customer) {
-    log.debug(String.format("%s %s", request.getMethod(), uriInfo.getAbsolutePath()));
-    try {
-        Customer c = ejb.addCustomer(customer);
-        URI uri = UriBuilder.fromUri(uriInfo.getAbsolutePath())
-                .path(CustomersResource.class, "getCustomer")
-                .build(c.getId());
-        return Response.created(uri)
-                .entity(c)
-                .build();
-    } catch (Exception ex) {
-        return serverError(log, "creating person", ex).build();
-    }
 }
 ]]></programlisting>
+            </listitem>
+        </itemizedlist>                   
+  </section>
+
+  <section id="ejb-jaxrs-resource-jaxrsclass-getcollection">
+      <title>JAX-RS GET Resource Collection</title>
+      <itemizedlist spacing="compact">
+          <listitem><para>Get members of a resource</para></listitem>
+          <listitem><para>Could add query parameters</para></listitem>
+          <listitem><para>Common to add paging</para></listitem>
+      </itemizedlist>                   
+
+      <section id="ejb-jaxrs-resource-jaxrsclass-getcollection-api">
+          <title>Server-side GET Resource Collection</title>
+<programlisting language="java"><![CDATA[@GET @Path("")
+@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+public Response getTodoLists(
+        @QueryParam("offset") @DefaultValue("0") Integer offset, 
+        @QueryParam("limit") @DefaultValue("10") Integer limit) {
+    ResponseBuilder rb = null;
+    try {
+        TodoListListDTO entity = todosMgmt.getTodoLists(offset, limit);
+        rb = Response.ok(entity)
+                .contentLocation(uriInfo.getAbsolutePath());
+    } catch (InternalErrorException ex) {
+        rb = Response.serverError().entity(ex.getMessage());
+    } catch (Exception ex) {
+        logger.info("Unexpected exception getting TodoLists", ex);
+        String msg = String.format("Unexpected error getting TodoLists: %s", ex.toString());
+        rb = Response.serverError()
+                .entity(new MessageDTO(msg));
+    }
+    return rb.build();
+}
+]]></programlisting>
+          <itemizedlist spacing="compact">
+              <listitem><para>@Path("") - method applied to URI path of overall JAX-RS class</para></listitem>
+              <listitem><para>@Produces - indicates Content-Type results are available for</para></listitem>
+              <listitem><para>@QueryParam - maps query parameter to input method argument</para></listitem>
+              <listitem><para>@DefaultValue - assigns a value to be applied when query parameter not supplied by caller</para></listitem>
+              <listitem><para>contentLocation() - returns Content-Location header indicating URI for payload</para></listitem>
+              <listitem><para>uriInfo - injected resource that knows the calling URI context for method</para></listitem>
+          </itemizedlist>                   
+      </section>
+
+      <section id="ejb-jaxrs-resource-jaxrsclass-getcollection-client">
+          <title>Client-side GET Resource Collection</title>
+
+<programlisting language="java"><![CDATA[# client
+private UriBuilder getBaseUrl(String...path) {
+    UriBuilder builder = UriBuilder.fromUri(baseUrl);        
+    if (path!=null) {
+        for (String p:path) {
+            builder = builder.path(p);
+        }
+    }
+    return builder;
+}
+]]></programlisting>
+          <itemizedlist spacing="compact">
+              <listitem><para>UriBuilder - used to form a URL to resource</para></listitem>
+          </itemizedlist>                   
+<programlisting language="java"><![CDATA[# client
+    static String TODO_LISTS_PATH = "todo_lists";
+]]></programlisting>
+<programlisting language="java"><![CDATA[# client
+public Response getTodoLists(Integer offset, Integer limit) {
+    URI uri = getBaseUrl(TODO_LISTS_PATH).build();
+    WebTarget target = client.target(uri);
+    if (offset!=null) {
+        target=target.queryParam(OFFSET, offset);
+    }
+    if (limit!=null) {
+        target=target.queryParam(LIMIT, limit);
+    }
+    return target.request(mediaType)
+          .buildGet()
+          .invoke();
+}
+]]></programlisting>
+          <itemizedlist spacing="compact">
+              <listitem><para>queryParam - used to pass named query parameters to method</para></listitem>
+              <listitem><para>mediaType - used to indicate which media types willing to accept</para></listitem>
+              <listitem><para>Response - directly returned for inspection</para></listitem>
+          </itemizedlist>                   
+<programlisting language="java"><![CDATA[# client
+static <T> T getEntity(Response response, Class<T> type) {
+    if (Response.Status.Family.SUCCESSFUL.equals(response.getStatusInfo().getFamily())) {
+        return response.readEntity(type, type.getAnnotations());
+    } else {
+]]></programlisting>
+          <itemizedlist spacing="compact">
+              <listitem><para>Helper method to inspect Response and return instance if success</para></listitem>
+              <listitem><para>Inspection may need to look at headers</para></listitem>
+              <listitem><para>Content-Type dictated by API return payload</para></listitem>
+          </itemizedlist>                   
+<programlisting language="java"><![CDATA[# client
+Response response = todosClient.getTodoLists(null, null);
+TodoListListDTO todoLists = getEntity(response, TodoListListDTO.class);
+]]></programlisting>
+          <itemizedlist spacing="compact">
+              <listitem><para>Caller indicates Java type for payload returned</para></listitem>
+          </itemizedlist>                   
+
+      </section>
+  </section>
+        
+
+  <section id="ejb-jaxrs-resource-jaxrsclass-post">
+      <title>JAX-RS Resource POST Method</title>
+      <itemizedlist spacing="compact">
+          <listitem><para>Create new resource or tunnel service</para></listitem>
+          <listitem><para>Returns CREATED and URI of created resource</para></listitem>
+      </itemizedlist>                   
+
+      <section id="ejb-jaxrs-resource-jaxrsclass-post-api">
+          <title>Server-side POST Resource Collection</title>
+
+<programlisting language="java"><![CDATA[private ResponseBuilder getBadRequestResponse(Exception ex) {
+    logger.debug(ex.getMessage());
+    return Response.status(Status.BAD_REQUEST)
+            .entity(new MessageDTO(ex.getMessage()));        
+}
+]]></programlisting>
+          <itemizedlist spacing="compact">
+              <listitem><para>Simple helper method to build status-specific response</para></listitem>
+              <listitem><para>MessageDTO used to report error text -- still targeted mediaType</para></listitem>
+          </itemizedlist>                   
+
+<programlisting language="java"><![CDATA[@POST
+@Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+public Response createTodoList(TodoListDTO todoList) {
+    ResponseBuilder rb = null;
+    try {
+        TodoListDTO entity = todosMgmt.createTodoList(todoList);
+        URI location = uriInfo.getBaseUriBuilder()
+                .path(TodoListsResource.class)
+                .path(TodoListsResource.class, "getTodoList")
+                .build(entity.getName());
+        rb = Response.created(location)                    
+                .contentLocation(location)
+                .entity(entity);
+    } catch (InvalidRequestException ex) {
+        rb = getBadRequestResponse(ex);
+    } catch (InternalErrorException ex) {
+        rb = getInternalErrorResponse(ex);
+    } catch (Exception ex) {
+        rb = getUndexpectedErrorResponse("Unexpected error creating TodoList", ex);
+    }
+    return rb.build();
+}
+]]></programlisting>
+          <itemizedlist spacing="compact">
+              <listitem><para>@POST - makes the method available for the resource</para></listitem>
+              <listitem><para>created() - helper method to indicate a 201/CREATED status and a Location header</para></listitem>
+              <listitem><para>uriInfo.getBaseUriBuilder() - access to a URIBuilder to build locationj URI</para></listitem>
+          </itemizedlist>                   
+      </section>
+
+      <section id="ejb-jaxrs-resource-jaxrsclass-post-client">
+          <title>Client-side POST Resource Collection</title>
+<programlisting language="java"><![CDATA[# client
+public Response createTodoList(TodoListDTO todoList) {
+    URI uri = getBaseUrl(TODO_LISTS_PATH).build();
+    WebTarget target = client.target(uri);
+    return target.request(mediaType)
+            .buildPost(Entity.entity(todoList, mediaType, todoList.getClass().getAnnotations()))
+            .invoke();
+}
+]]></programlisting>
+          <itemizedlist spacing="compact">
+              <listitem><para>Entity.entity() - used to define request content</para></listitem>
+              <listitem><para>buildPost() - accepts entity definition or null if no payload content</para></listitem>
+          </itemizedlist>                   
+
+<programlisting language="java"><![CDATA[# client
+Response response = todosClient.createTodoList(todoList);
+TodoListDTO createdList = getEntity(response,TodoListDTO.class);
+]]></programlisting>
         </section>
+    </section>
         
         
 
         <section id="ejb-jaxrs-resource-jaxrsclass-get">
-            <title>JAX-RS GET Resource Method</title>
+            <title>JAX-RS GET Resource Single Method</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Non-destructive read</para></listitem>
-                <listitem><para>Returns OK with payload</para></listitem>
+                <listitem><para>Returns 200/OK with payload</para></listitem>
             </itemizedlist>                   
-<programlisting language="java"><![CDATA[
-@GET @Path("{id}")
-@Produces(MediaType.APPLICATION_XML)
-public Response getProduct(@PathParam("id")int id) {
-    log.debug(String.format("%s %s", request.getMethod(), uriInfo.getAbsolutePath()));
 
+            <section id="ejb-jaxrs-resource-jaxrsclass-get-api">
+                <title>Server-side GET Single Resource</title>
+<programlisting language="java"><![CDATA[@GET @Path("{listName}")
+@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+public Response getTodoList(@PathParam("listName") String listName) {
+    ResponseBuilder rb = null;
     try {
-        Product product = ejb.getProduct(id);
-        if (product != null) {
-            return Response.ok(product)
-                    .build();
-        }
-        else {
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity(String.format("unable to locate product %d", id))
-                    .type(MediaType.TEXT_PLAIN)
-                    .build();
-        }
+        TodoListDTO entity = todosMgmt.getTodoList(listName);
+        rb = Response.ok(entity)
+                .contentLocation(uriInfo.getAbsolutePath());
+    } catch (ResourceNotFoundException ex) {
+        rb = getNotFoundResponse(ex);
+    } catch (InternalErrorException ex) {
+        rb = getInternalErrorResponse(ex);
     } catch (Exception ex) {
-        return ResourceHelper.serverError(log, "getting product", ex).build();
+        rb = getUndexpectedErrorResponse("Unexpected error creating TodoList", ex);
     }
+    return rb.build();        
 }
 ]]></programlisting>
+                <itemizedlist spacing="compact">
+                    <listitem><para>@Path defines required parameter(s) using {variable} syntax</para></listitem>
+                    <listitem><para>@PathParam maps "listName" from URI path to String listName argument to method</para></listitem>
+                    <listitem><para>@DefaultValue("value") can be applied -- otherwise null if not supplied</para></listitem>
+                    <listitem><para>Since this is the GET for a single resource -- the contentLocation will be the exact URI that called this endpoint</para></listitem>
+                </itemizedlist>                   
+            </section>
+
+            <section id="ejb-jaxrs-resource-jaxrsclass-get-client">
+                <title>Client-side GET Single Resource</title>
+<programlisting language="java"><![CDATA[# client
+static String TODO_LIST_PATH = "todo_lists/{listName}";
+]]></programlisting>
+                <itemizedlist spacing="compact">
+                    <listitem><para>String URI is defined with {variable} syntax</para></listitem>
+                    <listitem><para>{variable} - in this case - identifies which todo_list resource within the collection</para></listitem>
+                </itemizedlist>                   
+
+<programlisting language="java"><![CDATA[# client
+public Response getTodoList(String listName) {
+    URI uri = getBaseUrl(TODO_LIST_PATH).build(listName);
+
+    WebTarget target = client.target(uri);
+    return target.request(mediaType)
+            .buildGet()
+            .invoke();
+}
+]]></programlisting>
+                <itemizedlist spacing="compact">
+                    <listitem><para>build() - accepts {variable} values in sequence order</para></listitem>
+                </itemizedlist>                   
+
+<programlisting language="java"><![CDATA[# client
+    //request a resource that does exist
+Response response = todosClient.getTodoList(todoList.getName());
+TodoListDTO resultList = getEntity(response, TodoListDTO.class);
+]]></programlisting>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Specific Resource will be marshaled back to client using DTO view</para></listitem>
+                </itemizedlist>                   
+
+<programlisting language="java"><![CDATA[# client
+    //request a resource that does not exist
+Response response = todosClient.getTodoList("foobar_not_exist");
+assertEquals("unexpected error family", 
+        Status.Family.CLIENT_ERROR, 
+        response.getStatusInfo().getFamily());
+assertEquals("unexpected status", 
+        Status.NOT_FOUND, 
+        response.getStatusInfo());
+]]></programlisting>
+                <itemizedlist spacing="compact">
+                    <listitem><para>NOT_FOUND CLIENT_ERROR will be returned to client for unknown resource ID</para></listitem>
+                </itemizedlist>                   
+            </section>
+
+
+
+
         </section>
 
         <section id="ejb-jaxrs-resource-jaxrsclass-put">
-            <title>JAX-RS PUT Resource Method</title>
+            <title>JAX-RS PUT (Nested) Resource Method</title>
             <itemizedlist spacing="compact">
-                <listitem><para>Create new or update existing</para></listitem>
+                <listitem><para>Update existing or create well-known URI</para></listitem>
                 <listitem><para>Optional results</para></listitem>
+                <listitem><para>In this case we will work with nested resource</para></listitem>
             </itemizedlist>                   
-<programlisting language="java"><![CDATA[
-    @PUT @Path("{id}")
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
-    public Response updateProduct(@PathParam("id") int id, Product product) {
-        log.debug(String.format("%s %s", request.getMethod(), uriInfo.getAbsolutePath()));
 
-        try {
-            Product p = ejb.updateProduct(product);
-            return Response.ok(p)
-                    .build();
-        } catch (Exception ex) {
-            return ResourceHelper.serverError(log, "update product", ex).build();
-        }
+            <section id="ejb-jaxrs-resource-jaxrsclass-put-api">
+                <title>Server-Side JAX-RS PUT Resource Method</title>
+
+<programlisting language="java"><![CDATA[@PUT @Path("{listName}/todo_items/{itemName}")
+@Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+public Response updateTodoItem(
+        @PathParam("listName") String listName,
+        @PathParam("itemName") String itemName,
+        TodoItemDTO item) {
+    ResponseBuilder rb = null;
+    try {
+        TodoItemDTO entity = todosMgmt.updateTodoListItem(listName, itemName, item);
+        rb = Response.ok(entity);
+    } catch (ResourceNotFoundException ex) {
+        rb = getNotFoundResponse(ex);
+    } catch (InvalidRequestException ex) {
+        rb = getBadRequestResponse(ex);
+    } catch (InternalErrorException ex) {
+        rb = getInternalErrorResponse(ex);
+    } catch (Exception ex) {
+        rb = getUndexpectedErrorResponse("Unexpected error updating TodoItems", ex);
     }
+    return rb.build();                                
+}
 ]]></programlisting>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Our todoItem is below a specific todoList</para></listitem>
+                    <listitem><para>Two {variables} exist in path to represent the parent and child IDs</para></listitem>
+                    <listitem><para>We are using a PUT since we know the exact URI for the resource</para></listitem>
+                </itemizedlist>
+            </section>
+
+            <section id="ejb-jaxrs-resource-jaxrsclass-put-client">
+                <title>Client-side JAX-RS PUT Resource Method</title>
+<programlisting language="java"><![CDATA[# client
+static String TODO_LIST_PATH = "todo_lists/{listName}";
+static String TODO_ITEM_PATH = "todo_items/{itemName}";
+]]></programlisting>
+<programlisting language="java"><![CDATA[# client
+public Response updateTodoItem(String listName, TodoItemDTO item) {
+    URI uri = getBaseUrl(TODO_LIST_PATH, TODO_ITEM_PATH).build(listName, item.getName());
+    WebTarget target = client.target(uri);
+    
+    return target.request(mediaType)
+            .buildPut(Entity.entity(item, mediaType, item.getClass().getAnnotations()))
+            .invoke();
+}
+]]></programlisting>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Our URI has two {variables} and build() requires two sequential values</para></listitem>
+                    <listitem><para>buildPut() - accepts payload definition same as earlier buildPost()</para></listitem>
+                </itemizedlist>                   
+<programlisting language="java"><![CDATA[# client
+Response response = todosClient.updateTodoItem(todoList.getName(), item);
+TodoItemDTO updated = getEntity(response, item),TodoItemDTO.class);
+]]></programlisting>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Caller must supply context information to fill in nested resource path</para></listitem>
+                </itemizedlist>                   
+            </section>
         </section>
 
 
@@ -117,55 +392,86 @@ public Response getProduct(@PathParam("id")int id) {
                 <listitem><para>Deletes specified resource</para></listitem>
                 <listitem><para>Optional results</para></listitem>
             </itemizedlist>                   
-<programlisting language="java"><![CDATA[
-@DELETE @Path("{id}")
-@Produces(MediaType.APPLICATION_XML)
-public Response deleteCustomer(@PathParam("id") int id) {
-    log.debug(String.format("%s %s", request.getMethod(), uriInfo.getAbsolutePath()));
+
+            <section id="ejb-jaxrs-resource-jaxrsclass-delete-api">
+                <title>Server-side JAX-RS DELETE Resource Method</title>
+<programlisting language="java"><![CDATA[@DELETE @Path("{listName}")
+public Response deleteTodoList(@PathParam("listName") String listName) {
+    ResponseBuilder rb = null;
     try {
-        ejb.deleteCustomer(id);
-        return Response.ok()
-                .build();
+        todosMgmt.deleteTodoList(listName);
+        rb = Response.noContent();
+    } catch (ResourceNotFoundException ex) {
+        rb = getNotFoundResponse(ex);
+    } catch (InternalErrorException ex) {
+        rb = getInternalErrorResponse(ex);
     } catch (Exception ex) {
-        return serverError(log, "deleting person", ex).build();
+        rb = getUndexpectedErrorResponse("Unexpected error deleting TodoList", ex);
+    }
+    return rb.build();                
+}
+]]></programlisting>
+                <itemizedlist spacing="compact">
+                    <listitem><para>DELETE method signals action to take with identified resource</para></listitem>
+                    <listitem><para>noContent() - a variant of 200/OK with Content-Length=0; statusCode=204</para></listitem>
+                </itemizedlist>                   
+            </section>
+
+            <section id="ejb-jaxrs-resource-jaxrsclass-delete-client">
+                <title>Client-side JAX-RS DELETE Resource Method</title>
+<programlisting language="java"><![CDATA[# client
+static String TODO_LIST_PATH = "todo_lists/{listName}";
+]]></programlisting>
+<programlisting language="java"><![CDATA[# client
+public Response deleteTodoList(String listName) {
+    URI uri = getBaseUrl(TODO_LIST_PATH).build(listName);
+    WebTarget target = client.target(uri);
+    
+    return target.request(mediaType)
+            .buildDelete()
+            .invoke();
+}
+]]></programlisting>
+                <itemizedlist spacing="compact">
+                    <listitem><para>buildDelete() - builds request similar to others except with DELETE as the verb</para></listitem>
+                </itemizedlist>                   
+<programlisting language="java"><![CDATA[# client
+Response response = todosClient.deleteTodoList(todoList.getName());
+assertSuccess("error deleting todoList", response);
+]]></programlisting>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Caller inspects Response for successful status code</para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>                   
+<programlisting language="java"><![CDATA[# client
+static <T> void assertSuccess(String message, Response response) {
+    if (!Response.Status.Family.SUCCESSFUL.equals(response.getStatusInfo().getFamily())) {
+        throw new IllegalStateException(String.format(message + ", error response[%d %s]: %s",
+                response.getStatus(),
+                response.getStatusInfo(),
+                response.readEntity(String.class))
+                );            
+    } else {
+        response.close();
     }
 }
 ]]></programlisting>
+                <itemizedlist spacing="compact">
+                    <listitem><para>SUCCESSFUL family check avoids 200/OK versus 204/NO_CONTENT confusion</para></listitem>
+                </itemizedlist>                   
+            </section>
+
         </section>
-    </section>
 
-        <section id="ejb-jaxrs-resource-http">
-        <title>HTTP Request/Response</title>
+
+    <section id="ejb-jaxrs-resource-summary">
+        <title>Summary</title>
         <itemizedlist spacing="compact">
-            <listitem><para>Request supplies method, URI, optional payload, and other properties</para></listitem>
-        </itemizedlist>                   
-<programlisting language=""><![CDATA[
-GET /jaxrsInventoryWAR/rest/categories?name=snacks&offset=0&limit=0 HTTP/1.1
-Accept: application/xml
-Host: 127.0.0.1:7080
-Connection: Keep-Alive
-User-Agent: Apache-HttpClient/4.1.3 (java 1.5)
-]]></programlisting>
-
-        <itemizedlist spacing="compact">
-            <listitem><para>Response provides status code, optional entity, and other properties]</para></listitem>
-        </itemizedlist>                   
-<programlisting language=""><![CDATA[
-HTTP/1.1 200 OK
-Server: Apache-Coyote/1.1
-Content-Type: application/xml
-Transfer-Encoding: chunked
-Date: Tue, 06 Nov 2012 07:32:18 GMT
-
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:catageories xmlns:ns2="http://webejb.ejava.info/inventory" count="1" limit="0" offset="0" version="0">
-    <categories id="4" name="snacks" version="1">
-        <productCount>1</productCount>
-    </categories>
-</ns2:catageories>
-]]></programlisting>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
     </section>
-
-
 </chapter>
   

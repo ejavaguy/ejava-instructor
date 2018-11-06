@@ -83,7 +83,7 @@ public class GreetingsResource {
 
             <section id="ejb-jaxrs-ejb-exceptions-client-notfound">
                 <title>Not Found Client Error</title>
-                <para>client identified resource that cannot be found</para>
+                <para>Client identified resource that cannot be found</para>
 
 <programlisting language="java"><![CDATA[public class ResourceNotFoundException extends Exception {
     public ResourceNotFoundException(String format, Object...args) {
@@ -172,7 +172,7 @@ public String greet(String name) {
 ]]></programlisting>
                   <itemizedlist spacing="compact">
                       <listitem><para>Implements greeting</para></listitem>
-                      <listitem><para>No transactional behavior -- default for EJBs is REQUIRED</para></listitem>
+                      <listitem><para>No transactional behavior -- default for EJB is REQUIRED</para></listitem>
                   </itemizedlist>
               </listitem>
 
@@ -212,6 +212,10 @@ logger.info("GET {} => {}/{}", target.getUri(), response.getStatus(), response.g
 GET http://localhost:8080/ejavaTodos/api/greetings/greet => 200/OK
 hello null
 ]]></programlisting>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>The above should have been reported a detected BAD_REQUEST</para></listitem>
+                                <listitem><para>We need to fix/implement this</para></listitem>
+                            </itemizedlist>
                         </listitem>
 
                   </itemizedlist>
@@ -257,6 +261,7 @@ public Response greet(@QueryParam("name") String name) {
 }
 ]]></programlisting>
                   <itemizedlist spacing="compact">
+                      <listitem><para>We are purposely generalizing our exception logic here as part of incremental example</para></listitem>
                       <listitem><para>Resource method currently treating all exceptions as Internal Server Error</para>
 <programlisting language="java"><![CDATA[# client
 WebTarget target = client.target(uri);
@@ -269,6 +274,7 @@ GET http://localhost:8080/ejavaTodos/api/greetings/greet => 500/Internal Server 
 unexpected error greeting name[null]
 ]]></programlisting>
                         </listitem>
+                      <listitem><para>This needs improvement/correction to report correct error type</para></listitem>
                   </itemizedlist>
               </listitem>
 

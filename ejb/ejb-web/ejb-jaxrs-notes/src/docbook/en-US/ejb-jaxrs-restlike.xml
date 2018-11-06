@@ -67,7 +67,7 @@
                     <listitem><para>Links somewhat used</para>
                         <itemizedlist spacing="compact">
                             <listitem><para>Rarely opaque and rarely discovered -- especially within payload body</para></listitem>
-                            <listitem><para>Clients commonly construct URI links from responses and knowledge of API</para></listitem>
+                            <listitem><para>Clients commonly construct URI links from ID responses and knowledge of API</para></listitem>
                         </itemizedlist>                   
                     </listitem>
                 </itemizedlist>                   
@@ -91,7 +91,7 @@
                     </footnote>
                 </para>
                 <itemizedlist spacing="compact">
-                    <listitem><para>Level 0 - Using HTTP as soley a transport</para></listitem>
+                    <listitem><para>Level 0 - Using HTTP soley as a transport</para></listitem>
                     <listitem><para>Level 1 - Using Resources</para></listitem>
                     <listitem><para>Level 2 - Using HTTP Methods</para></listitem>
                     <listitem><para>Level 3 - Using Hypermedia Controls</para></listitem>
@@ -128,7 +128,7 @@
                 <itemizedlist spacing="compact">
                     <listitem><para>Document</para></listitem>
                     <listitem><para>Set of properties</para></listitem>
-                    <listitem><para>Action/Activity -- even verbs can be treated as nouns</para></listitem>
+                    <listitem><para>Action or Activity -- even verbs can be treated as nouns</para></listitem>
                     <listitem><para>(nearly anything)</para></listitem>
                 </itemizedlist>                   
             </listitem>
@@ -188,7 +188,7 @@ urn:info.ejava.products:1
                         </para>
                         <itemizedlist spacing="compact">
                             <listitem><para>Resource's location on a network</para></listitem>
-                            <listitem><para>Contains protocol information</para></listitem>
+                            <listitem><para>Contains protocol information -- "how to get it"</para></listitem>
                             <listitem><para>Example:</para>
 <programlisting language=""><![CDATA[
 http://127.0.0.1/jaxrsInventoryWAR/api/products/1
@@ -227,7 +227,7 @@ products/1
 ]]></programlisting>
             </listitem>
 
-            <listitem><para>Example individual resource URI</para>
+            <listitem><para>Example individual resource URIs (with mandatory path {parameter}s</para>
 <programlisting language=""><![CDATA[
 /api/products/{productId}
 /api/categories/{categoryId}
@@ -236,7 +236,7 @@ products/1
 ]]></programlisting>
             </listitem>
 
-            <listitem><para>Example nested resources URI</para>
+            <listitem><para>Example nested resource URIs</para>
 <programlisting language=""><![CDATA[
 /api/products/{productId}/instructions
 /api/categories/{categoryId}/products

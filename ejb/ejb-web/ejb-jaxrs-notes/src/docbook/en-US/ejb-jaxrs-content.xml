@@ -6,11 +6,16 @@
     <itemizedlist spacing="compact">
         <listitem><para>Web content is shared using many standardized
             <ulink url="https://www.freeformatter.com/mime-types-list.html">MIME Types</ulink></para></listitem>
-        <listitem><para>We will address only 2 of them</para>
+        <listitem><para>We will address only 2 of them -- both now required by JAX-RS</para>
             <itemizedlist spacing="compact">
                 <listitem><para>XML - JAXB support was part of original JAX-RS spec</para></listitem>
-                <listitem><para>JSON - requirement for JSONB support was added to JAX-RS in JavaEE 8</para></listitem>
-                <listitem><para>No other MIME Types are required, but many are provided thru vendor extensions of the standard JAX-RS marshaling/demarshaling framework</para></listitem>
+                <listitem><para>JSON - requirement for JSONB support was added to JAX-RS in 2.1 as a part of JavaEE 8</para></listitem>
+            </itemizedlist>
+        </listitem>
+        <listitem><para>No other MIME Types are required by JAX-RS</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Any can be added thru standard JAX-RS marshaling/demarshaling framework </para></listitem>
+                <listitem><para>Many are immediately available thru vendor extensions</para></listitem>
             </itemizedlist>
         </listitem>
         <listitem><para>We will show manual approaches to marshaling/demarshaling first</para>
@@ -20,21 +25,19 @@
             </itemizedlist>
         </listitem>
         <listitem><para>Sample DTO Class</para>
-<programlisting language=""><![CDATA[public class MessageDTO implements Serializable {
+<programlisting language="java"><![CDATA[public class MessageDTO implements Serializable {
     private String text;
 
     public MessageDTO() {}
     public MessageDTO(String message) {
         this.text = message;
     }
-    
     public String getText() {
         return text;
     }
     public void setText(String text) {
         this.text = text;
     }
-    
     @Override
     public String toString() {
         return text;
@@ -62,6 +65,7 @@
 
         <itemizedlist spacing="compact">
             <listitem><para>Default marshaling/demarshaling is supported without class modifications</para></listitem>
+            <listitem><para>We will look at two JSON marshaling/demarshaling frameworks; JSONB and Jackson</para></listitem>
         </itemizedlist>
 
         <section id="ejb-jaxrs-content-json-jsonb">
@@ -82,7 +86,7 @@ Jsonb builder = JsonbBuilder.create(config);
 ]]></programlisting>
                   </listitem>
 
-                <listitem><para>Use Jsonb instance to marshal to JSON</para>
+                <listitem><para>Use Jsonb instance to marshal DTO instance to JSON</para>
 <programlisting language="java"><![CDATA[protected <T> String marshal(T object) {
     if (object==null) { return ""; }
     String buffer = builder.toJson(object);
@@ -91,7 +95,7 @@ Jsonb builder = JsonbBuilder.create(config);
 ]]></programlisting>
                   </listitem>
 
-                <listitem><para>Use Jsonb to demarshal from JSON</para>
+                <listitem><para>Use Jsonb to demarshal DTO instance from JSON</para>
 <programlisting language="java"><![CDATA[protected <T> T demarshal(Class<T> type, String buffer)  {
     T result = (T) builder.fromJson(buffer, type);
     return result;
@@ -119,7 +123,6 @@ Jsonb builder = JsonbBuilder.create(config);
                     <listitem><para>Jsonb API</para>
 <programlisting language="xml"><![CDATA[<properties>
         <javax.json.bind-api.version>1.0</javax.json.bind-api.version>
-        <jackson.version>2.9.5</jackson.version>
 
 <dependencyManagement>
     <dependencies>
@@ -199,7 +202,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 ]]></programlisting>
                   </listitem>
 
-                <listitem><para>Use ObjectMapper instance to marshal to JSON</para>
+                <listitem><para>Use ObjectMapper instance to marshal DTO instance to JSON</para>
 <programlisting language="java"><![CDATA[protected <T> String marshal(T object) 
         throws JsonGenerationException, JsonMappingException, IOException {
     StringWriter buffer = new StringWriter();
@@ -209,7 +212,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 ]]></programlisting>
                   </listitem>
 
-                <listitem><para>Use ObjectMapper to demarshal from JSON</para>
+                <listitem><para>Use ObjectMapper to demarshal DTO instance from JSON</para>
 <programlisting language="java"><![CDATA[protected <T> T demarshal(Class<T> type, String buffer) 
         throws JsonParseException, JsonMappingException, IOException {
     T result = mapper.readValue(buffer, type);
@@ -251,7 +254,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 <programlisting language="xml"><![CDATA[<dependencies>
     <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-databind</artifactId>
+        <artifactId>jackson-annotations</artifactId>
         <scope>provided</scope>
     </dependency>
 ]]></programlisting>
@@ -296,12 +299,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 </message>
 ]]></programlisting>
 
-<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:message xmlns:ns2="urn:ejava.jaxrs.todos">
-    <text>sample text</text>
-</ns2:message>
-]]></programlisting>
-
         <itemizedlist spacing="compact">
             <listitem><para>JAX-RS JAX-B support has existed since the start of JAX-RS</para></listitem>
             <listitem><para>XML is much more precise than JSON -- but with precision and tuning comes complication</para>
@@ -335,16 +332,16 @@ JAXBContext jbx = JAXBContext.newInstance(type);
 ]]></programlisting>
               </listitem>
 
-            <listitem><para>Use JAXContext instance obtain a Marshaller to marshal to XML</para>
+            <listitem><para>Use JAXBContext instance obtain a Marshaller to marshal DTO instance to XML</para>
 <programlisting language="java"><![CDATA[import javax.xml.bind.Marshaller;
 ]]></programlisting>
 <programlisting language="java"><![CDATA[protected <T> String marshal(T object) throws JAXBException {
     if (object==null) { return ""; }
-    
     JAXBContext jbx = JAXBContext.newInstance(object.getClass());
     
     Marshaller marshaller = jbx.createMarshaller();
     marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);        
+
     StringWriter buffer = new StringWriter();
     marshaller.marshal(object, buffer);
     return buffer.toString();        
@@ -352,13 +349,13 @@ JAXBContext jbx = JAXBContext.newInstance(type);
 ]]></programlisting>
               </listitem>
 
-            <listitem><para>Use JAXBContext instance to obtain an Unmarshaller to demarshal from XML</para>
+            <listitem><para>Use JAXBContext instance to obtain an Unmarshaller to demarshal DTO instance from XML</para>
 <programlisting language="java"><![CDATA[import javax.xml.bind.Unmarshaller;
 ]]></programlisting>
 <programlisting language="java"><![CDATA[protected <T> T demarshal(Class<T> type, String buffer) throws JAXBException {
     if (buffer==null) { return null; }
-    
     JAXBContext jbx = JAXBContext.newInstance(type);
+
     Unmarshaller unmarshaller = jbx.createUnmarshaller();
     
     ByteArrayInputStream bis = new ByteArrayInputStream(buffer.getBytes());
@@ -395,19 +392,25 @@ JAXBContext jbx = JAXBContext.newInstance(type);
 
     <section id="ejb-jaxrs-content-handling">
         <title>Content Handling</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>JAX-RS defines an encoding/decoding framework to marshal/demarshal content</para></listitem>
+            <listitem><para>Provider will automatically perform this work for JSON, XML, and vendor-specific supported content types</para></listitem>
+        </itemizedlist>
 
         <section id="ejb-jaxrs-content-handling-client-send">
             <title>Client Marshal Request Content</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Pass result of Entity.entity() with target mediaType and annotations to guide marshaling choices</para>
-<programlisting language="java"><![CDATA[import javax.ws.rs.client.Entity;
+<programlisting language="java"><![CDATA[# client
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 ]]></programlisting>
-<programlisting language="java"><![CDATA[Response response = target.request(mediaType)
-        .buildPost(Entity.entity(todoList, mediaType, todoList.getClass().getAnnotations()))
-        .invoke();
+<programlisting language="java"><![CDATA[# client
+Response response = target.request(mediaType)
+    .buildPost(Entity.entity(todoList, mediaType, todoList.getClass().getAnnotations()))
+    .invoke();
 ]]></programlisting>
                 </listitem>
             </itemizedlist>
@@ -454,9 +457,11 @@ public Response createTodoList(TodoListDTO todoList) {
             <title>Demarshal Response Content</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Pass Response.readEntity the type of object expected and annotations to guide demarshaling choices</para>
-<programlisting language="java"><![CDATA[import javax.ws.rs.core.Response;
+<programlisting language="java"><![CDATA[# client
+import javax.ws.rs.core.Response;
 ]]></programlisting>
-<programlisting language="java"><![CDATA[static <T> T getEntity(Response response, Class<T> type) {
+<programlisting language="java"><![CDATA[# client
+static <T> T getEntity(Response response, Class<T> type) {
     if (Response.Status.Family.SUCCESSFUL.equals(response.getStatusInfo().getFamily())) {
         return response.readEntity(type, type.getAnnotations());
     } else {
