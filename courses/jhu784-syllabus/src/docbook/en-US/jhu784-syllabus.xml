@@ -196,9 +196,9 @@
                 <entry namest="date">Nov07</entry>
             </row>
             <row rowsep="1">
-                <entry namest="topic"><para>Web-enabled EJBs with JAX-RS</para></entry>
-                <!--
                 <entry namest="topic"><para><link linkend="ejb-jaxrs">Web-enabled EJBs with JAX-RS</link></para></entry>
+                <!--
+                <entry namest="topic"><para>Web-enabled EJBs with JAX-RS</para></entry>
                 -->
             </row>
             <row rowsep="1">

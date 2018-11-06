@@ -17,7 +17,7 @@
     
     <properties>
        <doc.base>jhu784-syllabus-book</doc.base>
-       <content.version>v2018-10-23</content.version>
+       <content.version>v2018-11-06</content.version>
     </properties>
 
     <dependencies>
