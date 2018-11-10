@@ -1,7 +1,7 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="ejb-security">
+<chapter id="ejb-security-ejb">
     <title>EJB Security</title>
     <itemizedlist spacing="compact">
         <listitem><para>EJB access restrictions</para>
@@ -15,7 +15,7 @@
         <listitem><para>Server Security Domain authentication and authorization</para></listitem>
     </itemizedlist>
 
-    <section id="ejb-security-access-control">
+    <section id="ejb-security-ejb-access-control">
         <title>EJB Access Control (Declarative)</title>
         
         <figure>
@@ -89,7 +89,7 @@ public class SecurePingEJB implements SecurePingRemote, SecurePingLocal {
 
     </section>
 
-    <section id="ejb-security-programmatic">
+    <section id="ejb-security-ejb-programmatic">
         <title>Programmatic Security</title>
         
         <figure>
@@ -160,7 +160,7 @@ public class SecurePingEJB implements SecurePingRemote, SecurePingLocal {
         
     </section>
 
-    <section id="ejb-security-jbossauth">
+    <section id="ejb-security-ejb-jbossauth">
         <title>Authentication/Authorization JBoss Setup</title>
         <para><ulink url="https://docs.jboss.org/author/display/WFLY8/Security+Realms">Wildfly Security Realms Wiki</ulink></para>
         <itemizedlist spacing="compact">
@@ -258,7 +258,7 @@ admin2=admin]]></programlisting>
         </itemizedlist>
     </section>
 
-    <section id="ejb-security-summary">
+    <section id="ejb-security-ejb-summary">
         <title>Summary</title>
         <itemizedlist spacing="compact">
             <listitem><para>EJB access restrictions</para>

@@ -1,14 +1,14 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="web-security">
+<chapter id="ejb-security-web">
     <title>Web Tier Access Control</title>
     <itemizedlist spacing="compact">
         <listitem><para>Lock down access to web pages and commands</para></listitem>
         <listitem><para>Identify user prior to EJB interaction</para></listitem>
     </itemizedlist>
 
-    <section id="web-security-auth">
+    <section id="ejb-security-web-auth">
         <title>Authentication</title>
         <itemizedlist spacing="compact">
             <listitem><para>HTTP Basic Authentication</para>
@@ -39,7 +39,7 @@
         </itemizedlist>
     </section>
 
-    <section id="web-security-constraints">
+    <section id="ejb-security-web-constraints">
         <title>Security Constraints (web.xml)</title>
 
         <figure>
@@ -136,7 +136,7 @@
        </itemizedlist>
     </section>
 
-    <section id="web-security-form">
+    <section id="ejb-security-web-form">
         <title>FORM-based Login</title>
         
         <figure>
@@ -166,7 +166,7 @@
         
         <figure>
             <title>transport-guarantee=CONFIDENTIAL</title>
-            <graphic scale="60" fileref="images/web-security-https.png"/>
+            <graphic scale="60" fileref="images/ejb-security-web-https.png"/>
         </figure>
         <itemizedlist spacing="compact">
             <listitem><para>uri-path constrained to use only HTTPS</para></listitem>
@@ -174,7 +174,7 @@
 
         <figure>
             <title>Web Authentication Context Passed to EJB</title>
-            <graphic scale="60" fileref="images/web-security-caller-roles.png"/>
+            <graphic scale="60" fileref="images/ejb-security-web-caller-roles.png"/>
         </figure>
         <itemizedlist spacing="compact">
             <listitem><para>EJB returning formatted string with caller role information</para></listitem>
@@ -183,15 +183,15 @@
         </itemizedlist>
     </section>
     
-    <section id="web-security-basic">
+    <section id="ejb-security-web-basic">
         <title>BASIC Authentication</title>
         
         <figure>
             <title></title>
-<programlisting language=""><![CDATA[<login-config>
+<programlisting language="xml"><![CDATA[<login-config>
     <auth-method>BASIC</auth-method>
 </login-config>]]></programlisting>            
-       <graphic scale="60" fileref="images/web-security-basic.png"/>
+       <graphic scale="60" fileref="images/ejb-security-web-basic.png"/>
         </figure>
         <itemizedlist spacing="compact">
             <listitem><para>BASIC authentication requested for any missing credentials</para></listitem>
@@ -201,7 +201,7 @@
 
         <figure>
             <title>EJB Access Violation</title>
-            <graphic scale="60" fileref="images/web-security-access-violation.png"/>
+            <graphic scale="60" fileref="images/ejb-security-web-access-violation.png"/>
         </figure>
         <itemizedlist spacing="compact">
             <listitem><para>Authenticate user passed to EJB</para></listitem>
@@ -210,7 +210,7 @@
     </section>
     
 
-    <section id="web-security-summary">
+    <section id="ejb-security-web-summary">
         <title>Summary</title>
         <itemizedlist spacing="compact">
             <listitem><para>URL-based access restrictions</para></listitem>
