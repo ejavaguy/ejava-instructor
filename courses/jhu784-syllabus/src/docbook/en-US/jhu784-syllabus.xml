@@ -245,18 +245,13 @@
                 <entry namest="date">Nov14</entry>
             </row>
             <row rowsep="1">
-                <entry namest="topic"><para>JavaEE Security</para></entry>
-                <!--
-                <entry namest="topic"><para><link linkend="javaee-security">JavaEE Security</link></para></entry>
-                -->
+                <entry namest="topic"><para><link linkend="ejb-security">EJB/JavaEE Security</link></para></entry>
                 <entry namest="comment"><para>Rubinger &amp; Burke: Ch 15</para></entry>
             </row>
             <row rowsep="1">
                 <entry namest="session"/>
                 <entry namest="topic"><para>JavaEE Interceptors</para></entry>
-                <!--
                 <entry namest="topic"><para><link linkend="javaee-interceptors">JavaEE Interceptors</link></para></entry>
-                -->
             </row>
 
             <row rowsep="1">

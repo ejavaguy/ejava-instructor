@@ -143,19 +143,6 @@
             <version>${project.version}</version>
             <classifier>docsrc</classifier>
         </dependency>
-        <!--
-        <dependency>
-            <groupId>info.ejava.docs.ejb</groupId>
-            <artifactId>webtier-notes</artifactId>
-            <version>${project.version}</version>
-            <classifier>docsrc</classifier>
-        </dependency>
-        <dependency>
-            <groupId>info.ejava.docs.ejb</groupId>
-            <artifactId>ejb-jaxrs-notes</artifactId>
-            <version>${project.version}</version>
-            <classifier>docsrc</classifier>
-        </dependency>
         <dependency>
             <groupId>info.ejava.docs.ejb</groupId>
             <artifactId>ejb-security-notes</artifactId>
@@ -165,6 +152,13 @@
         <dependency>
             <groupId>info.ejava.docs.ejb</groupId>
             <artifactId>javaee-interceptor-notes</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
+        <!--
+        <dependency>
+            <groupId>info.ejava.docs.ejb</groupId>
+            <artifactId>webtier-notes</artifactId>
             <version>${project.version}</version>
             <classifier>docsrc</classifier>
         </dependency>
