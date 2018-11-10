@@ -75,7 +75,7 @@
 
             <listitem><para>Uncommon REST features adopted</para>
                 <itemizedlist spacing="compact">
-                    <listitem><para><ulink link="https://martinfowler.com/articles/richardsonMaturityModel.html#level3">Hyperlinks</ulink></para>
+                    <listitem><para><ulink url="https://martinfowler.com/articles/richardsonMaturityModel.html#level3">Hyperlinks</ulink></para>
                         <itemizedlist spacing="compact">
                             <listitem><para>Dynamic discovery of resource capabilities</para></listitem>
                         </itemizedlist>                   

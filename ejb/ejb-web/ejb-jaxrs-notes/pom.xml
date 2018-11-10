@@ -18,7 +18,7 @@
     
     <properties>
        <doc.base>ejb-jaxrs-book</doc.base>
-       <content.version>v2018-11-06</content.version>
+       <content.version>v2018-11-10</content.version>
     </properties>
 
     <build>
