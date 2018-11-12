@@ -1156,9 +1156,9 @@ public EventDTO getEventFetchedDTO(int eventId) {
         Event event = (Event) row[0];
         String venueName = (String) row[1];
         Number numTickets = (Number) row[2];
-        dtoData.put(EVENT, event);
-        dtoData.put(VENUE_NAME, venueName);
-        dtoData.put(NUM_TICKETS, numTickets.intValue());
+        dtoData.put(EventMgmtDAO.EVENT, event);
+        dtoData.put(EventMgmtDAO.VENUE_NAME, venueName);
+        dtoData.put(EventMgmtDAO.NUM_TICKETS, numTickets.intValue());
     }
     return toEventDTO(dtoData);
 }
