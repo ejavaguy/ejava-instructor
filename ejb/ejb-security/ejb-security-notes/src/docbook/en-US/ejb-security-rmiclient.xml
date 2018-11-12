@@ -5,7 +5,7 @@
     <title>EJB Security RMI Client</title>
     <itemizedlist spacing="compact">
         <listitem><para>JBoss Remoting and JNDI InitialContext</para></listitem>
-        <listitem><para>EJBClient and CallbackHandler</para></listitem>
+        <listitem><para>EJBClient and JNDI InitialContext</para></listitem>
         <listitem><para>Changing Users</para></listitem>
         <listitem><para>Access Violations</para></listitem>
         <listitem><para>Access Granted</para></listitem>
@@ -13,228 +13,169 @@
 
     <section id="ejb-security-rmiclient-remoting">
         <title>JBoss Remoting</title>
-        
-        <figure>
-            <title>jndi.properties</title>
-<programlisting language=""><![CDATA[java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
-java.naming.factory.url.pkgs=org.jboss.ejb.client.naming
-java.naming.provider.url=http-remoting://localhost:8080
-jboss.naming.client.ejb.context=true]]></programlisting>
-        </figure>
         <itemizedlist spacing="compact">
-            <listitem><para>factory.initial set to JBoss Remoting implementation</para></listitem>
-            <listitem><para>provider.url set to address of JBoss server</para></listitem>
-            <listitem><para>ejb.context set to "true" to use this library to establish EJB contexts</para></listitem>
-            <listitem><para>url.pkgs option and used for alternate namespaces (e.g., "ejb:")</para></listitem>
+            <listitem><para>Used to perform JMS and other non-EJB resource lookups</para></listitem>
         </itemizedlist>
         
+        <section id="ejb-security-rmiclient-remoting-jndiprops">
+            <title>jndi.properties</title>
+<programlisting language=""><![CDATA[java.naming.factory.initial=org.wildfly.naming.client.WildFlyInitialContextFactory
+java.naming.factory.url.pkgs=
+java.naming.provider.url=http-remoting://127.0.0.1:8080
+]]></programlisting>
+            <itemizedlist spacing="compact">
+                <listitem><para>factory.initial set to WildFlyInitialContextFactory implementation</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>compatible with both JBoss Remoting and EJB Client</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>provider.url set to address of JBoss server</para></listitem>
+                <listitem><para>url.pkgs option not needed with Wildfly implementation (e.g., "ejb:")</para></listitem>
+            </itemizedlist>
+        </section>
+        
                 
-        <figure>
+        <section id="ejb-security-rmiclient-remoting-jndiname">
             <title>JBoss Remoting JNDI Name</title>
 <programlisting language=""><![CDATA[securePingEAR/securePingEJB/SecurePingEJB!info.ejava.examples.secureping.ejb.SecurePingRemote]]></programlisting>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>Using generic JBoss Remoting JNDI name</para></listitem>
-        </itemizedlist>
+            <itemizedlist spacing="compact">
+                <listitem><para>Using generic JBoss Remoting JNDI name</para></listitem>
+            </itemizedlist>
+        </section>
                 
-        <figure>
-            <title>Client Provides Credentials to JNDI InitialContext</title>
-<programlisting language="java"><![CDATA[private Context runAs(String username, String password) throws NamingException {
-    Properties env = new Properties();
-    if (username != null) {
-        env.put(Context.SECURITY_PRINCIPAL, username);
-        env.put(Context.SECURITY_CREDENTIALS, password);
+        <section id="ejb-security-rmiclient-remoting-auth">
+            <title>JBoss Remoting Authentication with JNDI InitialContext</title>
+<programlisting language="java"><![CDATA[private Context runAs(String[] login) throws NamingException, IOException {
+    Properties env = new Properties(); //load the defaults from jndi.properties
+    if (login != null) {
+        env.put(Context.SECURITY_PRINCIPAL, login[0]);
+        env.put(Context.SECURITY_CREDENTIALS, login[1]);
     }
-    env.put("jboss.naming.client.ejb.context", true); //override anything we put there for EJBClient
     return new InitialContext(env);
-}]]></programlisting>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>Client provides credentials in JNDI prior to obtaining InitialContext</para></listitem>
-            <listitem><para>Must use current JNDI Context to lookup @Remote</para></listitem>
-        </itemizedlist>
+}
+]]></programlisting>
+            <itemizedlist spacing="compact">
+                <listitem><para>Client provides credentials in JNDI prior to obtaining InitialContext</para></listitem>
+                <listitem><para>Must use current JNDI Context to lookup @Remote</para></listitem>
+            </itemizedlist>
+        </section>
                 
-        <figure>
+        <section id="ejb-security-rmiclient-remoting-auth-example">
             <title>Example Changing Users with JBoss Remoting</title>
-<programlisting language="java"><![CDATA[     jndi=runAs(userUser, userPassword);
-     ejb=(SecurePing)jndi.lookup(jndiName);
-     assertFalse("user in admin role", ejb.isCallerInRole("admin"));
-     
-     jndi=runAs(adminUser, adminPassword);
-     ejb=(SecurePing)jndi.lookup(jndiName);
-     assertTrue("admin not in admin role", ejb.isCallerInRole("admin"));]]></programlisting>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>Client can switch credentials with a change in InitialContexts and @Remote reference</para></listitem>
-        </itemizedlist>
+<programlisting language="java"><![CDATA[protected String[] userLogin = new String[] { userUser, userPassword };
+protected String[] adminLogin = new String[] { adminUser, adminPassword };
+]]></programlisting>
 
+<programlisting language="java"><![CDATA[jndi=runAs(userLogin);
+ejb=(SecurePing)jndi.lookup(jndiName);
+assertFalse("user in admin role", ejb.isCallerInRole("admin"));
+assertTrue("user not in user role", ejb.isCallerInRole("user"));
+jndi.close();
+
+jndi=runAs(adminLogin);
+ejb=(SecurePing)jndi.lookup(jndiName);
+assertTrue("admin not in admin role", ejb.isCallerInRole("admin"));
+assertTrue("admin not in user role", ejb.isCallerInRole("user"));
+jndi.close();
+]]></programlisting>
+            <itemizedlist spacing="compact">
+                <listitem><para>Client can switch credentials with a change in InitialContexts and @Remote reference</para></listitem>
+            </itemizedlist>
+        </section>
                 
-        <figure>
-            <title>Fixed Credentials</title>
+        <section id="ejb-security-rmiclient-remoting-auth-fixed">
+            <title>Optional Fixed Credentials</title>
 <programlisting language=""><![CDATA[java.naming.security.principal=known
 java.naming.security.credentials=password1!]]></programlisting>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>Fixed credentials can be placed in jndi.properties when known and not changing</para></listitem>
-        </itemizedlist>
+            <itemizedlist spacing="compact">
+                <listitem><para>Fixed credentials can be placed in jndi.properties when known and not changing</para></listitem>
+            </itemizedlist>
+        </section>
 
     </section>
 
     <section id="ejb-security-rmiclient-ejbclient">
         <title>EJBClient</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Primary means to communicate with EJB using RMI</para></listitem>
+            <listitem><para>Leverages vendor knowledge of EJB and specific @Remote interface</para></listitem>
+        </itemizedlist>
                 
-        <figure>
+        <section id="ejb-security-rmiclient-ejbclient-jndiprops">
             <title>jndi.properties</title>
-<programlisting language=""><![CDATA[java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
-java.naming.factory.url.pkgs=org.jboss.ejb.client.naming
-java.naming.provider.url=http-remoting://localhost:8080
-jboss.naming.client.ejb.context=false]]></programlisting>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>factory.initial not important, will delegate to naming extension</para></listitem>
-            <listitem><para>url.pkgs defines Java package with EJBClient extensions</para></listitem>
-            <listitem><para>provider.url ignored in this case</para></listitem>
-            <listitem><para>ejb.context not used and set to false in this case</para></listitem>
-        </itemizedlist>
-        
-                
-        <figure>
-            <title>jboss-ejb-client.properties</title>
-<programlisting language=""><![CDATA[
-remote.connectionprovider.create.options.org.xnio.Options.SSL_ENABLED=false
-
-remote.connections=default
-remote.connection.default.host=localhost
-remote.connection.default.port=8080
-remote.connection.default.connect.options.org.xnio.Options.SASL_DISALLOWED_MECHANISMS=JBOSS-LOCAL-USER
-remote.connection.default.connect.options.org.xnio.Options.SASL_POLICY_NOANONYMOUS=false
-remote.connection.default.callback.handler.class=info.ejava.examples.secureping.ejbclient.BasicCallbackHandler
+<programlisting language=""><![CDATA[java.naming.factory.initial=org.wildfly.naming.client.WildFlyInitialContextFactory
+java.naming.factory.url.pkgs=
+java.naming.provider.url=http-remoting://127.0.0.1:8080
 ]]></programlisting>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>SSL_ENABLED=false - example setup does not yet cover SSL and would require trustStore</para></listitem>
-            <listitem><para>SASL_DISALLOWED_MECHANISMS=JBOSS-LOCAL-USER - disallowing default user to be set to $local</para></listitem>
-            <listitem><para>callback.handler.class=info.ejava...BasicCallbackHandler - provider credentials via callback</para></listitem>
-        </itemizedlist>
-
-                
-        <figure>
-            <title>CallbackHandler used to Provide Credentials</title>
-<programlisting language="java"><![CDATA[import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.sasl.RealmCallback;
-
-public class BasicCallbackHandler implements CallbackHandler {
-    private String name;
-    private char[] password;
-    private String realm="ApplicationRealm";
-
-    public BasicCallbackHandler(String name, String password) {
-        this.name = name;
-        setPassword(password);
-    }
-
-    public void handle(Callback[] callbacks) 
-        throws UnsupportedCallbackException, IOException {
-        for (Callback cb : callbacks) {
-            if (cb instanceof NameCallback) {
-                ((NameCallback)cb).setName(name);                
-            }
-            else if (cb instanceof PasswordCallback) {
-                ((PasswordCallback)cb).setPassword(password);
-            }
-            else if (cb instanceof RealmCallback) {
-                ((RealmCallback)cb).setText(realm);
-            }
-            else {
-                throw new UnsupportedCallbackException(cb);
-            }
-        }
-    }
-}]]></programlisting>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>Class was registered in jboss-ejb-client.properties</para></listitem>
-            <listitem><para>Class responds to handle() callbacks</para></listitem>
-        </itemizedlist>
-
-                
-        <figure>
-            <title>CallbackHandler Accessed at Class Scope</title>
-<programlisting language="java"><![CDATA[public class BasicCallbackHandler implements CallbackHandler {
-...    
-    private static CallbackHandler login;
-
-    public void handle(Callback[] callbacks) 
-        throws UnsupportedCallbackException, IOException {
-        if (login!=null && login!=this) {
-            login.handle(callbacks);
-            return;
-        }
-
-        for (Callback cb : callbacks) {
-        ...
+            <itemizedlist spacing="compact">
+                <listitem><para>factory.initial not important if url.pkgs extension supplied</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>WildFlyInitialContextFactory performs this automatically</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>provider.url same as with JBoss Remoting</para></listitem>
+            </itemizedlist>
+        </section>
         
-    public static void setLogin(CallbackHandler login) {
-        BasicCallbackHandler.login=login;
-    }
-    public static CallbackHandler getLogin() {
-        return login;
-    }        
-}]]></programlisting>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>CallbackHandler accessed at class-scope</para></listitem>
-            <listitem><para>Must register credentials at class level</para></listitem>
-            <listitem><para>Credentials tied to connection. Cannot change identities without breaking and re-establishing connection (with proprietary API)</para></listitem>
-        </itemizedlist>
 
+                
+        <section id="ejb-security-rmiclient-ejbclient-jndiauth">
+            <title>EJB Client Authentication with JNDI InitialContext</title>
+<programlisting language="java"><![CDATA[protected static String[] currentLogin;
+]]></programlisting>
 
-        <figure>
-            <title>Proprietary API used to Change Identity</title>
-<programlisting language="java"><![CDATA[private void runAs(CallbackHandler login) throws NamingException, IOException {
-    InputStream is = getClass().getResourceAsStream("/jboss-ejb-client.properties");
-    try {
-        Properties props = new Properties();
-        props.load(is);
-        BasicCallbackHandler.setLogin(login);
-        EJBClientConfiguration cfg = new PropertiesBasedEJBClientConfiguration(props);
-        ContextSelector<EJBClientContext> contextSelector = new ConfigBasedEJBClientContextSelector(cfg);
-        EJBClientContext.setSelector(contextSelector);
-    } finally {
-        is.close();
+<programlisting language="java"><![CDATA[private void runAs(String[] login) throws NamingException, IOException {
+    if (!Arrays.equals(login, currentLogin) || securePing==null) {
+        Properties props = new Properties();  //initialize with values from jndi.properties
+        if (login!=null) {
+            props.put(Context.SECURITY_PRINCIPAL, login[0]);
+            props.put(Context.SECURITY_CREDENTIALS, login[1]);
+        }
+        InitialContext jndi = null;
+        try {
+            jndi = new InitialContext(props);
+            securePing = (SecurePingRemote)jndi.lookup(jndiName);
+            currentLogin = login;
+        } finally {
+            if (jndi!=null) { jndi.close(); }
+        }
     }
-}]]></programlisting>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>EJBClient stores credentials with connection</para></listitem>
-            <listitem><para>Must establish new connection to have CallbackHandler called again</para></listitem>
-        </itemizedlist>
+}
+]]></programlisting>
+            <itemizedlist spacing="compact">
+                <listitem><para>EJBClient stores credentials with connection</para></listitem>
+                <listitem><para>No security need to keep InitialContext open</para></listitem>
+            </itemizedlist>
+        </section>
                 
                 
-        <figure>
+        <section id="ejb-security-rmiclient-ejbclient-example">
             <title>Example Changing Users with EJBClient</title>
-<programlisting language="java"><![CDATA[	runAs(userLogin);
-	assertFalse("user in admin role",   securePing.isCallerInRole("admin"));
-	
-	runAs(adminLogin);
-	assertTrue("admin not in admin role", securePing.isCallerInRole("admin"));]]></programlisting>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>No need to get new InitialContext or new lookup of @Remote</para></listitem>
-        </itemizedlist>
+<programlisting language="java"><![CDATA[protected String[] userLogin = new String[] { userUser, userPassword };
+protected String[] adminLogin = new String[] { adminUser, adminPassword };
+]]></programlisting>
+
+<programlisting language="java"><![CDATA[runAs(userLogin);
+assertFalse("user in admin role",   securePing.isCallerInRole("admin"));
+assertTrue("user not in user role", securePing.isCallerInRole("user"));
+
+runAs(adminLogin);
+assertTrue("admin not in admin role", securePing.isCallerInRole("admin"));
+assertTrue("admin not in user role",  securePing.isCallerInRole("user"));
+]]></programlisting>
+            <itemizedlist spacing="compact">
+                <listitem><para>No need to get new InitialContext or new lookup of @Remote</para></listitem>
+            </itemizedlist>
+        </section>
                 
-        <figure>
-            <title>Fixed Credentials</title>
+        <section id="ejb-security-rmiclient-ejbclient-auth-fixed">
+            <title>Optional Fixed Credentials</title>
 <programlisting language=""><![CDATA[remote.connection.default.username=known
 remote.connection.default.password=password1!]]></programlisting>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>Fixed credentials can be placed in jboss-ejb-client.properties when known and not changing</para></listitem>
-        </itemizedlist>
+            <itemizedlist spacing="compact">
+                <listitem><para>Fixed credentials can be placed in jboss-ejb-client.properties when known and not changing</para></listitem>
+            </itemizedlist>
+        </section>
     </section>
     
     <section id="ejb-security-rmiclient-sanitycheck">
@@ -242,48 +183,56 @@ remote.connection.default.password=password1!]]></programlisting>
         <itemizedlist spacing="compact">
             <listitem><para>Useful to implement sanity check to assure authentication and authorizations in place</para></listitem>
         </itemizedlist>
-                
-        <figure>
-            <title>EJB Security Query Methods</title>
+
 <programlisting language="java"><![CDATA[@Stateless
 public class SecurePingEJB implements SecurePingRemote, SecurePingLocal {    
     @Resource
     SessionContext ctx;
-    
-    @PermitAll
-    public boolean isCallerInRole(String role) {
-        boolean result = ctx.isCallerInRole(role);
-        logger.debug("user=" + ctx.getCallerPrincipal().getName() + 
-                ", isCallerInRole(" + role + ")=" + result);  
-        return result;
-    }
-    
-    @PermitAll
-    public String getPrincipal() {
-        String name= ctx.getCallerPrincipal().getName();
-        logger.debug("getPrincipal(), name=" + name);
-        return name;
-    }]]></programlisting>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>Implement security query methods in a EJB</para></listitem>
-        </itemizedlist>
+]]></programlisting>
                 
-        <figure>
+        <section id="ejb-security-rmiclient-sanitycheck-whoami">
+            <title>whoAmI</title>
+<programlisting language="java"><![CDATA[@PermitAll
+public String whoAmI() {
+    String name= ctx.getCallerPrincipal().getName();
+    logger.debug("whoAmI()={}", name);
+    return name;
+}
+]]></programlisting>
+            <itemizedlist spacing="compact">
+                <listitem><para>Implement debug method to return authenticated identity</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="ejb-security-rmiclient-sanitycheck-inrole">
+            <title>isCallerInRole</title>
+<programlisting language="java"><![CDATA[@PermitAll
+public boolean isCallerInRole(String role) {
+    boolean result = ctx.isCallerInRole(role);
+    logger.debug("user={}, isCallerInRole({})={}", ctx.getCallerPrincipal().getName(), role, result);  
+    return result;
+}
+]]></programlisting>
+            <itemizedlist spacing="compact">
+                <listitem><para>Implement debug method to return role query result</para></listitem>
+            </itemizedlist>
+        </section>
+                
+        <section id="ejb-security-rmiclient-sanitycheck-success">
             <title>Client Issues Security Query Calls</title>
 <programlisting language="java"><![CDATA[runAs(userLogin);
-assertEquals("unexpected user", userUser, securePing.getPrincipal());
+assertEquals("unexpected user", userUser, securePing.whoAmI());
 assertFalse("user in internalRole role", securePing.isCallerInRole("internalRole"));
 
 runAs(adminLogin);
-assertEquals("unexpected user", adminUser, securePing.getPrincipal());
+assertEquals("unexpected user", adminUser, securePing.whoAmI());
 assertTrue("admin not in internalRole role", securePing.isCallerInRole("internalRole"));]]></programlisting>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>Client asserts security query results to verify setup correctly</para></listitem>
-        </itemizedlist>
+            <itemizedlist spacing="compact">
+                <listitem><para>Client asserts security query results to verify setup correctly</para></listitem>
+            </itemizedlist>
+        </section>
                 
-        <figure>
+        <section id="ejb-security-rmiclient-sanitycheck-accessviolation">
             <title>Example Access Violation</title>
 <programlisting language="java"><![CDATA[Context jndi = new InitialContext();
 logger.debug("looking up jndi.name={}", jndiName);
@@ -298,39 +247,46 @@ catch (EJBAccessException ex) {
     logger.info("expected exception thrown:" + ex);
 }]]></programlisting>
 
-<programlisting language=""><![CDATA[-looking up jndi.name=ejb:securePingEAR/securePingEJB/SecurePingEJB!info.ejava.examples.secureping.ejb.SecurePingRemote
--realm callback:ApplicationRealm
--name callback:user1
--password callback:password1!
--expected exception thrown:javax.ejb.EJBAccessException: JBAS014502: Invocation on method: 
-public abstract java.lang.String info.ejava.examples.secureping.ejb.SecurePing.pingAdmin() of bean: 
-SecurePingEJB is not allowed]]></programlisting>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>EJBAccessException thrown when accessing method not allowed</para></listitem>
-        </itemizedlist>
+<programlisting language=""><![CDATA[
+-looking up jndi.name=ejb:securePingEAR/securePingEJB/SecurePingEJB
+   !info.ejava.examples.secureping.ejb.SecurePingRemote as user1
+-found=Proxy for remote EJB StatelessEJBLocator for "securePingEAR/securePingEJB/SecurePingEJB", 
+   view is interface info.ejava.examples.secureping.ejb.SecurePingRemote, affinity is None
+-login=[user1, password1!], whoAmI=user1
+-expected exception thrown:javax.ejb.EJBAccessException: WFLYEJB0364: Invocation on method: 
+   public abstract java.lang.String info.ejava.examples.secureping.ejb.SecurePing.pingAdmin() 
+   of bean: SecurePingEJB is not allowed
+]]></programlisting>
+            <itemizedlist spacing="compact">
+                <listitem><para>EJBAccessException thrown when accessing method not allowed</para></listitem>
+            </itemizedlist>
+        </section>
                 
-        <figure>
+        <section id="ejb-security-rmiclient-sanitycheck-accessgranted">
             <title>Example Access Granted</title>
 <programlisting language="java"><![CDATA[runAs(adminLogin);
 logger.info(securePing.pingAdmin());]]></programlisting>
 
-<programlisting language=""><![CDATA[-realm callback:ApplicationRealm
--name callback:admin1
--password callback:password1!
--called pingAdmin, principal=admin1, isUser=true, isAdmin=true, isInternalRole=true]]></programlisting>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>Access to method protected by declarative security granted</para></listitem>
-            <listitem><para>Results of programmatic security checks returned in formatted text string</para></listitem>
-        </itemizedlist>
+<programlisting language=""><![CDATA[
+-looking up jndi.name=ejb:securePingEAR/securePingEJB/SecurePingEJB
+   !info.ejava.examples.secureping.ejb.SecurePingRemote as admin1
+-found=Proxy for remote EJB StatelessEJBLocator for "securePingEAR/securePingEJB/SecurePingEJB", 
+   view is interface info.ejava.examples.secureping.ejb.SecurePingRemote, affinity is None
+-login=[admin1, password1!], whoAmI=admin1
+-called pingAdmin, principal=admin1, isUser=true, isAdmin=true, isInternalRole=true
+]]></programlisting>
+            <itemizedlist spacing="compact">
+                <listitem><para>Access to method protected by declarative security granted</para></listitem>
+                <listitem><para>Results of programmatic security checks returned in formatted text string</para></listitem>
+            </itemizedlist>
+        </section>
     </section>
     
     <section id="ejb-security-rmiclient-summary">
         <title>Summary</title>
         <itemizedlist spacing="compact">
             <listitem><para>JBoss Remoting and JNDI InitialContext</para></listitem>
-            <listitem><para>EJBClient and CallbackHandler</para></listitem>
+            <listitem><para>EJBClient and JNDI InitialContext</para></listitem>
             <listitem><para>Changing Users</para></listitem>
             <listitem><para>Access Violations</para></listitem>
             <listitem><para>Access Granted</para></listitem>

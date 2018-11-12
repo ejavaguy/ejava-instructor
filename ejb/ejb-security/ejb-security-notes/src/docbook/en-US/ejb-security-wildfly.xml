@@ -1,0 +1,266 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="ejb-security-wildfly">
+    <title>JBoss/Wildfly Security</title>
+
+    <itemizedlist spacing="compact">
+        <listitem>
+            <para>Legacy implementation (covered below)
+            <footnote id="ejb-security-wildfly-10-realms">
+                <para>
+                  <ulink url="https://docs.jboss.org/author/display/WFLY10/Security+Realms">Wildfly 10 Admin Guide</ulink>
+                </para>
+            </footnote>
+            </para>
+<programlisting language="xml"><![CDATA[<server xmlns="urn:jboss:domain:7.0">
+    <management>
+        <security-realms>
+        ...
+        </security-realms>
+...
+    <subsystem xmlns="urn:jboss:domain:security:2.0">
+        <security-domains>
+          ...
+        </security-domains>
+    </subsystem>
+]]></programlisting>
+        </listitem>
+        <listitem>
+            <para>Latest implementation: "Elytron" (not covered)
+            <footnote id="ejb-security-wildfly-13-elytron-guide">
+                <para>
+                  <ulink url="http://docs.wildfly.org/13/WildFly_Elytron_Security.html">Wildfly 13 Elytron Security Guide</ulink>
+                </para>
+            </footnote>
+            </para>
+<programlisting language="xml"><![CDATA[<subsystem xmlns="urn:wildfly:elytron:3.0" final-providers="combined-providers" 
+                                           disallowed-providers="OracleUcrypto">
+    <security-domains>
+      ...
+    </security-domains>
+    <security-realms>
+      ...
+    </security-realms>
+</subsystem>
+]]></programlisting>
+        </listitem>
+    </itemizedlist>
+
+    <section id="ejb-security-wildfly-realm">
+        <title>Security Realm</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Integrates identity store into application server</para></listitem>
+            <listitem><para>Verifies credentials</para></listitem>
+            <listitem><para>Obtains attributes associated with identity</para></listitem>
+            <listitem><para>Performs role mappings</para></listitem>
+            <listitem><para>ManagementRealm and ApplicationRealm supplied out of the box</para></listitem>
+        </itemizedlist>
+
+<programlisting language="xml"><![CDATA[
+<server xmlns="urn:jboss:domain:7.0">
+  <management>
+      <security-realms>
+          <security-realm name="ApplicationRealm">
+              <server-identities>
+                  <ssl>
+                      <keystore path="application.keystore" 
+                                relative-to="jboss.server.config.dir" 
+                                keystore-password="password" 
+                                alias="server" 
+                                key-password="password" 
+                                generate-self-signed-certificate-host="localhost"/>
+                  </ssl>
+              </server-identities>
+              <authentication>
+                  <local default-user="$local" allowed-users="*" skip-group-loading="true"/>
+                  <properties path="application-users.properties" 
+                              relative-to="jboss.server.config.dir"/>
+              </authentication>
+              <authorization>
+                  <properties path="application-roles.properties" 
+                              relative-to="jboss.server.config.dir"/>
+              </authorization>
+          </security-realm>
+      </security-realms>
+]]></programlisting>
+        <itemizedlist spacing="compact">
+            <listitem><para>server-identities</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Supplies a server identity to clients for inbound connections</para></listitem>
+                    <listitem><para>Supplies a client identity for outbound connections (e.g., username/password)</para></listitem>
+                    <listitem><para>In this example, server identity is supplied from an SSL keystore</para></listitem>
+                </itemizedlist>
+            </listitem>
+
+            <listitem><para>authentication</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Identifies which credential stores are used to authenticate incoming connections</para></listitem>
+                    <listitem><para>In this example, user credentials are stored in a static file with username and password</para></listitem>
+                    <listitem><para>"local"</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Allows local users to connect to server without a password</para></listitem>
+                            <listitem><para>Leverages a token written to the filesystem and judges read/write permissions of the client</para></listitem>
+                            <listitem><para>Anonymous local client will have identity if "$local" </para></listitem>
+                            <listitem><para>Local client may specify any username in "allowed-users" without a password</para></listitem>
+                            <listitem><para>Applies to only JBoss Remoting/RMI callers</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </itemizedlist>
+            </listitem>
+
+            <listitem><para>authorization</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para>Defines how roles are assigned to users</listitem>
+                    <listitem><para>In this example, user roles are stored in a static file with username and roles</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+
+        <note>
+            <title>$local default user bypasses authentication</title>
+            <para>
+                JBoss can operate in a mode to trust a user connecting from the same machine
+                and running under the same operating system identity that launched the server.
+                This allows for development scenarios to bypass login credentials and 
+                Command Line Interface (CLI) to operate without credential prompts.
+            </para>
+<programlisting language="xml"><![CDATA[<local default-user="$local" allowed-users="*" skip-group-loading="true"/>]]></programlisting>
+        </note>
+        
+    </section>
+
+    <section id="ejb-security-wildfly-realm-refs">
+        <title>Security Realm References</title>
+<programlisting language="xml"><![CDATA[<subsystem xmlns="urn:jboss:domain:remoting:4.0">
+    <http-connector name="http-remoting-connector" 
+                    connector-ref="default" 
+                    security-realm="ApplicationRealm"/>
+</subsystem>
+]]></programlisting>
+<programlisting language="xml"><![CDATA[<subsystem xmlns="urn:jboss:domain:undertow:6.0" default-server="default-server" 
+                                                 default-virtual-host="default-host" 
+                                                 default-servlet-container="default" 
+                                                 default-security-domain="other" 
+                                                 statistics-enabled="true">
+    <server name="default-server">
+         ...
+        <https-listener name="https" socket-binding="https" 
+                                     security-realm="ApplicationRealm" 
+                                     enable-http2="true"/>
+        <host name="default-host" alias="localhost">
+            <location name="/" handler="welcome-content"/>
+            <http-invoker security-realm="ApplicationRealm"/>
+        </host>
+]]></programlisting>
+    </section>
+
+    <section id="ejb-security-wildfly-domain">
+        <title>Security Domain</title>
+
+        <itemizedlist spacing="compact">
+            <listitem><para>High-level security policies backed by one or more Security Realms</para></listitem>
+            <listitem><para>Can be shared across multiple applications</para></listitem>
+            <listitem><para>Results in a Security Identity for the identity of the current caller by using:</para></listitem>
+        </itemizedlist>
+
+        <section id="ejb-security-wildfly-domain-other">
+            <title>"other" Security Domain</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Default Security Domain for applications</para></listitem>
+                <listitem><para>Two login modules</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Remoting leverages information from Remoting connection if used</para></listitem>
+                        <listitem><para>RealmDirect delegates to SecurityRealm (default=ApplicationRealm)</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+
+<programlisting language="xml"><![CDATA[<subsystem xmlns="urn:jboss:domain:security:2.0">
+    <security-domains>
+        <security-domain name="other" cache-type="default">
+            <authentication>
+                <login-module code="Remoting" flag="optional">
+                    <module-option name="password-stacking" value="useFirstPass"/>
+                </login-module>
+                <login-module code="RealmDirect" flag="required">
+                    <module-option name="password-stacking" value="useFirstPass"/>
+                </login-module>
+            </authentication>
+        </security-domain>
+
+<subsystem xmlns="urn:jboss:domain:ejb3:5.0">
+    ...
+    <default-security-domain value="other"/>
+    ...
+</subsystem>
+
+<subsystem xmlns="urn:jboss:domain:undertow:6.0" default-server="default-server" 
+                                                 default-virtual-host="default-host" 
+                                                 default-servlet-container="default" 
+                                                 default-security-domain="other" 
+                                                 statistics-enabled="true">
+  ...
+</subsystem>
+]]></programlisting>
+        </section>
+    </section>
+
+
+
+
+    <section id="ejb-security-wildfly-properties">
+        <title>Wildfly Built-in Authentication and Authorization</title>
+        <para>
+            JBoss installs with a set of static files to implement user authentication
+            and authorization. This can be augmented or replaced by more dynamic sources
+            such as a database or LDAP.
+        </para>
+        
+        <figure>
+            <title>Example Authentication Source: application-users.properties</title>
+<programlisting language="xml"><![CDATA[$ cat standalone/configuration/application-users.properties                                                                                      
+known=0aea67d2fdd25e4207f0bc2a5c84a1a6
+user1=b802b482f67706cb453ab9294b88a9ea
+admin1=7357a05355829fb2855412b69297a55b
+publisher1=a15cfe086e59fea3fe4c787b834f55b8
+subscriber1=838a4d7dceb6655e0297947d9677c6cb
+requestor1=21a138aa0eeec44ee9cf08ebd9a1dcb5
+worker1=41c30fe6af7d12f7b7fd9aa60060f13d
+admin2=f064c7710b767a156f7e07469f8ad944]]></programlisting>
+   </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Authenticates identity of user</para></listitem>
+            <listitem><para>Username and hashed password stored in static file</para></listitem>
+        </itemizedlist>
+
+        
+        <figure>
+            <title>Example Access Control Source: application-roles.properties</title>
+<programlisting language="xml"><![CDATA[$ cat standalone/configuration/application-roles.properties 
+user1=user,esales-user
+admin1=user,admin,dmv-admin,mayberry-admin,eleague-admin,eclub-admin
+publisher1=publisher
+subscriber1=subscriber
+requestor1=requestor
+worker1=worker
+admin2=admin]]></programlisting>
+   </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Assigns roles to authenticated user</para></listitem>
+            <listitem><para>Username and roles stored in static file</para></listitem>
+        </itemizedlist>
+
+    </section>
+
+    <section id="ejb-security-wildfly-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Legacy and Elytron serve the same authentication and authorization purposes</para></listitem>
+            <listitem><para>SecurityRealm addresses details of authentication and obtaining user properties</para></listitem>
+            <listitem><para>SecurityDomain contains higher level instructions - including the map realm properties into roles</para></listitem>
+        </itemizedlist>
+    </section>
+
+</chapter>
+  
