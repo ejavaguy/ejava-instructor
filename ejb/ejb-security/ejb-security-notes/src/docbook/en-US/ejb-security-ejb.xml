@@ -15,11 +15,11 @@
         <listitem><para>Server Security Domain authentication and authorization</para></listitem>
     </itemizedlist>
 
-    <section id="ejb-security-ejb-access-control">
-        <title>EJB Access Control (Declarative)</title>
+    <section id="ejb-security-ejb-declarative">
+        <title>Declarative EJB Access Control</title>
         
         <figure>
-            <title>EJB Access Control: Annotations</title>
+            <title>Declarative EJB Access Control: Annotations</title>
 <programlisting language="java"><![CDATA[@Stateless(name="SecurePingEJB")
 public class SecurePingEJB implements SecurePingRemote, SecurePingLocal {
     ...
@@ -45,12 +45,13 @@ public class SecurePingEJB implements SecurePingRemote, SecurePingLocal {
 }]]></programlisting>
         </figure>
         <itemizedlist spacing="compact">
-            <listitem><para><code>javax.annotation.security</code> annotations define access requirements to EJB methods</para></listitem>
+            <listitem><para><code>javax.annotation.security</code> annotations define caller role requirements to access EJB methods</para></listitem>
+            <listitem><para>role can be literal or a logical mapping (see below)</para></listitem>
         </itemizedlist>
         
         
         <figure>
-            <title>EJB Access Control: ejb-jar.xml</title>
+            <title>Declarative EJB Access Control: ejb-jar.xml</title>
 <programlisting language="xml"><![CDATA[<assembly-descriptor>
 ...
     <method-permission>
@@ -93,19 +94,49 @@ public class SecurePingEJB implements SecurePingRemote, SecurePingLocal {
         <title>Programmatic Security</title>
         
         <figure>
-            <title>Programmatic Security Check</title>
-<programlisting language="java"><![CDATA[    @Resource
-    SessionContext ctx;
+            <title>Programmatic Role Check</title>
+<programlisting language="java"><![CDATA[@Resource
+SessionContext ctx;
 
-        if (ctx.isCallerInRole(role)) { 
-            ... 
-        }]]></programlisting>
+    if (!ctx.isCallerInRole(role)) { 
+        throw new EJBAccessException("..."); 
+    }
+]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Permits method to determine when access should be checked</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Programmatic Property Check</title>
+<programlisting language="java"><![CDATA[@Resource
+SessionContext ctx;
+
+@RolesAllowed({"admin"})
+public String updateGreeting(String greeting) {        
+  String login = ctx.getCallerPrincipal().getName();
+  Office office = getOfficeByAdmin(login);
+
+  if (office!=null) {
+    office.setGreeting(greeting);
+  }
+]]></programlisting>
         </figure>
         <itemizedlist spacing="compact">
             <listitem><para>Permits more fine-grain access control down to the object level</para></listitem>
-            <listitem><para>role can be literal or a logical mapping (see below)</para></listitem>
+            <listitem><para>Caller is not only required to have "admin" role -- they must be admin of specific resource</para></listitem>
         </itemizedlist>
-        
+
+    </section>
+
+
+    <section id="ejb-security-ejb-rolemap">
+        <title>Optional Role Name Mapping</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Permits role-name within Java code to be mapped to security role</para></listitem>
+            <listitem><para>No annotation for this. Must use descriptor or update referenced roles</para></listitem>
+        </itemizedlist>
+
         <figure>
             <title>Optional Role Mapping: ejb-jar.xml</title>
 <programlisting language="xml"><![CDATA[    <enterprise-beans>
@@ -127,10 +158,11 @@ public class SecurePingEJB implements SecurePingRemote, SecurePingLocal {
         </security-role>
     </assembly-descriptor>]]></programlisting>
         </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>Permits role-name within Java code to be mapped to security role</para></listitem>
-        </itemizedlist>
-        
+    </section>
+
+    <section id="ejb-security-ejb-setup">
+        <title>EJB Security Setup</title>
+
         <figure>
             <title>EJB Security Setup: META-INF/jboss-ejb3.xml</title>
 <programlisting language="xml"><![CDATA[<?xml version="1.0"?>  
