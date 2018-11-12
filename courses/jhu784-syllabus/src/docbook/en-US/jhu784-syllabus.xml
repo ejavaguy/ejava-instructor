@@ -250,7 +250,6 @@
             </row>
             <row rowsep="1">
                 <entry namest="session"/>
-                <entry namest="topic"><para>JavaEE Interceptors</para></entry>
                 <entry namest="topic"><para><link linkend="javaee-interceptors">JavaEE Interceptors</link></para></entry>
             </row>
 
