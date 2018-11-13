@@ -131,14 +131,12 @@ public String updateGreeting(String greeting) {
 
 
     <section id="ejb-security-ejb-rolemap">
-        <title>Optional Role Name Mapping</title>
+        <title>Optional Role Mapping: ejb-jar.xml</title>
         <itemizedlist spacing="compact">
             <listitem><para>Permits role-name within Java code to be mapped to security role</para></listitem>
             <listitem><para>No annotation for this. Must use descriptor or update referenced roles</para></listitem>
         </itemizedlist>
 
-        <figure>
-            <title>Optional Role Mapping: ejb-jar.xml</title>
 <programlisting language="xml"><![CDATA[    <enterprise-beans>
         <session>
             <ejb-name>SecurePingEJB</ejb-name>
@@ -157,14 +155,11 @@ public String updateGreeting(String greeting) {
             <role-name>user</role-name>
         </security-role>
     </assembly-descriptor>]]></programlisting>
-        </figure>
     </section>
 
     <section id="ejb-security-ejb-setup">
-        <title>EJB Security Setup</title>
+        <title>EJB Security Setup: META-INF/jboss-ejb3.xml</title>
 
-        <figure>
-            <title>EJB Security Setup: META-INF/jboss-ejb3.xml</title>
 <programlisting language="xml"><![CDATA[<?xml version="1.0"?>  
 <jboss:ejb-jar 
    xmlns:jboss="http://www.jboss.com/xml/ns/javaee"
@@ -184,7 +179,6 @@ public String updateGreeting(String greeting) {
         </sec:security>
     </assembly-descriptor>    
 </jboss:ejb-jar>]]></programlisting>
-        </figure>
         <itemizedlist spacing="compact">
             <listitem><para>security element assigns security properties to one or more EJBs</para></listitem>
             <listitem><para>security-domain assigns to a specific security-domain defined on server</para>

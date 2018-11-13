@@ -11,7 +11,7 @@
     
     
     
-   <figure>
+    <section id="ejb-security-runas-callerid">
        <title>Default security-identity: use-caller-identity</title>
 <programlisting language="xml"><![CDATA[<enterprise-beans>
 	<session>
@@ -21,30 +21,13 @@
 	    </security-identity>
 	</session>
 </enterprise-beans>]]></programlisting>
-   </figure>
-   <itemizedlist spacing="compact">
-        <listitem><para>security-identity of bean defaults to caller identity</para></listitem>
-    </itemizedlist>
+        <itemizedlist spacing="compact">
+            <listitem><para>security-identity of bean defaults to caller identity</para></listitem>
+        </itemizedlist>
+    </section>
 
-   <figure>
+    <section id="ejb-security-runas-rolename">
        <title>Run-as security-identity: role-name</title>
-<programlisting language="xml"><![CDATA[<enterprise-beans>
-    <session>
-        <ejb-name>SecurePingClientEJB</ejb-name>
-        <security-identity>
-            <run-as>
-                <role-name>admin</role-name>
-            </run-as>
-        </security-identity>
-    </session>
-</enterprise-beans>
-<assembly-descriptor>
-    <security-role>
-        <role-name>admin</role-name>
-    </security-role>
-</assembly-descriptor>
-]]></programlisting>
-
 <programlisting language="java"><![CDATA[import javax.annotation.security.RunAs;
 
 @Stateless
@@ -54,14 +37,21 @@ public class SecurePingClientEJB
     implements SecurePingClientRemote, SecurePingClientLocal {
     @EJB(lookup="ejb:securePingEAR/securePingEJB/SecurePingEJB!info.ejava.examples.secureping.ejb.SecurePingRemote")
     SecurePingRemote securePingServer;]]></programlisting>
-   </figure>
-    <itemizedlist spacing="compact">
-        <listitem><para>EJB can discard caller's identity/roles and run-as a specific role</para></listitem>
-        <listitem><para>Requires specification of an identity (provider-specific annotation)</para></listitem>
-    </itemizedlist>
+        <itemizedlist spacing="compact">
+            <listitem><para>EJB can discard caller's identity/roles and run-as a specific role</para></listitem>
+        </itemizedlist>
+
+        <note>
+            <title>@RunAs uses roleName and not userName</title>
+            <para>
+              Provide the roleName (e.g., "admin") you wish the method to execute with and 
+              *not* the userName (e.g., "admin1") when using the @RunAs annotation.
+            </para>
+        </note>
+   </section>
 
 
-   <figure>
+    <section id="ejb-security-runas-principal">
        <title>Run-as principal: identity</title>
 <programlisting language="xml"><![CDATA[<assembly-descriptor>
     <sec:security>
@@ -70,14 +60,21 @@ public class SecurePingClientEJB
         <sec:run-as-principal>admin1</sec:run-as-principal>
     </sec:security>
 </assembly-descriptor>]]></programlisting>
-   </figure>
-    <itemizedlist spacing="compact">
-        <listitem><para>Specifies specific user-identity to run-as</para></listitem>
-        <listitem><para>Vendor-specific</para></listitem>
-    </itemizedlist>
+        <itemizedlist spacing="compact">
+            <listitem><para>Specifies specific user-identity to run-as</para></listitem>
+            <listitem><para>Vendor-specific</para></listitem>
+        </itemizedlist>
+        <note>
+            <title>Use JBoss Annotations or jboss-ejb3.xml for caller identity</title>
+            <para>
+              Use jboss-ejb3.xml elements to define caller identity if overriding or 
+              supplying caller identity. Otherwise caller identity will be blank.
+            </para>
+        </note>
+   </section>
 
-   <figure>
-       <title>Invoking Protected EJB thru Run-as Proxy</title>
+    <section id="ejb-security-runas-invoke">
+        <title>Invoking Protected EJB thru Run-as Proxy</title>
 <programlisting language="java"><![CDATA[runAs(userLogin);
 logger.info(securePing.pingAdmin());]]></programlisting>
 
@@ -87,18 +84,28 @@ public String pingAdmin() {
 }]]></programlisting>
 
 <programlisting language=""><![CDATA[
--realm callback:ApplicationRealm
--name callback:user1
--password callback:password1!
--securePingClient called pingAdmin, principal=user1, isUser=true, isAdmin=false, isInternalRole=false:
-securePing=called pingAdmin, principal=admin1, isUser=false, isAdmin=true, isInternalRole=true
+-looking up jndi.name=ejb:securePingClientEAR/securePingClientEJB/SecurePingClientEJB
+   !info.ejava.examples.secureping.ejb.SecurePingClientRemote as user1
+-found=Proxy for remote EJB StatelessEJBLocator for 
+  "securePingClientEAR/securePingClientEJB/SecurePingClientEJB", 
+  view is interface info.ejava.examples.secureping.ejb.SecurePingClientRemote, affinity is None
+
+-login=[user1, password1!], whoAmI=user1
+-securePingClient called pingAdmin, principal=user1, 
+                                    isUser=true, 
+                                    isAdmin=false, 
+                                    isInternalRole=false:
+       securePing=called pingAdmin, principal=admin1, 
+                                    isUser=false, 
+                                    isAdmin=true, 
+                                    isInternalRole=true
 ]]></programlisting>
-   </figure>
     <itemizedlist spacing="compact">
         <listitem><para>user1 is allowed to call method restricted to admin when proxied by run-as EJB</para></listitem>
-        <listitem><para>proxy EJB sees caller as user1 and having all assigned roles</para></listitem>
+        <listitem><para>proxy EJB sees caller as user1 and having user1 assigned roles</para></listitem>
         <listitem><para>proxied EJB sees caller as admin1 and only having assigned admin role</para></listitem>
     </itemizedlist>
+   </section>
 
     <section id="ejb-security-runas-summary">
         <title>Summary</title>
