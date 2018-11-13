@@ -26,7 +26,7 @@ java.naming.provider.url=http-remoting://127.0.0.1:8080
             <itemizedlist spacing="compact">
                 <listitem><para>factory.initial set to WildFlyInitialContextFactory implementation</para>
                     <itemizedlist spacing="compact">
-                        <listitem><para>compatible with both JBoss Remoting and EJB Client</para></listitem>
+                        <listitem><para>compatible with both JBoss Remoting and EJBClient</para></listitem>
                     </itemizedlist>
                 </listitem>
                 <listitem><para>provider.url set to address of JBoss server</para></listitem>
@@ -57,6 +57,7 @@ java.naming.provider.url=http-remoting://127.0.0.1:8080
             <itemizedlist spacing="compact">
                 <listitem><para>Client provides credentials in JNDI prior to obtaining InitialContext</para></listitem>
                 <listitem><para>Must use current JNDI Context to lookup @Remote</para></listitem>
+                <listitem><para>Must leave JNDI Context open while making calls on @Remote interface</para></listitem>
             </itemizedlist>
         </section>
                 
@@ -118,9 +119,17 @@ java.naming.provider.url=http-remoting://127.0.0.1:8080
         </section>
         
 
+        <section id="ejb-security-rmiclient-ejbclient-jndiname">
+            <title>EJBClient JNDI Name</title>
+<programlisting language=""><![CDATA[ejb:securePingEAR/securePingEJB/SecurePingEJB!info.ejava.examples.secureping.ejb.SecurePingRemote]]></programlisting>
+            <itemizedlist spacing="compact">
+                <listitem><para>Using EJBClient JNDI name prefix ("ejb:")</para></listitem>
+            </itemizedlist>
+        </section>
+                
                 
         <section id="ejb-security-rmiclient-ejbclient-jndiauth">
-            <title>EJB Client Authentication with JNDI InitialContext</title>
+            <title>EJBClient Authentication with JNDI InitialContext</title>
 <programlisting language="java"><![CDATA[protected static String[] currentLogin;
 ]]></programlisting>
 

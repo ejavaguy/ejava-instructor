@@ -46,7 +46,7 @@ public class SecurePingEJB implements SecurePingRemote, SecurePingLocal {
         </figure>
         <itemizedlist spacing="compact">
             <listitem><para><code>javax.annotation.security</code> annotations define caller role requirements to access EJB methods</para></listitem>
-            <listitem><para>role can be literal or a logical mapping (see below)</para></listitem>
+            <listitem><para>role can be literal or a logical mapping (see <link linkend="ejb-security-ejb-rolemap">Role Mapping</link> below)</para></listitem>
         </itemizedlist>
         
         

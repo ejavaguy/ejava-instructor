@@ -57,7 +57,7 @@
             <listitem><para>ManagementRealm and ApplicationRealm supplied out of the box</para></listitem>
         </itemizedlist>
 
-<programlisting language="xml"><![CDATA[
+<programlisting language="xml"><![CDATA[# standalone.xml
 <server xmlns="urn:jboss:domain:7.0">
   <management>
       <security-realms>
@@ -101,7 +101,7 @@
                         <itemizedlist spacing="compact">
                             <listitem><para>Allows local users to connect to server without a password</para></listitem>
                             <listitem><para>Leverages a token written to the filesystem and judges read/write permissions of the client</para></listitem>
-                            <listitem><para>Anonymous local client will have identity if "$local" </para></listitem>
+                            <listitem><para>Anonymous local client will have identity of "$local" </para></listitem>
                             <listitem><para>Local client may specify any username in "allowed-users" without a password</para></listitem>
                             <listitem><para>Applies to only JBoss Remoting/RMI callers</para></listitem>
                         </itemizedlist>
@@ -120,7 +120,7 @@
         <note>
             <title>$local default user bypasses authentication</title>
             <para>
-                JBoss can operate in a mode to trust a user connecting from the same machine
+                JBoss can operate in a mode to trust an RMI user connecting from the same machine
                 and running under the same operating system identity that launched the server.
                 This allows for development scenarios to bypass login credentials and 
                 Command Line Interface (CLI) to operate without credential prompts.
@@ -161,7 +161,7 @@
         <itemizedlist spacing="compact">
             <listitem><para>High-level security policies backed by one or more Security Realms</para></listitem>
             <listitem><para>Can be shared across multiple applications</para></listitem>
-            <listitem><para>Results in a Security Identity for the identity of the current caller by using:</para></listitem>
+            <listitem><para>Results in a Security Identity for the identity of the current caller</para></listitem>
         </itemizedlist>
 
         <section id="ejb-security-wildfly-domain-other">

@@ -73,6 +73,11 @@ WEB-INF/jboss-web.xml
    -->
   <auth-method>BASIC?silent=true,FORM</auth-method>
 ]]></programlisting>
+            <itemizedlist spacing="compact">
+                <listitem><para>API will silently accept BASIC Authorization header if supplied</para></listitem>
+                <listitem><para>API will not provide any response codes or headers making browser believe it accepts BASIC</para></listitem>
+                <listitem><para>Web UI will act as if it only uses FORM</para></listitem>
+            </itemizedlist>
         </section>
     </section>
 
@@ -84,7 +89,6 @@ WEB-INF/jboss-web.xml
 public class SecurePingJaxRsApplication extends Application {
 ]]></programlisting>
 <programlisting language="java"><![CDATA[@Path("ping")
-@PermitAll
 public class SecurePingResource {
     //this injection requires CDI, which requires a WEB-INF/beans.xml file be in place to activate
     @EJB(beanName="SecurePingEJB", beanInterface=SecurePingLocal.class)
@@ -95,6 +99,8 @@ public class SecurePingResource {
 ]]></programlisting>
         <itemizedlist spacing="compact">
             <listitem><para>Accessible via "/api/ping"</para></listitem>
+            <listitem><para>Injected with EJB for business tier integration</para></listitem>
+            <listitem><para>Injected with SecurityContext for programmatic security checks</para></listitem>
         </itemizedlist>
 
         <section id="ejb-security-resource-jaxrs-debug">
@@ -160,6 +166,9 @@ public Response isCallerInRole(@PathParam("role") String role) {
 String credentials = userUser + ":" + userPassword;
 String authn = "Basic " + Base64.getEncoder().encodeToString(credentials.getBytes());
 ]]></programlisting>
+                </listitem>
+
+                <listitem><para>Results in the following value</para>
 <programlisting language=""><![CDATA[
 Basic dXNlcjE6cGFzc3dvcmQxIQ==
 ]]></programlisting>
@@ -171,6 +180,9 @@ Response response = target.request(MediaType.TEXT_PLAIN)
         .header("Authorization", authn)
         .get();
 ]]></programlisting>
+                </listitem>
+
+                <listitem><para>Results in the following header being addedi to request</para>
 <programlisting language=""><![CDATA[
 Authorization: Basic dXNlcjE6cGFzc3dvcmQxIQ==
 ]]></programlisting>
@@ -230,8 +242,7 @@ jaxRsClient.register(authnFilter);
 URI whoAmIUri = UriBuilder.fromUri(baseHttpUrl).path("whoAmI").build();
 WebTarget target = jaxRsClient.target(whoAmIUri);
 logger.debug("GET {}", target.getUri());
-Response response = target.request(MediaType.TEXT_PLAIN)
-        .get();
+Response response = target.request(MediaType.TEXT_PLAIN).get();
 ]]></programlisting>
 
           <tip>
@@ -392,6 +403,42 @@ hdrs rcvd: [Connection=keep-alive,
                     </listitem>
                 </itemizedlist>
             </section>
+
+            <section id="ejb-security-resource-client-https-hostname">
+                <title>Problem: SSL Hostname Verification</title>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Java requires the common name (CN) of certificate from trustStore to match the hostname returned from server</para></listitem>
+                    <listitem><para>Development scenarios can cause some mis-matches</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Certificate generated for localhost used externally (expected localhost or 127.0.0.1)</para></listitem>
+                            <listitem><para>Certificate generated for external used internally (expected xyz.com)</para>
+                            </listitem>
+                        </itemizedlist>
+                    </listitem>
+                    <listitem><para>Can resolve thru Hostname Verifier Override</para>
+<programlisting language="java"><![CDATA[# IT client
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
+]]></programlisting>
+<programlisting language="java"><![CDATA[# IT client
+private static class MyHostnameVerifier implements HostnameVerifier {
+    @Override
+    public boolean verify(String hostname, SSLSession session) {
+        return true; //or whatever you wish to check for
+    }
+}
+]]></programlisting>
+                    </listitem>
+                    <listitem><para>Register verifier with ClientBuilder used to create JAX-RS Client</para>
+<programlisting language="java"><![CDATA[# IT client
+ClientBuilder clientBuilder = ClientBuilder.newBuilder()
+                                           .hostnameVerifier(new MyHostnameVerifier());
+Client jaxRsClient = clientBuilder.build();
+]]></programlisting>
+                    </listitem>
+                    <listitem><para>Results in connection being established if certificate recognized - even if hostname mismatch</para></listitem>
+                </itemizedlist>
+            </section>
         </section>
     </section>
 
@@ -441,7 +488,7 @@ public Pinger anonymous() {
         </section>
 
         <section id="ejb-security-resource-declarative-webxml">
-            <title>Declarative Access Control</title>
+            <title>Declarative Access Control Constraints</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Define role restrictions for url-patterns</para></listitem>
             </itemizedlist>
@@ -474,12 +521,12 @@ public Pinger anonymous() {
             <title>Nested Resource Called from Two URIs</title>
             <itemizedlist spacing="compact">
                 <listitem><para>No web access control, delegating to EJB - Resource method called for all callers</para>
-<programlisting language="xml"><![CDATA[# web.xml
+<programlisting language=""><![CDATA[
 GET https://localhost:8443/securePingApi/api/ping/pingUser
 ]]></programlisting>
                 </listitem>
                 <listitem><para>Web API access control - Resource method only invoked for authorized callers</para>
-<programlisting language="xml"><![CDATA[
+<programlisting language=""><![CDATA[
 GET https://localhost:8443/securePingApi/api/ping/secured/pingUser
 ]]></programlisting>
                 </listitem>

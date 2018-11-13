@@ -33,12 +33,15 @@
                 <listitem><para>have more understanding of:</para>
                     <itemizedlist spacing="compact">
                         <listitem><para>the basic concepts behind JavaEE Access Control</para></listitem>
-                        <listitem><para>how to runAs another user within JavaEE</para></listitem>
+                        <listitem><para>what a Security Realm is</para></listitem>
+                        <listitem><para>authentication thru JNDI</para></listitem>
+                        <listitem><para>how to runAs with alternate roles and alternate user identity within JavaEE</para></listitem>
+                        <listitem><para>how to secure and authorize Web API access</para></listitem>
                     </itemizedlist>
                 </listitem>
                 <listitem><para>be able to:</para>
                     <itemizedlist spacing="compact">
-                        <listitem><para>define access control policy for EJB and Web applications</para></listitem>
+                        <listitem><para>define access control policy for EJB and Web API applications</para></listitem>
                         <listitem><para>authenticate and obtain proper access to the application</para>
                             <itemizedlist spacing="compact">
                                 <listitem><para>implement RMI authentication using JNDI InitialContext</para></listitem>
