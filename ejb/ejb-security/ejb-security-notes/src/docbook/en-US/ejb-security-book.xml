@@ -58,5 +58,6 @@
     <xi:include href="ejb-security-wildfly.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-security-rmiclient.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-security-runas.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ejb-security-resource.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ejb-security-web.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </book>
