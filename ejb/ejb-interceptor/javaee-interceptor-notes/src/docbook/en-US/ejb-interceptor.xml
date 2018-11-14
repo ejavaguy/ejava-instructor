@@ -26,7 +26,7 @@
             </listitem>
         </itemizedlist>
 
-        <figure>
+        <section id="ejb-interceptor-business-intercepted">
             <title>Sample Business Method being Intercepted</title>
 <programlisting language="java"><![CDATA[@Stateless
 public class ContactsEJB implements ContactsRemote {
@@ -39,9 +39,9 @@ public class ContactsEJB implements ContactsRemote {
         em.persist(contact);
         return contact;
     }]]></programlisting>
-        </figure>
+        </section>
 
-        <figure>
+        <section id="ejb-interceptor-business-interceptor">
             <title>Sample Business Method Interceptor</title>
 <programlisting language="java"><![CDATA[import javax.interceptor.AroundConstruct;
 
@@ -56,18 +56,27 @@ public class LifecycleInterceptor {
         logger.debug("*** Response Object: {}", response);
         return response;
     }]]></programlisting>
-        </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Simple interceptor logs call and response</para></listitem>
+            </itemizedlist>
+        </section>
 
-        <figure>
+        <section id="ejb-interceptor-business-output">
             <title>Sample Output</title>
 <programlisting language=""><![CDATA[
-LifecycleInterceptor] (EJB default - 4) *** Business Method: public info.ejava.examples.ejb.interceptor.bo.Contact 
+LifecycleInterceptor] (EJB default - 4) *** Business Method: 
+    public info.ejava.examples.ejb.interceptor.bo.Contact 
     info.ejava.examples.ejb.interceptor.ejb.ContactsEJB.createContact(info.ejava.examples.ejb.interceptor.bo.Contact) 
     throws info.ejava.examples.ejb.interceptor.ejb.InvalidParam, 
     caller=anonymous
 ContactsEJB] (EJB default - 4) createContact(Contact [id=0, name=John Doe, normalizedName=null])
-LifecycleInterceptor] (EJB default - 4) *** Response Object: Contact [id=1, name=John Doe, normalizedName=john doe]]]></programlisting>
-        </figure>
+LifecycleInterceptor] (EJB default - 4) *** Response Object: Contact [id=1, name=John Doe, normalizedName=john doe]
+]]></programlisting>
+            <itemizedlist spacing="compact">
+                <listitem><para>Interceptor was able to identify what was being called and who was calling it</para></listitem>
+                <listitem><para>Interceptor could have implemented security constraints, validation, etc.</para></listitem>
+            </itemizedlist>
+        </section>
     </section>
 
     <section id="ejb-interceptor-invocationctx">    
@@ -77,7 +86,7 @@ LifecycleInterceptor] (EJB default - 4) *** Response Object: Contact [id=1, name
             <listitem><para>Methods to control behavior of invocation chain</para></listitem>
         </itemizedlist>
         
-        <figure>
+        <section id="ejb-interceptor-invocationctx-iface">    
             <title>InvocationContext Interface</title>
 <programlisting language="java"><![CDATA[public interface javax.interceptor.InvocationContext {
   public abstract java.lang.Object getTarget();
@@ -89,7 +98,7 @@ LifecycleInterceptor] (EJB default - 4) *** Response Object: Contact [id=1, name
   public abstract java.util.Map<java.lang.String, java.lang.Object> getContextData();
   public abstract java.lang.Object proceed() throws java.lang.Exception;
 }]]></programlisting>
-        </figure>
+        </section>
     </section>
 
 
@@ -103,7 +112,6 @@ LifecycleInterceptor] (EJB default - 4) *** Response Object: Contact [id=1, name
                     <listitem><para><code>PreDestory</code></para></listitem>
                 </itemizedlist>
             </listitem>
-            <listitem><para></para></listitem>
             <listitem><para>Stateful EJB Interceptors</para>
                 <itemizedlist spacing="compact">
                     <listitem><para>may define state callbacks</para>
@@ -118,7 +126,7 @@ LifecycleInterceptor] (EJB default - 4) *** Response Object: Contact [id=1, name
         </itemizedlist>
         
         
-        <figure>
+        <section id="ejb-interceptor-lifecycle-callbacks">
             <title>Lifecycle Callbacks</title>
 <programlisting language="java"><![CDATA[
 public class LifecycleInterceptor {
@@ -136,7 +144,7 @@ public class LifecycleInterceptor {
     public void destory(InvocationContext ctx) {
     ...
     }]]></programlisting>
-        </figure>
+        </section>
     </section>
     
 
@@ -151,8 +159,8 @@ public class LifecycleInterceptor {
             <listitem><para>May not throw application exceptions</para></listitem>
         </itemizedlist>
 
-        <figure>
-            <title></title>
+        <section id="ejb-interceptor-timer-interceptor">
+            <title>Timer Interceptor</title>
 <programlisting language="java"><![CDATA[
 public class LifecycleInterceptor {
     @AroundTimeout
@@ -161,18 +169,22 @@ public class LifecycleInterceptor {
         Object response = ctx.proceed();
         return response;
     }]]></programlisting>
-        </figure>
+        </section>
     </section>
 
     <section id="ejb-interceptor-activation">
         <title>Activating Interceptors</title>
         <itemizedlist spacing="compact">
-            <listitem><para>EJB Deployment descriptor (ejb-jar.xml)</para></listitem>
-            <listitem><para>@Interceptors annotation</para></listitem>
-            <listitem><para>CDI Deployment descriptor (beans.xml)</para></listitem>
+            <listitem><para>Three (3) ways:</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>EJB Deployment descriptor (ejb-jar.xml)</para></listitem>
+                    <listitem><para>@Interceptors annotation</para></listitem>
+                    <listitem><para>CDI Deployment descriptor (beans.xml)</para></listitem>
+                </itemizedlist>
+            </listitem>
         </itemizedlist>
 
-        <figure>
+        <section id="ejb-interceptor-activation-ejbxml">
             <title>EJB Descriptor (ejb-jar.xml) Activation</title>
 <programlisting language="xml"><![CDATA[<?xml version="1.0"?>
 <ejb-jar ...
@@ -180,20 +192,22 @@ public class LifecycleInterceptor {
     <assembly-descriptor>
         <interceptor-binding>
             <ejb-name>ContactsEJB</ejb-name>
-            <interceptor-class>info.ejava.examples.ejb.interceptor.interceptors.LifecycleInterceptor</interceptor-class>
+            <interceptor-class>
+              info.ejava.examples.ejb.interceptor.interceptors.LifecycleInterceptor
+            </interceptor-class>
         </interceptor-binding>
     </assembly-descriptor>   
 </ejb-jar>]]></programlisting>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>Decouples EJB and Interceptor classes</para></listitem>
-            <listitem><para>Assign to specific EJBs or globally</para></listitem>
-            <listitem><para>Assign to specific EJB methods or global to class</para></listitem>
-            <listitem><para>Can control order applied</para></listitem>
-        </itemizedlist>
+            <itemizedlist spacing="compact">
+                <listitem><para>Decouples EJB and Interceptor classes</para></listitem>
+                <listitem><para>Assign to specific EJBs or globally</para></listitem>
+                <listitem><para>Assign to specific EJB methods or global to class</para></listitem>
+                <listitem><para>Can control order applied</para></listitem>
+            </itemizedlist>
+        </section>
 
 
-        <figure>
+        <section id="ejb-interceptor-activation-annotation">
             <title>@Interceptor(s) Annotation Activation</title>
 <programlisting language="java"><![CDATA[//way 1 - class level
 @Stateless
@@ -215,14 +229,14 @@ public class ContactsEJB implements ContactsRemote {
 	})
     public Contact createContact(Contact contact) throws InvalidParam {
 ]]></programlisting>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>@Annotation near-equivalent to EJB deployment descriptor</para></listitem>
-            <listitem><para>Couples EJB class to Interceptor class</para></listitem>
-            <listitem><para>Cannot assign globally to all EJBs</para></listitem>
-            <listitem><para>Can assign to specific EJB methods or global to class</para></listitem>
-            <listitem><para>Can control order applied</para></listitem>
-        </itemizedlist>
+            <itemizedlist spacing="compact">
+                <listitem><para>@Annotation near-equivalent to EJB deployment descriptor</para></listitem>
+                <listitem><para>Couples EJB class to Interceptor class</para></listitem>
+                <listitem><para>Cannot assign globally to all EJBs</para></listitem>
+                <listitem><para>Can assign to specific EJB methods or global to class</para></listitem>
+                <listitem><para>Can control order applied</para></listitem>
+            </itemizedlist>
+        </section>
     </section>
     
     

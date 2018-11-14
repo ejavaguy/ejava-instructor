@@ -241,6 +241,8 @@ public class PostNormizedInterceptor extends ValidatorInterceptor {
 <programlisting language="java"><![CDATA[@Validation
 @Interceptor
 public class ContactsNormalizerInterceptor {
+    private ContactNormalizer contactNormalizer=new ContactNormalizer();
+
     @AroundInvoke
     public Object invoke(InvocationContext ctx) throws Exception {
         logger.debug("intercepting: {}", ctx.getMethod());
