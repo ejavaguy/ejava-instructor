@@ -189,9 +189,9 @@ hi
     <dependencies>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jaxrs</artifactId>
+            <artifactId>resteasy-client</artifactId>
             <version>${resteasy.version}</version>
-        </dependency>       
+        </dependency>
 ]]></programlisting>
 <programlisting language="xml"><![CDATA[<dependency>
     <groupId>org.jboss.resteasy</groupId>
