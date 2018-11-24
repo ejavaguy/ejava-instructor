@@ -1,0 +1,247 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="async-jms20-messaging">
+    <title>Messaging</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Communication between applications that exchange messages</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Message forms a single, encapsulated, unit of communication between applications</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>De-couples Producer and Consumer of the Message</para></listitem>
+            <listitem><para>Message-Oriented-Middleware (MOM)</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>category of application communication</para></listitem>
+                    <listitem><para>uses asynchronous message passing versus synchronous request/reply</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Advantages</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Producer and Consumer operate independently</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Messages can be persisted when consumer unavailable</para></listitem>
+                            <listitem><para>Messages can be retrieved even after producer is unavailable</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                    <listitem><para>Qualities of service can be applied independent of clients</para></listitem>
+                    <listitem><para>Resource utilization can be applied by messaging provide</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+
+    <section id="async-jms20-messaging-directconn">
+        <title>MOM Architecture: Direct Connections</title>
+        <graphic scalefit="1" fileref="images/lib1-mom.jpg"/>
+        <itemizedlist spacing="compact">
+            <listitem><para>
+              Producer/Consumer communicate over a TCP/IP connection
+              </para></listitem>
+            <listitem><para>
+              Directly aware of state of link to the other end
+              </para></listitem>
+            <listitem><para>
+              Producer cannot send messages when Consumer unavailable
+              </para></listitem>
+            <listitem><para>
+              Consumer cannot receive messages when Producer unavailable
+              </para></listitem>
+            <listitem><para>
+              Separate messages must be sent to separate clients</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>
+                      Producer must be aware of what Consumer needs
+                      </para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>
+              Security and QoS must be implemented by entirely within clients 
+              </para></listitem>
+            <listitem><para>
+              Good for realtime status networks
+              </para></listitem>
+        </itemizedlist>
+    </section>
+
+
+    <section id="async-jms20-messaging-unicast">
+        <title>MOM Architecture: Unicast Connections</title>
+        <graphic scalefit="1" fileref="images/lib2-mom.jpg"/>
+        <itemizedlist spacing="compact">
+            <listitem><para>
+              Producer/Consumer communicate over a Uni-cast IP
+              </para></listitem>
+            <listitem><para>
+              No concept of an end-to-end link
+              </para></listitem>
+            <listitem><para>
+              Producer issues messages whether Consumer available or not
+              </para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>
+                      MOM can add acknowledgment and queuing mechanisms
+                      </para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>
+              Consumer cannot receive messages when Producer unavailable
+              </para></listitem>
+            <listitem><para>
+              Producer only needs to send one message
+                </para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>
+                      Consumers able to control when they receive
+                      </para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>
+              Security and QoS must be implemented by entirely within clients 
+              </para></listitem>
+            <listitem><para>
+              Good for high performance publish/subscribe networks 
+              </para></listitem>
+        </itemizedlist>
+    </section>
+
+
+
+    <section id="async-jms20-messaging-broker">
+        <title>MOM Architecture: Broker-based</title>
+        <graphic scalefit="1" fileref="images/broker1-mom.jpg"/>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>
+
+
+    <section id="async-jms20-messaging-multibroker">
+        <title>MOM Architecture: Multi-Broker</title>
+        <graphic scalefit="1" fileref="images/broker2-mom.jpg"/>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+            </listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="async-jms20-messaging-keys">
+        <title>Messaging Key Concepts</title>
+        <graphic scalefit="1" fileref="images/producer-consumer.jpg"/>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+            </listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="async-jms20-messaging-queuing">
+        <title>Message Queuing</title>
+        <graphic scalefit="1" fileref="images/sender-receiver.jpg"/>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+            </listitem>
+        </itemizedlist>
+    </section>
+
+
+    <section id="async-jms20-messaging-pubsub">
+        <title>Publish/Subscribe</title>
+        <graphic scalefit="1" fileref="images/producer-consumer.jpg"/>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+            </listitem>
+        </itemizedlist>
+    </section>
+
+
+    <section id="async-jms20-messaging-requestreply">
+        <title>Request/Reply</title>
+        <graphic scalefit="1" fileref="images/request-reply.jpg"/>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+            </listitem>
+        </itemizedlist>
+    </section>
+
+
+    <section id="async-jms20-messaging-">
+        <title></title>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+            </listitem>
+        </itemizedlist>
+    </section>
+
+
+
+    <section id="async-jms20-messaging-summary">
+        <title>Chapter Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>
+
+</chapter>
+  

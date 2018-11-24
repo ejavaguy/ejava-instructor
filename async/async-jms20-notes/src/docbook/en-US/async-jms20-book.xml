@@ -1,0 +1,75 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="async-jms20">
+    <bookinfo>
+        <title>Java Messaging Service (JMS) 2.0 API</title>
+        <subtitle></subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>This presentation provides an introduction to the core JMS 2.0 API.
+            </para>
+        </abstract>
+        
+    </bookinfo>
+
+    <preface id="async-jms-purpose">
+        <title>Purpose</title>
+        <section id="async-jms-purpose-goals">
+            <title>Goals</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Understand concepts behind "messaging"</para></listitem>
+                <listitem><para>Introduce core aspects of the JMS 2.0 API</para></listitem>
+                <listitem><para>Implement asynchronous messaging flows within an application</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="async-jms20-purpose-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall be able to:</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Describe the difference between messaging and a standard client/server call</para></listitem>
+                <listitem><para>Describe the difference between publish/subscribe (Topic) and send/receive (Queue) messaging</para></listitem>
+                <listitem><para>Define administered resources in the server</para></listitem>
+                <listitem><para>Inject administered resources in their applications</para></listitem>
+                <listitem><para>Construct runtime resources within their application</para></listitem>
+                <listitem><para>Send and receive JMS messages</para></listitem>
+            </itemizedlist>
+        </section>
+    </preface>
+
+
+    <xi:include href="async-jms20-messaging.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+    <chapter id="async-jms20-jms">
+        <title>JMS</title>
+    </chapter>
+    <chapter id="async-jms20-example-topic">
+        <title>Example: Publish/Subscribe Topic</title>
+        <subtitle>JMS Notifier</subtitle>
+    </chapter>
+    <chapter id="async-jms20-example-queue">
+        <title>Example: Send/Receive Queue</title>
+        <subtitle>JMS Scheduler</subtitle>
+    </chapter>
+    <chapter id="async-jms20-jmsapi">
+        <title>JMS API</title>
+    </chapter>
+
+    <appendix id="async-jms20-sources">
+        <title>Sources</title>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                <emphasis>"What's New in JMS 2.0"</emphasis>, Nigel Deakin, 
+                <ulink url="https://www.oracle.com/technetwork/articles/java/jms20-1947669.html">https://www.oracle.com/technetwork/articles/java/jms20-1947669.html</ulink>,
+                2013 Oracle Technology Network
+                </para>
+            </listitem>
+        </orderedlist>
+    </appendix>
+</book>

@@ -6,8 +6,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>jmsCore</artifactId>
+    <artifactId>async-jms11-notes</artifactId>
     <packaging>war</packaging>
 
-    <name>Async::Java Messaging Service</name>
+    <name>Async::Core Java Messaging Service 1.1 Notes</name>
 </project>

@@ -17,7 +17,8 @@
     </description>
 
     <modules>
-        <module>jmsCore</module>
+        <module>async-jms20-notes</module>
+        <module>async-jms11-notes</module>
         <module>asyncEJB</module>
     </modules>
 </project>
