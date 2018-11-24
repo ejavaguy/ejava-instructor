@@ -265,12 +265,8 @@
                 <entry namest="date">Nov28</entry>
             </row>
             <row rowsep="1">
-                <entry namest="topic"><para>JMS</para></entry>
+                <entry namest="topic"><para><link linkend="async-jms20">JMS</link></para></entry>
                 <entry namest="comment"><para>Rubinger &amp; Burke: Ch 8 &amp; 19</para></entry>
-                <!--
-                <entry namest="topic"><para><ulink url="../ppt/jmsCore.ppt">JMS Core</ulink></para></entry>
-                <entry namest="topic"><para><ulink url="../ppt/asyncEJB.ppt">EJB and JMS</ulink></para></entry>
-                -->
             </row>
 
             <row rowsep="1">
