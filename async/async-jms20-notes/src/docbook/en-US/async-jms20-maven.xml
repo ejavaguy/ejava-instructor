@@ -1,0 +1,85 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="async-jms20-maven">
+    <title>JMS Maven Aspects</title>
+
+    <section id="async-jms20-maven-api">
+        <title>JMS API Maven Aspects</title>
+        <itemizedlist spacing="compact">
+
+            <listitem><para>Dependency Management</para>
+<programlisting language="xml"><![CDATA[<properties>
+    <javax.jms-api.version>2.0.1</javax.jms-api.version>
+
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>javax.jms</groupId>
+            <artifactId>javax.jms-api</artifactId>
+            <version>${javax.jms-api.version}</version>
+        </dependency>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Dependencies</para>
+<programlisting language="xml"><![CDATA[<dependencies>
+    <dependency>
+        <groupId>javax.jms</groupId>
+        <artifactId>javax.jms-api</artifactId>
+        <scope>provided</scope>
+    </dependency>
+]]></programlisting>                        
+            </listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="async-jms20-maven-testing">
+        <title>JMS Testing Maven Aspects</title>
+        <itemizedlist spacing="compact">
+
+            <listitem><para>Dependency Management</para>
+<programlisting language="xml"><![CDATA[<properties>
+    <wildfly-naming-client.version>1.0.9.Final</wildfly-naming-client.version>
+    <artemis-jms.version>1.5.5</artemis-jms.version>
+
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-naming-client</artifactId>
+            <version>${wildfly-naming-client.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>artemis-jms-client</artifactId>
+            <version>${artemis-jms.version}</version>
+        </dependency>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Dependencies</para>
+<programlisting language="xml"><![CDATA[<dependencies>
+    <dependency>
+        <groupId>org.wildfly</groupId>
+        <artifactId>wildfly-naming-client</artifactId>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>artemis-jms-client</artifactId>
+        <scope>test</scope>
+    </dependency>
+]]></programlisting>                        
+            </listitem>
+        </itemizedlist>
+
+        <note>
+          <title>JMS Test Dependencies included in jboss-rmi-client dependency</title>
+          <para>The test dependencies above should be automatically 
+             brought in through the info.ejava.examples.common:jboss-rmi-client 
+             dependency used by many IT tests.</para>
+        </note>
+    </section>
+</chapter>
+  

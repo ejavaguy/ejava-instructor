@@ -1,0 +1,507 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+
+<chapter id="async-jms20-jmsapi">
+    <title>JMS API</title>
+
+    <section id="async-jms20-jmsapi-classes">
+        <title>JMS API Classes</title>
+        <graphic scalefit="1" fileref="images/jms20-api.jpg"/>
+        <itemizedlist spacing="compact">
+            <listitem><para>JMS 2.0 "Ease of Use"</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Collapsed Connection and Session functionality into JMSContext</para></listitem>
+                    <listitem><para>Created easier to manage/use JMSProducer and JMSConsumer</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="async-jms20-jmsapi-connfactory">
+        <title>ConnectionFactory</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Encapsulates a set of properties usually assigned by administrator</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>clientId - optional unique identity required for durable subscriptions</para></listitem>
+                    <listitem><para>listen address</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>commonly obtained thru JNDI lookup</para>
+<programlisting language="java"><![CDATA[import javax.naming.InitialContext;
+import javax.jms.ConnectionFactory;
+]]></programlisting>                        
+<programlisting language="java"><![CDATA[InitialContext jndi = new InitialContext();    
+ConnectionFactory connFactory=(ConnectionFactory)jndi.lookup("jms/RemoteConnectionFactory");
+]]></programlisting>                        
+              </listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="async-jms20-jmsapi-jmscontext">
+        <title>JMSContext</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Client's primary interface to JMS provider</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Combines Connection and Session functionality</para></listitem>
+                    <listitem><para>Allocates resources outside of client JVM</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Created from ConnectionFactory</para>
+<programlisting language="java"><![CDATA[import javax.jms.JMSContext;
+]]></programlisting>
+<programlisting language="java"><![CDATA[JMSContext context = connFactory.createContext()
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>Must be closed (except when injected)</para></listitem>
+            <listitem><para>Supports JavaSE 7 AutoCloseable</para>
+<programlisting language="java"><![CDATA[try (JMSContext context = connFactory.createContext()) {
+  ...
+}
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>Authentication can be performed when created from JavaSE client</para>
+<programlisting language="java"><![CDATA[JMSContext context = connFactory.createContext(user, password)
+]]></programlisting>                        
+            </listitem>
+            <listitem><para>Can be injected when running within JavaEE container</para>
+<programlisting language="java"><![CDATA[import javax.jms.JMSConnectionFactory;
+]]></programlisting>                        
+<programlisting language="java"><![CDATA[@Inject @JMSConnectionFactory("java:/JmsXA")
+private JMSContext jmsContext;
+]]></programlisting>                        
+            </listitem>
+
+
+            <listitem><para>One thread per JMSContext</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>application may create child JMSContext for multi-threaded applications</para></listitem>
+                </itemizedlist>
+<programlisting language="java"><![CDATA[try (JMSContext context=createContext();
+     JMSContext context2=context.createContext(JMSContext.CLIENT_ACKNOWLEDGE)) {
+   ...
+}
+]]></programlisting>                        
+            </listitem>
+            <listitem><para>Supports an ExceptionListener</para></listitem>
+        </itemizedlist>
+
+    </section>
+
+
+
+    <section id="async-jms20-jmsapi-destinations">
+        <title>Destinations</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Works the same for Topic and Queue</para></listitem>
+            <listitem><para>JNDI lookups supported for JavaSE clients</para></listitem>
+            <listitem><para>Injection supported for JavaEE components</para></listitem>
+        </itemizedlist>
+
+        <section id="async-jms20-jmsapi-lookup">
+            <title>JNDI Lookup</title>
+<programlisting language="java"><![CDATA[import javax.jms.Destination;
+]]></programlisting>                        
+<programlisting language="java"><![CDATA[Destination destination = (Destination)jndi.lookup("jms/queue/ejava/examples/jmsMechanics/queue1")
+]]></programlisting>                        
+        </section>
+
+        <section id="async-jms20-jmsapi-inject">
+            <title>Injected Destination</title>
+<programlisting language="java"><![CDATA[import javax.jms.Topic;
+]]></programlisting>
+<programlisting language="java"><![CDATA[@Resource(lookup="java:/jms/topic/ejava/examples/asyncMarket/topic1", type=Topic.class)
+private Destination sellTopic;
+]]></programlisting>
+        </section>
+    </section>
+
+
+    <section id="async-jms20-jmsapi-send">
+        <title>Send Message</title>
+        <orderedlist spacing="compact">
+            <listitem><para>Obtain JMSContext from ConnectionFactory (JavaSE) or injection (JavaEE container)</para></listitem>
+            <listitem><para>Obtain Destination from JNDI lookup (JavaSE) or injection (JavaEE container)</para></listitem>
+            <listitem><para>Create Message</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Message - all properties and no payload</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Messages have pre-defined and user-defined properties</para></listitem>
+                            <listitem><para>Message properties are subject to Subscription Selectors in broker</para></listitem>
+                            <listitem><para>Messages are not closed</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                    <listitem><para>MapMessage - Map payload of properties</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Additional properties opaque to broker</para></listitem>
+                            <listitem><para>Properties required to be of "java.lang" types - no custom types</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                    <listitem><para>TextMessage - textual payload</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Ideal for XML and JSON-based DTO payloads</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                    <listitem><para>BytesMessage - binary blob payload</para></listitem>
+                    <listitem><para>ObjectMessage - Java serialized object payload</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Requires Java-based receiver with DTO Classes</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                    <listitem><para>StreamMessage - sequential data payload</para></listitem>
+                </itemizedlist>
+<programlisting language="java"><![CDATA[import javax.jms.MapMessage;
+]]></programlisting>
+<programlisting language="java"><![CDATA[MapMessage message = jmsContext.createMapMessage();
+]]></programlisting>
+            </listitem>
+            <listitem><para>Set Message Properties (optional)</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Message property accessesors throw JMSException checked exceptions</para></listitem>
+                </itemizedlist>
+<programlisting language="java"><![CDATA[import javax.jms.JMSException;
+]]></programlisting>
+<programlisting language="java"><![CDATA[message.setJMSType("saleUpdate"); //JMSType is a pre-defined property
+message.setStringProperty("awayClub", ...);//"awayClub" is example of user-defined String property
+message.setIntProperty("awayTeamId", ...); //"awayTeamId" is example of user-defined int property
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>Set Message Payload</para>
+<programlisting language="java"><![CDATA[//this example is a MapMessage - each Message type has specific interface
+message.setLong("id", item.getId());
+message.setString("name", item.getName());
+message.setString("seller", item.getOwner().getUserId());
+message.setLong("startDate", item.getStartDate().getTime());
+message.setLong("endDate", item.getEndDate().getTime());
+message.setDouble("minBid", item.getMinBid());
+message.setDouble("bids", item.getBids().size());
+message.setDouble("highestBid", 
+        (item.getHighestBid() == null ? 0.00 : item.getHighestBid().getAmount()));            
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>Create JMSProducer</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>JMSProducers are not closed - different from JMS 1.1 Producer</para></listitem>
+                </itemizedlist>
+<programlisting language="java"><![CDATA[import javax.jms.Producer;
+]]></programlisting>
+<programlisting language="java"><![CDATA[JMSProducer producer = context.createProducer();
+]]></programlisting>
+            </listitem>
+            <listitem><para>Set JMSProducer options</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Time to live - number of millisecs a sent message will live in the broker waiting to be delivered</para></listitem>
+                    <listitem><para>Priority - delivery priority of messages given to broker</para></listitem>
+                    <listitem><para>Delivery Mode - level of guarantee required when completing a send() to the broker</para></listitem>
+                    <listitem><para>Delivery Delay - minimum number of millsecs before broker will issue to consumer</para></listitem>
+                </itemizedlist>
+<programlisting language="java"><![CDATA[//JMSProducer supports method chaining
+producer.setPriority(Message.DEFAULT_PRIORITY)
+        .setTimeToLive(Message.DEFAULT_TIME_TO_LIVE)
+        .setDeliveryMode(Message.DEFAULT_DELIVERY_MODE)
+        .setDeliveryDelay(Message.DEFAULT_DELIVERY_DELAY);
+]]></programlisting>
+            </listitem>
+            <listitem><para>Send Message to Destination</para>
+<programlisting language="java"><![CDATA[producer.send(sellTopic, message);
+]]></programlisting>
+            </listitem>
+        </orderedlist>
+    </section>
+
+
+    <section id="async-jms20-jmsapi-receive">
+        <title>Receive Message</title>
+
+
+        <section id="async-jms20-jmsapi-receive-receive">
+            <title>Poll from JMSConsumer</title>
+            <orderedlist spacing="compact">
+                <listitem><para>Obtain JMSContext from ConnectionFactory (JavaSE) or injection (JavaEE container)</para></listitem>
+                <listitem><para>Obtain Destination from JNDI lookup (JavaSE) or injection (JavaEE container)</para></listitem>
+                <listitem><para>Create a JMSConsumer for a specific destination</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>JMSConsumer must be closed and is AutoCloseable</para></listitem>
+                    </itemizedlist>
+<programlisting language="java"><![CDATA[import javax.jms.JMSConsumer;
+]]></programlisting>
+<programlisting language="java"><![CDATA[try (JMSConsumer syncConsumer = context.createConsumer(destination);
+     JMSConsumer asyncConsumer = context2.createConsumer(destination)) {
+}
+]]></programlisting>
+                </listitem>
+                <listitem><para>Call receive() to obtain the next message</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>receive() - perminently wait for next Message</para></listitem>
+                        <listitem><para>receiveNoWait() - immediately return with next Message or null if none waiting</para></listitem>
+                        <listitem><para>receive(long timeout) - wait up to timeout msecs before returning null if no Message</para></listitem>
+                    </itemizedlist>
+<programlisting language="java"><![CDATA[Message message=consumer.receiveNoWait();
+]]></programlisting>
+                </listitem>
+
+                <listitem><para>Get Message Properties (optional)</para>
+<programlisting language="java"><![CDATA[String level = message.getStringProperty("level");//"level" is user-defined property            
+logger.debug("receive ({}, mode={}, pri={}{}):{}",++count,
+        message.getJMSDeliveryMode(),       //"JMSDeliveryMode" is pre-defined property
+        message.getJMSPriority(),           //"JMSPriority" is pre-defined property
+        (level==null?"":", level="+level),
+        message.getJMSMessageID());         //"JMSMessageID" is pre-defined property
+]]></programlisting>
+                </listitem>
+
+                <listitem><para>Get Message Payload</para>
+<programlisting language="java"><![CDATA[TextMessage m1 = ...
+TextMessage text = m1.request.getText();
+
+ObjectMessage m2 = ...
+XxxDTO dto = (XxxDTO)m2.getObject();
+]]></programlisting>
+                </listitem>
+
+
+                <listitem><para>Alternately, call JMS 2.0 receiveBody(T) to get just the payload</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>message.receiveBody(Class&lt;T&gt; c)</para></listitem>
+                        <listitem><para>message.receiveBodyNoWait(Class&lt;T&gt; c)</para></listitem>
+                        <listitem><para>message.receiveBody(Class&lt;T&gt; c, long delay)</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </orderedlist>
+        </section>
+
+        <section id="async-jms20-jmsapi-receive-onmsg">
+            <title>JMSConsumer Listener</title>
+            <orderedlist spacing="compact">
+                <listitem><para>Obtain JMSContext from ConnectionFactory (JavaSE)</para></listitem>
+                <listitem><para>Obtain Destination from JNDI lookup (JavaSE)</para></listitem>
+                <listitem><para>Implement javax.jms.MessageListener</para>
+<programlisting language="java"><![CDATA[public class AsyncClient implements MessageListener ... {
+    public void onMessage(Message message) {
+      ...
+    }
+}
+]]></programlisting>
+                </listitem>
+                <listitem><para>Create a JMSConsumer</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>JMSConsumer must be closed and implements AutoCloseable</para></listitem>
+                    </itemizedlist>
+<programlisting language="java"><![CDATA[try (JMSConsumer syncConsumer = context.createConsumer(destination);
+     JMSConsumer asyncConsumer = context2.createConsumer(destination)) {
+   ...
+}
+]]></programlisting>
+                </listitem>
+                <listitem><para>Register MessageListener with JMSConsumer</para>
+<programlisting language="java"><![CDATA[//create a client to asynchronous receive messages through onMessage() callbacks
+AsyncClient asyncClient = new AsyncClient();
+asyncConsumer.setMessageListener(asyncClient);
+]]></programlisting>
+                </listitem>
+
+                <listitem><para>Process Messages as they are received through onMessage() callback</para> </listitem>
+            </orderedlist>
+        </section>
+
+        <section id="async-jms20-jmsapi-receive-mdb">
+            <title>Message Driven Bean (MDB)</title>
+            <orderedlist spacing="compact">
+                <listitem><para>Implement a javax.jms.MessageListener</para>
+<programlisting language="java"><![CDATA[public class BuyerMDB implements MessageListener {
+    public void onMessage(Message message) {
+]]></programlisting>
+                </listitem>
+
+                <listitem><para>Annotate the class as @MessageDriven</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Fill in @MessageDriven @ActivationConfigProperty values</para>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>destinationLookup - JNDI name for destination</para></listitem>
+                                <listitem><para>destinationType - javax.jms.Queue or javax.jms.Topic</para></listitem>
+                                <listitem><para>messageSelector - SQL-like property selector</para></listitem>
+
+                                <listitem><para>acknowledgeMode - when to 100% accept message from broker</para></listitem>
+                                <listitem><para>subscriptionDurability - durable or transient Topic subscription</para></listitem>
+                                <listitem><para>clientId - unique JMSContext/Connection ID for durable subscription</para></listitem>
+                                <listitem><para>subscriptionName - required for durable subscription</para></listitem>
+                                <listitem><para>connectionFactoryLookup - JNDI name for ConnectionFactory</para></listitem>
+                            </itemizedlist>
+                        </listitem>
+                    </itemizedlist>
+<programlisting language="java"><![CDATA[
+@MessageDriven(activationConfig={
+        @ActivationConfigProperty(
+                propertyName="destinationType",
+                propertyValue="javax.jms.Topic"),            
+        @ActivationConfigProperty(
+                propertyName="destination",
+                propertyValue="java:/jms/topic/ejava/examples/asyncMarket/topic1"),            
+        @ActivationConfigProperty(
+                propertyName="messageSelector",
+                propertyValue="JMSType in ('forSale', 'saleUpdate')"),
+        @ActivationConfigProperty(
+                propertyName="acknowledgeMode",
+                propertyValue="Auto-acknowledge")            
+})
+public class BuyerMDB implements MessageListener {
+    @PermitAll
+    public void onMessage(Message message) {
+
+]]></programlisting>
+                </listitem>
+
+                <listitem><para>Grant container permission to invoke onMessage()</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para></para>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>Annotate class or onMessage() method with @PermitAll</para></listitem>
+                            </itemizedlist>
+                        </listitem>
+                    </itemizedlist>
+<programlisting language="java"><![CDATA[
+@MessageDriven(...)
+public class BuyerMDB implements MessageListener {
+    @PermitAll
+    public void onMessage(Message message) {
+]]></programlisting>
+                </listitem>
+
+                <listitem><para>Process Messages as they are received through onMessage() callback</para> </listitem>
+            </orderedlist>
+        </section>
+
+    </section>
+
+
+
+
+    <section id="async-jms20-jmsapi-jmscontext-ack">
+      <title>Message Acknowledgement</title>
+      <itemizedlist spacing="compact">
+          <listitem><para>Broker retains consumed until acknowledged</para></listitem>
+          <listitem><para>Smaller windows (ack per Message) slower but can keep client and broker fully synchronized</para></listitem>
+          <listitem><para>Larger windows (ack per N Messages) faster but can produce duplicate messages</para></listitem>
+      </itemizedlist>
+
+      <section id="async-jms20-jmsapi-jmscontext-ack-auto">
+        <title>Message Acknowledgement: AUTO_ACKNOWLEDGE</title>
+<programlisting language="java"><![CDATA[try (JMSContext context = connFactory.createContext(JMSContext.AUTO_ACKNOWLEDGE)) {
+    ...
+    Message message = ...
+}
+]]></programlisting>                        
+        <itemizedlist spacing="compact">
+            <listitem><para>
+                Message automatically acknowledged by session when client synchronously receives (receive()) or 
+                asynchronously processes (onMessage) message
+                </para></listitem>
+            <listitem><para>
+                Can be used with MessageDriven EJBs (MDBs)
+                </para>
+<programlisting language="java"><![CDATA[@MessageDriven(activationConfig={
+        @ActivationConfigProperty(
+                propertyName="acknowledgeMode",
+                propertyValue="Auto-acknowledge")            
+})
+public class BuyerMDB implements MessageListener {
+    @PermitAll
+    public void onMessage(Message message) {
+        ...
+    }
+}
+]]></programlisting>                        
+</listitem>
+        </itemizedlist>
+      </section>
+
+      <section id="async-jms20-jmsapi-jmscontext-ack-dupsok">
+        <title>Message Acknowledgement: DUPS_OK_ACKNOWLEDGE</title>
+<programlisting language="java"><![CDATA[try (JMSContext context = connFactory.createContext(JMSContext.DUPS_OK_ACKNOWLEDGE)) {
+    ...
+    Message message = ...
+}
+]]></programlisting>                        
+        <itemizedlist spacing="compact">
+            <listitem><para>Similar to AUTO_ACKNOWLEDGE</para></listitem>
+            <listitem><para>Session lazily acknowledges messages</para></listitem>
+            <listitem><para>Can result in duplicate messages</para></listitem>
+            <listitem><para>
+                Can also be used with MessageDriven EJBs (MDBs)
+                </para>
+<programlisting language="java"><![CDATA[@MessageDriven(activationConfig={
+        @ActivationConfigProperty(
+                propertyName="acknowledgeMode",
+                propertyValue="Dups-ok-acknowledge")            
+})
+public class BuyerMDB implements MessageListener {
+    @PermitAll
+    public void onMessage(Message message) {
+        ...
+    }
+}
+]]></programlisting>                        
+</listitem>
+        </itemizedlist>
+      </section>
+
+      <section id="async-jms20-jmsapi-jmscontext-ack-client">
+        <title>Message Acknowledgement: CLIENT_ACKNOWLEDGE</title>
+<programlisting language="java"><![CDATA[try (JMSContext context = connFactory.createContext(JMSContext.CLIENT_ACKNOWLEDGE)) {
+    ...
+    Message message = ...
+    message.acknowledge();
+}
+]]></programlisting>                        
+        <itemizedlist spacing="compact">
+            <listitem><para>
+                Messages are manually acknowledged
+                </para></listitem>
+            <listitem><para>
+                Any acknowledged message acknowledges all prior messages consumed
+                </para></listitem>
+        </itemizedlist>
+      </section>
+
+      <section id="async-jms20-jmsapi-jmscontext-ack-tx">
+        <title>Message Acknowledgement: SESSION_TRANSACTED</title>
+<programlisting language="java"><![CDATA[try (JMSContext context = connFactory.createContext(JMSContext.SESSION_TRANSACTED)) {
+    ...
+    Message message = ...
+    context.commit();
+}
+]]></programlisting>                        
+        <itemizedlist spacing="compact">
+            <listitem><para>
+                Send or receive Message(s) within a local transaction
+                </para></listitem>
+            <listitem><para>
+                Changes are not reflected in broker until commit() and undone on call to rollback()
+                </para></listitem>
+            <listitem><para>
+                Useful for JavaSE clients to receive and fully process message
+                </para></listitem>
+            <listitem><para>
+                Can only be used with MDBs using Bean-Managed Transactions
+                </para></listitem>
+        </itemizedlist>
+      </section>
+    </section>
+
+
+    <section id="async-jms20-jmsapi-summary">
+        <title>JMS API Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>ConnectionFactory can contain client-specific properties (e.g., clientId)</para></listitem>
+            <listitem><para>Flows begin with JMSContext and Destination</para></listitem>
+            <listitem><para>JMSProducer required to send()</para></listitem>
+            <listitem><para>JMSConsumer required to receive() or onMessage()</para></listitem>
+        </itemizedlist>
+    </section>
+
+</chapter>
+  

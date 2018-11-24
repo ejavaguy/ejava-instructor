@@ -36,7 +36,8 @@
                 <listitem><para>Describe the difference between messaging and a standard client/server call</para></listitem>
                 <listitem><para>Describe the difference between publish/subscribe (Topic) and send/receive (Queue) messaging</para></listitem>
                 <listitem><para>Define administered resources in the server</para></listitem>
-                <listitem><para>Inject administered resources in their applications</para></listitem>
+                <listitem><para>Lookup administered resources using JNDI in their JavaSE-based applications</para></listitem>
+                <listitem><para>Inject administered resources in their JavaEE container-based applications</para></listitem>
                 <listitem><para>Construct runtime resources within their application</para></listitem>
                 <listitem><para>Send and receive JMS messages</para></listitem>
             </itemizedlist>
@@ -45,21 +46,9 @@
 
 
     <xi:include href="async-jms20-messaging.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-
-    <chapter id="async-jms20-jms">
-        <title>JMS</title>
-    </chapter>
-    <chapter id="async-jms20-example-topic">
-        <title>Example: Publish/Subscribe Topic</title>
-        <subtitle>JMS Notifier</subtitle>
-    </chapter>
-    <chapter id="async-jms20-example-queue">
-        <title>Example: Send/Receive Queue</title>
-        <subtitle>JMS Scheduler</subtitle>
-    </chapter>
-    <chapter id="async-jms20-jmsapi">
-        <title>JMS API</title>
-    </chapter>
+    <xi:include href="async-jms20-jms.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="async-jms20-api.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="async-jms20-maven.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 
     <appendix id="async-jms20-sources">
         <title>Sources</title>

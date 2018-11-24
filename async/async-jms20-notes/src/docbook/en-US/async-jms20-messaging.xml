@@ -110,52 +110,96 @@
         <title>MOM Architecture: Broker-based</title>
         <graphic scalefit="1" fileref="images/broker1-mom.jpg"/>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para>
+            <listitem><para>
+              Producer/Consumer communicate to a separate broker
+              </para></listitem>
+            <listitem><para>
+              No concept of an end-to-end link
+              </para></listitem>
+            <listitem><para>
+              Producer issues messages whether Consumer available or not
+              </para>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>
+                        application can add acknowledgment mechanisms
+                      </para></listitem>
                 </itemizedlist>
-            </listitem>
+              </listitem>
+            <listitem><para>
+              Consumer can receive messages when Producer unavailable
+              </para></listitem>
+            <listitem><para>
+              Producer only needs to send one message
+              </para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>
+                        Consumers able to control when they receive
+                      </para></listitem>
+                </itemizedlist>
+              </listitem>
+            <listitem><para>
+              Security and QoS can be implemented within broker (thin client)
+              </para></listitem>
+            <listitem><para>
+              Good for fully decoupling messaging complexity from clients
+                </para></listitem>
         </itemizedlist>
     </section>
+
+
 
 
     <section id="async-jms20-messaging-multibroker">
         <title>MOM Architecture: Multi-Broker</title>
         <graphic scalefit="1" fileref="images/broker2-mom.jpg"/>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para>
+            <listitem><para>
+              Clients unaware of physical topology
+              </para></listitem>
+            <listitem><para>
+              MOM Brokers link can 
+              </para>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>
+                      honor time-of-day bandwidth constraints
+                      </para></listitem>
+                    <listitem><para>
+                      conserve bandwidth between sites by only sending what is needed
+                      </para></listitem>
+                    <listitem><para>
+                      point of site-to-site firewall control
+                      </para></listitem>
+                    <listitem><para>
+                      form alternate route routing
+                      </para></listitem>
                 </itemizedlist>
-<programlisting language="java"><![CDATA[
-]]></programlisting>                        
-            </listitem>
+              </listitem>
         </itemizedlist>
     </section>
+
+
 
     <section id="async-jms20-messaging-keys">
         <title>Messaging Key Concepts</title>
         <graphic scalefit="1" fileref="images/producer-consumer.jpg"/>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para>
+            <listitem><para>Producer</para>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>produces message</para></listitem>
                 </itemizedlist>
-<programlisting language="java"><![CDATA[
-]]></programlisting>                        
-            </listitem>
+              </listitem>
+            <listitem><para>Destination</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>target of produced message</para></listitem>
+                    <listitem><para>source of consumed message</para></listitem>
+                    <listitem><para>hosted by messaging provider</para></listitem>
+                </itemizedlist>
+              </listitem>
+            <listitem><para>Consumer</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>consumes message</para></listitem>
+                </itemizedlist>
+              </listitem>
         </itemizedlist>
     </section>
 
@@ -163,17 +207,24 @@
         <title>Message Queuing</title>
         <graphic scalefit="1" fileref="images/sender-receiver.jpg"/>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para>
+            <listitem><para>Sender</para>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>a Producer</para></listitem>
+                    <listitem><para>sends message to a Queue with specific target/intent</para></listitem>
                 </itemizedlist>
-<programlisting language="java"><![CDATA[
-]]></programlisting>                        
-            </listitem>
+              </listitem>
+            <listitem><para>Queue</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>a Destination</para></listitem>
+                    <listitem><para>delivers message to, at most, one receiver</para></listitem>
+                </itemizedlist>
+              </listitem>
+            <listitem><para>Receiver</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>a Consumer</para></listitem>
+                    <listitem><para>intended target of message</para></listitem>
+                </itemizedlist>
+              </listitem>
         </itemizedlist>
     </section>
 
@@ -182,17 +233,33 @@
         <title>Publish/Subscribe</title>
         <graphic scalefit="1" fileref="images/producer-consumer.jpg"/>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para>
+            <listitem><para>Publisher</para>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>a Producer</para></listitem>
+                    <listitem><para>publishes message to Topic with no specific target/intent</para></listitem>
                 </itemizedlist>
-<programlisting language="java"><![CDATA[
-]]></programlisting>                        
-            </listitem>
+              </listitem>
+            <listitem><para>Topic</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>a Destination</para></listitem>
+                    <listitem><para>delivers message to all Subscribers</para></listitem>
+                </itemizedlist>
+              </listitem>
+            <listitem><para>Subscriber</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>a Consumer</para></listitem>
+                    <listitem><para>has registered interest in a Topic</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>
+                              durable subscription – lives beyond active client connection
+                            </para></listitem>
+                            <listitem><para>
+                              non-durable subscription – only exists during client connection
+                            </para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </itemizedlist>
+              </listitem>
         </itemizedlist>
     </section>
 
@@ -201,45 +268,93 @@
         <title>Request/Reply</title>
         <graphic scalefit="1" fileref="images/request-reply.jpg"/>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para>
+            <listitem><para>Requestor</para>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>sends message to a destination appropriate to be available to a Replier</para></listitem>
+                    <listitem><para>receives reply for request</para></listitem>
                 </itemizedlist>
-<programlisting language="java"><![CDATA[
-]]></programlisting>                        
-            </listitem>
+              </listitem>
+            <listitem><para>Request Destination</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>can be Topic or Queue</para></listitem>
+                </itemizedlist>
+              </listitem>
+            <listitem><para>Reply Destination</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>can be Topic or Queue (typically a Queue)</para></listitem>
+                </itemizedlist>
+              </listitem>
+            <listitem><para>Replier</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>receives request message from destination</para></listitem>
+                    <listitem><para>sends reply message to destination specified in request</para></listitem>
+                </itemizedlist>
+              </listitem>
         </itemizedlist>
     </section>
 
+    <section id="async-jms20-messaging-requestreplytx">
+        <title>Messaging and Transactions</title>
+        <graphic scalefit="1" fileref="images/request-reply.jpg"/>
 
-    <section id="async-jms20-messaging-">
-        <title></title>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para>
+            <listitem><para>Each interaction with Destination can be made part of an existing ACID transaction</para>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>Transaction #1</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Requestor</para>
+                                <itemizedlist spacing="compact">
+                                    <listitem><para>begins some work</para></listitem>
+                                    <listitem><para>
+                                      sends message to a destination appropriate to be available to a Replier
+                                    </para></listitem>
+                                </itemizedlist>
+                            </listitem>
+                        </itemizedlist>
+                      </listitem>
+                    <listitem><para>Transaction #2</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Replier</para>
+                                <itemizedlist spacing="compact">
+                                    <listitem><para>receives request message from destination</para></listitem>
+                                    <listitem><para>performs work</para></listitem>
+                                    <listitem><para>sends reply message to destination specified in request</para></listitem>
+                                </itemizedlist>
+                            </listitem>
+                        </itemizedlist>
+                      </listitem>
+                    <listitem><para>Transaction #3</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Requestor</para>
+                                <itemizedlist spacing="compact">
+                                    <listitem><para>receives reply for request</para></listitem>
+                                    <listitem><para>completes work</para></listitem>
+                                </itemizedlist>
+                            </listitem>
+                        </itemizedlist>
+                      </listitem>
                 </itemizedlist>
-<programlisting language="java"><![CDATA[
-]]></programlisting>                        
             </listitem>
         </itemizedlist>
     </section>
-
 
 
     <section id="async-jms20-messaging-summary">
-        <title>Chapter Summary</title>
+        <title>Messaging Summary</title>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Messaging decouples Sender from Receiver</para></listitem>
+            <listitem><para>Different Messaging paradigmes</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Publish/Subscribe, Topic-based</para></listitem>
+                    <listitem><para>Send/Receive, Queue-based</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Different Messaging architectures</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Client/Library-based</para></listitem>
+                    <listitem><para>Broker/Server-based</para></listitem>
+                </itemizedlist>
+            </listitem>
         </itemizedlist>
     </section>
 

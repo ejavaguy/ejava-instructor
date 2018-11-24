@@ -1,0 +1,173 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="async-jms20-jms">
+    <title>JMS</title>
+
+    <section id="async-jms20-jms-background">
+        <title>JMS Background</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Vendor-neutral API to access enterprise messaging systems.</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Similar API role as JDBC</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>
+                                JDBC is an API for accessing RDBMS 
+                              </para></listitem>
+                            <listitem><para>
+                                JMS is an API for accessing enterprise messaging systems
+                              </para></listitem>
+                        </itemizedlist>
+                      </listitem>
+                </itemizedlist>
+              </listitem>
+            <listitem><para>
+              API between the application (JMS client) and the messaging provider 
+              (JMS provider); not between providers
+              </para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Similar non-role as JDBC</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>
+                                JDBC won't cause data inserted into an HSQL instance 
+                                to magically show up in an Oracle instance
+                              </para></listitem>
+                            <listitem><para>
+                                JMS won't cause a message sent to a JBossMQ destination 
+                                to magically show up in a BEA instance's destination
+                              </para></listitem>
+                        </itemizedlist>
+                      </listitem>
+                </itemizedlist>
+              </listitem>
+            <listitem><para>
+              Its a Java API; no other languages addressed
+              </para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>
+                      JMS providers accommodate other language clients using proprietary non-Java APIs
+                      </para></listitem>
+                </itemizedlist>
+              </listitem>
+        </itemizedlist>
+    </section>
+
+
+
+
+    <section id="async-jms20-jms-notjms">
+        <title>Not Specified by JMS</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Security</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>How are destinations secured</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Load Balancing/Fault Tolerance</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>How do Topics scale to many publishers/subscribers</para></listitem>
+                    <listitem><para>How does a provider account for broker failure</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Error Notifications</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>What happens when storage exhausted</para></listitem>
+                    <listitem><para>FIFO?, LIFO? retention</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Administration</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>How are destinations and connection factories added</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Message Repository</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>How is storage allocated</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Wire Protocol</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>RMI?</para></listitem>
+                    <listitem><para>HTTP?</para></listitem>
+                    <listitem><para>Other?</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Interoperability with non-Java clients</para></listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="async-jms20-jms-history">
+      <title>JMS History</title>
+
+      <itemizedlist spacing="compact">
+          <listitem><para>1.0</para>
+              <itemizedlist spacing="compact">
+                  <listitem><para>~1998-2001</para></listitem>
+                  <listitem><para>Initial API</para></listitem>
+                  <listitem><para>Very destination-type specific, hard to generalize</para>
+                      <itemizedlist spacing="compact">
+                          <listitem><para>publisher.publish() to Topic</para></listitem>
+                          <listitem><para>sender.send() to Queue</para></listitem>
+                      </itemizedlist>
+                  </listitem>
+              </itemizedlist>
+          </listitem>
+
+          <listitem><para>1.1</para>
+              <itemizedlist spacing="compact">
+                  <listitem><para>2002</para></listitem>
+                  <listitem><para>Generalized destination-type specific calls</para>
+                      <itemizedlist spacing="compact">
+                          <listitem><para>producer.send() to Topic or Queue</para></listitem>
+                          <listitem><para>consumer.receive() from Topic or Queue</para>
+                          </listitem>
+                      </itemizedlist>
+                  </listitem>
+              </itemizedlist>
+          </listitem>
+
+          <listitem><para>2.0</para>
+              <itemizedlist spacing="compact">
+                  <listitem><para>2013</para></listitem>
+                  <listitem><para>Ease of use</para>
+                      <itemizedlist spacing="compact">
+                          <listitem><para>Combined Connection and Session into JMSContext</para></listitem>
+                          <listitem><para>Fewer objects/calls to setup a flow</para></listitem>
+                          <listitem><para>Java 7 AutoClosable eliminates boilerplate code in try/finally blocks</para></listitem>
+                          <listitem><para>Read contents of Message without downcasting to Message type</para></listitem>
+                          <listitem><para></para></listitem>
+                      </itemizedlist>
+                  </listitem>
+                  <listitem><para>New features</para>
+                      <itemizedlist spacing="compact">
+                          <listitem><para>Shared subscriptions</para></listitem>
+                          <listitem><para>Delivery delay</para></listitem>
+                      </itemizedlist>
+                  </listitem>
+              </itemizedlist>
+          </listitem>
+      </itemizedlist>
+    </section>
+
+    <section id="async-jms20-jms-demo">
+        <title>JMS Demonstrations</title>
+
+        <section id="async-jms20-jms-demo-topic">
+            <title>JMS Topic Demonstration: JMS Notifier</title>
+        </section>
+        <section id="async-jms20-jms-demo-queue">
+            <title>JMS Queue Demonstration: JMS Scheduler</title>
+        </section>
+    </section>
+
+    <section id="async-jms20-jms-summary">
+        <title>Chapter Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>JMS is an API not an implementation</para></listitem>
+            <listitem><para>Vendors provide implementations that satisfy the API and address more features</para></listitem>
+            <listitem><para>Topics allow multiple subscribers to be notified of same event</para></listitem>
+            <listitem><para>Queues provide simple load-balancing solutions</para></listitem>
+        </itemizedlist>
+    </section>
+
+</chapter>
