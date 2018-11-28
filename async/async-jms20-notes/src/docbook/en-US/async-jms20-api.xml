@@ -357,11 +357,7 @@ public class BuyerMDB implements MessageListener {
 
                 <listitem><para>Grant container permission to invoke onMessage()</para>
                     <itemizedlist spacing="compact">
-                        <listitem><para></para>
-                            <itemizedlist spacing="compact">
-                                <listitem><para>Annotate class or onMessage() method with @PermitAll</para></listitem>
-                            </itemizedlist>
-                        </listitem>
+                        <listitem><para>Annotate class or onMessage() method with @PermitAll</para></listitem>
                     </itemizedlist>
 <programlisting language="java"><![CDATA[
 @MessageDriven(...)

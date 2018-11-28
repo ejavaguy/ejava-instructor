@@ -16,7 +16,7 @@
     
     <properties>
        <doc.base>async-jms20-book</doc.base>
-       <content.version>v2018-11-23</content.version>
+       <content.version>v2018-11-27</content.version>
     </properties>
 
     <build>

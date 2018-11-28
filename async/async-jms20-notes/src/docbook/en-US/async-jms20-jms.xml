@@ -135,7 +135,6 @@
                           <listitem><para>Fewer objects/calls to setup a flow</para></listitem>
                           <listitem><para>Java 7 AutoClosable eliminates boilerplate code in try/finally blocks</para></listitem>
                           <listitem><para>Read contents of Message without downcasting to Message type</para></listitem>
-                          <listitem><para></para></listitem>
                       </itemizedlist>
                   </listitem>
                   <listitem><para>New features</para>
