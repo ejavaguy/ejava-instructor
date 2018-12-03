@@ -1,0 +1,58 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="async-methods">
+    <bookinfo>
+        <title>Asynchronous Methods</title>
+        <subtitle></subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>This presentation provides an introduction to using Asynchronous
+            Methods in JavaEE.
+            </para>
+        </abstract>
+        
+    </bookinfo>
+
+    <preface id="async-methods-purpose">
+        <title>Purpose</title>
+        <section id="async-methods-purpose-goals">
+            <title>Goals</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Decouple called execution from client thread</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="async-methods-purpose-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall be able to:</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Define an EJB method to complete in an asynchronous thread</para></listitem>
+                <listitem><para>Invoke an asynchronous method</para></listitem>
+                <listitem><para>Check on the completion status of an asynchronous method</para></listitem>
+                <listitem><para>Return a result from an asynchronous method</para></listitem>
+                <listitem><para>Compare use of asynchronous methods versus JMS</para></listitem>
+            </itemizedlist>
+        </section>
+    </preface>
+
+
+    <xi:include href="async-methods-overview.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+    <appendix id="async-methods-sources">
+        <title>Sources</title>
+        <orderedlist spacing="compact">
+            <listitem><para>
+                <emphasis>"Java Platform, Enterprise Edition: The Java EE Tutorial, Asynchronous Method Invocation"</emphasis>, Oracle, 
+                <ulink url="https://docs.oracle.com/javaee/7/tutorial/ejb-async001.htm">https://docs.oracle.com/javaee/7/tutorial/ejb-async001.htm</ulink>,
+                2014 Oracle
+                </para>
+            </listitem>
+        </orderedlist>
+    </appendix>
+</book>

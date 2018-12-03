@@ -161,6 +161,12 @@
             <version>${project.version}</version>
             <classifier>docsrc</classifier>
         </dependency>
+        <dependency>
+            <groupId>info.ejava.docs.async</groupId>
+            <artifactId>async-methods-notes</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
         <!--
         <dependency>
             <groupId>info.ejava.docs.ejb</groupId>
