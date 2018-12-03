@@ -275,7 +275,7 @@
             </row>
             <row rowsep="1">
                 <entry namest="session"/>
-                <entry namest="topic">Asynchronous Methods</entry>
+                <entry namest="topic"><para><link linkend="async-methods">Asynchronous Methods</link></para></entry>
             </row>
             <row rowsep="1">
                 <entry namest="session"/>

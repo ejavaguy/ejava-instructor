@@ -1,0 +1,210 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="async-methods-chapter">
+    <title>Asynchronous Overview</title>
+
+    <section id="async-methods-overview-scenario">
+        <title>Asynchronous Scenario</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Task(s) may take considerable time to complete</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Client may not need to wait for task to complete</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Multiple tasks could run concurrently</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Client may gather results as they complete</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="async-methods-overview-threads">
+        <title>Potential Asynchronous Solution: Manually Spawn Thread</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Manually create a Java thread to complete task</para></listitem>
+        </itemizedlist>
+
+        <section id="async-methods-overview-threads-analysis">
+            <title>Threads Solution Analysis</title>
+            <itemizedlist spacing="compact">
+              <listitem><para>Manual creation of a Java thread within EJB is illegal</para>
+                  <itemizedlist spacing="compact">
+                      <listitem><para>JavaEE uses ThreadLocal variables to keep track of component execution state</para></listitem>
+                  </itemizedlist>
+              </listitem>
+              <listitem><para>Something in-tune with the JavaEE container will need to be used instead</para></listitem>
+            </itemizedlist>
+        </section>
+    </section>
+
+    <section id="async-methods-overview-jms">
+        <title>Potential Asynchronous Solution: JMS</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Messages are processed by JMS consumers in independent threads</para></listitem>
+        </itemizedlist>
+
+        <section id="async-methods-overview-jms-details">
+            <title>JMS Solution Details</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Establish</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>a JMS destination for work requests</para></listitem>
+                        <listitem><para>a JMS destination for work responses</para></listitem>
+                        <listitem><para>a MessageDriven Bean to perform asynchronous work</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>Client</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>builds JMS message with request information</para></listitem>
+                        <listitem><para>sends JMS request message to request destination</para></listitem>
+                        <listitem><para>continues working</para></listitem>
+                        <listitem><para>waits for response</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>MessageDriven Bean</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>is invoked to handle the JMS request message</para></listitem>
+                        <listitem><para>performs requested work</para></listitem>
+                        <listitem><para>builds JMS message with response information</para></listitem>
+                        <listitem><para>sends JMS response message to response destination</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>Client</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>receives JMS response message</para></listitem>
+                        <listitem><para>extracts the response information</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="async-methods-overview-jms-analysis">
+            <title>JMS Solution Analysis</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>A lot of work if just trying to invoke a local asynchronous call</para></listitem>
+                <listitem><para>Better used in distributed or pure publish/subscribe scenarios</para></listitem>
+                <listitem><para>JMS is an early JavaEE API - alternate APIs have been created since</para></listitem>
+            </itemizedlist>
+        </section>
+    </section>
+
+    <section id="async-methods-overview-async">
+        <title>Potential Asynchronous Solution: Asynchronous Methods</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Request container to execute method in independent thread from caller</para></listitem>
+            <listitem><para>Client and called method are fully decoupled from one another</para></listitem>
+            <listitem><para>Called method executes in new transaction context</para></listitem>
+            <listitem><para>Available since EJB 3.1</para></listitem>
+        </itemizedlist>
+
+        <section id="async-methods-overview-async-details">
+            <title>Asynchronous Method Solution Details</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Establish</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>an EJB method to perform work in independent thread</para></listitem>
+                        <listitem><para>Annotate EJB method with @javax.ejb.Asynchronous</para>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>Alternately annotate EJB class to make all methods asynchronous</para></listitem>
+                            </itemizedlist>
+                        </listitem>
+                        <listitem><para>Declare return type as:</para>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>void or</para></listitem>
+                                <listitem><para>java.util.concurrent.Future</para>
+<programlisting language="java"><![CDATA[import java.util.concurrent.Future;
+import javax.ejb.Asynchronous;
+]]></programlisting>                        
+<programlisting language="java"><![CDATA[@Stateless
+public class AuctionMgmtActionEJB {
+    @Asynchronous
+    public Future<Date> doWorkAsync(long delay) {
+]]></programlisting>                        
+                                </listitem>
+                            </itemizedlist>
+
+                            <note>
+                              <title>Future&lt;T&gt; return methods can throw application exceptions</title>
+                              <para>
+                                Asynchronous methods that return "void" cannot throw application exceptions.
+                                Asynchronous methods that return "Future&lt;T&gt; can throw application exceptions.
+                              </para>
+                            </note>
+
+                        </listitem>
+
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>Client</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Invokes method normally using standard arguments</para>
+<programlisting language="java"><![CDATA[Future<Date> f = actions.doWorkAsync(delay);
+]]></programlisting>                        
+                        </listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>Asynchronous Method</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>performs work</para></listitem>
+                        <listitem><para>returns result information wrapped in javax.ejb.AsyncResult</para>
+<programlisting language="java"><![CDATA[javax.ejb.AsyncResult
+]]></programlisting>                        
+<programlisting language="java"><![CDATA[@Asynchronous
+public Future<Date> doWorkAsync(long delay) {
+    return new AsyncResult<Date>(now);
+]]></programlisting>                        
+                          <note>
+                            <title>AsyncResult used to provide result to container</title>
+                            <para>
+                              AsyncResult is only a convenience class used to pass the result to the
+                              container. This instance is not accessible to the client. The client will
+                              be given an instance of a Future built and managed by the container.
+                            </para>
+                          </note>
+                        </listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>Client</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>immediately receives Future&lt;T&gt; response message</para></listitem>
+                        <listitem><para>may call isDone() to check on status</para>
+<programlisting language="java"><![CDATA[Future<Date> f = actions.doWorkAsync(delay);
+...
+f.isDone();
+]]></programlisting>                        
+                        </listitem>
+                        <listitem><para>may call get() to check on wait for result</para>
+<programlisting language="java"><![CDATA[Future<Date> f = actions.doWorkAsync(delay);
+...
+Date date = f.get();
+]]></programlisting>                        
+                        </listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="async-methods-overview-async-analysis">
+            <title>Asynchronous Method Solution Analysis</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Simple API</para></listitem>
+                <listitem><para>Primarily for local calls</para></listitem>
+            </itemizedlist>
+        </section>
+    </section>
+
+
+    <section id="async-methods-overview-summary">
+        <title>Asynchronous Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Make called execution independent of caller thread</para></listitem>
+            <listitem><para>Threads unacceptable JavaEE solution</para></listitem>
+            <listitem><para>JMS acceptable, but overcomplicated solution</para></listitem>
+            <listitem><para>Asynchronous Method and Future&lt;T&gt;</para></listitem>
+        </itemizedlist>
+    </section>
+
+</chapter>
+  

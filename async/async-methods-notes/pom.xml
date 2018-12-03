@@ -1,0 +1,31 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>info.ejava.docs.async</groupId>
+        <artifactId>async</artifactId>
+        <version>5.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>async-methods-notes</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Async::Async Methods Notes</name>
+    <description>
+        This project contains the documentation for invoking asynchronous methods
+        within EJB.
+    </description>
+    
+    <properties>
+       <doc.base>async-methods-book</doc.base>
+       <content.version>v2018-12-02</content.version>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jboss.maven.plugins</groupId>
+                <artifactId>maven-jdocbook-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
