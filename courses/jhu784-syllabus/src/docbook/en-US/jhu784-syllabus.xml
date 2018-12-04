@@ -279,10 +279,10 @@
             </row>
             <row rowsep="1">
                 <entry namest="session"/>
-                <entry namest="topic">EJB Timers</entry>
+                <entry namest="topic"><para><link linkend="async-ejbtimers">EJB Timers</link></para></entry>
             </row>
             <row rowsep="1">
-              <entry namest="comment"><link linkend="esport-project3-part">Project 3</link> due by Sun, 8am Dec09</entry>
+              <entry namest="comment"><link linkend="esport-project3-part">Project 3</link> due by Sun, 5pm Dec09</entry>
             </row>
 
                 <!--

@@ -167,6 +167,12 @@
             <version>${project.version}</version>
             <classifier>docsrc</classifier>
         </dependency>
+        <dependency>
+            <groupId>info.ejava.docs.async</groupId>
+            <artifactId>async-ejbtimers-notes</artifactId>
+            <version>${project.version}</version>
+            <classifier>docsrc</classifier>
+        </dependency>
         <!--
         <dependency>
             <groupId>info.ejava.docs.ejb</groupId>

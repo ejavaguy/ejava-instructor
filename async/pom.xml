@@ -19,6 +19,7 @@
     <modules>
         <module>async-jms20-notes</module>
         <module>async-methods-notes</module>
+        <module>async-ejbtimers-notes</module>
         <module>async-jms11-notes</module>
         <module>asyncEJB</module>
     </modules>

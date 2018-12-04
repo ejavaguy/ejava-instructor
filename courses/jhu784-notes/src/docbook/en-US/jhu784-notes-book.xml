@@ -85,6 +85,7 @@
     <xi:include href="javaee-interceptors-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="async-jms20-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="async-methods-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="async-ejbtimers-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <!-- 
     <xi:include href="webtier-part.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     -->
