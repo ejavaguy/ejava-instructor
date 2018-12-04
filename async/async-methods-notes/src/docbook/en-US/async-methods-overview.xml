@@ -153,7 +153,9 @@ public class AuctionMgmtActionEJB {
 ]]></programlisting>                        
 <programlisting language="java"><![CDATA[@Asynchronous
 public Future<Date> doWorkAsync(long delay) {
+    Date now = ...
     return new AsyncResult<Date>(now);
+}
 ]]></programlisting>                        
                           <note>
                             <title>AsyncResult used to provide result to container</title>
@@ -191,6 +193,7 @@ Date date = f.get();
             <itemizedlist spacing="compact">
                 <listitem><para>Simple API</para></listitem>
                 <listitem><para>Primarily for local calls</para></listitem>
+                <listitem><para>Cannot share the same persistence context and transaction as caller</para></listitem>
             </itemizedlist>
         </section>
     </section>

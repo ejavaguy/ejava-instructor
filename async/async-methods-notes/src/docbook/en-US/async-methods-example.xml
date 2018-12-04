@@ -1,0 +1,222 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="async-methods-example">
+    <title>Asynchronous Methods Example</title>
+
+    <itemizedlist spacing="compact">
+        <listitem><para>Client EJB</para>
+<programlisting language="java"><![CDATA[@Stateless
+public class AuctionMgmtEJB implements AuctionMgmtRemote, AuctionMgmtLocal {
+    @EJB
+    private AuctionMgmtActionEJB actions;
+]]></programlisting>                        
+        </listitem>
+
+        <listitem><para>Worker EJB</para>
+<programlisting language="java"><![CDATA[@Stateless
+public class AuctionMgmtActionEJB {
+    public Date doWorkSync(long delay) {
+    }    
+    @Asynchronous
+    public Future<Date> doWorkAsync(long delay) {
+    }    
+]]></programlisting>                        
+        </listitem>
+    </itemizedlist>
+
+    <section id="async-methods-example-sync">
+        <title>Synchronous Example</title>
+
+        <section id="async-methods-example-sync-client">
+            <title>Synchronous Example: Client</title>
+<programlisting language="java"><![CDATA[/**
+ * Perform action synchronously while this caller waits
+ */
+@Override
+@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+public void workSync(int count, long delay) {
+    DateFormat df = new SimpleDateFormat("HH:mm:ss.SSS");
+    
+    long startTime = System.currentTimeMillis();
+    for (int i=0; i<count; i++) {
+        logger.info("{} issuing sync request, delay={}", df.format(new Date()), delay);
+        Date date = actions.doWorkSync(delay);
+        logger.info("sync waitTime={} msecs", System.currentTimeMillis()-startTime);
+    }
+    long syncTime = System.currentTimeMillis() - startTime;
+    logger.info("workSync time={} msecs", syncTime);
+}    
+]]></programlisting>                        
+            <itemizedlist spacing="compact">
+                <listitem><para>Invokes count synchronous workers sequentially</para></listitem>
+            </itemizedlist>
+        </section>
+      
+        <section id="async-methods-example-sync-worker">
+            <title>Synchronous Example: Worker</title>
+<programlisting language="java"><![CDATA[/**
+ * Perform action synchronously while caller waits.
+ */
+@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+public Date doWorkSync(long delay) {
+    DateFormat df = new SimpleDateFormat("HH:mm:ss.SSS");
+    logger.debug("sync method {} starting {} delay at {}", 
+                 Thread.currentThread().getId(), delay, df.format(new Date()));
+    try { Thread.sleep(delay); }
+    catch (Exception ex) {
+        logger.error("unexpected error during sleep", ex);
+    }
+    Date now = new Date();
+    logger.debug("sync method {} completed {} delay at {}", 
+                 Thread.currentThread().getId(), delay, df.format(now));
+    
+    return now;
+}    
+]]></programlisting>                        
+
+            <itemizedlist spacing="compact">
+                <listitem><para>Work performed takes "delay" amount of time</para></listitem>
+                <listitem><para>Timestamp of completion printed and returned to caller when complete</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="async-methods-example-sync-results">
+            <title>Synchronous Example: Results</title>
+<programlisting language="java"><![CDATA[08:01:04,614 [Client] (default task-2) 08:01:04.614 issuing sync request, delay=3000
+08:01:04,614 [Worker] (default task-2) sync method 231 starting 3000 delay at 08:01:04.614
+08:01:07,618 [Worker] (default task-2) sync method 231 completed 3000 delay at 08:01:07.617
+08:01:07,618 [Client] (default task-2) sync waitTime=3004 msecs
+08:01:07,619 [Client] (default task-2) 08:01:07.619 issuing sync request, delay=3000
+08:01:07,619 [Worker] (default task-2) sync method 231 starting 3000 delay at 08:01:07.619
+08:01:10,621 [Worker] (default task-2) sync method 231 completed 3000 delay at 08:01:10.620
+08:01:10,621 [Client] (default task-2) sync waitTime=6007 msecs
+08:01:10,621 [Client] (default task-2) 08:01:10.621 issuing sync request, delay=3000
+08:01:10,622 [Worker] (default task-2) sync method 231 starting 3000 delay at 08:01:10.622
+08:01:13,626 [Worker] (default task-2) sync method 231 completed 3000 delay at 08:01:13.625
+08:01:13,626 [Client] (default task-2) sync waitTime=9012 msecs
+08:01:13,627 [Client] (default task-2) workSync time=9013 msecs
+]]></programlisting>                        
+            <itemizedlist spacing="compact">
+                <listitem><para>Workers execute in same thread ("default task-2") as caller</para></listitem>
+            </itemizedlist>
+        </section>
+    </section>
+
+    <section id="async-methods-example-async">
+
+        <section id="async-methods-example-async-client">
+            <title>Asynchronous Example: Client</title>
+<programlisting language="java"><![CDATA[import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+]]></programlisting>                        
+<programlisting language="java"><![CDATA[/**
+ * Perform action async from this caller
+ */
+@Override
+@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+public void workAsync(int count, long delay) {
+    DateFormat df = new SimpleDateFormat("HH:mm:ss.SSS");
+    
+    List<Future<Date>> results = new ArrayList<Future<Date>>();
+      //issue requests
+    long startTime = System.currentTimeMillis();
+    for (int i=0; i<count; i++) {
+        logger.info("{} issuing async request, delay={}", df.format(new Date()), delay);
+        Future<Date> date = actions.doWorkAsync(delay);
+        results.add(date);
+        logger.info("async waitTime={} msecs", System.currentTimeMillis()-startTime);
+    }
+
+      //process results
+    for (Future<Date> f: results) {
+        logger.info("{} getting async response", df.format(new Date()));
+        try {
+            Date date = f.get();
+        } catch (ExecutionException | InterruptedException ex) {
+            logger.error("unexpected error on future.get()", ex);
+            throw new EJBException("unexpected error during future.get():"+ex);
+        }
+        logger.info("{} got async response", df.format(new Date()));
+    }
+    long asyncTime = System.currentTimeMillis() - startTime;
+    logger.info("workAsync time={} msecs", asyncTime);
+}    
+]]></programlisting>                        
+            <itemizedlist spacing="compact">
+                <listitem><para>Invokes count synchronous workers sequentially</para></listitem>
+            </itemizedlist>
+        </section>
+      
+        <section id="async-methods-example-async-worker">
+            <title>Asynchronous Example: Worker</title>
+<programlisting language="java"><![CDATA[/**
+ * Perform action async from caller
+ */
+@Asynchronous
+public Future<Date> doWorkAsync(long delay) {
+    DateFormat df = new SimpleDateFormat("HH:mm:ss.SSS");
+    logger.debug("async method {} starting {} delay at {}", 
+                 Thread.currentThread().getId(), delay, df.format(new Date()));
+    try { Thread.sleep(delay); }
+    catch (Exception ex) {
+        logger.error("unexpected error during sleep", ex);
+    }
+    Date now = new Date();
+    logger.debug("async method {} completed {} delay at {}", 
+                 Thread.currentThread().getId(), delay, df.format(now));
+    
+    return new AsyncResult<Date>(now);
+}    
+]]></programlisting>                        
+
+            <itemizedlist spacing="compact">
+                <listitem><para>Work performed takes "delay" amount of time</para></listitem>
+                <listitem><para>Timestamp of completion printed and returned to caller when complete</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="async-methods-example-async-results">
+            <title>Asynchronous Example: Results</title>
+<programlisting language="java"><![CDATA[08:08:15,861 [Client] (default task-1) sellTopic=ActiveMQTopic[asyncMarket-topic1]
+08:08:15,861 [Client] (default task-1) 08:08:15.861 issuing async request, delay=3000
+08:08:15,863 [Client] (default task-1) async waitTime=2 msecs
+08:08:15,863 [Client] (default task-1) 08:08:15.863 issuing async request, delay=3000
+08:08:15,864 [Client] (default task-1) async waitTime=3 msecs
+08:08:15,864 [Client] (default task-1) 08:08:15.864 issuing async request, delay=3000
+08:08:15,864 [Client] (default task-1) async waitTime=3 msecs
+08:08:15,864 [Client] (default task-1) 08:08:15.864 getting async response
+08:08:15,865 [Worker] (EJB default - 8) async method 224 starting 3000 delay at 08:08:15.865
+08:08:15,865 [Worker] (EJB default - 6) async method 222 starting 3000 delay at 08:08:15.865
+08:08:15,865 [Worker] (EJB default - 7) async method 223 starting 3000 delay at 08:08:15.865
+08:08:18,870 [Worker] (EJB default - 7) async method 223 completed 3000 delay at 08:08:18.870
+08:08:18,870 [Worker] (EJB default - 8) async method 224 completed 3000 delay at 08:08:18.870
+08:08:18,870 [Worker] (EJB default - 6) async method 222 completed 3000 delay at 08:08:18.870
+08:08:18,873 [Client] (default task-1) 08:08:18.873 got async response
+08:08:18,873 [Client] (default task-1) 08:08:18.873 getting async response
+08:08:18,873 [Client] (default task-1) 08:08:18.873 got async response
+08:08:18,873 [Client] (default task-1) 08:08:18.873 getting async response
+08:08:18,873 [Client] (default task-1) 08:08:18.873 got async response
+08:08:18,873 [Client] (default task-1) workAsync time=3012 msecs
+]]></programlisting>                        
+            <itemizedlist spacing="compact">
+                <listitem><para>Workers execute in different threads ("EJB default - #") from caller ("default task-1")</para></listitem>
+            </itemizedlist>
+        </section>
+    </section>
+
+
+    <section id="async-methods-example-summary">
+        <title>Asynchronous Example Summary</title>
+<programlisting language="java"><![CDATA[08:13:10,640 (AsyncMethodIT.java:29) -count=3, delay=3000, syncTime=9017 msecs
+08:13:10,640 (AsyncMethodIT.java:30) -count=3, delay=3000, asyncTime=3018 msecs
+]]></programlisting>                        
+
+        <itemizedlist spacing="compact">
+            <listitem><para>Asynchronous approach was much faster than synchronous approach</para></listitem>
+            <listitem><para>Asynchronous approach allowed work to be done concurrently</para></listitem>
+        </itemizedlist>
+    </section>
+
+</chapter>
+  
