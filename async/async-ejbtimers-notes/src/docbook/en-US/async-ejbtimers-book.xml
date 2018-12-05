@@ -51,18 +51,17 @@
 
 
     <xi:include href="async-ejbtimers-overview.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="async-ejbtimers-example.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 
-<!--
     <appendix id="async-ejbtimers-sources">
         <title>Sources</title>
         <orderedlist spacing="compact">
             <listitem><para>
-                <emphasis>"Title"</emphasis>, Author, 
-                <ulink url="https://">https://</ulink>,
-                2014 Publisher
+                <emphasis>"Using the Timer Service"</emphasis>, Oracle, 
+                <ulink url="https://docs.oracle.com/javaee/7/tutorial/ejb-basicexamples004.htm">https://docs.oracle.com/javaee/7/tutorial/ejb-basicexamples004.htm</ulink>,
+                2014 Oracle
                 </para>
             </listitem>
         </orderedlist>
     </appendix>
-    -->
 </book>

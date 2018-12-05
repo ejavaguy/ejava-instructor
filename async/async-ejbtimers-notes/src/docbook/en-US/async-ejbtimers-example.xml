@@ -1,0 +1,154 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="async-methods-example">
+    <title>EJB Timers Example</title>
+
+    <section id="async-methods-example-declarative">
+        <title>Declarative Calendar</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>@Timeout callback method annotated with @Schedule</para>
+<programlisting language="java"><![CDATA[@Timeout
+@Schedule(second="*/10", minute ="*", hour="*", 
+          dayOfMonth="*", month="*", year="*", persistent=false)
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+public void execute(Timer timer) {
+    logger.info("timer fired: {}", timer);
+    try {
+        checkAuction();
+    }
+    catch (Exception ex) {
+        logger.error("error checking auction", ex);
+    }
+}
+]]></programlisting>                        
+            </listitem>
+            <listitem><para>Server-side output</para>
+<programlisting language="java"><![CDATA[23:08:30 [AuctionMgmtEJB] (EJB default-6) **** AuctionMgmtEJB init() ***
+23:08:30 [AuctionMgmtEJB] (EJB default-6) timerService=org.jboss.as.ejb3.timerservice.TimerServiceImpl@d72fc25
+23:08:30 [AuctionMgmtEJB] (EJB default-6) checkAuctionInterval=10000
+23:08:30 [AuctionMgmtEJB] (EJB default-6) timer fired: [id=02cbc8b5-0ddd-414e-b81d-59c7800371fd 
+    timedObjectId=asyncMarketEAR.asyncMarketEJB.AuctionMgmtEJB auto-timer?:true persistent?:false 
+    timerService=org.jboss.as.ejb3.timerservice.TimerServiceImpl@d72fc25 
+    initialExpiration=null intervalDuration(in milli sec)=0 
+    nextExpiration=Tue Dec 04 23:08:40 EST 2018 timerState=IN_TIMEOUT info=null]
+23:08:30 [AuctionMgmtEJB] (EJB default-6) checking auctions
+23:08:30 [AuctionMgmtEJB] (EJB default-6) processed 0 active items
+23:08:40 [AuctionMgmtEJB] (EJB default-7) **** AuctionMgmtEJB init() ***
+23:08:40 [AuctionMgmtEJB] (EJB default-7) timerService=org.jboss.as.ejb3.timerservice.TimerServiceImpl@d72fc25
+23:08:40 [AuctionMgmtEJB] (EJB default-7) checkAuctionInterval=10000
+23:08:40 [AuctionMgmtEJB] (EJB default-7) timer fired: [id=02cbc8b5-0ddd-414e-b81d-59c7800371fd 
+    timedObjectId=asyncMarketEAR.asyncMarketEJB.AuctionMgmtEJB auto-timer?:true persistent?:false 
+    timerService=org.jboss.as.ejb3.timerservice.TimerServiceImpl@d72fc25 
+    initialExpiration=null intervalDuration(in milli sec)=0 
+    nextExpiration=Tue Dec 04 23:08:50 EST 2018 timerState=IN_TIMEOUT info=null]
+23:08:40 [AuctionMgmtEJB] (EJB default-7) checking auctions
+23:08:40 [AuctionMgmtEJB] (EJB default-7) processed 0 active items
+23:08:50 [AuctionMgmtEJB] (EJB default-9) **** AuctionMgmtEJB init() ***
+23:08:50 [AuctionMgmtEJB] (EJB default-9) timerService=org.jboss.as.ejb3.timerservice.TimerServiceImpl@d72fc25
+23:08:50 [AuctionMgmtEJB] (EJB default-9) checkAuctionInterval=10000
+23:08:50 [AuctionMgmtEJB] (EJB default-9) timer fired: [id=02cbc8b5-0ddd-414e-b81d-59c7800371fd 
+    timedObjectId=asyncMarketEAR.asyncMarketEJB.AuctionMgmtEJB auto-timer?:true persistent?:false 
+    timerService=org.jboss.as.ejb3.timerservice.TimerServiceImpl@d72fc25 
+    initialExpiration=null intervalDuration(in milli sec)=0 
+    nextExpiration=Tue Dec 04 23:09:00 EST 2018 timerState=IN_TIMEOUT info=null]
+23:08:50 [AuctionMgmtEJB] (EJB default-9) checking auctions
+23:08:50 [AuctionMgmtEJB] (EJB default-9) processed 0 active items
+]]></programlisting>                        
+            </listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="async-methods-example-">
+        <title>Programmatic Calendar</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Client builds Calendar using ScheduleExpression</para>
+<programlisting language="java"><![CDATA[@EJB(beanInterface=AuctionMgmtLocal.class)
+private AuctionMgmt auctionMgmt;
+
+...
+ScheduleExpression schedule = new ScheduleExpression();
+schedule.second("*/10");
+schedule.minute("*");
+schedule.hour("*");
+schedule.dayOfMonth("*");
+schedule.month("*");
+schedule.year("*");
+auctionMgmt.initTimers(schedule);
+]]></programlisting>                        
+            </listitem>
+            <listitem><para>Server-side EJB method to initialize EJB Timer</para>
+<programlisting language="java"><![CDATA[public void initTimers(ScheduleExpression schedule) {
+    cancelTimers();
+    logger.debug("initializing timers, schedule={}", schedule);
+    timerService.createCalendarTimer(schedule, new TimerConfig("checkAuctionTimer", false));
+}
+]]></programlisting>                        
+            </listitem>
+            <listitem><para>Initialize Timers Cancels all other Timers - including declarative Timers</para>
+<programlisting language="java"><![CDATA[public void cancelTimers() {
+    logger.debug("canceling timers");
+    for (Timer timer : (Collection<Timer>)timerService.getTimers()) {
+        timer.cancel();
+    }
+}
+]]></programlisting>                        
+            </listitem>
+            <listitem><para>Server-side EJB method called back</para>
+<programlisting language="java"><![CDATA[@Timeout
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+public void execute(Timer timer) {
+    logger.info("timer fired: {}", timer);
+    try {
+        checkAuction();
+    }
+    catch (Exception ex) {
+        logger.error("error checking auction", ex);
+    }
+}
+]]></programlisting>                        
+            </listitem>
+            <listitem><para>Server-side output</para>
+<programlisting language="java"><![CDATA[23:20:00 [AuctionMgmtEJB] (EJB default-8) **** AuctionMgmtEJB init() ***
+23:20:00 [AuctionMgmtEJB] (EJB default-8) timerService=org.jboss.as.ejb3.timerservice.TimerServiceImpl@3ae3cbd8
+23:20:00 [AuctionMgmtEJB] (EJB default-8) checkAuctionInterval=10000
+23:20:00 [AuctionMgmtEJB] (EJB default-8) timer fired: [id=a68ba008-1020-49a6-a755-68bbaac4fae3 
+    timedObjectId=asyncMarketEAR.asyncMarketEJB.AuctionMgmtEJB auto-timer?:false persistent?:false 
+    timerService=org.jboss.as.ejb3.timerservice.TimerServiceImpl@3ae3cbd8 
+    initialExpiration=null intervalDuration(in milli sec)=0 
+    nextExpiration=Tue Dec 04 23:20:10 EST 2018 timerState=IN_TIMEOUT info=checkAuctionTimer]
+23:20:00 [AuctionMgmtEJB] (EJB default-8) checking auctions
+23:20:00 [AuctionMgmtEJB] (EJB default-8) processed 0 active items
+23:20:10 [AuctionMgmtEJB] (EJB default-6) **** AuctionMgmtEJB init() ***
+23:20:10 [AuctionMgmtEJB] (EJB default-6) timerService=org.jboss.as.ejb3.timerservice.TimerServiceImpl@3ae3cbd8
+23:20:10 [AuctionMgmtEJB] (EJB default-6) checkAuctionInterval=10000
+23:20:10 [AuctionMgmtEJB] (EJB default-6) timer fired: [id=a68ba008-1020-49a6-a755-68bbaac4fae3 
+    timedObjectId=asyncMarketEAR.asyncMarketEJB.AuctionMgmtEJB auto-timer?:false persistent?:false 
+    timerService=org.jboss.as.ejb3.timerservice.TimerServiceImpl@3ae3cbd8 
+    initialExpiration=null intervalDuration(in milli sec)=0 
+    nextExpiration=Tue Dec 04 23:20:20 EST 2018 timerState=IN_TIMEOUT info=checkAuctionTimer]
+23:20:10 [AuctionMgmtEJB] (EJB default-6) checking auctions
+23:20:10 [AuctionMgmtEJB] (EJB default-6) processed 0 active items
+23:20:20 [AuctionMgmtEJB] (EJB default-7) **** AuctionMgmtEJB init() ***
+23:20:20 [AuctionMgmtEJB] (EJB default-7) timerService=org.jboss.as.ejb3.timerservice.TimerServiceImpl@3ae3cbd8
+23:20:20 [AuctionMgmtEJB] (EJB default-7) checkAuctionInterval=10000
+23:20:20 [AuctionMgmtEJB] (EJB default-7) timer fired: [id=a68ba008-1020-49a6-a755-68bbaac4fae3 
+    timedObjectId=asyncMarketEAR.asyncMarketEJB.AuctionMgmtEJB auto-timer?:false persistent?:false 
+    timerService=org.jboss.as.ejb3.timerservice.TimerServiceImpl@3ae3cbd8 initialExpiration=null 
+    intervalDuration(in milli sec)=0 nextExpiration=Tue Dec 04 23:20:30 EST 2018 timerState=IN_TIMEOUT info=checkAuctionTimer]
+23:20:20 [AuctionMgmtEJB] (EJB default-7) checking auctions
+23:20:20 [AuctionMgmtEJB] (EJB default-7) processed 0 active items
+]]></programlisting>                        
+            </listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="async-methods-example-summary">
+        <title>Chapter Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Declarative EJB Timers are very simple to define</para></listitem>
+            <listitem><para>Programmatic EJB Timer methods provide for point-in-time control</para></listitem>
+        </itemizedlist>
+    </section>
+</chapter>
+  
