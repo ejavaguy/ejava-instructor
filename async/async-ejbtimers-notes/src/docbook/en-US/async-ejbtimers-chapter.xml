@@ -1,10 +1,10 @@
 <!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="async-methods-chapter">
+<chapter id="async-ejbtimers-chapter">
     <title>Chapter</title>
 
-    <section id="async-methods-chapter-">
+    <section id="async-ejbtimers-chapter-">
         <title></title>
         <itemizedlist spacing="compact">
             <listitem><para></para></listitem>
@@ -21,7 +21,7 @@
         </itemizedlist>
     </section>
 
-    <section id="async-methods-chapter-summary">
+    <section id="async-ejbtimers-chapter-summary">
         <title>Chapter Summary</title>
         <itemizedlist spacing="compact">
             <listitem><para></para></listitem>

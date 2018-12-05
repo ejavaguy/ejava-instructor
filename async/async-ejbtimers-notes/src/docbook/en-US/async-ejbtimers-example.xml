@@ -1,10 +1,10 @@
 <!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="async-methods-example">
+<chapter id="async-ejbtimers-example">
     <title>EJB Timers Example</title>
 
-    <section id="async-methods-example-declarative">
+    <section id="async-ejbtimers-example-declarative">
         <title>Declarative Calendar</title>
         <itemizedlist spacing="compact">
             <listitem><para>@Timeout callback method annotated with @Schedule</para>
@@ -59,7 +59,7 @@ public void execute(Timer timer) {
         </itemizedlist>
     </section>
 
-    <section id="async-methods-example-">
+    <section id="async-ejbtimers-example-">
         <title>Programmatic Calendar</title>
         <itemizedlist spacing="compact">
             <listitem><para>Client builds Calendar using ScheduleExpression</para>
@@ -143,7 +143,7 @@ public void execute(Timer timer) {
         </itemizedlist>
     </section>
 
-    <section id="async-methods-example-summary">
+    <section id="async-ejbtimers-example-summary">
         <title>Chapter Summary</title>
         <itemizedlist spacing="compact">
             <listitem><para>Declarative EJB Timers are very simple to define</para></listitem>
