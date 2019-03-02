@@ -3,7 +3,7 @@
     <parent>
         <groupId>info.ejava.docs.intro</groupId>
         <artifactId>intro</artifactId>
-        <version>5.0.0-SNAPSHOT</version>
+        <version>5.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>devenv-docbook</artifactId>

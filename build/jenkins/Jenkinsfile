@@ -1,0 +1,73 @@
+@Library('ejava-jenkinsfile') _
+
+pipeline {
+	agent {
+		kubernetes {
+			cloud 'rancher'
+			label 'ejava-docs-deploy'
+			yaml """
+apiVersion: v1
+kind: Pod
+metadata: 
+spec:
+  containers:
+  - name: maven
+    image: maven:3.6.1-jdk-8
+    resources:
+      limits: 
+        memory: "4Gi"
+      requests:
+        memory: "512Mi" 
+    command:
+    - cat
+    tty: true
+    namespace: jenkins
+"""
+		}
+	}
+    
+	
+	environment {
+        SETTINGS_XML = 'ejava-settings.xml'
+        MAVEN_OPTS='-Dmaven.wagon.http.ssl.allowall=true \
+                    -Dmaven.wagon.http.ssl.insecure=true'
+	}
+	
+	options {
+		timestamps()
+	}
+    triggers {
+        pollSCM('H/5 * * * *')
+    }
+
+	stages {
+        stage ('Setup Env') {
+            steps {
+                script {
+                    ifBranch('master', {
+                       env.MAVEN_PROFILES="-Pwebdev"
+                    }, {
+                       env.MAVEN_PROFILES="-Ptest-deploy"                    
+                    })
+                    echo "branch=$BRANCH_NAME, profiles=$MAVEN_PROFILES"
+                }
+                sshSetup()
+            }
+        }
+
+        stage ("Check out") {
+            steps {
+                checkout scm
+            }
+        }
+		
+		stage ('Build Docs and Deploy') {
+			steps {
+				echo 'Building ...'
+                mavenContainer {
+                    sh 'mvn clean deploy -s $MAVEN_SETTINGS_XML $MAVEN_PROFILES'
+                }
+			}
+		}
+	}
+}

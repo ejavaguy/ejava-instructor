@@ -3,7 +3,7 @@
     <parent>
         <groupId>info.ejava.docs.jpa</groupId>
         <artifactId>business-logic</artifactId>
-        <version>5.0.0-SNAPSHOT</version>
+        <version>5.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>business-logic-notes</artifactId>
