@@ -65,7 +65,7 @@ spec:
 			steps {
 				echo 'Building ...'
                 mavenContainer {
-                    sh 'mvn clean deploy -s $MAVEN_SETTINGS_XML $MAVEN_PROFILES'
+                    sh 'mvn clean deploy -T 1.5C -s $MAVEN_SETTINGS_XML $MAVEN_PROFILES'
                 }
 			}
 		}
