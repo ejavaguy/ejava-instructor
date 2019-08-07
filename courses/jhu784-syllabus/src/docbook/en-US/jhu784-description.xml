@@ -9,7 +9,7 @@
         <title>Meeting Times/Location</title>
         <itemizedlist spacing="compact">
             <listitem><para>Wednesdays, 4:30-7:10pm</para></listitem>
-            <listitem><para>APL, K1</para></listitem>
+            <listitem><para>APL, TBD</para></listitem>
         </itemizedlist>
     </section>
 
@@ -29,8 +29,8 @@
        </para>
         <itemizedlist spacing="compact">
             <listitem><para>
-            Implement a data access tier to a relational database using Java Persistence API (JPA), 
-            Java Database Connectivity (JDBC) API, and variety of data modeling and access patterns.</para></listitem>
+            Implement a data access tier to a relational database using Java Persistence API (JPA) 
+            and variety of data modeling and access patterns.</para></listitem>
 
             <listitem><para>
             Implement synchronous and asynchronous server-side business logic using stateless and stateful session EJBs, 
@@ -43,7 +43,7 @@
         </itemizedlist>
        
        <para>
-            Other critical Java EE infrastructure services will be discussed, including the 
+            Other critical Java SE/EE infrastructure services will be discussed, including the Java Database Connectivity (JDBC) API,
             Java Naming and Directory Interface (JNDI), the Java Message Service (JMS), the Java Transaction (JTA) API, 
             and Java EE security.
 
@@ -53,10 +53,9 @@
         </para>
 
         <para>
-            The course is being actively updated to JavaEE 8 (JPA 2.2, EJB 3.2, JAX-RS 2.1, and JMS 2.0)
-            but a few order APIs and legacy examples remain. The development environment used in class
-            is based on the Wildfly application server and is JavaSE 8 and JavaEE 7-compliant with the ability to 
-            preview some JavaEE 8-specific features.
+            The course is being actively updated to JavaEE 8 (JPA 2.2, EJB 3.2, JAX-RS 2.1, and JMS 2.0) and JDK 11
+            but a few order APIs and legacy examples remain for demonstration purposes. The development environment 
+            used in class is based on the Wildfly application server and is JDK 11 and JavaEE 8-compliant.
         </para>
     </section>
 
@@ -79,38 +78,16 @@
 
     <section id="jhu784-texts-optional">
         <title>Course Text(s)</title>
-        <section id="jhu784-texts-recommended">
-            <title>Optional Text(s)</title>
-            <para>The following is a list of optional texts that are pertinent to the course material but 
-            are not necessary for you to own. The course examples, notes, and free Internet resources
-            for this course are plentiful.</para>
-            <itemizedlist spacing="compact">
-	            <listitem><para>
-	            <ulink url="http://oreilly.com/catalog/9780596158033/preview#preview"><emphasis>"Enterprise Java Beans 3.1, 6th Edition"</emphasis></ulink>, 
-	            Andrew Lee Rubinger and Bill Burke, 2010, O'Reilly, ISBN-10: 0596158025; ISBN-13: 978-0596158026 
-	            </para>
-                </listitem>
-
-               <listitem><para>A Servlet/JSP Text</para>
-                    <itemizedlist spacing="compact">
-                        <listitem><para>
-                        <ulink url="http://pdf.coreservlets.com/"><emphasis>"Core Servlets and JavaServer Pages (JSP)"</emphasis></ulink>, 
-                        Marty Hall and Larry Brown, 2003, Prentice Hall PTR; ISBN 0130092290 
-                        </para>
-                        </listitem>
-                    </itemizedlist>
-                </listitem>
-            </itemizedlist>
-        </section>
+        <para>The course uses no mandatory texts. The course examples and notes for this course and free Internet resources are plentiful.</para>
     </section>
         
     <section id="jhu784-required-software">
         <title>Required Software</title>
         <para>
             This course will make heavy use of development tools
-            (Git, Maven 3, JUnit, SLF/Log4j, and Eclipse), a database 
+            (JDK 11, Git, Maven 3, JUnit, SLF/Log4j, and Eclipse), a database 
             (H2 Database Engine), JPA persistence provider
-            (Hibernate), and application server (JBoss/Wildfly 13). 
+            (Hibernate), and application server (JBoss/Wildfly 17). 
             Students are required to establish a local
             development environment. Detailed instructions for setup are
             part of the first exercise (Development Environment Setup).
@@ -120,13 +97,9 @@
     <section id="jhu784-references">
         <title>References</title>
         <para>
-            The core of the EJB 3.2 content is covered in the EJB text for 
-            the course (and competing texts as well as online). Associated 
-            topics (database schema, JDBC, Web Tier, JMS, and tools) are not 
-            covered in the course text, but documentation will be provided 
-            through course slides, examples, and tutorials. A list of online 
-            references can be found on this site. Each lecture will supply a 
-            list of references for that technical area.            
+            Documentation will be provided through course slides, examples, 
+            and tutorials.  Each lecture will supply a 
+            list of links for that technical area.            
         </para>
     </section>
 
@@ -202,7 +175,7 @@
             </listitem>
             <listitem>
                 <para>
-                    There will be one required project startup/sanity check submission
+                    There will be one required "project startup/sanity check" submission
                     and will be primarily graded on a done/not-done basis.
                     The intent of this requirement is to promote early, more-focused
                     productivity and exchange of artifacts between the 
@@ -268,7 +241,8 @@
             You can get individual, non-technical questions 
             answered via <ulink url="mailto:jim.stafford@jhu.edu">e-mail</ulink>. 
             It is very common for me to ask for a copy of your broken project so that I can provide
-            more analysis and precise feedback.
+            more analysis and precise feedback. This is commonly transmitted either as an attachment
+            to the e-mail or a link to an archive in GoogleDocs.
             Students needing further assistance are also welcome 
             make other arrangements during the week or schedule a web meeting using <ulink url="https://jhu.zoom.us/">Zoom Conferencing</ulink>.
         </para>

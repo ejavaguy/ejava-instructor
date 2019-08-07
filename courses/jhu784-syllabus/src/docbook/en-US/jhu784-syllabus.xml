@@ -23,12 +23,11 @@
         
             <row rowsep="1">
                <entry namest="session">1</entry>
-               <entry namest="date">Aug29</entry>
+               <entry namest="date">Aug28</entry>
                <entry namest="topic"><para>Course Introduction</para></entry>
             </row>
             <row rowsep="1">
                <entry namest="topic"><para><link linkend="javaee-intro">Enterprise Java (JavaEE) Introduction</link></para></entry>
-               <entry namest="comment"><para>Rubinger &amp; Burke: Ch 1-4</para></entry>
             </row>
             <row rowsep="1">
               <entry namest="comment"><para><ulink url="../html/jhu784-devenv-setup.html">Exercise: Development Environment Setup</ulink></para></entry>
@@ -39,7 +38,7 @@
             
             <row rowsep="1">
               <entry namest="session">2</entry>
-              <entry namest="date">Sep05</entry>
+              <entry namest="date">Sep04</entry>
               <entry namest="topic"><para><link linkend="devenv">Development Environment Overview</link></para></entry>
             </row>
             <row rowsep="1">
@@ -48,27 +47,21 @@
 
             <row rowsep="1">
                <entry namest="session">3</entry>
-               <entry namest="date">Sep12</entry>
+               <entry namest="date">Sep11</entry>
                <entry namest="topic"><para><link linkend="jpa-dao">Data Access Objects (DAOs)</link></para></entry>
             </row>
             <row rowsep="1">
               <entry namest="topic"><para><link linkend="jpa-entitymgr">JPA Entity Manager</link></para></entry>
-              <entry namest="comment"><para>Rubinger &amp; Burke: Ch 9</para></entry>
-            </row>
-            <row rowsep="1">
               <entry namest="comment"><para><ulink url="../html/jpa-entitymgr-ex.html">Exercise: Entity Manager Exercise</ulink></para></entry>
             </row>
             <row rowsep="1">
-              <entry namest="comment"><para>Project 0 Startup/Sanity Check due by Sun, 8am Sep21</para></entry>
+              <entry namest="comment"><para>Project 0 Startup/Sanity Check due by Sun, 8am Sep22</para></entry>
             </row>
 
             <row rowsep="1">
               <entry namest="session">4</entry>
-              <entry namest="date">Sep19</entry>
+              <entry namest="date">Sep18</entry>
               <entry namest="topic"><para><link linkend="jpa-entity">JPA Core Entity Mapping</link></para></entry>
-              <entry namest="comment"><para>Rubinger &amp; Burke: Ch 10</para></entry>
-            </row>
-            <row rowsep="1">
               <entry namest="comment"><para><ulink url="../html/jpa-entity-ex.html">Exercise: Entity Mapping Exercise</ulink></para></entry>
             </row>
             <row rowsep="1">
@@ -76,51 +69,39 @@
             </row>
 
             <row rowsep="1">
-              <entry namest="session">5 *NO CLASS* Online Lecture</entry>
-              <entry namest="date">Sep26</entry>
+              <entry namest="session">5</entry>
+              <entry namest="date">Sep25</entry>
               <entry namest="topic"><para><link linkend="jpa-relation">JPA Relationships</link></para></entry>
-              <entry namest="comment"><para>Rubinger &amp; Burke: Ch 11</para></entry>
-            </row>
-            <row rowsep="1">
               <entry namest="comment"><para><ulink url="../html/jpa-relationex.html">Exercise: Relationship Mapping Exercise</ulink></para></entry>
             </row>
             <row rowsep="1">
               <entry namest="topic"><para><link linkend="jpa-inheritance">JPA Inheritance</link></para></entry>
-              <entry namest="comment"><para>Rubinger &amp; Burke: Ch 12</para></entry>
             </row>
 
             <row rowsep="1">
               <entry namest="session">6</entry>
-              <entry namest="date">Oct03</entry>
+              <entry namest="date">Oct02</entry>
               <entry namest="topic"><para><link linkend="jpa-query">JPA Query (Queries, JPAQL, &amp; Criteria API)</link></para></entry>
-              <entry namest="comment"><para>Rubinger &amp; Burke: Ch 13</para></entry>
-            </row>
-            <row rowsep="1">
               <entry namest="comment"><para><ulink url="../html/jpa-queryex.html">Exercise: JPA Query Exercise</ulink></para></entry>
             </row>
-                <!-- 
             <row rowsep="1">
-              <entry namest="comment">Project 1 - due by Sun, 8am Oct14</entry>
-              <entry namest="comment"><link linkend="esport-project1-part">Project 1</link> due by Sun, 8am Oct14</entry>
+              <!--
+              <entry namest="comment">Project 1 - due by Sun, 8am Oct13</entry>
+              -->
+              <entry namest="comment"><link linkend="edatashare-project1-part">Project 1</link> due by Sun, 8am Oct14</entry>
             </row>
-                 -->
             <row rowsep="1">
               <entry namest="topic"><para><link linkend="jpa-tuning">JPA/SQL Tuning</link></para></entry>
             </row>
 
             <row rowsep="1">
-                <entry namest="session">7</entry>
-                <entry namest="date">Oct10</entry>
+                <entry namest="session">7 *NO CLASS* Online Meetups</entry>
+                <entry namest="date">Oct09</entry>
                 <entry namest="topic"><para>Project 1 Topics</para></entry>
-                <entry namest="comment"><link linkend="esport-project1-part">Project 1</link> preview due by Sun, 8am Oct14*</entry>
-            </row>
-            <row rowsep="1">
-                <entry namest="comment"><link linkend="esport-project1-part">Project 1</link> officially due by Sun, 8am Oct21*</entry>
             </row>
         </tbody>
         </tgroup>
     </table>    
-    <para>* One week extension only applies if preview is turned in by due date and 1:1 session completed.</para>
 
 
     <table>
@@ -141,33 +122,23 @@
         <tbody>
             <row rowsep="1">
                 <entry namest="session">8</entry>
-                <entry namest="date">Oct17</entry>
-                <entry namest="topic"><para>Project 1 Topics</para></entry>
-            </row>
-            <row rowsep="1">
+                <entry namest="date">Oct16</entry>
                 <entry namest="topic"><para><link linkend="ejb-intro">EJB Introduction</link></para></entry>
-                <entry namest="comment"><para>Rubinger &amp; Burke: Ch 5-7</para></entry>
             </row>
             <row rowsep="1">
+                <entry namest="topic"><para><link linkend="ejb-dev">EJB Development Scenarios</link></para></entry>
                 <entry namest="comment"><para><ulink url="../html/ejb-basic-lab.html">Exercise: Basic EJB Development</ulink></para></entry>
             </row>
             
             <row rowsep="1">
                 <entry namest="session">9</entry>
-                <entry namest="date">Oct24</entry>
+                <entry namest="date">Oct23</entry>
             </row>
             <row rowsep="1">
                 <entry namest="topic"><para><link linkend="ejb-basic">Basic Session EJB</link></para></entry>
             </row>
             <row rowsep="1">
-                <entry namest="topic"><para><link linkend="ejb-dev">EJB Development Scenarios</link></para></entry>
-            </row>
-            <row rowsep="1">
                 <entry namest="topic"><para><link linkend="enc-config">Configuring EJBs using ENC and JNDI</link></para></entry>
-                <!--
-                <entry namest="comment"><para><ulink url="../html/encconfig-lab.html">Exercise: JNDI/ENC Configuration</ulink></para></entry>
-                -->
-                <entry namest="comment"><para>Rubinger &amp; Burke: Ch 16</para></entry>
             </row>
             <row>
                 <entry namest="topic"><para><link linkend="cdi-config">Configuring EJBs using CDI</link></para></entry>
@@ -176,9 +147,8 @@
 
             <row rowsep="1">
                 <entry namest="session">10</entry>
-                <entry namest="date">Oct31</entry>
+                <entry namest="date">Oct30</entry>
             </row>
-
             <row rowsep="1">
                 <entry namest="topic"><para><link linkend="ejb-jpa">EJB/Server-Side JPA Topics</link></para></entry>
                 <entry namest="comment"><para><ulink url="../html/ejb-jpa-lab.html">Exercise: JPA/EJB Remote Interfaces</ulink></para></entry>
@@ -188,18 +158,14 @@
                 <!--
                 <entry namest="topic"><para><link linkend="ejb-tx">EJB Transactions</link> <ulink url="../ppt/javaeeTransactions.ppt">slides</ulink></para></entry>
                 -->
-                <entry namest="comment"><para>Rubinger &amp; Burke: Ch 17</para></entry>
             </row>
 
             <row rowsep="1">
                 <entry namest="session">11</entry>
-                <entry namest="date">Nov07</entry>
+                <entry namest="date">Nov06</entry>
             </row>
             <row rowsep="1">
                 <entry namest="topic"><para><link linkend="ejb-jaxrs">Web-enabled EJBs with JAX-RS</link></para></entry>
-                <!--
-                <entry namest="topic"><para>Web-enabled EJBs with JAX-RS</para></entry>
-                -->
             </row>
             <row rowsep="1">
                 <entry namest="topic"><para>Web-UI integration</para></entry>
@@ -209,12 +175,15 @@
             </row>
 
             <row rowsep="1">
-              <entry namest="comment"><link linkend="esport-project2-part">Project 2</link> due by Sun, 8am Nov18</entry>
+              <!--
+              <entry namest="comment">Project 2</link> due by Sun, 8am Nov17</entry>
+              -->
+              <entry namest="comment"><link linkend="edatashare-project2-part">Project 2</link> due by Sun, 8am Nov17</entry>
             </row>
 
             <row rowsep="1">
                 <entry namest="session">***</entry>
-                <entry namest="date">Nov09</entry>
+                <entry namest="date">Nov08</entry>
                 <entry namest="topic"><para>EP Drop/Audit Deadline</para></entry>
                 <entry namest="comment"><para><ulink url="https://ep.jhu.edu/student-services/academic-services/academic-calendar">
                 EP Acedemic Calendar</ulink></para></entry>
@@ -242,11 +211,10 @@
         <tbody>
             <row rowsep="1">
                 <entry namest="session">12</entry>
-                <entry namest="date">Nov14</entry>
+                <entry namest="date">Nov13</entry>
             </row>
             <row rowsep="1">
                 <entry namest="topic"><para><link linkend="ejb-security">EJB/JavaEE Security</link></para></entry>
-                <entry namest="comment"><para>Rubinger &amp; Burke: Ch 15</para></entry>
             </row>
             <row rowsep="1">
                 <entry namest="session"/>
@@ -254,24 +222,23 @@
             </row>
 
             <row rowsep="1">
-                <entry namest="session"></entry>
-                <entry namest="date">Nov21</entry>
-                <entry namest="topic">Thanksgiving Break (no class)</entry>
-            </row>
-            
-            
-            <row rowsep="1">
                 <entry namest="session">13</entry>
-                <entry namest="date">Nov28</entry>
+                <entry namest="date">Nov20</entry>
             </row>
             <row rowsep="1">
                 <entry namest="topic"><para><link linkend="async-jms20">JMS</link></para></entry>
-                <entry namest="comment"><para>Rubinger &amp; Burke: Ch 8 &amp; 19</para></entry>
+            </row>
+            
+            
+            <row rowsep="1">
+                <entry namest="session"></entry>
+                <entry namest="date">Nov28</entry>
+                <entry namest="topic">Thanksgiving Break (no class)</entry>
             </row>
 
             <row rowsep="1">
                 <entry namest="session">14</entry>
-                <entry namest="date">Dec05</entry>
+                <entry namest="date">Dec04</entry>
             </row>
             <row rowsep="1">
                 <entry namest="session"/>
@@ -282,7 +249,10 @@
                 <entry namest="topic"><para><link linkend="async-ejbtimers">EJB Timers</link></para></entry>
             </row>
             <row rowsep="1">
-              <entry namest="comment"><link linkend="esport-project3-part">Project 3</link> due by Sun, 5pm Dec09</entry>
+              <!--
+              <entry namest="comment">Project 3</link> due by Sun, 5pm Dec09</entry>
+              -->
+              <entry namest="comment"><link linkend="edatashare-project3-part">Project 3</link> due by Sun, 5pm Dec09</entry>
             </row>
 
                 <!--

@@ -153,7 +153,7 @@
                 Projects must build using 
                 <ulink url="http://maven.apache.org/">Maven 3</ulink>. 
                 <ulink url="http://ant.apache.org/">Ant</ulink> will be used late in the semester 
-                to wrap any interactive commands (e.g., launch JavaSE JMS subscriber)
+                to wrap any JavaSE commands with classpaths
                 </para></listitem>
             <listitem><para>
                 All projects must be portable to build and deploy within grader and
@@ -161,7 +161,7 @@
                 feedback (not early content grading feedback).
                 </para></listitem>
             <listitem><para>
-                Test Cases must be written using JUnit or another unit test frameworks that
+                Test Cases must be written using JUnit or another Java-based unit test framework that
                 will run within a Maven surefire and failsafe environments.
                 </para></listitem>
             <listitem><para>
