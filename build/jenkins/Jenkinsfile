@@ -12,7 +12,7 @@ metadata:
 spec:
   containers:
   - name: maven
-    image: maven:3.6.1-jdk-8
+    image: maven:3.6.1-jdk-11
     resources:
       limits: 
         memory: "4Gi"
