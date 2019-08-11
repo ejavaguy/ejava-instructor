@@ -6,11 +6,11 @@
     <title>JBoss (Wildfly) Setup</title>    
     <para>
         We will be using the JBoss/Wildfly Application Server this semester. This is a fully-compliant
-        JavaEE 7 application server that includes a preview mode for JavaEE 8.
+        JavaEE 8 application server.
     </para>
     <note>
         <title>JBoss Application Server/Wildfly (AS) and JBoss Enterprise Application Platform (EAP)</title>
-        <para>JBoss has a community version (formerly call JBoss AS - renamed Wildfly ~2012) and 
+        <para>JBoss has a community version (formerly called JBoss AS - renamed Wildfly ~2012) and 
             commercial version (JBoss EAP) of 
             their JavaEE application server. Both are open source and built off the same code base. 
             In theory, changes propagate through the community version first in daily changes and 
@@ -35,20 +35,20 @@
     </note>
 
     <section id="devenv-jboss-install">
-        <title>Download and Install Wildfly 13.0.0.Final</title>
+        <title>Download and Install Wildfly 17.0.1.Final</title>
         <orderedlist spacing="compact">
-            <listitem><para>Download Wildfly 13.0.0.Final
-                <ulink url="http://www.wildfly.org/downloads/">http://www.wildfly.org/downloads/</ulink>.
+            <listitem><para>Download Wildfly 17.0.1.Final
+                <ulink url="https://www.wildfly.org/downloads/">https://www.wildfly.org/downloads/</ulink>.
                 The 'Quickstarts' examples are also helpful but class notes, exercises, and guidance
-                may have simplified, generalized, or alternative approaches to what is contained in the guides.</para>
+                may have simplified or alternative approaches to what is contained in the guides.</para>
             </listitem>
             <listitem>
                 <para>
                     Install JBoss into a directory that does not have any spaces in its path.
                 </para>
-                <programlisting><![CDATA[$ unzip ~/Downloads/wildfly-13.0.0.Final.zip                
+                <programlisting><![CDATA[$ unzip ~/Downloads/wildfly-17.0.1.Final.zip                
                 
-$ ls wildfly-13.0.0.Final/
+$ ls wildfly-17.0.1.Final/
 appclient  bin  copyright.txt  docs  domain  jboss-modules.jar  LICENSE.txt  modules  README.txt  standalone  welcome-content
 ]]></programlisting>                        
             </listitem>
@@ -57,28 +57,27 @@ appclient  bin  copyright.txt  docs  domain  jboss-modules.jar  LICENSE.txt  mod
                     Test the installation by starting the default
                     configuration installation.
                 </para>
-                <programlisting><![CDATA[$ ./wildfly-13.0.0.Final/bin/standalone.sh
+                <programlisting><![CDATA[$ ./wildfly-17.0.1.Final/bin/standalone.sh
 =========================================================================
 
   JBoss Bootstrap Environment
 
-  JBOSS_HOME: /opt/wildfly-13.0.0.Final
+  JBOSS_HOME: /opt/wildfly-17.0.1.Final
 
   JAVA: java
 
-  JAVA_OPTS:  -server -Xms64m -Xmx512m -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.byteman -Djava.awt.headless=true
+  JAVA_OPTS:  -server -Xms64m -Xmx512m -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.byteman -Djava.awt.headless=true  --add-exports=java.base/sun.nio.ch=ALL-UNNAMED --add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED --add-exports=jdk.unsupported/sun.reflect=ALL-UNNAMED
 
 =========================================================================
 
-12:09:04,979 INFO  [org.jboss.modules] (main) JBoss Modules version 1.8.5.Final
-12:10:29,008 INFO  [org.jboss.msc] (main) JBoss MSC version 1.4.2.Final
-12:10:29,051 INFO  [org.jboss.threads] (main) JBoss Threads version 2.3.2.Final
-12:10:29,319 INFO  [org.jboss.as] (MSC service thread 1-2) WFLYSRV0049: WildFly Full 13.0.0.Final (WildFly Core 5.0.0.Final) starting
-...
-
-12:10:56,481 INFO  [org.jboss.as] (Controller Boot Thread) WFLYSRV0060: Http management interface listening on http://127.0.0.1:9990/management
-12:10:56,483 INFO  [org.jboss.as] (Controller Boot Thread) WFLYSRV0051: Admin console listening on http://127.0.0.1:9990
-12:10:56,486 INFO  [org.jboss.as] (Controller Boot Thread) WFLYSRV0025: WildFly Full 13.0.0.Final (WildFly Core 5.0.0.Final) started in 46320ms - Started 290 of 511 services (308 services are lazy, passive or on-demand)
+17:37:03,254 INFO  [org.jboss.modules] (main) JBoss Modules version 1.9.1.Final
+17:37:04,270 INFO  [org.jboss.msc] (main) JBoss MSC version 1.4.8.Final
+17:37:04,292 INFO  [org.jboss.threads] (main) JBoss Threads version 2.3.3.Final
+17:37:04,558 INFO  [org.jboss.as] (MSC service thread 1-1) WFLYSRV0049: WildFly Full 17.0.1.Final (WildFly Core 9.0.2.Final) starting
+...                
+17:37:11,257 INFO  [org.jboss.as] (Controller Boot Thread) WFLYSRV0060: Http management interface listening on http://127.0.0.1:9990/management
+17:37:11,259 INFO  [org.jboss.as] (Controller Boot Thread) WFLYSRV0051: Admin console listening on http://127.0.0.1:9990
+17:37:11,259 INFO  [org.jboss.as] (Controller Boot Thread) WFLYSRV0025: WildFly Full 17.0.1.Final (WildFly Core 9.0.2.Final) started in 8842ms - Started 314 of 576 services (369 services are lazy, passive or on-demand)
 ]]></programlisting>
                 <note>
                     <para>There are .sh version of scripts for *nix platforms
@@ -103,35 +102,31 @@ appclient  bin  copyright.txt  docs  domain  jboss-modules.jar  LICENSE.txt  mod
             <listitem><para>Shutdown the server using Control-C</para></listitem>
             <listitem><para>Copy over the class example server files from what 
                 you cloned and built from github earlier.</para>
-<programlisting language=""><![CDATA[$ cd wildfly-13.0.0.Final
+<programlisting language=""><![CDATA[$ cd wildfly-17.0.1.Final
 
-wildfly-13.0.0.Final]$ unzip -l .../ejava-student/servers/ejava-wildfly1300/target/ejava-wildfly1300-5.0.0-SNAPSHOT-server.zip 
-Archive:  /home/jim/workspaces/ejava-class/ejava-student2/servers/ejava-wildfly1300/target/ejava-wildfly1300-5.0.0-SNAPSHOT-server.zip
-  Length      Date    Time    Name
----------  ---------- -----   ----
-        0  08-13-2018 12:21   domain/
-        0  08-13-2018 12:21   domain/configuration/
-        0  08-13-2018 12:21   standalone/
-        0  08-13-2018 12:21   standalone/configuration/
-     1774  08-13-2018 12:21   domain/configuration/application-roles.properties
-     2402  08-13-2018 12:21   domain/configuration/application-users.properties
-    37888  08-13-2018 12:21   standalone/configuration/standalone.xml
-     1774  08-13-2018 12:21   standalone/configuration/application-roles.properties
-     1190  08-13-2018 12:21   standalone/configuration/server.keystore
-     2490  08-13-2018 12:21   standalone/configuration/application-users.properties
-      575  08-13-2018 12:21   standalone/configuration/server.cer
----------                     -------
-    48093                     11 files
-
-wildfly-13.0.0.Final]$ unzip .../ejava-student/servers/ejava-wildfly1300/target/ejava-wildfly1300-5.0.0-SNAPSHOT-server.zip
-Archive:  .../ejava-student2/servers/ejava-wildfly1300/target/ejava-wildfly1300-5.0.0-SNAPSHOT-server.zip
-replace domain/configuration/application-roles.properties? [y]es, [n]o, [A]ll, [N]one, [r]ename: A
-  inflating: domain/configuration/application-roles.properties  
-...
+wildfly-17.0.1.Final]$ unzip .../ejava-student/servers/ejava-wildfly1701/target/ejava-wildfly1701-5.1.0-SNAPSHOT-server.zip
+Archive:  .../ejava-student/servers/ejava-wildfly1701/target/ejava-wildfly1701-5.1.0-SNAPSHOT-server.zip
+replace standalone/configuration/application-roles.properties? [y]es, [n]o, [A]ll, [N]one, [r]ename: A
+  inflating: standalone/configuration/application-roles.properties
+  inflating: standalone/configuration/application-users.properties
+  inflating: standalone/configuration/application.keystore
+  inflating: standalone/configuration/standalone.xml
+  inflating: domain/configuration/application-roles.properties
+  inflating: domain/configuration/application-users.properties
 ]]></programlisting>
             </listitem>
             <listitem><para>Restart the server</para></listitem>
         </orderedlist>        
+
+        <note>
+            <title>Artemis Logging Initialization Error</title>
+            <para>There is a bug within the Artemis JMS logging initialization that requires an upgrade
+               of that software to fix. I have seen the error on Windows but not on *Nix systems.
+               It is activated when we added the ejava class configuration files because the class
+               configuration adds JMS -- which is not part of the standard configuration.</para>
+<programlisting><![CDATA[18:13:50,363 WARN  [org.apache.activemq.artemis.core.server] (ServerService Thread Pool -- 82) AMQ222277: Problem initializing automatic logging configuration reload for file:c:\apps\wildfly-17.0.1.Final\standalone\configuration/logging.properties: java.net.URISyntaxException: Illegal character in opaque part at index 7: file:c:\apps\wildfly-17.0.1.Final\standalone\configuration/logging.properties
+]]></programlisting>
+        </note>
     </section>
     
     <section id="add-jboss-admin">
@@ -147,32 +142,37 @@ replace domain/configuration/application-roles.properties? [y]es, [n]o, [A]ll, [
                 user credentials when the client executes on the same 
                 machine by the same user that started the server.
                 </para>
-<programlisting><![CDATA[ejava-student]$ egrep 'jboss.user|jboss.password' build/dependencies/pom.xml
-        <jboss.user>admin</jboss.user>
-        <jboss.password>password1!</jboss.password>
+<programlisting><![CDATA[ejava-student]$ egrep 'jboss.user|jboss.password' -R build
+build/ejava-build-parent/pom.xml:        <jboss.user>admin</jboss.user>
+build/ejava-build-parent/pom.xml:        <jboss.password>password1!</jboss.password>
 ]]></programlisting>
                 <programlisting><![CDATA[$ ./bin/add-user.sh 
 
-What type of user do you wish to add? 
- a) Management User (mgmt-users.properties) 
+What type of user do you wish to add?
+ a) Management User (mgmt-users.properties)
  b) Application User (application-users.properties)
-(a): 
+(a):
 
 Enter the details of the new user to add.
 Using realm 'ManagementRealm' as discovered from the existing property files.
 Username : admin
-User 'admin' already exists and is disabled, would you like to... 
- a) Update the existing user password and roles 
- b) Enable the existing user 
+User 'admin' already exists and is disabled, would you like to...
+ a) Update the existing user password and roles
+ b) Enable the existing user
  c) Type a new username
 (a): a
-
-What groups do you want this user to belong to? (Please enter a comma separated list, or leave blank for none)[  ]: 
-Updated user 'admin' to file '/opt/wildfly-13.0.0.Final/standalone/configuration/mgmt-users.properties'
-Updated user 'admin' to file '/opt/wildfly-13.0.0.Final/domain/configuration/mgmt-users.properties'
-Updated user 'admin' with groups  to file '/opt/wildfly-13.0.0.Final/standalone/configuration/mgmt-groups.properties'
-Updated user 'admin' with groups  to file '/opt/wildfly-13.0.0.Final/domain/configuration/mgmt-groups.properties'
-Is this new user going to be used for one AS process to connect to another AS process? 
+Password recommendations are listed below. To modify these restrictions edit the add-user.properties configuration file.
+ - The password should be different from the username
+ - The password should not be one of the following restricted values {root, admin, administrator}
+ - The password should contain at least 8 characters, 1 alphabetic character(s), 1 digit(s), 1 non-alphanumeric symbol(s)
+Password :
+Re-enter Password :
+What groups do you want this user to belong to? (Please enter a comma separated list, or leave blank for none)[  ]:
+Updated user 'admin' to file '/opt/wildfly-17.0.1.Final/standalone/configuration/mgmt-users.properties'
+Updated user 'admin' to file '/opt/wildfly-17.0.1.Final/domain/configuration/mgmt-users.properties'
+Updated user 'admin' with groups  to file '/opt/wildfly-17.0.1.Final/standalone/configuration/mgmt-groups.properties'
+Updated user 'admin' with groups  to file '/opt/wildfly-17.0.1.Final/domain/configuration/mgmt-groups.properties'
+Is this new user going to be used for one AS process to connect to another AS process?
 e.g. for a slave host controller connecting to the master or for a Remoting connection for server to server EJB calls.
 yes/no? no
 ]]></programlisting>                        
@@ -266,16 +266,16 @@ Listening for transport dt_socket at address: 8000
                 </para>
                 <programlisting language="xml"><![CDATA[
         <profile>
-            <id>wildfly13</id>
+            <id>wildfly17</id>
             <properties>
                 <jboss.host>127.0.0.2</jboss.host>
-                <jboss.home>/opt/wildfly-13.0.0.Final</jboss.home>
+                <jboss.home>/opt/wildfly-17.0.1.Final</jboss.home>
             </properties>
         </profile>
     </profiles>
         ...
     <activeProfiles>
-        <activeProfile>wildfly13</activeProfile>
+        <activeProfile>wildfly17</activeProfile>
         <activeProfile>h2db</activeProfile>
     </activeProfiles>
 </settings>

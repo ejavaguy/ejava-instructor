@@ -4,8 +4,22 @@
 <chapter id="devenv-jdk-setup">
     <title>Java JDK Setup</title>
     <para>
-        You will need a copy of Java 8 SDK installed. 
+        You will need a JDK 11 installed. 
     </para>
+    <para>
+        Although most of the source code and maven modules used in class are backwards 
+        compatible with JDK 8, the modules and the build system around it have been
+        migrated to JDK 11.  There are a few changes between JDK 8 and JDK 11 that will
+        make flipping between the two difficult. Therefore target JDK 11 for use in class.
+    </para>
+    <itemizedlist spacing="compact">
+        <listitem><para>Removal of JavaEE APIs from JavaSE requiring additional dependencies for the JDK 11 classpath
+            </para></listitem>
+        <listitem><para>Command line changes to the JDK that require custom maven-compiler-plugin configuration
+            </para></listitem>
+        <listitem><para>Oracle JDK no longer free for commercial use. Suitable alternate is OpenJDK.
+            </para></listitem>
+    </itemizedlist>
     <note>
         <title>Keep 32/64-bit choices consistent</title>
         <para>
@@ -15,83 +29,32 @@
     </note>
 
     <section id="devenv-jdk-install">
-        <title>Download and Install JDK</title>
+        <title>Download and Install JDK 11</title>
         <itemizedlist spacing="compact">
-            <listitem>
-                <para>
-                    Linux Users: I normally would say OpenJDK will work fine
-                    for class but I have found that early versions of OpenJDK 8 were lagging
-                    behind in some SSL/encryption support that makes communicating
-                    with remote servers using HTTPS an issue. Do yourself a favor
-                    and go with Oracle JDK 8 (latest) by downloading the rpm from their
-                    site and installing.
-                    <ulink url="http://www.oracle.com/technetwork/java/javase/downloads/index.html">http://www.oracle.com/technetwork/java/javase/downloads/index.html</ulink>
-<programlisting language=""><![CDATA[# Fedora example
-$ sudo rpm -ih jdk-8u181-linux-x64.rpm
-$ sudo alternatives --config java
-
-There are 3 programs which provide 'java'.
-
-  Selection    Command
------------------------------------------------
-*  1           /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.65-3.b17.fc21.x86_64/jre/bin/java
- + 2           /usr/java/jdk1.8.0_60/jre/bin/java
-   3           /usr/java/jdk1.8.0_181-amd64/jre/bin/java
-
-Enter to keep the current selection[+], or type selection number: 3
-
-$ sudo alternatives --config javac
-
-There are 3 programs which provide 'javac'.
-
-  Selection    Command
------------------------------------------------
-*+ 1           /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.65-3.b17.fc21.x86_64/bin/javac
-   2           /usr/java/jdk1.8.0_60/bin/javac
-   3           /usr/java/jdk1.8.0_181-amd64/bin/javac
-Enter to keep the current selection[+], or type selection number: 3   
-]]></programlisting>
-                </para>
-            </listitem>
-            <listitem>
-                <para>
-                    Windows Users: Install the Java 8 JDK from Sun/Oracle
-                </para>
-                <orderedlist spacing="compact">
-                    <listitem>
-                        <para>
-                            Download a copy of the Java 8 JDK
-                            <ulink url="http://www.oracle.com/technetwork/java/javase/downloads/index.html">http://www.oracle.com/technetwork/java/javase/downloads/index.html</ulink>.
-                            Choose Java SE 8 (latest) JDK. We will only be using the
-                            JDK portion in class so avoid the alternate downloads that add in the
-                            Glassfish JavaEE Application Server and NetBeans. We will be
-                            using JBoss and Eclipse.
-                        </para>
-                    </listitem>
-                    <listitem>
-                        <para>
-                            Install the JDK and associated JRE in a
-                            directory that does not have spaces in its path.
-                        </para>
-                        <note>
-                            <title>Windows/Oracle JDK Users: stay awake here!!!</title>
-                            <para>
-                                The Oracle Windows JDK installer will attempt to place
-                                the JDK and JRE in a directory with spaces. Be sure to
-                                override the installer defaults when it prompts you for 
-                                installation directory.    
-                            </para>
-                        </note>
-                    </listitem>
-                    <listitem>
-                        <para>Define an environment variable JAVA_HOME to reference the JDK</para>
-                    </listitem>
-                    <listitem>
-                        <para>Add JAVA_HOME/bin to your PATH if necessary</para>
-                    </listitem>
-                </orderedlist>
-            </listitem>
+            <listitem><para>Mac Users <ulink url="https://adoptopenjdk.net/">AdoptOpenJDK</ulink> or thru package manager (e.g., brew)
+                </para></listitem>
+            <listitem><para>Linux Users thru package manager (e.g., yum, apt)
+                <programlisting language=""><![CDATA[$ sudo apt install openjdk-11-jdk]]></programlisting>
+                </para></listitem>
+            <listitem><para>Windows Users <ulink url="https://www.azul.com/downloads/zulu-community/">Azul OpenJDK</ulink>
+                </para></listitem>
         </itemizedlist>
+    </section>
+
+    <section id="devenv-jdk-path">
+      <title>Add JDK to PATH</title>
+      <itemizedlist spacing="compact">
+          <listitem>
+              <para>Define an environment variable JAVA_HOME to reference the JDK</para>
+                  <figure>
+                      <title>Mac Example</title>
+          <programlisting language=""><![CDATA[export JAVA_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home/]]></programlisting>
+                  </figure>
+          </listitem>
+          <listitem>
+              <para>Add JAVA_HOME/bin to your PATH if necessary</para>
+          </listitem>
+      </itemizedlist>
     </section>
 
     <section id="devenv-jdk-verify">
@@ -100,23 +63,39 @@ Enter to keep the current selection[+], or type selection number: 3
         <listitem><para>Depending on how you performed the installation, you may need to add
             the JDK to your PATH</para></listitem>
         <listitem><figure>
-            <title>Fedora Example</title>
+            <title>Mac Example</title>
 <programlisting language=""><![CDATA[$ java -version
-java version "1.8.0_181"
-Java(TM) SE Runtime Environment (build 1.8.0_181-b13)
-Java HotSpot(TM) 64-Bit Server VM (build 25.181-b13, mixed mode) 
- 
+openjdk version "11.0.4" 2019-07-16
+OpenJDK Runtime Environment AdoptOpenJDK (build 11.0.4+11)
+OpenJDK 64-Bit Server VM AdoptOpenJDK (build 11.0.4+11, mixed mode)
+
 $ javac -version
-javac 1.8.0_181]]></programlisting>
+javac 11.0.4]]></programlisting>
+            </figure>
+
+        </listitem>        
+
+        <listitem><figure>
+            <title>Ubuntu Linux Example</title>
+ <programlisting language=""><![CDATA[$ java -version
+openjdk version "11.0.4" 2019-07-16
+OpenJDK Runtime Environment (build 11.0.4+11-post-Ubuntu-1ubuntu218.04.3)
+OpenJDK 64-Bit Server VM (build 11.0.4+11-post-Ubuntu-1ubuntu218.04.3, mixed mode, sharing)
+
+$ javac -version
+javac 11.0.4]]></programlisting>
             </figure>
 
         </listitem>        
         <listitem><figure>
-            <title>Windows Example (TODO: Update Example)</title>
+            <title>Windows Example</title>
  <programlisting language=""><![CDATA[> java -version
+openjdk version "11.0.4" 2019-07-16 LTS
+OpenJDK Runtime Environment Zulu11.33+15-CA (build 11.0.4+11-LTS)
+OpenJDK 64-Bit Server VM Zulu11.33+15-CA (build 11.0.4+11-LTS, mixed mode)
 
-> javac -version
-]]></programlisting>
+>javac -version
+javac 11.0.4]]></programlisting>
             </figure>
 
         </listitem>        

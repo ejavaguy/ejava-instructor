@@ -12,9 +12,17 @@
     </para>
     <figure>
         <title>Verifying if Git is Installed</title>
-<programlisting><![CDATA[//my fedora system
+<programlisting><![CDATA[//my Ubuntu system
 $ git --version
-git version 2.1.0
+git version 2.17.1
+]]></programlisting>
+<programlisting><![CDATA[//my Mac system
+$ git --version
+git version 2.22.0
+]]></programlisting>
+<programlisting><![CDATA[//my Windows system
+>git --version
+git version 2.22.0.windows.1
 ]]></programlisting>
     </figure>
 
@@ -36,8 +44,28 @@ git version 2.1.0
             <listitem>
                 <para>
                     Linux Command-Line Users: Use your package 
-                    installer. Select git-core, gitk, and git-gui packages.
+                    installer. My normal choice is to select git, gitk, and git-gui packages.
                 </para>
+<programlisting><![CDATA[//my Ubuntu system
+$ sudo apt update
+$ sudo apt install git gitk git-gui
+
+$ git --version
+git version 2.17.1
+]]></programlisting>
+            </listitem>
+            <listitem>
+                <para>
+                    Mac Users: Although confusing at times, I find most development tools 
+                    are available thru the brew package manager.
+                </para>
+<programlisting><![CDATA[//my Mac
+$ brew update
+$ brew install git
+
+$ git --version
+git version 2.22.0
+]]></programlisting>
             </listitem>
             <listitem>
                 <para>
@@ -47,20 +75,14 @@ git version 2.1.0
             </listitem>
             <listitem>
                 <para>
-                    Windows Command-Line Users: Git comes in a core
-                    layer and then OS-layer add-ons. The core layer is
-                    sufficient for class and can be found at
-                    <ulink url="http://msysgit.github.io/">http://msysgit.github.io/</ulink>                    
+                    Windows Command-Line Users: Use one of the many available packagings for Git
                 </para>
-                <note>
-                    <title>There are othe sources of Git for Windows</title>
-                    <itemizedlist spacing="compact">
-                        <listitem><para><ulink url="https://git-scm.com/">git-scm.com</ulink></para></listitem>
-                        <listitem><para><ulink url="https://code.google.com/p/tortoisegit/">TortoiseGit</ulink></para></listitem>
-                        <listitem><para><ulink url="http://git-for-windows.github.io/">git-for-windows.github.io</ulink></para></listitem>
-                    </itemizedlist>
-
-                </note>
+                <itemizedlist spacing="compact">
+                    <listitem><para><ulink url="https://git-scm.com/">git-scm.com</ulink></para></listitem>
+                    <listitem><para><ulink url="https://code.google.com/p/tortoisegit/">TortoiseGit</ulink></para></listitem>
+                    <listitem><para><ulink url="http://git-for-windows.github.io/">git-for-windows.github.io</ulink></para></listitem>
+                </itemizedlist>
+                <para>git-scm example</para>
                 <orderedlist spacing="compact">
                     <listitem>
                         <para>
@@ -68,19 +90,29 @@ git version 2.1.0
                         </para>
                     </listitem>
                     <listitem>
-                        <para>Accept the default installation option of
-                            "Use Git Bash bash only". As the prompt
-                            states, it has the least risk and will be suitable 
-                            for the minor amount of use required in class.
+                        <para>Pick your choice of editors.
                         </para>
                     </listitem>
                     <listitem>
-                        <para>Chose your checkout style. Don't worry about 
+                        <para>Pick how deeply integrated with the Windows shell
+                            you want Git and Git bash commands to be. When working
+                            on Windows systems, I find the Git bash shell to be a 
+                            very usable and lightweight alternative to Cygwin.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>Choose your checkout style. Don't worry about 
                             commit style you will only be performing
                             read-only checkouts. I chose "Checkout as-is,
                             commit Unix-style line endings" since I used all
                             linux-style editors on Windows. You may want the
                             Window checkout format.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>Choose your terminal window. I would recommend 
+                            anything over the default Windows console window
+                            -- but that is a personal preference.
                         </para>
                     </listitem>
                     <listitem>

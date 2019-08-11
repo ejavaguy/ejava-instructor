@@ -13,13 +13,14 @@
                 <para>
                     Download Maven 3
                     <ulink url="http://maven.apache.org/download.html">http://maven.apache.org/download.html</ulink>
+                    or download thru a package manager
                 </para>
             </listitem>
             <listitem>
                 <para>
                     Unzip the contents into a directory with no spaces in its path.
                 </para>
-                <programlisting><![CDATA[$ ls apache-maven-3.5.4
+                <programlisting><![CDATA[$ ls apache-maven-3.6.1
 bin  boot  conf  lib  LICENSE  NOTICE  README.txt]]></programlisting>
             </listitem>
             <listitem>
@@ -27,27 +28,41 @@ bin  boot  conf  lib  LICENSE  NOTICE  README.txt]]></programlisting>
                     Add an environment variable for MAVEN_HOME and
                     add MAVEN_HOME/bin to your PATH
                 </para>
-                <programlisting><![CDATA[# my linux system -- should be done in .bashrc
-export MAVEN_HOME=/opt/apache-maven-3.5.4
+                <programlisting><![CDATA[# my bash systems -- should be done in .bashrc or .bash_profile
+export MAVEN_HOME=/opt/apache-maven-3.6.1
 export PATH=$MAVEN_HOME/bin:$PATH
 
-# my windows system -- should be done in Advanced System Settings->Environment Variables
-set MAVEN_HOME=/apps/apache-maven-3.5.4
+
+# my Windows system -- should be done in Advanced System Settings->Environment Variables
+set MAVEN_HOME=c:/apps/apache-maven-3.6.1
 set PATH=%MAVEN_HOME%\bin;%PATH%
 ]]></programlisting>
             </listitem>
             <listitem>
                 <para>Verify maven is installed and in the path</para>
-                <programlisting><![CDATA[//my fedora system
+                <programlisting><![CDATA[//my Ubuntu system
 $ mvn -version
-Apache Maven 3.5.4 (1edded0938998edf8bf061f1ceb3cfdeccf443fe; 2018-06-17T14:33:14-04:00)
-Maven home: /opt/apache-maven-3.5.4
-Java version: 1.8.0_181, vendor: Oracle Corporation, runtime: /usr/java/jdk1.8.0_181-amd64/jre
+Apache Maven 3.6.1 (d66c9c0b3152b2e69ee9bac180bb8fcc8e6af555; 2019-04-04T15:00:29-04:00)
+Maven home: /opt/apache-maven-3.6.1
+Java version: 11.0.4, vendor: Ubuntu, runtime: /usr/lib/jvm/java-11-openjdk-amd64
 Default locale: en_US, platform encoding: UTF-8
-OS name: "linux", version: "4.1.13-100.fc21.x86_64", arch: "amd64", family: "unix"
+OS name: "linux", version: "5.0.0-23-generic", arch: "amd64", family: "unix"
 
-//my windows xp system
-> mvn --version
+//my Mac system - installed via brew
+$ mvn -version
+Apache Maven 3.6.1 (d66c9c0b3152b2e69ee9bac180bb8fcc8e6af555; 2019-04-04T15:00:29-04:00)
+Maven home: /usr/local/Cellar/maven/3.6.1/libexec
+Java version: 1.8.0_202, vendor: AdoptOpenJdk, runtime: /Library/Java/JavaVirtualMachines/adoptopenjdk-8.jdk/Contents/Home/jre
+Default locale: en_US, platform encoding: UTF-8
+OS name: "mac os x", version: "10.14.5", arch: "x86_64", family: "mac"
+
+//my Windows system
+>mvn -version
+Apache Maven 3.6.1 (d66c9c0b3152b2e69ee9bac180bb8fcc8e6af555; 2019-04-04T15:00:29-04:00)
+Maven home: C:\apps\apache-maven-3.6.1\bin\..
+Java version: 11.0.4, vendor: Azul Systems, Inc., runtime: C:\apps\zulu-openjdk11
+Default locale: en_US, platform encoding: Cp1252
+OS name: "windows 10", version: "10.0", arch: "amd64", family: "windows"
 ]]></programlisting>
             </listitem>
         </orderedlist>
@@ -64,9 +79,12 @@ OS name: "linux", version: "4.1.13-100.fc21.x86_64", arch: "amd64", family: "uni
                 </para>
                 <orderedlist spacing="compact">
                     <listitem>
+                        <para>Create a <code>.m2</code> directory below your HOME directory.</para>
+                    </listitem>
+                    <listitem>
                         <para>
                             Add the following to the<code>.m2/settings.xml</code>
-                            file in your HOME directory.
+                            file below your HOME directory.
                         </para>
                         <programlisting language="xml"><![CDATA[<?xml version="1.0"?>
 <settings xmlns="http://maven.apache.org/POM/4.0.0"
@@ -74,7 +92,7 @@ OS name: "linux", version: "4.1.13-100.fc21.x86_64", arch: "amd64", family: "uni
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
 
     <offline>false</offline>
-    
+
     <profiles>
     </profiles>
     
@@ -185,9 +203,62 @@ windows> set MAVEN_OPTS=-Xmx512m
 
 windows> %HOME%\mavenrc_pre.bat
 ]]></programlisting>                        
-            <para>
-                You can also set them using shell-specific techniques.
-            </para>
+        </note>
+
+        <note>
+            <title>PKCS12 trustStores</title>
+
+            <para>If you are getting the following error...</para>
+<programlisting><![CDATA[[ERROR]     Unexpected error: java.security.InvalidAlgorithmParameterException: the trustAnchors parameter must be non-empty -> [Help 2]
+]]></programlisting>                        
+            <para>and a <code>-list</code> of the default cacerts file without a password produces a type of <code>PKCS12</code>
+               and 0 entries ...</para>
+<programlisting><![CDATA[$ keytool -list -cacerts
+Enter keystore password:
+Keystore type: PKCS12
+Keystore provider: SUN
+Your keystore contains 0 entries
+]]></programlisting>                        
+            <para>and executing the same command with a <code>changeit</code> password produces entries...</para>
+<programlisting><![CDATA[$ keytool -list -cacerts
+Enter keystore password: changeit
+Keystore type: PKCS12
+Keystore provider: SUN
+Your keystore contains 134 entries
+]]></programlisting>
+
+            <para>then you have a post JDK9 generated truststore and will need to supply the password each time
+            you execute a Java command. The former default format of truststores was changed from JKS to PKCS12
+            in JDK9. JKS allows access to public keys without a password. PKCS12 requires a password.</para>
+<programlisting><![CDATA[$ mvn clean install -Djavax.net.ssl.trustStorePassword=changeit
+]]></programlisting>
+            <para>One workaround would be to add the trustStore password to the <code>.mavenrc</code> mentioned
+            earlier. 
+<programlisting><![CDATA[bash> export MAVEN_OPTS="-Djavax.net.ssl.trustStorePassword=changeit"
+windows> set MAVEN_OPTS=-Djavax.net.ssl.trustStorePassword=changeit
+]]></programlisting>
+            Another workaround option is to regenerate the truststore as a JKS that does not require a password
+            to obtain public certs. Edit the <code>security/java.security</code> property file</para>
+<programlisting><![CDATA[sudo vi /etc/java-11-openjdk/security/java.security
+]]></programlisting>
+            <para>Change the <code>keystore.type</code> from <code>pkcs12</code> to <code>jks</code>.</para>
+<programlisting><![CDATA[274 # Default keystore type.
+ 275 #
+ 276 #keystore.type=pkcs12
+ 277 keystore.type=jks
+]]></programlisting>
+            <para>Remove the existing <code>cacerts</code> file and re-generate it.</para>
+<programlisting><![CDATA[$ sudo rm /etc/ssl/certs/java/cacerts 
+$ sudo update-ca-certificates -f
+]]></programlisting>
+            <para>The newly generated <code>cacerts</code> file will be of type <code>JKS</code>
+               and enable access to public certs without a password.</para>
+<programlisting><![CDATA[$ keytool -list -cacerts
+Enter keystore password:
+Keystore type: JKS
+Keystore provider: SUN
+Your keystore contains 133 entries
+]]></programlisting>
         </note>
     </section>
     
@@ -198,8 +269,7 @@ windows> %HOME%\mavenrc_pre.bat
         </para>
         <figure>
             <title>Missing Maven Dependency Error/Warning Message</title>
-<programlisting language=""><![CDATA[
-Failure to find com.oracle:ojdbc6:pom:11.2.0.3 in ... 
+<programlisting language=""><![CDATA[Failure to find com.oracle:ojdbc6:pom:11.2.0.3 in ... 
 was cached in the local repository, resolution will not be reattempted until the update interval of 
 ... has elapsed or updates are forced.
 ]]></programlisting>                        
@@ -210,6 +280,7 @@ was cached in the local repository, resolution will not be reattempted until the
             the artifact directly from the vendor and manually install it in your local repository.
         </para>
         <note>
+            <title>This is only an example!!!</title>
             <para>
                 This is only an example. You are *not* required to download if the Oracle database driver for
                 class. You can create a dummy file ($ touch dummy.jar) and register it using
