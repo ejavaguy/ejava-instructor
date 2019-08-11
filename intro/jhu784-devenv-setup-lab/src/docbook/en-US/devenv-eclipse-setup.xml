@@ -5,12 +5,24 @@
 <chapter id="devenv-eclipse-setup">
     <title>Eclipse Setup</title>
     <para>
-        The most current version of Eclipse is Photon. However, August/September is the 
-        worst time to switch to the newest Eclipse platform since they normally release
-        in the summer and the previous release from last year has had a chance to receive bug fixes and 
-        performance patches. I am going to follow my own advice and stick last year's
-        model (Oxygen) -- which has had some time to mature. You may use Photon or another IDE entirely.
+        The most current release of Eclipse IDE as of preparing these instructions is 2019-06. Eclipse IDE
+        seems to have gone from a yearly release cycle to a three month release cycle . When they followed
+        a yearly release cycle -- it was always released in the August/Sepember timeframe and that was the 
+        worst time to switch. The best time to upgrade when they followed the yearly cycle was in the 
+        Janurary timeframe when issues had been reported and patches had time to be released. 
+        I am not sure yet how to time the new 
+        three month cycles -- but needless to say "the latest" is not a requirement for this course.
+        If you already have an IDE or a version of Eclipse that you are comfortable with -- there should 
+        be no reason to upgrade.
     </para>
+
+    <note>
+        <title>No Course Requirement for Eclipse IDE</title>
+        <para>
+          There is no course requirement that you use Eclipse IDE or the latest Eclipse IDE. Many students
+          have completed this course using IntelliJ.
+        </para>
+    </note>
 
     <section id="devenv-eclipse-install">
         <title>Download and Install Eclipse</title>
@@ -18,30 +30,40 @@
             <listitem>
                 <para>
                     Download Eclipse IDE for JavaEE Developers 
-                    <ulink url="https://www.eclipse.org/downloads/packages/release/oxygen/3a/eclipse-ide-java-ee-developers">https://www.eclipse.org/downloads/packages/release/oxygen/3a/eclipse-ide-java-ee-developers</ulink>
+                    <ulink url="https://www.eclipse.org/downloads/packages/release/2019-06/r/eclipse-ide-enterprise-java-developers">Eclipse IDE for Enterprise Developers</ulink>
                     or latest from
-                    <ulink url="https://www.eclipse.org/downloads/packages/release/oxygen">https://www.eclipse.org/downloads/packages/release/oxygen</ulink>
+                    <ulink url="https://www.eclipse.org/downloads/packages">Eclipse Packages</ulink>
                     or 
-                    <ulink url="http://eclipse.org/downloads">http://eclipse.org/downloads</ulink>
+                    <ulink url="http://eclipse.org/downloads">Eclipse Downloads</ulink>
                 </para>
             </listitem>
-            <listitem><para>Unzip the downloaded archive.</para>
-<programlisting><![CDATA[$ tar xzf ~/Downloads/eclipse-jee-xxxx-xx-linux-gtk-x86_64.tar.gz
 
-$ ls eclipse
-artifacts.xml  configuration  dropins  eclipse  eclipse.ini  features  icon.xpm  p2  plugins  readme
-]]></programlisting>                        
+            <listitem><para>Install Eclipse IDE for JavaEE Developers and Start</para>
+              <itemizedlist spacing="compact">
+                <listitem><para>For the Mac installation, a .dmg was provided. Install Eclipse to the 
+                    Applications folder, pin it to the taskbar so that it is easy to locate, and 
+                    start Eclipse.
+                    </para></listitem>
+                <listitem><para>For the Linux installation, a tar.gz archive was provided. Exctract this to a 
+                    location on your computer, and start Eclipse.
+                    </para></listitem>
+                <listitem><para>For the Windows installation, a .zip archive was provided. Extract this to a 
+                    location on your computer, pin the <code>eclipse</code> executable
+                    to the taskbar so that it is easy to locate, and start Eclipse.
+                    </para></listitem>
+              </itemizedlist>
             </listitem>
-            <listitem><para>Create a shortcut for starting Eclipse</para></listitem>
-            <listitem><para>Start Eclipse</para></listitem>
         </orderedlist>
+    </section>
+
+    <section id="devenv-eclipse-import">
     </section>
     
     <section id="devenv-eclipse-jdk">
         <title>Define JDK location</title>
         <para>Eclipse will default to the JRE when launching most tools/applications.
             Sometimes this can be an issue and requires a JDK. Add the JDK and make it 
-            your default JRE.</para>
+            your default JRE. Make sure it is JDK 11.</para>
         <orderedlist spacing="compact">
             <listitem><para>Window-&gt;Preferences-&gt;Java-&gt;Installed JREs</para></listitem>
             <listitem><para>press Add..-&gt;Standard VM and reference the JDK instance you installed earlier</para></listitem>
@@ -79,16 +101,16 @@ artifacts.xml  configuration  dropins  eclipse  eclipse.ini  features  icon.xpm 
                 <orderedlist spacing="compact">
                     <listitem><para>Select Window-&gt;Open Perspective-&gt;Other-&gt;Java</para></listitem>
                     <listitem><para>Select Top Level Elements-&gt;Working Sets from the down-facing triangle in the top-right corner of the Package Explorer.</para></listitem>
-                    <listitem><para>Create a New Java Working Set and call it "class-examples"</para></listitem>
+                    <listitem><para>Create a New Java Working Set and call it "javase"</para></listitem>
                     <listitem><para>Press OK</para></listitem>
                 </orderedlist>
             </listitem>
             <listitem><para>Import the class examples into Eclipse as a Maven Project</para>
                 <orderedlist spacing="compact">
-                    <listitem><para>Right click on "class-examples" in the Package 
+                    <listitem><para>Right click on "javase" in the Package 
                         Explorer and select Import...-&gt;Maven-&gt;Existing Maven Projects</para></listitem>
                     <listitem><para>Browse to the project area where you performed 
-                        the Git checkout earlier and select the javase/javase5Enhancements folder.</para></listitem>
+                        the Git checkout earlier and select the <code>javase</code> folder.</para></listitem>
                     <listitem><para>Select Next to have the current project(s)
                         added to the selected working set.</para>
                     <note>
@@ -103,7 +125,7 @@ artifacts.xml  configuration  dropins  eclipse  eclipse.ini  features  icon.xpm 
                     </listitem>
                     <listitem>
                         <para>
-                            Build and test the application using 
+                            Build and test the <code>javase5Enhancements</code> application using 
                             Run As-&gt;Maven Install by right clicking on any of the 
                             project folders.
                        </para>
@@ -166,8 +188,8 @@ openFile
             <listitem><para>Type <code>Wildfly</code> into the seach field and press Go</para></listitem>
             <listitem><para>Click Install for the <code>JBoss Tools</code></para></listitem>
             <listitem><para>Complete the installation steps for JBoss Tools. There
-                are many tools in the repository. Not all of them are
-                needed for class or obvious how to use them without more investigation. 
+                are many tools in the repository. Very few of them are
+                needed for class or not obvious how to use them without more investigation. 
                 Choose the following suggested minimal set.</para>
                 <itemizedlist spacing="compact">
                     <listitem><para>Context and Dependency Injection Tools</para></listitem>
@@ -190,13 +212,15 @@ openFile
                 <orderedlist spacing="compact">
                     <listitem><para>Open the JavaEE Perspective</para></listitem>
                     <listitem><para>Select "new server wizard..." in the Servers panel</para></listitem>
-                    <listitem><para>Select Wildfly 12 under the 
-                        JBoss Community folder (works with Wildfly 13.x as well)</para></listitem>
+                    <listitem><para>Select Wildfly 17 under the 
+                        JBoss Community folder</para></listitem>
+                    <listitem><para>Select defaults for location, controlled by, 
+                        and create new runtime.</para></listitem>
                     <listitem><para>Set HOME to your wildfly installation directory
-                       using the Browse button on the next panel</para></listitem>
-                    <listitem><para>Name the server "standalone" and leave the 
-                       to match the default "standalone.xml" configuration file.</para></listitem>
-                    <listitem><para>Set the JRE to the default 'real' JRE</para></listitem>
+                       using the Browse button on the next panel.</para></listitem>
+                    <listitem><para>Set the JRE to JavaSE-11</para></listitem>
+                    <listitem><para>Leave the server base directory as "standalone" and 
+                       configuration to "standalone.xml".</para></listitem>
                     <listitem><para>Review options. Note that I generally start my 
                         server externally so that standard output does not compete 
                         with my other actions within Eclipse. However, there are
