@@ -11,7 +11,7 @@
     </para>
     
     <note>
-        <para>The latest version of Ant is 1.10.5. Older versions of Ant will 
+        <para>The latest version of Ant is 1.10.6. Older versions of Ant will 
             work as well (e.g., 1.9.x) if you already have it installed.</para>
     </note>
 
@@ -20,7 +20,7 @@
         <itemizedlist spacing="compact">
             <listitem><para>Linux users - use your package installer or follow the Windows instructions.</para>
             </listitem>
-            <listitem><para>Windows users</para>
+            <listitem><para>Windows and Mac users</para>
                 <orderedlist spacing="compact">
                     <listitem><para>Download Apache Ant from <ulink url="http://ant.apache.org/">http://ant.apache.org/</ulink></para></listitem>
                     <listitem><para>Unzip the archive to directory without spaces in its path</para></listitem>
@@ -32,7 +32,7 @@
                 <para>Verify Ant is in your PATH</para>
 <programlisting language=""><![CDATA[
 > ant -version
-Apache Ant(TM) version 1.10.5 compiled on July 10 2018
+Apache Ant(TM) version 1.10.6 compiled on July 10 2018
 ]]></programlisting>                        
             </listitem>
         </itemizedlist>
