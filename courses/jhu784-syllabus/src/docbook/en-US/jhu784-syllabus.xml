@@ -86,9 +86,9 @@
             </row>
             <row rowsep="1">
               <!--
-              <entry namest="comment">Project 1 - due by Sun, 8am Oct13</entry>
+              <entry namest="comment"><link linkend="edatashare-project1-part">Project 1</link> due by Sun, 8am Oct13</entry>
               -->
-              <entry namest="comment"><link linkend="edatashare-project1-part">Project 1</link> due by Sun, 8am Oct14</entry>
+              <entry namest="comment">Project 1 - due by Sun, 8am Oct13</entry>
             </row>
             <row rowsep="1">
               <entry namest="topic"><para><link linkend="jpa-tuning">JPA/SQL Tuning</link></para></entry>
@@ -176,9 +176,9 @@
 
             <row rowsep="1">
               <!--
-              <entry namest="comment">Project 2</link> due by Sun, 8am Nov17</entry>
-              -->
               <entry namest="comment"><link linkend="edatashare-project2-part">Project 2</link> due by Sun, 8am Nov17</entry>
+              -->
+              <entry namest="comment">Project 2</link> due by Sun, 8am Nov17</entry>
             </row>
 
             <row rowsep="1">
@@ -250,9 +250,9 @@
             </row>
             <row rowsep="1">
               <!--
-              <entry namest="comment">Project 3</link> due by Sun, 5pm Dec09</entry>
-              -->
               <entry namest="comment"><link linkend="edatashare-project3-part">Project 3</link> due by Sun, 5pm Dec09</entry>
+              -->
+              <entry namest="comment">Project 3</link> due by Sun, 5pm Dec09</entry>
             </row>
 
                 <!--
